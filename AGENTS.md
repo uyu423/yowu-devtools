@@ -651,6 +651,25 @@ if (shouldUseWorker(input)) {
 }
 ```
 
+## 문서 구조
+
+### Root 디렉토리 (즉시 참고 문서)
+- `README.md`: 프로젝트 개요 및 시작 가이드
+- `AGENTS.md`: AI Agent 작업 가이드 (이 문서)
+- `.cursorrules`: Cursor IDE 규칙
+- `SAS.md`: 상세 요구사항 명세 (Software Architecture Specification)
+- `IMPLEMENTATION_PLAN.md`: 구현 계획 및 체크리스트
+- `RELEASE_NOTES.md`: 릴리스 노트
+- `TEST_CHECKLIST.md`: 테스트 체크리스트
+
+### docs/ 디렉토리 (기타 문서)
+- `docs/V1.2.0_CROSS_CHECK.md`: v1.2.0 크로스 체크 결과
+- `docs/PWA_TROUBLESHOOTING.md`: PWA 트러블슈팅 가이드
+- `docs/TEST_RESULTS_v1.1.0.md`: v1.1.0 테스트 결과
+- `docs/TEST_ISSUES_v1.1.0.md`: v1.1.0 테스트 이슈
+
+**참고**: 핵심 개발 문서(`SAS.md`, `IMPLEMENTATION_PLAN.md`, `RELEASE_NOTES.md`, `TEST_CHECKLIST.md`)는 root에 두고, 나머지 기타 자질구레한 문서들(크로스 체크 결과, 트러블슈팅 가이드, 테스트 결과 등)은 `docs/` 하위에 생성하세요.
+
 ### 주의사항
 
 - Worker는 메인 스레드와 메시지 통신만 가능 (직접 DOM 접근 불가)
