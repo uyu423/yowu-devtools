@@ -28,6 +28,7 @@
 - ✨ **New Tools**:
   - Hash Generator: SHA-256, SHA-1, SHA-384, SHA-512, HMAC support (WebCrypto API)
   - UUID/ULID Generator: Generate UUID v4/v7 and ULID with batch generation (up to 100 IDs)
+  - Query String Parser: Parse and visualize URL query parameters with decoding options
 
 **Improvements:**
 

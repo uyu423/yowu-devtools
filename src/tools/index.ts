@@ -11,6 +11,7 @@ import { jwtEncoderTool } from './jwt-encoder';
 import { hashTool } from './hash';
 import { uuidTool } from './uuid';
 import { passwordTool } from './password';
+import { queryStringTool } from './query-string';
 
 export const tools: ToolDefinition[] = [
   jsonTool,
@@ -25,6 +26,7 @@ export const tools: ToolDefinition[] = [
   hashTool,
   uuidTool,
   passwordTool,
+  queryStringTool,
 ];
 
 export const getToolById = (id: string) => tools.find(t => t.id === id);

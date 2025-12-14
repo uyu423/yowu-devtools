@@ -330,6 +330,38 @@ const tools: ToolInfo[] = [
       'Copy individual or all passwords',
     ],
   },
+  {
+    id: 'url-parser',
+    path: '/url-parser',
+    title: 'URL Parser',
+    description:
+      'Parse and visualize URL components including protocol, host, path, fragment, and query parameters',
+    seoDescription:
+      'Free online URL parser. Parse and visualize URL components (protocol, host, path, fragment, query parameters) with decoding options. Client-side processing.',
+    keywords: [
+      'url parser',
+      'url analyzer',
+      'url decoder',
+      'url components',
+      'query string parser',
+      'query params',
+      'url parameters',
+      'url query parser',
+      'query string analyzer',
+      'url query string',
+      'query parameter parser',
+      'url query decoder',
+    ],
+    features: [
+      'Parse URL components (protocol, host, path, fragment)',
+      'Parse and visualize query parameters',
+      'Show decoded and raw values',
+      'Copy individual URL components',
+      'Copy individual parameters',
+      'Copy entire query string',
+      'Real-time parsing',
+    ],
+  },
 ];
 
 export function generateRoutes(): Plugin {

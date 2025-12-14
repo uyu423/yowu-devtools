@@ -355,3 +355,15 @@ src/
   - [ ] 복사 기능 (단일/일괄)
   - [ ] 유효성 검사 (최소 하나의 문자 유형 선택)
   - [ ] 도구 등록 및 SEO 정보 추가
+
+- [ ] **Query String Parser**:
+  - [ ] `src/tools/query-string/index.tsx` 생성
+  - [ ] URL 또는 query string 입력 받기
+  - [ ] Query string 파싱 로직 구현 (`URLSearchParams` 또는 직접 파싱)
+  - [ ] 파라미터 구조화 표시 (테이블 또는 카드 형태)
+  - [ ] 디코딩 옵션 (`showDecoded`, `showRaw`)
+  - [ ] 개별 파라미터 복사 기능
+  - [ ] 전체 query string 복사 기능
+  - [ ] 에러 처리 (잘못된 URL, query string 없음)
+  - [ ] 실시간 파싱 (Debounce)
+  - [ ] 도구 등록 및 SEO 정보 추가
