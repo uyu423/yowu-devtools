@@ -1,9 +1,11 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { tools } from '@/tools';
-import { X, Moon, Sun, Laptop, Sparkles } from 'lucide-react';
+import { tools, getToolById } from '@/tools';
+import { X, Moon, Sun, Laptop, Sparkles, Star, Clock } from 'lucide-react';
 import { useTheme } from '@/hooks/useTheme';
+import { useFavorites } from '@/hooks/useFavorites';
+import { useRecentTools } from '@/hooks/useRecentTools';
 import logoImg from '@/assets/yowu-logo.jpeg';
 
 interface SidebarProps {
@@ -12,6 +14,23 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
   const { theme, setTheme } = useTheme();
+  const { favorites, toggleFavorite, isFavorite } = useFavorites();
+  const { recentTools } = useRecentTools();
+
+  // 즐겨찾기 도구 목록
+  const favoriteTools = favorites
+    .map((id) => getToolById(id))
+    .filter((tool): tool is NonNullable<typeof tool> => tool !== undefined);
+
+  // 최근 사용한 도구 목록
+  const recentToolItems = recentTools
+    .map(({ toolId }) => getToolById(toolId))
+    .filter((tool): tool is NonNullable<typeof tool> => tool !== undefined);
+
+  // 즐겨찾기/최근 사용에 포함되지 않은 도구 목록
+  const otherTools = tools.filter(
+    (tool) => !favorites.includes(tool.id) && !recentTools.some((rt) => rt.toolId === tool.id)
+  );
 
   return (
     <div className="flex flex-col h-full bg-gray-50/50 dark:bg-gray-900 dark:border-gray-800 transition-colors">
@@ -42,28 +61,137 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
       
       {/* Nav List */}
       <div className="flex-1 overflow-y-auto py-4">
-        <nav className="space-y-1 px-3">
+        <nav className="space-y-4 px-3">
+          {/* 즐겨찾기 섹션 */}
+          {favoriteTools.length > 0 && (
+            <div>
+              <div className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+                <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                Favorites
+              </div>
+              <div className="space-y-1 mt-1">
+                {favoriteTools.map((tool) => (
+                  <NavLink
+                    key={tool.id}
+                    to={tool.path}
+                    onClick={onCloseMobile}
+                    className={({ isActive }) => cn(
+                      "group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
+                      isActive 
+                        ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300" 
+                        : "text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
+                    )}
+                  >
+                    {tool.icon && <tool.icon className="w-4 h-4 mr-3 opacity-70" />}
+                    <span className="flex-1">{tool.title}</span>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toggleFavorite(tool.id);
+                      }}
+                      className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-opacity"
+                      title="Remove from favorites"
+                    >
+                      <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
+                    </button>
+                  </NavLink>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 최근 사용한 도구 섹션 */}
+          {recentToolItems.length > 0 && (
+            <div>
+              <div className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+                <Clock className="w-3 h-3" />
+                Recent
+              </div>
+              <div className="space-y-1 mt-1">
+                {recentToolItems.map((tool) => (
+                  <NavLink
+                    key={tool.id}
+                    to={tool.path}
+                    onClick={onCloseMobile}
+                    className={({ isActive }) => cn(
+                      "group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
+                      isActive 
+                        ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300" 
+                        : "text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
+                    )}
+                  >
+                    {tool.icon && <tool.icon className="w-4 h-4 mr-3 opacity-70" />}
+                    <span className="flex-1">{tool.title}</span>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toggleFavorite(tool.id);
+                      }}
+                      className={cn(
+                        "opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-opacity",
+                        isFavorite(tool.id) && "opacity-100"
+                      )}
+                      title={isFavorite(tool.id) ? "Remove from favorites" : "Add to favorites"}
+                    >
+                      <Star className={cn(
+                        "w-3.5 h-3.5",
+                        isFavorite(tool.id) ? "fill-yellow-400 text-yellow-400" : ""
+                      )} />
+                    </button>
+                  </NavLink>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 전체 도구 리스트 */}
           {tools.length === 0 ? (
             <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
               No tools loaded
             </div>
           ) : (
-            tools.map(tool => (
-              <NavLink
-                key={tool.id}
-                to={tool.path}
-                onClick={onCloseMobile}
-                className={({ isActive }) => cn(
-                  "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
-                  isActive 
-                    ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300" 
-                    : "text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
-                )}
-              >
-                {tool.icon && <tool.icon className="w-4 h-4 mr-3 opacity-70" />}
-                {tool.title}
-              </NavLink>
-            ))
+            <div>
+              <div className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                All Tools
+              </div>
+              <div className="space-y-1 mt-1">
+                {otherTools.map(tool => (
+                  <NavLink
+                    key={tool.id}
+                    to={tool.path}
+                    onClick={onCloseMobile}
+                    className={({ isActive }) => cn(
+                      "group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
+                      isActive 
+                        ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300" 
+                        : "text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
+                    )}
+                  >
+                    {tool.icon && <tool.icon className="w-4 h-4 mr-3 opacity-70" />}
+                    <span className="flex-1">{tool.title}</span>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toggleFavorite(tool.id);
+                      }}
+                      className={cn(
+                        "opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-opacity",
+                        isFavorite(tool.id) && "opacity-100"
+                      )}
+                      title={isFavorite(tool.id) ? "Remove from favorites" : "Add to favorites"}
+                    >
+                      <Star className={cn(
+                        "w-3.5 h-3.5",
+                        isFavorite(tool.id) ? "fill-yellow-400 text-yellow-400" : ""
+                      )} />
+                    </button>
+                  </NavLink>
+                ))}
+              </div>
+            </div>
           )}
         </nav>
 
