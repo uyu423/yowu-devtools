@@ -64,8 +64,8 @@
 - 서버 기능/백엔드
 - 분석/로그(Analytics) 삽입
 - "외부 API 호출" 기반 기능(예: DNS 조회, HTTP 호출 등)
-- PWA/오프라인 캐시(추후 옵션)
-- JWT 검증 기능 (v1.1.0에서는 디코딩/인코딩만 제공, 검증은 제외)
+- ~~PWA/오프라인 캐시~~ ✅ v1.1.0에서 구현 완료 (`vite-plugin-pwa` 사용)
+- ~~JWT 검증 기능~~ ✅ v1.1.0에서 구현 완료 (서명 검증 포함)
 
 ---
 
@@ -939,21 +939,34 @@ export type ToolDefinition<TState> = {
 
 ## 14. 변경 이력
 
-- **v1.1.0** (2025-01-XX):
+- **v1.1.0** (2024-12-14):
 
-  - **사이드바 고도화**:
+  - **사이드바 고도화** ✅:
     - 최근 사용한 도구 리스트 추가 (최대 5개, localStorage 기반)
     - 즐겨찾기 리스트 및 메뉴 즐겨찾기 등록 기능 추가 (localStorage 기반)
     - 사이드바 UI 개선: 즐겨찾기/최근 사용 섹션 분리
-  - **Web App 지원**:
-    - `manifest.json` 추가로 Chrome 앱으로 등록 가능
-    - 독립 창으로 실행 가능
-    - 앱 아이콘 및 테마 색상 설정
-  - **신규 도구 추가**:
-    - JWT Encode/Decode 도구 추가 (디코딩/인코딩만 제공, 검증 기능 제외)
-  - **성능 개선**:
+    - `useRecentTools`, `useFavorites` 훅 구현 완료
+  - **Web App 지원** ✅:
+    - `vite-plugin-pwa` 도입으로 PWA 기능 완전 지원
+    - `manifest.json` 자동 생성 (Chrome 앱으로 등록 가능)
+    - 독립 창으로 실행 가능 (`standalone` 모드)
+    - 앱 아이콘 및 테마 색상 설정 완료
+    - Service Worker 기반 오프라인 캐싱 구현
+    - 자동 업데이트 알림 및 설치 프롬프트
+    - 오프라인 폴백 페이지 추가
+    - `usePWA` 훅 및 `PWAUpdatePrompt` 컴포넌트 구현
+  - **신규 도구 추가** ✅:
+    - JWT Encode/Decode 도구 추가
+    - JWT 디코딩: Header, Payload, Signature 분리 및 표시
+    - JWT 인코딩: Header/Payload JSON 입력 및 HMAC 서명 지원
+    - 서명 검증 기능 (HMAC, RSA, ECDSA)
+    - 토큰 유효성 검사 (만료 시간 확인)
+  - **성능 개선** ✅:
     - 큰 데이터 처리 시 Web Worker 도입으로 UI 프리징 방지
-    - JSON, Diff, YAML 변환 시 자동 Worker 사용 (입력 크기 기준)
+    - JSON 파싱: 1MB 이상 또는 10,000줄 이상 시 자동 Worker 사용
+    - Diff 계산: 10,000줄 이상 시 자동 Worker 사용
+    - YAML 변환: 큰 파일 처리 시 자동 Worker 사용
+    - `useWebWorker` 공통 훅 구현으로 코드 재사용성 향상
     - 로딩 인디케이터 추가
 
 - **v1.3** (2025-01-XX):
