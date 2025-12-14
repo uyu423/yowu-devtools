@@ -1,0 +1,9 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://github.com/uyu423/yowu-devtools/blob/main/SAS.md
+    about: Please check the full specification and UX rules before opening an issue.
+  - name: Release Notes
+    url: https://github.com/uyu423/yowu-devtools/blob/main/RELEASE_NOTES.md
+    about: Check what's new in recent releases.
+
