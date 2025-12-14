@@ -22,34 +22,15 @@ An open toolbox for developers who would rather keep sensitive snippets on their
 
 ## Release Notes
 
-### v1.1.0 (December 2024)
+See [RELEASE_NOTES.md](./RELEASE_NOTES.md) for detailed release notes.
 
-**New Features:**
+## Reporting Issues
 
-- ✨ **Enhanced Sidebar**: Recent tools list and favorites for quick access
-- ✨ **JWT Tool**: Decode and encode JSON Web Tokens with signature verification
-- ✨ **Web App Support**: Install as a Chrome app with PWA features
-  - Automatic updates with user-friendly prompts
-  - Offline caching with Service Worker
-  - Install prompt for easy app installation
-- ✨ **Performance Improvements**: Web Workers for large data processing
-  - JSON parsing for files > 1MB or 10,000+ lines
-  - Text diff calculation for large comparisons
-  - YAML conversion for large files
-
-**Improvements:**
-
-- 🎨 Improved offline fallback page design
-- 🔔 Update notifications when new versions are available
-- 📱 Better mobile experience with PWA support
-- ⚡ Faster processing of large datasets without UI freezing
-
-**Technical:**
-
-- Migrated to `vite-plugin-pwa` for better PWA support
-- Added `useWebWorker` hook for reusable Worker logic
-- Enhanced caching strategies (Network First, Cache First)
-- Improved Service Worker management with automatic updates
+This project does not collect any logs or analytics. If you encounter a bug or error, please report it by opening a [GitHub Issue](https://github.com/uyu423/yowu-devtools/issues). Include as much detail as possible:
+- Steps to reproduce the issue
+- Expected behavior
+- Actual behavior
+- Browser and OS information (if relevant)
 
 For the full specification, UX rules, and backlog, read `SAS.md`. This README intentionally stays high level so we avoid duplicating that source of truth.
 
