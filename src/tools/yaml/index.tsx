@@ -6,6 +6,7 @@ import { ToolHeader } from '@/components/common/ToolHeader';
 import { EditorPanel } from '@/components/common/EditorPanel';
 import { ActionBar } from '@/components/common/ActionBar';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
+import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
 import { useTitle } from '@/hooks/useTitle';
 import { copyToClipboard } from '@/lib/clipboard';
@@ -103,9 +104,10 @@ const YamlTool: React.FC = () => {
       <ActionBar className="mt-4 flex-wrap items-center justify-between">
         <label 
           className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300"
-          title="Adjust the indentation width used when formatting converted output."
         >
-          <span>Indent</span>
+          <OptionLabel tooltip="Adjust the indentation width used when formatting converted output. This controls how many spaces are used for each level of nesting in the converted YAML or JSON.">
+            Indent
+          </OptionLabel>
           <select 
             className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-2 py-1"
             value={state.indent}

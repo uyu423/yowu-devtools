@@ -34,7 +34,43 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
   status = 'default',
 }) => {
   const { theme } = useTheme();
-  const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  
+  // 실제 DOM의 dark 클래스를 확인하여 정확한 상태 추적
+  const [isDark, setIsDark] = React.useState(() => {
+    if (typeof window === 'undefined') return false;
+    return document.documentElement.classList.contains('dark');
+  });
+
+  // 테마 변경 감지
+  React.useEffect(() => {
+    const checkTheme = () => {
+      setIsDark(document.documentElement.classList.contains('dark'));
+    };
+
+    // 초기 확인
+    checkTheme();
+
+    // MutationObserver로 클래스 변경 감지
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+
+    // 미디어 쿼리 변경 감지 (system 모드일 때)
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleMediaChange = () => {
+      if (theme === 'system') {
+        checkTheme();
+      }
+    };
+    mediaQuery.addEventListener('change', handleMediaChange);
+
+    return () => {
+      observer.disconnect();
+      mediaQuery.removeEventListener('change', handleMediaChange);
+    };
+  }, [theme]);
 
   return (
     <div
@@ -54,6 +90,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
       )}
       <div className="flex-1 min-h-0 overflow-hidden">
         <CodeMirror
+          key={`editor-${isDark ? 'dark' : 'light'}`}
           value={value}
           height="100%"
           className="h-full text-sm font-mono"

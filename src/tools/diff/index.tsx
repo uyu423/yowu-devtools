@@ -5,6 +5,7 @@ import { FileDiff } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { EditorPanel } from '@/components/common/EditorPanel';
 import { ActionBar } from '@/components/common/ActionBar';
+import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useTitle } from '@/hooks/useTitle';
@@ -102,28 +103,30 @@ const DiffTool: React.FC = () => {
 
           <div className="flex flex-wrap items-center gap-4 text-sm text-gray-700 dark:text-gray-300">
             <label 
-              className="flex items-center gap-2"
-              title="Treat changes that only add or remove whitespace as no-ops."
+              className="flex items-center gap-2 cursor-pointer"
             >
               <input 
                 type="checkbox" 
-                className="rounded border-gray-300 dark:border-gray-600"
+                className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-500 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-0 cursor-pointer"
                 checked={state.ignoreWhitespace}
                 onChange={(e) => updateState({ ignoreWhitespace: e.target.checked })}
               />
-              <span>Ignore Whitespace</span>
+              <OptionLabel tooltip="Treat changes that only add or remove whitespace (spaces, tabs, newlines) as no-ops. This helps focus on actual content changes rather than formatting differences.">
+                Ignore Whitespace
+              </OptionLabel>
             </label>
             <label 
-              className="flex items-center gap-2"
-              title="Compare both inputs case-insensitively."
+              className="flex items-center gap-2 cursor-pointer"
             >
               <input 
                 type="checkbox" 
-                className="rounded border-gray-300 dark:border-gray-600"
+                className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-500 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-0 cursor-pointer"
                 checked={state.ignoreCase}
                 onChange={(e) => updateState({ ignoreCase: e.target.checked })}
               />
-              <span>Ignore Case</span>
+              <OptionLabel tooltip="Compare both inputs case-insensitively. When enabled, 'Hello' and 'hello' will be treated as identical, making the diff focus on other differences.">
+                Ignore Case
+              </OptionLabel>
             </label>
             <button
               className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
@@ -177,8 +180,8 @@ const DiffPane: React.FC<{ label: string; type: 'left' | 'right'; diffs: Diff[] 
           const highlight = op === 0
             ? ''
             : op === -1
-              ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
-              : 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300';
+              ? 'bg-red-100 dark:bg-red-900/60 text-red-800 dark:text-white'
+              : 'bg-green-100 dark:bg-green-900/60 text-green-800 dark:text-white';
           return (
             <span key={`${type}-${idx}`} className={highlight}>{text || '\n'}</span>
           );
@@ -191,7 +194,7 @@ const DiffPane: React.FC<{ label: string; type: 'left' | 'right'; diffs: Diff[] 
 const UnifiedPane: React.FC<{ diffs: Diff[] }> = ({ diffs }) => (
   <pre className="whitespace-pre-wrap break-words p-4 font-mono text-sm text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800">
     {diffs.map(([op, text], idx) => {
-      const style = op === 0 ? '' : op === 1 ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 line-through';
+      const style = op === 0 ? '' : op === 1 ? 'bg-green-100 dark:bg-green-900/60 text-green-800 dark:text-white' : 'bg-red-100 dark:bg-red-900/60 text-red-800 dark:text-white line-through';
       const prefix = op === 0 ? '' : op === 1 ? '+ ' : '- ';
       return (
         <span key={idx} className={style}>

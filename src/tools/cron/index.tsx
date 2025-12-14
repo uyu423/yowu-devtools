@@ -4,6 +4,7 @@ import type { ToolDefinition } from '@/tools/types';
 import { Timer } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
+import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
 import { useTitle } from '@/hooks/useTitle';
 import { format, formatDistanceToNow } from 'date-fns';
@@ -69,33 +70,35 @@ const CronTool: React.FC = () => {
 
       <div className="flex-1 flex flex-col gap-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Cron Expression</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Cron Expression</label>
           <input 
             type="text" 
             value={state.expression}
             onChange={(e) => updateState({ expression: e.target.value })}
-            className="block w-full rounded-md border border-gray-300 px-3 py-2 font-mono text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2 font-mono text-sm shadow-sm focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400"
           />
-          <div className="mt-3 flex flex-wrap gap-4 text-sm text-gray-600">
+          <div className="mt-3 flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400">
             <label 
-              className="inline-flex items-center gap-2"
-              title="Switch to the 6-field cron format that includes a leading seconds column."
+              className="inline-flex items-center gap-2 cursor-pointer"
             >
               <input 
                 type="checkbox" 
-                className="rounded border-gray-300"
+                className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-500 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-0 cursor-pointer"
                 checked={state.hasSeconds}
                 onChange={(e) => updateState({ hasSeconds: e.target.checked })}
               />
-              <span>Include seconds field</span>
+              <OptionLabel tooltip="Switch to the 6-field cron format that includes a leading seconds column. Standard cron uses 5 fields (minute, hour, day, month, weekday), but some systems support a 6-field format with seconds for more granular scheduling.">
+                Include seconds field
+              </OptionLabel>
             </label>
             <label 
               className="inline-flex items-center gap-2"
-              title="Choose whether upcoming runs are calculated in your local timezone or UTC."
             >
-              <span>Timezone</span>
+              <OptionLabel tooltip="Choose whether upcoming runs are calculated in your local timezone or UTC. Local timezone uses your browser's timezone settings, while UTC provides consistent results regardless of location.">
+                Timezone
+              </OptionLabel>
               <select 
-                className="rounded-md border px-2 py-1"
+                className="rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-2 py-1 text-sm"
                 value={state.timezone}
                 onChange={(e) => updateState({ timezone: e.target.value as CronToolState['timezone'] })}
               >
@@ -105,11 +108,12 @@ const CronTool: React.FC = () => {
             </label>
             <label 
               className="inline-flex items-center gap-2"
-              title="Set how many future executions to generate in the schedule table."
             >
-              <span>Next runs</span>
+              <OptionLabel tooltip="Set how many future executions to generate in the schedule table. This helps you preview when the cron job will run next, making it easier to verify your schedule.">
+                Next runs
+              </OptionLabel>
               <select 
-                className="rounded-md border px-2 py-1"
+                className="rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-2 py-1 text-sm"
                 value={state.nextCount}
                 onChange={(e) => updateState({ nextCount: Number(e.target.value) as 10 | 20 })}
               >
@@ -125,23 +129,23 @@ const CronTool: React.FC = () => {
         )}
 
         {!cronResult.error && cronResult.description && (
-          <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
-            <h3 className="text-sm font-medium text-blue-900 uppercase tracking-wider mb-1">Human readable</h3>
-            <p className="text-lg text-blue-800 font-semibold">{cronResult.description}</p>
+          <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800 rounded-lg p-4">
+            <h3 className="text-sm font-medium text-blue-900 dark:text-blue-300 uppercase tracking-wider mb-1">Human readable</h3>
+            <p className="text-lg text-blue-800 dark:text-blue-200 font-semibold">{cronResult.description}</p>
           </div>
         )}
 
         {!cronResult.error && cronResult.nextRuns.length > 0 && (
-          <div className="border rounded-lg overflow-hidden bg-white">
-            <div className="bg-gray-50 px-4 py-2 border-b text-sm font-medium text-gray-700 flex justify-between">
+          <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-800">
+            <div className="bg-gray-50 dark:bg-gray-700 px-4 py-2 border-b border-gray-200 dark:border-gray-600 text-sm font-medium text-gray-700 dark:text-gray-300 flex justify-between">
               <span>Next Scheduled Dates</span>
-              <span className="text-xs text-gray-500">{state.timezone === 'utc' ? 'UTC timezone' : 'Local timezone'}</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400">{state.timezone === 'utc' ? 'UTC timezone' : 'Local timezone'}</span>
             </div>
-            <ul className="divide-y divide-gray-100">
+            <ul className="divide-y divide-gray-100 dark:divide-gray-700">
               {cronResult.nextRuns.map((date, idx) => (
-                <li key={idx} className="px-4 py-3 text-sm text-gray-700 flex justify-between">
+                <li key={idx} className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 flex justify-between">
                   <span className="font-mono">{format(date, 'yyyy-MM-dd HH:mm:ss')}</span>
-                  <span className="text-gray-400">{formatDistanceToNow(date, { addSuffix: true })}</span>
+                  <span className="text-gray-400 dark:text-gray-500">{formatDistanceToNow(date, { addSuffix: true })}</span>
                 </li>
               ))}
             </ul>

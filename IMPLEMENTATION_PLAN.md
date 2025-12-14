@@ -59,6 +59,7 @@ src/
   - [x] Grouped Width Strategy
   - [x] `sonner` Setup
   - [x] `useTitle` Hook
+  - [x] **Tooltip 공통 컴포넌트**: `Tooltip.tsx`, `OptionLabel.tsx` 구현 및 모든 도구에 적용
 
 ### Phase 3: 도구별 기능 구현 (Logic Implementation) - **완료**
 

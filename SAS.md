@@ -241,6 +241,19 @@
 - **Validation 힌트**: 입력창 테두리 색상(Red/Green)으로 유효성 힌트 제공 (JSON 등)
 - **동적 타이틀**: 페이지 진입 시 `document.title` 업데이트 (`{ToolName} - tools.yowu.dev`)
 
+### 5.7 Tooltip 정책 (v1.2 추가)
+
+- **공통 Tooltip 컴포넌트**: 모든 도구에서 일관된 tooltip UI 제공
+  - 컴포넌트: `src/components/ui/Tooltip.tsx` (공통 Tooltip 래퍼)
+  - 컴포넌트: `src/components/ui/OptionLabel.tsx` (라벨 + Info 아이콘 + Tooltip 조합)
+- **사용 규칙**:
+  - 결과에 영향을 주는 옵션(label) 옆에 Info 아이콘 표시
+  - 마우스 오버 시 해당 옵션의 역할을 설명하는 tooltip 표시
+  - Tooltip은 화면 경계를 자동 감지하여 위/아래 위치 자동 조정
+  - 최대 너비: `max-w-lg` (512px), 내용에 맞게 자동 조정
+  - 다크 모드 지원 (배경: `bg-gray-900 dark:bg-gray-700`)
+- **적용 대상**: 모든 도구의 옵션 라벨 (Indent, Sort keys, Tree Depth, Ignore Whitespace, Ignore Case, URL Safe, Use + for spaces, Include seconds field, Timezone, Next runs 등)
+
 ---
 
 ## 6. 성능/최적화 요구사항 (NFR)

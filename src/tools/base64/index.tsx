@@ -6,6 +6,7 @@ import { ToolHeader } from '@/components/common/ToolHeader';
 import { EditorPanel } from '@/components/common/EditorPanel';
 import { ActionBar } from '@/components/common/ActionBar';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
+import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
 import { useTitle } from '@/hooks/useTitle';
 import { copyToClipboard } from '@/lib/clipboard';
@@ -84,16 +85,17 @@ const Base64Tool: React.FC = () => {
           </div>
 
           <label 
-            className="flex items-center space-x-2 text-sm text-gray-700 dark:text-gray-300"
-            title="Use the URL-safe Base64 alphabet (- and _) and omit padding for link-friendly strings."
+            className="flex items-center space-x-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer"
           >
             <input 
               type="checkbox" 
-              className="rounded border-gray-300 dark:border-gray-600"
+              className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-500 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-0 cursor-pointer"
               checked={state.urlSafe}
               onChange={(e) => updateState({ urlSafe: e.target.checked })}
             />
-            <span>URL Safe</span>
+            <OptionLabel tooltip="Use the URL-safe Base64 alphabet (- and _) and omit padding for link-friendly strings. This variant replaces '+' with '-' and '/' with '_', making the encoded string safe to use in URLs without additional encoding.">
+              URL Safe
+            </OptionLabel>
           </label>
 
           <button

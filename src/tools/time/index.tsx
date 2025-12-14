@@ -4,6 +4,8 @@ import type { ToolDefinition } from '@/tools/types';
 import { Clock } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
+import { OptionLabel } from '@/components/ui/OptionLabel';
+import { Tooltip } from '@/components/ui/Tooltip';
 import { useToolState } from '@/hooks/useToolState';
 import { useTitle } from '@/hooks/useTitle';
 import { format, formatISO } from 'date-fns';
@@ -95,24 +97,27 @@ const TimeTool: React.FC = () => {
         onShare={shareState}
       />
       <div className="space-y-8 mt-4">
-        <div className="bg-white p-6 rounded-lg border shadow-sm space-y-4">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm space-y-4">
           <div className="flex justify-between items-center flex-wrap gap-3">
-            <label className="text-sm font-medium text-gray-700">Epoch Timestamp</label>
-            <div className="flex items-center space-x-4 text-sm">
+            <OptionLabel tooltip="Epoch timestamp represents the number of seconds or milliseconds that have elapsed since January 1, 1970 (Unix epoch) in UTC. This is a common way to represent dates in programming." className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Epoch Timestamp
+            </OptionLabel>
+            <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
               {(['ms', 's'] as const).map(unit => (
                 <label 
                   key={unit} 
-                  className="inline-flex items-center gap-2"
-                  title={unit === 'ms' ? 'Interpret the epoch value as milliseconds since 1970-01-01 UTC.' : 'Interpret the epoch value as seconds since 1970-01-01 UTC.'}
+                  className="inline-flex items-center gap-2 cursor-pointer"
                 >
                   <input 
                     type="radio" 
                     name="epoch-unit" 
                     checked={state.epochUnit === unit}
                     onChange={() => handleUnitChange(unit)}
-                    className="text-blue-600"
+                    className="text-blue-600 dark:text-blue-500"
                   />
-                  <span>{unit === 'ms' ? 'milliseconds' : 'seconds'}</span>
+                  <OptionLabel tooltip={unit === 'ms' ? 'Interpret the epoch value as milliseconds since 1970-01-01 UTC. This is the JavaScript Date format (e.g., 1704067200000).' : 'Interpret the epoch value as seconds since 1970-01-01 UTC. This is the Unix timestamp format (e.g., 1704067200).'}>
+                    {unit === 'ms' ? 'milliseconds' : 'seconds'}
+                  </OptionLabel>
                 </label>
               ))}
             </div>
@@ -121,31 +126,40 @@ const TimeTool: React.FC = () => {
             type="text" 
             value={state.epochInput}
             onChange={(e) => handleEpochChange(e.target.value)}
-            className={`block w-full rounded-md border px-3 py-2 font-mono text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500 ${epochError ? 'border-red-300' : 'border-gray-300'}`}
+            className={`block w-full rounded-md border px-3 py-2 font-mono text-sm shadow-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400 ${epochError ? 'border-red-300 dark:border-red-700' : 'border-gray-300 dark:border-gray-600'}`}
             placeholder="e.g. 1704067200000"
           />
           {epochError && <ErrorBanner message="Epoch input error" details={epochError} />}
         </div>
 
         <div className="flex justify-center">
-          <button className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors" onClick={handleSetNow}>
+          <button className="px-4 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors border border-gray-200 dark:border-gray-700" onClick={handleSetNow}>
             Set to Now
           </button>
         </div>
 
-        <div className="bg-white p-6 rounded-lg border shadow-sm space-y-4">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm space-y-4">
           <div className="flex justify-between items-center flex-wrap gap-3">
-            <label className="text-sm font-medium text-gray-700">ISO 8601 Date</label>
-            <div className="flex items-center gap-2 text-sm text-gray-600">
+            <OptionLabel tooltip="ISO 8601 is an international standard for date and time representation. The format is YYYY-MM-DDTHH:mm:ss.sssZ, where 'Z' indicates UTC timezone. This format is widely used in APIs and databases." className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              ISO 8601 Date
+            </OptionLabel>
+            <div className="flex items-center gap-2 text-sm">
               {(['local', 'utc'] as const).map((tz) => (
-                <button
+                <Tooltip
                   key={tz}
-                  onClick={() => handleTimezoneChange(tz)}
-                  className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide ${state.timezone === tz ? 'border-blue-600 text-blue-600' : 'border-gray-300 text-gray-500'}`}
-                  title={tz === 'local' ? 'Display ISO conversions relative to your local timezone.' : 'Display ISO conversions relative to UTC.'}
+                  content={tz === 'local' ? 'Display ISO conversions relative to your local timezone. The time will be adjusted based on your browser\'s timezone settings.' : 'Display ISO conversions relative to UTC (Coordinated Universal Time). This is the standard timezone used in programming and avoids daylight saving time complications.'}
                 >
-                  {tz === 'local' ? 'Local' : 'UTC'}
-                </button>
+                  <button
+                    onClick={() => handleTimezoneChange(tz)}
+                    className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide transition-colors ${
+                      state.timezone === tz 
+                        ? 'border-blue-600 dark:border-blue-500 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30' 
+                        : 'border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
+                    }`}
+                  >
+                    {tz === 'local' ? 'Local' : 'UTC'}
+                  </button>
+                </Tooltip>
               ))}
             </div>
           </div>
@@ -153,13 +167,13 @@ const TimeTool: React.FC = () => {
             type="text" 
             value={state.isoInput}
             onChange={(e) => handleIsoChange(e.target.value)}
-            className={`block w-full rounded-md border px-3 py-2 font-mono text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500 ${isoError ? 'border-red-300' : 'border-gray-300'}`}
+            className={`block w-full rounded-md border px-3 py-2 font-mono text-sm shadow-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400 ${isoError ? 'border-red-300 dark:border-red-700' : 'border-gray-300 dark:border-gray-600'}`}
             placeholder="e.g. 2024-01-01T00:00:00.000Z"
           />
           {isoError && <ErrorBanner message="ISO input error" details={isoError} />}
         </div>
 
-        <div className="bg-blue-50 p-4 rounded-md text-sm text-blue-900 border border-blue-100">
+        <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-md text-sm text-blue-900 dark:text-blue-100 border border-blue-100 dark:border-blue-800">
           <p className="flex justify-between"><span className="font-medium">Local Time</span><span className="font-mono">{derivedDate ? format(derivedDate, 'yyyy-MM-dd HH:mm:ss.SSS xxx') : '-'}</span></p>
           <p className="mt-2 flex justify-between"><span className="font-medium">UTC</span><span className="font-mono">{derivedDate ? derivedDate.toISOString() : '-'}</span></p>
         </div>
