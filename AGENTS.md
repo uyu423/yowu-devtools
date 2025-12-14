@@ -9,6 +9,47 @@
 - `npm run build` – type-checks via `tsc -b`, builds production assets, and generates route-specific HTML files for SEO.
 - `npm run preview` – serves the built bundle to sanity-check release artifacts.
 
+## AI Agent 작업 가이드
+
+### 작업 완료 후 필수 검증
+
+**중요**: 모든 단위 작업이 완료된 이후에는 반드시 다음을 수행해야 합니다:
+
+1. **빌드 검증**: `npm run build` 실행하여 빌드가 성공하는지 확인
+   - 타입 체크 오류 확인 (`tsc -b` 실행)
+   - 빌드 오류 확인 (Vite 빌드 프로세스)
+   - 생성된 파일 확인 (`dist/` 디렉토리)
+   - SEO 파일 생성 확인 (`sitemap.xml`, `robots.txt`, 각 도구별 `index.html` 등)
+
+2. **Lint 검증**: `npm run lint` 실행하여 코드 스타일 오류 확인
+   - 모든 lint 오류 수정
+   - 경고도 가능하면 해결
+
+3. **작업 완료 확인**:
+   - 빌드가 성공적으로 완료되었는지 확인
+   - 생성된 산출물이 예상대로 생성되었는지 확인
+   - 타입 오류가 없는지 확인
+   - 런타임 오류가 없는지 확인 (가능한 경우)
+
+**예외 상황**:
+- 단순 문서 수정만 한 경우에는 빌드 생략 가능
+- 하지만 코드 변경이 있었다면 반드시 빌드 검증 필요
+- 설정 파일 변경 시에도 빌드 검증 권장
+
+**작업 흐름 예시**:
+```bash
+# 1. 코드 수정
+# ... 파일 편집 ...
+
+# 2. Lint 검증
+npm run lint
+
+# 3. 빌드 검증 (필수)
+npm run build
+
+# 4. 빌드 성공 확인 후 작업 완료
+```
+
 **Note**: The build process automatically generates:
 - Separate HTML files for each tool route (`/json/index.html`, `/diff/index.html`, etc.)
 - SEO files (`sitemap.xml`, `robots.txt`)

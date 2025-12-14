@@ -8,7 +8,7 @@ import { tools } from '@/tools';
 import { useEffect } from 'react';
 import { usePWA } from '@/hooks/usePWA';
 import { useRecentTools } from '@/hooks/useRecentTools';
-import { useResolvedTheme } from '@/hooks/useTheme';
+import { useResolvedTheme } from '@/hooks/useThemeHooks';
 import { APP_VERSION } from '@/lib/constants';
 
 function AppContent() {

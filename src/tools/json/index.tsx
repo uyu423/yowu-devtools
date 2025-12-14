@@ -10,7 +10,7 @@ import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useTitle } from '@/hooks/useTitle';
-import { useResolvedTheme } from '@/hooks/useTheme';
+import { useResolvedTheme } from '@/hooks/useThemeHooks';
 import { useWebWorker, shouldUseWorkerForText } from '@/hooks/useWebWorker';
 import { copyToClipboard } from '@/lib/clipboard';
 import { JsonView, defaultStyles } from 'react-json-view-lite';

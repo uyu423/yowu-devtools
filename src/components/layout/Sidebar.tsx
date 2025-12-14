@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { tools, getToolById } from '@/tools';
 import { X, Moon, Sun, Laptop, Sparkles, Star, Clock } from 'lucide-react';
-import { useTheme } from '@/hooks/useTheme';
+import { useTheme } from '@/hooks/useThemeHooks';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useRecentTools } from '@/hooks/useRecentTools';
 import logoImg from '@/assets/yowu-logo.jpeg';
