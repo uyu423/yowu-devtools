@@ -46,14 +46,12 @@ function AppContent() {
                 </span>
               </h1>
               <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-                An open toolbox for developers who would rather keep sensitive
-                snippets on their own machines. Too many "free" web converters
-                quietly ship data to unknown backends, so this project keeps
-                every transformation inside the browser, publishes every line of
-                code, and documents the UX decisions in the open. The goal is
-                simple: make the common chores (JSON inspection, cron sanity
-                checks, quick diffs, etc.) pleasant <strong>and</strong>{' '}
-                trustworthy.
+                A privacy-first toolbox for developers who want to keep their
+                data on their own machines. All processing happens in your
+                browser—no servers, no trackers, no data collection. Open source
+                and auditable, making common developer tasks (JSON formatting,
+                password generation, hash calculation, UUID creation, and more)
+                fast, secure, and trustworthy.
               </p>
 
               {/* Why it exists */}
@@ -67,10 +65,9 @@ function AppContent() {
                       •
                     </span>
                     <span>
-                      <strong>Transparent processing</strong> – no servers, no
-                      trackers, and an auditable codebase. If a tool claims to
-                      only prettify JSON, you should be able to confirm that's
-                      all it does.
+                      <strong>Privacy-first</strong> – everything runs in your
+                      browser. No data sent to servers, no tracking, no
+                      analytics. Your sensitive data stays on your machine.
                     </span>
                   </li>
                   <li className="flex items-start">
@@ -78,10 +75,10 @@ function AppContent() {
                       •
                     </span>
                     <span>
-                      <strong>Shareable but private by default</strong> –
-                      nothing leaves the tab unless you explicitly create a
-                      share link; even then the payload stays compressed inside
-                      the URL fragment.
+                      <strong>Fast and efficient</strong> – Command Palette for
+                      quick navigation, file drag & drop support, and Web
+                      Workers for handling large datasets without freezing your
+                      browser.
                     </span>
                   </li>
                   <li className="flex items-start">
@@ -89,10 +86,19 @@ function AppContent() {
                       •
                     </span>
                     <span>
-                      <strong>Composable workspace</strong> – a single layout,
-                      persistent state per tool, and theme controls so you're
-                      not juggling a dozen shady tabs during a debugging
-                      session.
+                      <strong>Installable PWA</strong> – works offline, installs
+                      as a standalone app, and automatically updates when new
+                      versions are available.
+                    </span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-blue-600 dark:text-blue-400 mr-2">
+                      •
+                    </span>
+                    <span>
+                      <strong>Open and auditable</strong> – every line of code
+                      is public. You can verify what each tool does and how it
+                      processes your data.
                     </span>
                   </li>
                 </ul>
