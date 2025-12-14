@@ -203,7 +203,7 @@ const { state, shareState } = useToolState<JsonToolState>(
 
 1. **훅 생성**: `src/hooks/useRecentTools.ts`
    ```typescript
-   const MAX_RECENT_TOOLS = 5;
+   const MAX_RECENT_TOOLS = 3;
    const STORAGE_KEY = 'yowu-devtools:v1:app:recentTools';
    
    interface RecentTool {
@@ -221,7 +221,7 @@ const { state, shareState } = useToolState<JsonToolState>(
    ```
 
 3. **사이드바 통합**: `src/components/layout/Sidebar.tsx`에 섹션 추가
-   - 최근 사용한 도구 목록 표시 (최대 5개)
+   - 최근 사용한 도구 목록 표시 (최대 3개)
    - 시간순 정렬 (최신이 상단)
    - 중복 방지 (같은 도구는 최신 항목만 유지)
 

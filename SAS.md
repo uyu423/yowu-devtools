@@ -131,7 +131,7 @@
 
   - Header: 로고(yowu.dev 링크) + 타이틀(`tools.yowu.dev`)
   - **즐겨찾기 섹션** (v1.1.0 추가): 즐겨찾기로 등록한 도구 목록 (별 아이콘으로 등록/해제)
-  - **최근 사용한 도구 섹션** (v1.1.0 추가): 최근 사용한 도구 목록 (최대 5개, 시간순 정렬)
+  - **최근 사용한 도구 섹션** (v1.1.0 추가): 최근 사용한 도구 목록 (최대 3개, 시간순 정렬)
   - 전체 툴 리스트: 모든 도구 목록
   - 툴이 많아질 경우를 대비해 **카테고리 필드**를 모델에 포함(현재 UI에서는 미사용 가능)
   - Footer: 테마 토글(Light/System/Dark)
@@ -362,12 +362,12 @@ const { state, shareState } = useToolState<YamlToolState>(
 #### 최근 사용한 도구 기능
 
 - **저장 위치**: `yowu-devtools:v1:app:recentTools` (localStorage)
-- **데이터 형식**: `Array<{ toolId: string; timestamp: number }>` (최대 5개)
+- **데이터 형식**: `Array<{ toolId: string; timestamp: number }>` (최대 3개)
 - **기능**:
   - 도구 페이지 진입 시 자동으로 기록
   - 최근 사용한 순서대로 표시 (최신이 상단)
   - 중복 방지: 같은 도구를 다시 사용하면 기존 항목을 제거하고 최상단에 추가
-  - 최대 5개까지만 유지 (오래된 항목 자동 삭제)
+  - 최대 3개까지만 유지 (오래된 항목 자동 삭제)
   - 즐겨찾기와 중복 표시 가능 (즐겨찾기 섹션과 최근 사용 섹션 모두에 표시 가능)
 
 ### 5.9 Web App 지원 (v1.1.0 추가)
@@ -942,7 +942,7 @@ export type ToolDefinition<TState> = {
 - **v1.1.0** (2024-12-14):
 
   - **사이드바 고도화** ✅:
-    - 최근 사용한 도구 리스트 추가 (최대 5개, localStorage 기반)
+    - 최근 사용한 도구 리스트 추가 (최대 3개, localStorage 기반)
     - 즐겨찾기 리스트 및 메뉴 즐겨찾기 등록 기능 추가 (localStorage 기반)
     - 사이드바 UI 개선: 즐겨찾기/최근 사용 섹션 분리
     - `useRecentTools`, `useFavorites` 훅 구현 완료
