@@ -1,10 +1,9 @@
 /* eslint-disable react-refresh/only-export-components */
 import React from 'react';
 import type { ToolDefinition } from '@/tools/types';
-import { Hash } from 'lucide-react';
+import { Hash, Copy } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { EditorPanel } from '@/components/common/EditorPanel';
-import { ActionBar } from '@/components/common/ActionBar';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
 import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
@@ -259,6 +258,14 @@ const HashTool: React.FC = () => {
           <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
             Hash Result {isCalculating && <span className="text-gray-500">(Calculating...)</span>}
           </label>
+          <button
+            onClick={handleCopy}
+            disabled={!hashResult || isCalculating}
+            className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Copy Hash"
+          >
+            <Copy className="w-4 h-4" />
+          </button>
         </div>
         <EditorPanel
           value={hashResult || (isCalculating ? 'Calculating...' : '')}
@@ -268,17 +275,6 @@ const HashTool: React.FC = () => {
           readOnly={true}
         />
       </div>
-
-      {/* Actions */}
-      <ActionBar>
-        <button
-          onClick={handleCopy}
-          disabled={!hashResult || isCalculating}
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed rounded-md transition-colors"
-        >
-          Copy Hash
-        </button>
-      </ActionBar>
     </div>
   );
 };

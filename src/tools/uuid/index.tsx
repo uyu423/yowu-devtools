@@ -1,10 +1,9 @@
 /* eslint-disable react-refresh/only-export-components */
 import React from 'react';
 import type { ToolDefinition } from '@/tools/types';
-import { KeyRound } from 'lucide-react';
+import { KeyRound, Copy } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { EditorPanel } from '@/components/common/EditorPanel';
-import { ActionBar } from '@/components/common/ActionBar';
 import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
 import { useTitle } from '@/hooks/useTitle';
@@ -227,6 +226,16 @@ const UuidTool: React.FC = () => {
           <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
             Generated IDs ({generatedIds.length})
           </label>
+          {state.count === 1 && (
+            <button
+              onClick={() => handleCopy()}
+              disabled={!outputText}
+              className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Copy ID"
+            >
+              <Copy className="w-4 h-4" />
+            </button>
+          )}
         </div>
         <div className="h-full overflow-auto">
           {state.count === 1 ? (
@@ -249,9 +258,10 @@ const UuidTool: React.FC = () => {
                   </code>
                   <button
                     onClick={() => handleCopy(id)}
-                    className="ml-4 px-2 py-1 text-xs text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+                    className="ml-4 p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+                    title="Copy ID"
                   >
-                    Copy
+                    <Copy className="w-4 h-4" />
                   </button>
                 </div>
               ))}
@@ -259,17 +269,6 @@ const UuidTool: React.FC = () => {
           )}
         </div>
       </div>
-
-      {/* Actions */}
-      <ActionBar>
-        <button
-          onClick={() => handleCopy()}
-          disabled={!outputText}
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed rounded-md transition-colors"
-        >
-          Copy {state.count === 1 ? 'ID' : 'All IDs'}
-        </button>
-      </ActionBar>
     </div>
   );
 };
