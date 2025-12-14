@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { useMemo } from 'react';
 import type { ToolDefinition } from '@/tools/types';
-import { Key, Copy } from 'lucide-react';
+import { Eye, Copy } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { EditorPanel } from '@/components/common/EditorPanel';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
@@ -461,7 +461,7 @@ export const jwtDecoderTool: ToolDefinition<JwtDecoderState> = {
   id: 'jwt-decoder',
   title: 'JWT Decoder',
   description: 'Decode JSON Web Tokens',
-  icon: Key,
+  icon: Eye,
   path: '/jwt-decoder',
   keywords: ['jwt', 'token', 'decode', 'json', 'web', 'token', 'verify', 'decoder'],
   category: 'parser',
