@@ -7,6 +7,7 @@ interface UsePWAResult {
   offlineReady: boolean;
   updateServiceWorker: () => Promise<void>;
   closePrompt: () => void;
+  closeInstallPrompt: () => void;
   isInstallable: boolean;
   installApp: () => Promise<void>;
   isOnline: boolean;
@@ -85,6 +86,10 @@ export function usePWA(): UsePWAResult {
     setOfflineReady(false);
   };
 
+  const closeInstallPrompt = () => {
+    setIsInstallable(false);
+  };
+
   const installApp = async () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const deferredPrompt = (window as any).deferredPrompt as { prompt: () => void; userChoice: Promise<{ outcome: string }> } | null;
@@ -103,6 +108,7 @@ export function usePWA(): UsePWAResult {
     offlineReady,
     updateServiceWorker,
     closePrompt,
+    closeInstallPrompt,
     isInstallable,
     installApp,
     isOnline,
