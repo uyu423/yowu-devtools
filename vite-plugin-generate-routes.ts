@@ -232,7 +232,7 @@ export function generateRoutes(): Plugin {
         };
 
         // SEO 최적화된 title 생성 (50-60자 권장)
-        const seoTitle = `${tool.title} - Free Online Tool | tools.yowu.dev`;
+        const seoTitle = `${tool.title} - Dev Tool | tools.yowu.dev`;
 
         // Description이 160자를 초과하면 자르기 (110-160자 권장)
         const optimizedDescription =
@@ -251,13 +251,13 @@ export function generateRoutes(): Plugin {
     <meta property="og:title" content="${seoTitle}" />
     <meta property="og:description" content="${optimizedDescription}" />
     <meta property="og:image" content="https://tools.yowu.dev/opengraph.png" />
-    <meta property="og:image:alt" content="${tool.title} - Free Online Tool" />
+    <meta property="og:image:alt" content="${tool.title} - Dev Tool" />
     <meta property="og:site_name" content="tools.yowu.dev" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="${seoTitle}" />
     <meta name="twitter:description" content="${optimizedDescription}" />
     <meta name="twitter:image" content="https://tools.yowu.dev/opengraph.png" />
-    <meta name="twitter:image:alt" content="${tool.title} - Free Online Tool" />
+    <meta name="twitter:image:alt" content="${tool.title} - Dev Tool" />
     <script type="application/ld+json">${JSON.stringify(
       structuredData,
       null,
