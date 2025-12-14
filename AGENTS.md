@@ -15,7 +15,18 @@
 - `404.html` for SPA routing support on GitHub Pages
 
 ## Coding Style & Naming Conventions
-Use TypeScript + JSX with 2-space indentation and functional components. Components follow PascalCase (`JsonTool.tsx`), hooks kebab-case (`use-tool-state.ts`), and utility files lowercase. Favor hooks for state, `clsx`/`tailwind-merge` for conditional classes, and Tailwind utility classes for layout. Keep user-facing strings in English only.
+Use TypeScript + JSX with 2-space indentation and functional components. Components follow PascalCase (`JsonTool.tsx`), hooks kebab-case (`use-tool-state.ts`), and utility files lowercase. Favor hooks for state, `clsx`/`tailwind-merge` for conditional classes, and Tailwind utility classes for layout.
+
+### Language Guidelines
+**All client-side text must be written in English only.** This includes:
+- User-facing UI text (buttons, labels, tooltips, error messages)
+- Footer content
+- Placeholder text
+- Toast notifications
+- Tool descriptions
+- Any text visible to end users
+
+**Rationale**: This is a global developer tool accessible to international users. English ensures consistency and broad accessibility. Code comments, documentation files (like this one), and internal developer notes may use other languages as needed, but all user-visible content must be in English.
 
 ## Testing Guidelines
 There are no automated tests yet; when adding them, colocate specs inside `src/<feature>/__tests__/` and name files `*.test.ts(x)`. Prefer Vitest + React Testing Library for component coverage, and mock expensive editor/diff interactions. Always document new manual verification steps in PRs until suites exist.

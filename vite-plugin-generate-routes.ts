@@ -191,7 +191,7 @@ const tools: ToolInfo[] = [
   {
     id: 'jwt',
     path: '/jwt',
-    title: 'JWT Decoder/Encoder',
+    title: 'JWT',
     description: 'Decode and encode JSON Web Tokens',
     seoDescription:
       'Free online JWT decoder and encoder. Decode JSON Web Tokens to view header, payload, and signature. Encode JWT tokens with HMAC signing. Verify token signatures and check expiration. All processing happens in your browser.',
