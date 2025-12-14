@@ -16,6 +16,9 @@ An open toolbox for developers who would rather keep sensitive snippets on their
 - LocalStorage + share-links let you hand off repro cases without inventing screenshots.
 - **SEO-optimized**: Each tool has its own page with dedicated meta tags for search engine indexing.
 - **Dark mode support**: System/Light/Dark theme toggle with consistent styling across all tools.
+- **Enhanced Sidebar** (v1.1.0): Recent tools and favorites for quick access, all stored locally.
+- **Web App support** (v1.1.0): Install as a Chrome app for standalone usage.
+- **Performance optimized** (v1.1.0): Web Workers prevent UI freezing when processing large data.
 
 For the full specification, UX rules, and backlog, read `SAS.md`. This README intentionally stays high level so we avoid duplicating that source of truth.
 
@@ -35,8 +38,9 @@ npm run preview
 src/
   components/   shared layout + primitives (ToolHeader, ActionBar, etc.)
   hooks/        tool state, title, theme helpers
-  lib/          clipboard + misc utilities
-  tools/        each self-contained feature (json, url, base64, ...)
+  lib/          clipboard + misc utilities + web workers
+  tools/        each self-contained feature (json, url, base64, jwt, ...)
+  workers/      web workers for heavy processing (optional)
 ```
 
 Shared contributor instructions live in `AGENTS.md`; treat them as the working agreement before sending any PRs.

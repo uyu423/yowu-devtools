@@ -33,6 +33,7 @@
 5. YAML ↔ JSON 변환
 6. Text Diff
 7. CRON 표현식(설명 + 다음 실행 시각)
+8. JWT Encode/Decode (v1.1.0 추가)
 
 공통 기능:
 
@@ -47,6 +48,15 @@
   - 실시간 변환 (Debounce 300~500ms) - 버튼 클릭 없이 자동 변환
   - 동적 페이지 타이틀 - 각 툴 페이지 진입 시 브라우저 탭 제목 변경
   - 그룹별 최적화된 Width 전략 (Wide/Medium/Narrow)
+- **사이드바 고도화** (v1.1.0 추가):
+  - 최근 사용한 도구 리스트 (localStorage 기반)
+  - 즐겨찾기 리스트 및 메뉴 즐겨찾기 등록 기능 (localStorage 기반)
+- **Web App 지원** (v1.1.0 추가):
+  - Chrome 앱으로 등록 가능 (`manifest.json` 기반)
+  - 독립 창으로 실행 가능
+  - Service Worker 기반 오프라인 캐싱 (선택사항, 향후 구현)
+- **성능 개선** (v1.1.0 추가):
+  - 큰 데이터 처리 시 Web Worker 도입으로 UI 프리징 방지
 
 ### 1.2 Out-of-Scope (v1에서 제외)
 
@@ -55,6 +65,7 @@
 - 분석/로그(Analytics) 삽입
 - "외부 API 호출" 기반 기능(예: DNS 조회, HTTP 호출 등)
 - PWA/오프라인 캐시(추후 옵션)
+- JWT 검증 기능 (v1.1.0에서는 디코딩/인코딩만 제공, 검증은 제외)
 
 ---
 
@@ -71,6 +82,11 @@
 - US-09: 다시 접속했을 때 **마지막 작업 상태가 복원**되면 좋겠다.
 - US-10: 각 도구 페이지로 진입 시 **브라우저 탭 타이틀**이 바뀌어 여러 탭을 띄워놓고 작업할 때 식별하기 쉬워야 한다.
 - US-11: 사이드바에서 `yowu.dev` 로고를 클릭해 개발자 블로그로 이동할 수 있다.
+- US-12: 사이드바에서 **최근 사용한 도구**를 빠르게 접근하고 싶다. (v1.1.0)
+- US-13: 자주 쓰는 도구를 **즐겨찾기**로 등록해 상단에 고정하고 싶다. (v1.1.0)
+- US-14: JWT 토큰을 디코딩해서 payload를 확인하고 싶다. (v1.1.0)
+- US-15: Chrome 앱으로 등록해 독립 창에서 사용하고 싶다. (v1.1.0)
+- US-16: 큰 JSON이나 텍스트를 처리할 때 UI가 멈추지 않았으면 좋겠다. (v1.1.0)
 
 ---
 
@@ -114,6 +130,9 @@
 - Left Sidebar: 툴 리스트(초기엔 단순 나열)
 
   - Header: 로고(yowu.dev 링크) + 타이틀(`tools.yowu.dev`)
+  - **즐겨찾기 섹션** (v1.1.0 추가): 즐겨찾기로 등록한 도구 목록 (별 아이콘으로 등록/해제)
+  - **최근 사용한 도구 섹션** (v1.1.0 추가): 최근 사용한 도구 목록 (최대 5개, 시간순 정렬)
+  - 전체 툴 리스트: 모든 도구 목록
   - 툴이 많아질 경우를 대비해 **카테고리 필드**를 모델에 포함(현재 UI에서는 미사용 가능)
   - Footer: 테마 토글(Light/System/Dark)
   - 이스터에그: "More coming soon..." 뱃지 (툴 목록 하단)
@@ -328,6 +347,158 @@ const { state, shareState } = useToolState<YamlToolState>(
   - 다크 모드 지원 (배경: `bg-gray-900 dark:bg-gray-700`)
 - **적용 대상**: 모든 도구의 옵션 라벨 (Indent, Sort keys, Tree Depth, Ignore Whitespace, Ignore Case, URL Safe, Use + for spaces, Include seconds field, Timezone, Next runs 등)
 
+### 5.8 사이드바 고도화 (v1.1.0 추가)
+
+#### 즐겨찾기 기능
+
+- **저장 위치**: `yowu-devtools:v1:app:favorites` (localStorage)
+- **데이터 형식**: `string[]` (도구 ID 배열)
+- **기능**:
+  - 각 도구 메뉴 항목에 별 아이콘 표시
+  - 별 아이콘 클릭 시 즐겨찾기 추가/제거
+  - 즐겨찾기로 등록된 도구는 사이드바 상단에 별도 섹션으로 표시
+  - 즐겨찾기 순서는 등록 순서 유지
+
+#### 최근 사용한 도구 기능
+
+- **저장 위치**: `yowu-devtools:v1:app:recentTools` (localStorage)
+- **데이터 형식**: `Array<{ toolId: string; timestamp: number }>` (최대 5개)
+- **기능**:
+  - 도구 페이지 진입 시 자동으로 기록
+  - 최근 사용한 순서대로 표시 (최신이 상단)
+  - 중복 방지: 같은 도구를 다시 사용하면 기존 항목을 제거하고 최상단에 추가
+  - 최대 5개까지만 유지 (오래된 항목 자동 삭제)
+  - 즐겨찾기와 중복 표시 가능 (즐겨찾기 섹션과 최근 사용 섹션 모두에 표시 가능)
+
+### 5.9 Web App 지원 (v1.1.0 추가)
+
+#### Manifest.json
+
+- **파일 위치**: `public/manifest.json`
+- **기능**:
+  - Chrome/Edge 브라우저에서 "앱으로 설치" 가능
+  - 독립 창으로 실행 가능
+  - 앱 아이콘 및 이름 설정
+  - 시작 URL 설정 (`/`)
+  - 테마 색상 설정 (다크 모드 지원)
+
+#### 설치 방법
+
+- Chrome/Edge에서 사이트 방문 시 주소창에 설치 아이콘 표시
+- 또는 Chrome 메뉴 → "도구" → "확장 프로그램" → "앱"에서 설치
+- 설치 후 `chrome://apps`에서 실행 가능
+
+#### Service Worker 오프라인 캐싱 (선택사항)
+
+**목적**: 네트워크 장애나 GitHub Pages 다운 시에도 앱이 동작하도록 정적 파일 캐싱
+
+**캐시 전략**:
+
+- **Cache First**: 정적 자산 (JS, CSS, 이미지) - 오래된 캐시라도 사용
+- **Network First with Fallback**: HTML 파일 - 네트워크 우선, 실패 시 캐시 사용
+- **캐시 만료 시간**: 설정 가능 (예: 7일, 30일)
+
+**구현 예시**:
+
+```typescript
+// public/sw.js (Service Worker)
+const CACHE_NAME = 'tools-yowu-dev-v1.1.0';
+const CACHE_EXPIRY = 7 * 24 * 60 * 60 * 1000; // 7일
+
+// 설치 시 캐시
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll([
+        '/',
+        '/index.html',
+        // 정적 자산 목록
+      ]);
+    })
+  );
+});
+
+// 요청 처리 (Network First 전략)
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    fetch(event.request)
+      .then((response) => {
+        // 네트워크 성공 시 캐시 업데이트
+        const responseClone = response.clone();
+        caches.open(CACHE_NAME).then((cache) => {
+          cache.put(event.request, responseClone);
+        });
+        return response;
+      })
+      .catch(() => {
+        // 네트워크 실패 시 캐시에서 제공
+        return caches.match(event.request).then((response) => {
+          if (response) {
+            // 캐시 만료 확인
+            const cacheDate = response.headers.get('sw-cache-date');
+            if (cacheDate && Date.now() - parseInt(cacheDate) < CACHE_EXPIRY) {
+              return response;
+            }
+          }
+          // 캐시도 없으면 오프라인 페이지
+          return caches.match('/offline.html');
+        });
+      })
+  );
+});
+```
+
+**등록 방법**:
+
+```typescript
+// src/main.tsx 또는 App.tsx
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then((registration) => {
+        console.log('SW registered:', registration);
+      })
+      .catch((error) => {
+        console.log('SW registration failed:', error);
+      });
+  });
+}
+```
+
+**주의사항**:
+
+- Service Worker는 HTTPS 또는 localhost에서만 동작
+- 캐시 무효화를 위해 버전 관리 필요 (`CACHE_NAME`에 버전 포함)
+- 사용자에게 캐시 정리 옵션 제공 고려
+- 캐시 크기 제한 고려 (브라우저별 다름, 보통 50MB~1GB)
+
+### 5.10 Web Worker 성능 최적화 (v1.1.0 추가)
+
+#### 적용 대상
+
+- 큰 데이터 처리 시 UI 프리징 방지
+- 주요 적용 도구:
+  - JSON Viewer: 큰 JSON 파싱 (예: 1MB 이상)
+  - Text Diff: 큰 텍스트 비교 (예: 10,000줄 이상)
+  - YAML Converter: 큰 YAML 파일 변환
+
+#### 구현 전략
+
+- **자동 감지**: 입력 크기나 줄 수를 기준으로 자동으로 Worker 사용 결정
+- **폴백**: Worker를 지원하지 않는 환경에서는 메인 스레드에서 처리
+- **로딩 인디케이터**: Worker 처리 중에는 로딩 상태 표시
+- **에러 처리**: Worker 내부 에러를 메인 스레드로 전달하여 표시
+
+#### Worker 파일 구조
+
+```
+src/
+  workers/
+    json-parser.worker.ts    # JSON 파싱 Worker
+    diff-calculator.worker.ts # Diff 계산 Worker
+    yaml-converter.worker.ts  # YAML 변환 Worker
+```
+
 ---
 
 ## 6. 성능/최적화 요구사항 (NFR)
@@ -341,9 +512,9 @@ const { state, shareState } = useToolState<YamlToolState>(
 
 - NFR-01: 입력 파싱/변환 중에도 UI가 멈추지 않도록 노력
 - NFR-02: 큰 입력(예: 수 MB)에서 에디터/렌더가 과도하게 느려지지 않게 방어 로직 제공
-- NFR-03: 무거운 연산(대형 JSON 파싱, 대형 diff 계산)은 **Web Worker 옵션** 제공
+- NFR-03: 무거운 연산(대형 JSON 파싱, 대형 diff 계산)은 **Web Worker 옵션** 제공 (v1.1.0 구현 완료)
 
-> Web Worker 설명(사용자 이해용): 브라우저에서 **별도 스레드**로 계산을 돌려 UI를 멈추지 않게 하는 기능. v1에서는 "큰 입력일 때 자동으로 Worker 사용" 정도로 내부 구현 옵션으로 둔다.
+> Web Worker 설명(사용자 이해용): 브라우저에서 **별도 스레드**로 계산을 돌려 UI를 멈추지 않게 하는 기능. v1.1.0부터 큰 입력일 때 자동으로 Worker 사용하여 UI 프리징을 방지합니다.
 
 ---
 
@@ -560,6 +731,31 @@ type CronToolState = {
 
 ---
 
+### 7.8 JWT Encode/Decode (`toolId: jwt`) (v1.1.0 추가)
+
+#### 상태
+
+```ts
+type JwtToolState = {
+  token: string;
+  mode: 'decode' | 'encode'; // 기본 decode
+};
+```
+
+#### 기능
+
+- FR-JWT-01: JWT 토큰 디코딩 (Header, Payload, Signature 분리 표시)
+- FR-JWT-02: Base64 URL 디코딩된 Header/Payload를 JSON 형태로 표시
+- FR-JWT-03: JWT 인코딩 (Header + Payload → 토큰 생성, Signature는 옵션)
+- FR-JWT-04: 디코딩 실패 시 에러 배너 표시
+- FR-JWT-05: **주의**: 검증 기능은 제공하지 않음 (디코딩/인코딩만 제공)
+- AC
+
+  - 유효한 JWT 토큰을 붙여넣으면 Header, Payload가 즉시 표시됨
+  - Base64 URL 디코딩 오류 시 명확한 에러 메시지 제공
+
+---
+
 ## 8. 확장성 설계 (신규 툴 추가가 쉬운 구조)
 
 ### 8.1 Tool 플러그인 계약(인터페이스)
@@ -730,7 +926,7 @@ export type ToolDefinition<TState> = {
 
 ## 13. 향후 추가하기 좋은 도구 Backlog(참고)
 
-- JWT 디코더(검증 X, payload 표시)
+- ~~JWT 디코더(검증 X, payload 표시)~~ ✅ v1.1.0에서 구현 완료
 - UUID v4/v7 생성기
 - QueryString ↔ JSON
 - Hash(SHA-256) 생성기("보안용 아님" 안내 포함)
@@ -742,6 +938,23 @@ export type ToolDefinition<TState> = {
 ---
 
 ## 14. 변경 이력
+
+- **v1.1.0** (2025-01-XX):
+
+  - **사이드바 고도화**:
+    - 최근 사용한 도구 리스트 추가 (최대 5개, localStorage 기반)
+    - 즐겨찾기 리스트 및 메뉴 즐겨찾기 등록 기능 추가 (localStorage 기반)
+    - 사이드바 UI 개선: 즐겨찾기/최근 사용 섹션 분리
+  - **Web App 지원**:
+    - `manifest.json` 추가로 Chrome 앱으로 등록 가능
+    - 독립 창으로 실행 가능
+    - 앱 아이콘 및 테마 색상 설정
+  - **신규 도구 추가**:
+    - JWT Encode/Decode 도구 추가 (디코딩/인코딩만 제공, 검증 기능 제외)
+  - **성능 개선**:
+    - 큰 데이터 처리 시 Web Worker 도입으로 UI 프리징 방지
+    - JSON, Diff, YAML 변환 시 자동 Worker 사용 (입력 크기 기준)
+    - 로딩 인디케이터 추가
 
 - **v1.3** (2025-01-XX):
 
