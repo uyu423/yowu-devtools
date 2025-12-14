@@ -218,20 +218,22 @@ const HashTool: React.FC = () => {
 
         {/* HMAC Option */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            HMAC Authentication
-          </label>
-          <div className="flex items-center gap-2">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={state.hmac}
-                onChange={(e) => updateState({ hmac: e.target.checked })}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-              />
-              <span className="text-sm text-gray-700 dark:text-gray-300">Enable HMAC</span>
+          <OptionLabel tooltip="HMAC (Hash-based Message Authentication Code) uses a secret key to authenticate and verify the integrity of messages. Enable this to generate HMAC signatures instead of regular hashes.">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              HMAC Authentication
             </label>
-          </div>
+            <div className="flex items-center gap-2">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={state.hmac}
+                  onChange={(e) => updateState({ hmac: e.target.checked })}
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <span className="text-sm text-gray-700 dark:text-gray-300">Enable HMAC</span>
+              </label>
+            </div>
+          </OptionLabel>
           {state.hmac && (
             <div className="mt-3">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
