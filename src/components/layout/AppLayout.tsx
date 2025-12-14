@@ -1,12 +1,9 @@
 import React from 'react';
 import { Sidebar } from './Sidebar';
 import { Menu } from 'lucide-react';
-import { useTheme } from '@/hooks/useTheme';
 
 export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
-  // Ensure theme is initialized
-  useTheme();
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white overflow-hidden">
@@ -47,4 +44,3 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
     </div>
   );
 };
-

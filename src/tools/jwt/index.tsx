@@ -1,13 +1,13 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { useMemo } from 'react';
 import type { ToolDefinition } from '@/tools/types';
-import { Key } from 'lucide-react';
+import { Key, Copy } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { EditorPanel } from '@/components/common/EditorPanel';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
 import { useToolState } from '@/hooks/useToolState';
 import { useTitle } from '@/hooks/useTitle';
-import { useTheme } from '@/hooks/useTheme';
+import { useResolvedTheme } from '@/hooks/useTheme';
 import { copyToClipboard } from '@/lib/clipboard';
 import { JsonView, defaultStyles } from 'react-json-view-lite';
 import 'react-json-view-lite/dist/index.css';
@@ -56,44 +56,13 @@ interface ValidationResult {
 }
 
 const JwtTool: React.FC = () => {
-  const { theme } = useTheme();
+  const resolvedTheme = useResolvedTheme();
   const { state, updateState, resetState, shareState } =
     useToolState<JwtToolState>('jwt', DEFAULT_STATE);
   
   useTitle(state.mode === 'decode' ? 'JWT Decoder' : 'JWT Encoder');
 
-  // 다크 모드 감지
-  const [isDark, setIsDark] = React.useState(() => {
-    if (typeof window === 'undefined') return false;
-    return document.documentElement.classList.contains('dark');
-  });
-
-  React.useEffect(() => {
-    const checkTheme = () => {
-      setIsDark(document.documentElement.classList.contains('dark'));
-    };
-
-    checkTheme();
-
-    const observer = new MutationObserver(checkTheme);
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class'],
-    });
-
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleMediaChange = () => {
-      if (theme === 'system') {
-        checkTheme();
-      }
-    };
-    mediaQuery.addEventListener('change', handleMediaChange);
-
-    return () => {
-      observer.disconnect();
-      mediaQuery.removeEventListener('change', handleMediaChange);
-    };
-  }, [theme]);
+  const isDark = resolvedTheme === 'dark';
 
   const jsonViewStyles = React.useMemo(
     () => ({
@@ -277,9 +246,32 @@ const JwtTool: React.FC = () => {
   const [signedToken, setSignedToken] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    if (state.mode !== 'encode' || state.algorithm === 'none' || !state.secretKey) {
-      setSignedToken(null);
-      return;
+    // Header의 alg 필드를 확인하여 서명 필요 여부 결정
+    let needsSigning = true;
+    try {
+      const header = JSON.parse(state.headerJson);
+      const alg = (header.alg as string) || state.algorithm;
+      if (alg === 'none') {
+        needsSigning = false;
+      } else if (alg.startsWith('HS') && !state.secretKey) {
+        setSignedToken(null);
+        return;
+      }
+    } catch {
+      // Header JSON 파싱 실패 시 기본 동작
+      if (state.algorithm === 'none' || (state.algorithm.startsWith('HS') && !state.secretKey)) {
+        setSignedToken(null);
+        return;
+      }
+    }
+
+    if (state.mode !== 'encode' || !needsSigning) {
+      if (!needsSigning) {
+        // 'none' 알고리즘인 경우 signToken에서 처리
+      } else {
+        setSignedToken(null);
+        return;
+      }
     }
 
     const signToken = async () => {
@@ -287,11 +279,28 @@ const JwtTool: React.FC = () => {
         const header = JSON.parse(state.headerJson);
         const payload = JSON.parse(state.payloadJson);
 
+        // Header의 alg 필드를 우선적으로 사용 (JWT 표준 준수)
+        // 별도 폼의 algorithm은 편의를 위한 것이지만, 실제 서명은 Header의 alg를 사용
+        const alg = (header.alg as string) || state.algorithm;
+        
+        // alg가 'none'이면 서명 없이 반환
+        if (alg === 'none') {
+          const headerB64 = base64UrlEncode(JSON.stringify(header));
+          const payloadB64 = base64UrlEncode(JSON.stringify(payload));
+          setSignedToken(`${headerB64}.${payloadB64}.`);
+          return;
+        }
+
+        // HMAC 알고리즘인지 확인
+        if (!alg.startsWith('HS')) {
+          throw new Error(`Unsupported algorithm: ${alg}. Only HS256, HS384, HS512, and 'none' are supported.`);
+        }
+
         const headerB64 = base64UrlEncode(JSON.stringify(header));
         const payloadB64 = base64UrlEncode(JSON.stringify(payload));
         const message = `${headerB64}.${payloadB64}`;
 
-        const hashName = state.algorithm === 'HS256' ? 'SHA-256' : state.algorithm === 'HS384' ? 'SHA-384' : 'SHA-512';
+        const hashName = alg === 'HS256' ? 'SHA-256' : alg === 'HS384' ? 'SHA-384' : 'SHA-512';
         const encoder = new TextEncoder();
         const keyData = encoder.encode(state.secretKey);
         const messageData = encoder.encode(message);
@@ -306,7 +315,8 @@ const JwtTool: React.FC = () => {
 
         const signature = await crypto.subtle.sign('HMAC', cryptoKey, messageData);
         const signatureArray = new Uint8Array(signature);
-        const binary = String.fromCharCode(...signatureArray);
+        // Uint8Array를 Base64로 직접 변환 (더 안전하고 효율적)
+        const binary = Array.from(signatureArray, byte => String.fromCharCode(byte)).join('');
         const base64 = btoa(binary);
         const signatureB64 = base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 
@@ -440,10 +450,24 @@ const JwtTool: React.FC = () => {
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Algorithm
+                <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
+                  (updates header.alg)
+                </span>
               </label>
               <select
                 value={state.algorithm}
-                onChange={(e) => updateState({ algorithm: e.target.value as JwtToolState['algorithm'] })}
+                onChange={(e) => {
+                  const newAlg = e.target.value as JwtToolState['algorithm'];
+                  updateState({ algorithm: newAlg });
+                  // Header JSON의 alg 필드도 자동 업데이트
+                  try {
+                    const header = JSON.parse(state.headerJson);
+                    header.alg = newAlg;
+                    updateState({ headerJson: JSON.stringify(header, null, 2) });
+                  } catch {
+                    // Header JSON 파싱 실패 시 무시
+                  }
+                }}
                 className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-gray-100"
               >
                 <option value="none">None (unsigned)</option>
@@ -480,9 +504,10 @@ const JwtTool: React.FC = () => {
                   </label>
                   <button
                     onClick={handleCopyToken}
-                    className="px-3 py-1 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+                    className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+                    title="Copy Token"
                   >
-                    Copy Token
+                    <Copy className="w-4 h-4" />
                   </button>
                 </div>
                 <EditorPanel
@@ -623,14 +648,13 @@ const JwtTool: React.FC = () => {
                 </h3>
                 <button
                   onClick={handleCopyHeader}
-                  className="px-3 py-1 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+                  className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+                  title="Copy JSON"
                 >
-                  Copy JSON
+                  <Copy className="w-4 h-4" />
                 </button>
               </div>
-              <div className={`bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-200 dark:border-gray-700 ${
-                isDark ? 'bg-gray-800' : ''
-              }`}>
+              <div className="rounded-lg p-4 border border-gray-200 dark:border-gray-700">
                 <JsonView
                   key={`jwt-header-${isDark ? 'dark' : 'light'}`}
                   data={decoded.header}
@@ -651,14 +675,13 @@ const JwtTool: React.FC = () => {
                 </h3>
                 <button
                   onClick={handleCopyPayload}
-                  className="px-3 py-1 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+                  className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+                  title="Copy JSON"
                 >
-                  Copy JSON
+                  <Copy className="w-4 h-4" />
                 </button>
               </div>
-              <div className={`bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-200 dark:border-gray-700 ${
-                isDark ? 'bg-gray-800' : ''
-              }`}>
+              <div className="rounded-lg p-4 border border-gray-200 dark:border-gray-700">
                 <JsonView
                   key={`jwt-payload-${isDark ? 'dark' : 'light'}`}
                   data={decoded.payload}
@@ -679,9 +702,10 @@ const JwtTool: React.FC = () => {
                 </h3>
                 <button
                   onClick={handleCopySignature}
-                  className="px-3 py-1 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+                  className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+                  title="Copy Signature"
                 >
-                  Copy
+                  <Copy className="w-4 h-4" />
                 </button>
               </div>
               <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
@@ -727,7 +751,8 @@ function base64UrlDecode(str: string): string {
 function base64UrlEncode(str: string): string {
   const encoder = new TextEncoder();
   const bytes = encoder.encode(str);
-  const binary = String.fromCharCode(...bytes);
+  // Uint8Array를 Base64로 직접 변환 (더 안전하고 효율적)
+  const binary = Array.from(bytes, byte => String.fromCharCode(byte)).join('');
   const base64 = btoa(binary);
   return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
@@ -779,10 +804,18 @@ async function verifyJwtSignature(
 
     const messageData = encoder.encode(message);
 
+    // signatureBytes는 Uint8Array이므로 올바른 범위의 ArrayBuffer를 사용
+    // Uint8Array의 buffer는 전체 ArrayBuffer를 참조할 수 있으므로, 
+    // byteOffset과 byteLength를 고려하여 올바른 범위만 사용
+    const signatureBuffer = signatureBytes.buffer.slice(
+      signatureBytes.byteOffset,
+      signatureBytes.byteOffset + signatureBytes.byteLength
+    );
+
     return await crypto.subtle.verify(
       'HMAC',
       cryptoKey,
-      signatureBytes as unknown as ArrayBuffer,
+      signatureBuffer,
       messageData
     );
   }
@@ -831,7 +864,7 @@ async function verifyJwtSignature(
           saltLength: 32,
         },
         cryptoKey,
-        signatureBytes as unknown as ArrayBuffer,
+        signatureBytes.buffer,
         messageData
       );
     } catch {
@@ -852,7 +885,7 @@ async function verifyJwtSignature(
           name: 'RSASSA-PKCS1-v1_5',
         },
         cryptoKeyPKCS1,
-        signatureBytes as unknown as ArrayBuffer,
+        signatureBytes.buffer,
         messageData
       );
     }
@@ -947,7 +980,7 @@ async function verifyJwtSignature(
         hash: hashName,
       },
       cryptoKey,
-      derSignature,
+      derSignature.buffer,
       messageData
     );
   }
@@ -964,4 +997,3 @@ export const jwtTool: ToolDefinition<JwtToolState> = {
   defaultState: DEFAULT_STATE,
   Component: JwtTool,
 };
-

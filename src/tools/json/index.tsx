@@ -10,7 +10,7 @@ import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useTitle } from '@/hooks/useTitle';
-import { useTheme } from '@/hooks/useTheme';
+import { useResolvedTheme } from '@/hooks/useTheme';
 import { useWebWorker, shouldUseWorkerForText } from '@/hooks/useWebWorker';
 import { copyToClipboard } from '@/lib/clipboard';
 import { JsonView, defaultStyles } from 'react-json-view-lite';
@@ -36,7 +36,7 @@ const DEFAULT_STATE: JsonToolState = {
 
 const JsonTool: React.FC = () => {
   useTitle('JSON Viewer');
-  const { theme } = useTheme();
+  const resolvedTheme = useResolvedTheme();
   const { state, updateState, resetState, shareState } =
     useToolState<JsonToolState>('json', DEFAULT_STATE, {
       // Exclude 'search' field as it's UI-only state
@@ -62,42 +62,7 @@ const JsonTool: React.FC = () => {
     [debouncedInput]
   );
 
-  // 다크 모드 감지 - 실제 DOM 클래스를 확인하여 정확한 상태 추적
-  const [isDark, setIsDark] = React.useState(() => {
-    if (typeof window === 'undefined') return false;
-    return document.documentElement.classList.contains('dark');
-  });
-
-  // 테마 변경 감지
-  React.useEffect(() => {
-    const checkTheme = () => {
-      setIsDark(document.documentElement.classList.contains('dark'));
-    };
-
-    // 초기 확인
-    checkTheme();
-
-    // MutationObserver로 클래스 변경 감지
-    const observer = new MutationObserver(checkTheme);
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class'],
-    });
-
-    // 미디어 쿼리 변경 감지 (system 모드일 때)
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleMediaChange = () => {
-      if (theme === 'system') {
-        checkTheme();
-      }
-    };
-    mediaQuery.addEventListener('change', handleMediaChange);
-
-    return () => {
-      observer.disconnect();
-      mediaQuery.removeEventListener('change', handleMediaChange);
-    };
-  }, [theme]);
+  const isDark = resolvedTheme === 'dark';
 
   const jsonViewStyles = React.useMemo(
     () => ({
@@ -359,11 +324,7 @@ const JsonTool: React.FC = () => {
             {!parseResult.error &&
               state.viewMode === 'tree' &&
               parseResult.data && (
-                <div
-                  className={`flex-1 min-h-0 overflow-auto p-4 ${
-                    isDark ? 'bg-gray-800' : ''
-                  }`}
-                >
+                <div className="flex-1 min-h-0 overflow-auto p-4">
                   <JsonView
                     key={`json-view-${isDark ? 'dark' : 'light'}`}
                     data={parseResult.data}
