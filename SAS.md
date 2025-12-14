@@ -81,9 +81,10 @@
 - Language: **TypeScript**
 - Build: **Vite**
 - UI: **React**
-- Routing: **React Router (HashRouter 권장)**
+- Routing: **React Router (BrowserRouter)**
 
-  - GitHub Pages/정적 호스팅에서 라우팅 이슈 최소화
+  - GitHub Pages에서 BrowserRouter 사용, 각 라우트별 HTML 파일 자동 생성으로 SEO 최적화
+  - `404.html`을 통한 SPA 라우팅 지원
 
 - Styling: **Tailwind CSS**
 
@@ -543,7 +544,18 @@ export type ToolDefinition<TState> = {
 
 - 라우팅:
 
-  - HashRouter 사용 시 별도 404 리라이트 불필요
+  - BrowserRouter 사용, 빌드 시 각 라우트별 HTML 파일 자동 생성
+  - `404.html`이 SPA 라우팅을 처리하여 직접 URL 접근 시 React 앱으로 리다이렉트
+  - 각 도구 페이지가 검색 엔진에 별도 페이지로 인덱싱됨
+
+### 10.3 SEO 최적화
+
+- 빌드 시 자동 생성되는 파일:
+  - 각 도구별 HTML 파일 (`/json/index.html`, `/diff/index.html` 등)
+  - 각 HTML에 도구별 메타 태그 포함 (title, description, Open Graph, Twitter Card)
+  - `sitemap.xml`: 모든 페이지를 검색 엔진에 알림
+  - `robots.txt`: 검색 엔진 크롤링 허용 및 sitemap 위치 지정
+- Vite 플러그인: `vite-plugin-generate-routes.ts`가 빌드 후 자동으로 라우트 HTML 생성
 
 ---
 
@@ -587,7 +599,16 @@ export type ToolDefinition<TState> = {
 
 ---
 
-## 14. 변경 이력 (v1.1)
+## 14. 변경 이력
+
+- **v1.2** (2025-01-XX):
+
+  - HashRouter → BrowserRouter 변경으로 SEO 최적화
+  - 빌드 시 각 도구별 HTML 파일 자동 생성
+  - 각 도구 페이지에 맞춤 메타 태그 자동 생성
+  - `sitemap.xml` 및 `robots.txt` 자동 생성
+  - `404.html`을 통한 SPA 라우팅 지원
+  - 다크 모드 완전 지원 (모든 컴포넌트 및 도구)
 
 - **v1.1** (2025-12-14):
   - 사이드바 UI 개선: 로고(yowu.dev) 추가, GitHub 링크 위치 변경, 이스터에그 뱃지 추가

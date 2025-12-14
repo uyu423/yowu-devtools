@@ -6,8 +6,13 @@
 ## Build, Test, and Development Commands
 - `npm run dev` – launches Vite with React Fast Refresh at `localhost:5173` for day-to-day work.
 - `npm run lint` – runs ESLint using `eslint.config.js`; keep it clean before pushing.
-- `npm run build` – type-checks via `tsc -b` and builds production assets.
+- `npm run build` – type-checks via `tsc -b`, builds production assets, and generates route-specific HTML files for SEO.
 - `npm run preview` – serves the built bundle to sanity-check release artifacts.
+
+**Note**: The build process automatically generates:
+- Separate HTML files for each tool route (`/json/index.html`, `/diff/index.html`, etc.)
+- SEO files (`sitemap.xml`, `robots.txt`)
+- `404.html` for SPA routing support on GitHub Pages
 
 ## Coding Style & Naming Conventions
 Use TypeScript + JSX with 2-space indentation and functional components. Components follow PascalCase (`JsonTool.tsx`), hooks kebab-case (`use-tool-state.ts`), and utility files lowercase. Favor hooks for state, `clsx`/`tailwind-merge` for conditional classes, and Tailwind utility classes for layout. Keep user-facing strings in English only.
@@ -20,3 +25,10 @@ Write short imperative commit subjects (`add base64 swap`, `wire cron parser`). 
 
 ## Environment & Deployment Notes
 Use Node 20+ / npm 10 to stay in sync with `package-lock.json`. Install dependencies with npm only. GitHub Pages deployment is handled by `.github/workflows/deploy.yml`; verify `npm run build` before merging to `main` because pushes trigger a deploy. Whenever a feature, UX flow, or tool option changes, immediately review and refresh all relevant docs (`README.md`, `AGENTS.md`, `SAS.md`, implementation notes) so instructions never drift from the actual behavior.
+
+## Routing & SEO
+- Uses **BrowserRouter** (not HashRouter) for clean, SEO-friendly URLs
+- Each tool route (`/json`, `/diff`, etc.) generates a separate HTML file during build
+- Custom Vite plugin (`vite-plugin-generate-routes.ts`) handles route HTML generation
+- Each generated HTML includes tool-specific meta tags for search engine optimization
+- GitHub Pages handles SPA routing via `404.html` redirect script

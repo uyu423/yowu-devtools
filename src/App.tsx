@@ -57,7 +57,7 @@ function App() {
                 {tools.map(tool => (
                   <a 
                     key={tool.id} 
-                    href={`#${tool.path}`}
+                    href={tool.path}
                     className="group block p-5 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-md transition-all bg-white dark:bg-gray-800"
                   >
                     <div className="flex items-start mb-2">
