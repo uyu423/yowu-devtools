@@ -216,6 +216,37 @@ const tools: ToolInfo[] = [
       'Header and payload viewer',
     ],
   },
+  {
+    id: 'hash',
+    path: '/hash',
+    title: 'Hash/Checksum Generator',
+    description: 'Calculate hash values and HMAC signatures',
+    seoDescription:
+      'Free online hash and checksum generator. Calculate SHA-256, SHA-1, SHA-384, SHA-512 hashes and HMAC signatures. All processing happens in your browser - no data sent to servers.',
+    keywords: [
+      'hash generator',
+      'checksum calculator',
+      'sha256',
+      'sha1',
+      'sha384',
+      'sha512',
+      'hmac',
+      'cryptographic hash',
+      'digest calculator',
+      'hash tool',
+      'checksum tool',
+      'fingerprint generator',
+    ],
+    features: [
+      'SHA-256 hash calculation',
+      'SHA-1 hash calculation',
+      'SHA-384 hash calculation',
+      'SHA-512 hash calculation',
+      'HMAC signature support',
+      'Hex and Base64 output formats',
+      'Real-time calculation',
+    ],
+  },
 ];
 
 export function generateRoutes(): Plugin {
