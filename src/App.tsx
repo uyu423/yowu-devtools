@@ -15,6 +15,13 @@ import { APP_VERSION } from '@/lib/constants';
 function AppContent() {
   const location = useLocation();
   const { addRecentTool } = useRecentTools();
+  
+  // 메인 페이지 타이틀 설정
+  useEffect(() => {
+    if (location.pathname === '/') {
+      document.title = "Yowu's DevTools";
+    }
+  }, [location.pathname]);
 
   // 도구 페이지 진입 시 최근 사용한 도구에 추가
   useEffect(() => {
