@@ -3,9 +3,17 @@ import { defineConfig } from 'vite';
 import { generateRoutes } from './vite-plugin-generate-routes';
 import path from 'path';
 import react from '@vitejs/plugin-react';
+import { readFileSync } from 'fs';
+
+// Read package.json to get version
+const packageJson = JSON.parse(readFileSync('./package.json', 'utf-8'));
+const appVersion = packageJson.version;
 
 // https://vite.dev/config/
 export default defineConfig({
+  define: {
+    'import.meta.env.APP_VERSION': JSON.stringify(appVersion),
+  },
   plugins: [
     react(),
     generateRoutes(),

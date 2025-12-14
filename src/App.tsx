@@ -9,6 +9,7 @@ import { useEffect } from 'react';
 import { usePWA } from '@/hooks/usePWA';
 import { useRecentTools } from '@/hooks/useRecentTools';
 import { useResolvedTheme } from '@/hooks/useTheme';
+import { APP_VERSION } from '@/lib/constants';
 
 function AppContent() {
   const location = useLocation();
@@ -30,8 +31,11 @@ function AppContent() {
           <div className="p-8 max-w-4xl mx-auto">
             {/* Hero Section */}
             <div className="mb-12">
-              <h1 className="text-4xl font-bold mb-6 text-gray-900 dark:text-white">
-                tools.yowu.dev
+              <h1 className="flex flex-col md:flex-row md:items-baseline gap-2 md:gap-3 text-4xl font-bold mb-6 text-gray-900 dark:text-white">
+                <span>Yowu's DevTools</span>
+                <span className="inline-flex items-center w-fit px-2 py-0.5 rounded-md text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border border-blue-200 dark:border-blue-800/50 leading-none">
+                  v{APP_VERSION}
+                </span>
               </h1>
               <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
                 An open toolbox for developers who would rather keep sensitive

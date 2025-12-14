@@ -50,7 +50,7 @@ export const PWAUpdatePrompt: React.FC<PWAUpdatePromptProps> = ({
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 max-w-sm">
+    <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 z-50 max-w-sm md:max-w-sm mx-auto md:mx-0">
       {needRefresh && (
         <div className="mb-2 rounded-lg border border-blue-200 dark:border-gray-700 bg-blue-50 dark:bg-gray-800 p-4 shadow-lg">
           <div className="flex items-start gap-3">
