@@ -8,7 +8,6 @@ import { tools } from '@/tools';
 import { useEffect } from 'react';
 import { usePWA } from '@/hooks/usePWA';
 import { useRecentTools } from '@/hooks/useRecentTools';
-import { useTheme } from '@/hooks/useTheme';
 
 function AppContent() {
   const location = useLocation();
@@ -148,9 +147,6 @@ function AppContent() {
 }
 
 function App() {
-  // Ensure theme is initialized at app level
-  useTheme();
-
   // PWA 기능 (업데이트 알림, 설치 프롬프트, 오프라인 감지)
   const pwa = usePWA();
 

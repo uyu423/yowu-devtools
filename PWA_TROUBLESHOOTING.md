@@ -127,3 +127,4 @@ window.addEventListener('beforeinstallprompt', (e) => {
 4. 다른 기기에서 테스트
 
 
+

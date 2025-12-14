@@ -3,7 +3,7 @@ import CodeMirror from '@uiw/react-codemirror';
 import { EditorView } from '@codemirror/view';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { cn } from '@/lib/utils';
-import { useTheme } from '@/hooks/useTheme';
+import { useResolvedTheme } from '@/hooks/useTheme';
 
 // We'll add more extensions later based on mode
 interface EditorPanelProps {
@@ -33,44 +33,8 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
   title,
   status = 'default',
 }) => {
-  const { theme } = useTheme();
-  
-  // 실제 DOM의 dark 클래스를 확인하여 정확한 상태 추적
-  const [isDark, setIsDark] = React.useState(() => {
-    if (typeof window === 'undefined') return false;
-    return document.documentElement.classList.contains('dark');
-  });
-
-  // 테마 변경 감지
-  React.useEffect(() => {
-    const checkTheme = () => {
-      setIsDark(document.documentElement.classList.contains('dark'));
-    };
-
-    // 초기 확인
-    checkTheme();
-
-    // MutationObserver로 클래스 변경 감지
-    const observer = new MutationObserver(checkTheme);
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class'],
-    });
-
-    // 미디어 쿼리 변경 감지 (system 모드일 때)
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleMediaChange = () => {
-      if (theme === 'system') {
-        checkTheme();
-      }
-    };
-    mediaQuery.addEventListener('change', handleMediaChange);
-
-    return () => {
-      observer.disconnect();
-      mediaQuery.removeEventListener('change', handleMediaChange);
-    };
-  }, [theme]);
+  const resolvedTheme = useResolvedTheme();
+  const isDark = resolvedTheme === 'dark';
 
   return (
     <div

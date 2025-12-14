@@ -7,7 +7,7 @@ import { EditorPanel } from '@/components/common/EditorPanel';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
 import { useToolState } from '@/hooks/useToolState';
 import { useTitle } from '@/hooks/useTitle';
-import { useTheme } from '@/hooks/useTheme';
+import { useResolvedTheme } from '@/hooks/useTheme';
 import { copyToClipboard } from '@/lib/clipboard';
 import { JsonView, defaultStyles } from 'react-json-view-lite';
 import 'react-json-view-lite/dist/index.css';
@@ -56,44 +56,13 @@ interface ValidationResult {
 }
 
 const JwtTool: React.FC = () => {
-  const { theme } = useTheme();
+  const resolvedTheme = useResolvedTheme();
   const { state, updateState, resetState, shareState } =
     useToolState<JwtToolState>('jwt', DEFAULT_STATE);
   
   useTitle(state.mode === 'decode' ? 'JWT Decoder' : 'JWT Encoder');
 
-  // 다크 모드 감지
-  const [isDark, setIsDark] = React.useState(() => {
-    if (typeof window === 'undefined') return false;
-    return document.documentElement.classList.contains('dark');
-  });
-
-  React.useEffect(() => {
-    const checkTheme = () => {
-      setIsDark(document.documentElement.classList.contains('dark'));
-    };
-
-    checkTheme();
-
-    const observer = new MutationObserver(checkTheme);
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class'],
-    });
-
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleMediaChange = () => {
-      if (theme === 'system') {
-        checkTheme();
-      }
-    };
-    mediaQuery.addEventListener('change', handleMediaChange);
-
-    return () => {
-      observer.disconnect();
-      mediaQuery.removeEventListener('change', handleMediaChange);
-    };
-  }, [theme]);
+  const isDark = resolvedTheme === 'dark';
 
   const jsonViewStyles = React.useMemo(
     () => ({
@@ -964,4 +933,3 @@ export const jwtTool: ToolDefinition<JwtToolState> = {
   defaultState: DEFAULT_STATE,
   Component: JwtTool,
 };
-
