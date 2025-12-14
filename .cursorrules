@@ -1,0 +1,413 @@
+# tools.yowu.dev - Cursor Rules
+
+이 파일은 tools.yowu.dev 프로젝트의 개발 가이드라인을 정의합니다. AI 에이전트와 개발자가 일관된 코드 스타일과 패턴을 따르도록 합니다.
+
+## 프로젝트 개요
+
+**tools.yowu.dev**는 개발자를 위한 클라이언트 사이드 전용 개발 도구 모음입니다. 모든 처리는 브라우저 내에서 이루어지며, 서버로 데이터를 전송하지 않습니다.
+
+### 핵심 원칙
+
+1. **클라이언트 사이드 전용**: 모든 변환/처리는 브라우저에서 수행, 외부 서버로 데이터 전송 없음
+2. **프라이버시 우선**: 사용자 데이터는 로컬에만 저장, 명시적 공유 링크 생성 시에만 URL에 포함
+3. **모듈형 구조**: 각 도구는 독립적인 모듈로 구성, 쉽게 추가/제거 가능
+4. **SEO 최적화**: BrowserRouter 사용, 각 도구별 HTML 파일 자동 생성
+5. **반응형 디자인**: 모바일/데스크탑 모두 지원
+6. **다크 모드**: System/Light/Dark 테마 지원
+
+## 기술 스택
+
+- **언어**: TypeScript (strict mode)
+- **프레임워크**: React 19 (함수형 컴포넌트만 사용)
+- **빌드 도구**: Vite 7
+- **라우팅**: React Router v7 (BrowserRouter)
+- **스타일링**: Tailwind CSS 3
+- **에디터**: CodeMirror 6 (@uiw/react-codemirror)
+- **상태 관리**: React Hooks (useState, useCallback, useMemo)
+- **알림**: Sonner (Toast)
+- **아이콘**: Lucide React
+- **압축**: lz-string (URL 공유용)
+
+## 프로젝트 구조
+
+```
+src/
+├── assets/          # 이미지, 로고 등 정적 자산
+├── components/      # 공통 컴포넌트
+│   ├── common/     # ToolHeader, EditorPanel, ActionBar, ErrorBanner
+│   ├── layout/     # AppLayout, Sidebar
+│   └── ui/         # Tooltip, OptionLabel 등 UI 프리미티브
+├── hooks/          # 커스텀 훅
+│   ├── useToolState.ts    # 도구 상태 관리 (localStorage + URL 공유)
+│   ├── useTheme.ts        # 테마 관리
+│   ├── useTitle.ts        # 페이지 타이틀 관리
+│   └── useDebouncedValue.ts  # 디바운스된 값
+├── lib/            # 유틸리티 함수
+│   ├── utils.ts    # cn (clsx + tailwind-merge)
+│   └── clipboard.ts # 클립보드 복사 헬퍼
+├── tools/          # 각 도구 구현
+│   ├── index.ts    # 도구 레지스트리
+│   ├── types.ts    # ToolDefinition 타입
+│   └── <toolId>/   # 각 도구별 디렉토리
+│       └── index.tsx  # 도구 컴포넌트 및 정의
+└── main.tsx        # 앱 진입점
+```
+
+## 코딩 스타일 및 명명 규칙
+
+### 파일/디렉토리 명명
+
+- **컴포넌트**: PascalCase (`ToolHeader.tsx`, `EditorPanel.tsx`)
+- **훅**: kebab-case (`use-tool-state.ts`) 또는 camelCase (`useToolState.ts`) - 현재는 camelCase 사용
+- **유틸리티**: lowercase (`utils.ts`, `clipboard.ts`)
+- **도구 디렉토리**: lowercase (`json/`, `url/`, `base64/`)
+
+### 컴포넌트 작성 규칙
+
+1. **함수형 컴포넌트만 사용**: 클래스 컴포넌트 금지
+2. **TypeScript 타입 명시**: 모든 props와 state에 타입 정의
+3. **인라인 스타일 금지**: Tailwind CSS 클래스만 사용
+4. **조건부 클래스**: `clsx`와 `tailwind-merge`의 `cn` 함수 사용
+5. **Props 인터페이스**: 컴포넌트 상단에 명시적으로 정의
+
+```typescript
+// ✅ 좋은 예
+interface ToolHeaderProps {
+  title: string;
+  description: string;
+  onReset?: () => void;
+}
+
+export const ToolHeader: React.FC<ToolHeaderProps> = ({ title, description, onReset }) => {
+  return (
+    <div className={cn("flex items-center", isActive && "bg-blue-50")}>
+      {/* ... */}
+    </div>
+  );
+};
+
+// ❌ 나쁜 예
+export const ToolHeader = ({ title, description }) => {
+  return <div style={{ display: 'flex' }}>{/* ... */}</div>;
+};
+```
+
+### 상태 관리 패턴
+
+1. **useToolState 훅 사용**: 모든 도구는 `useToolState`로 상태 관리
+2. **localStorage 자동 저장**: 상태 변경 시 자동으로 localStorage에 저장
+3. **URL 공유 지원**: `shareState` 함수로 공유 링크 생성
+4. **디바운싱**: 입력 필드는 `useDebouncedValue`로 디바운싱
+
+```typescript
+// ✅ 표준 패턴
+const { state, updateState, resetState, shareState } = useToolState<ToolState>(
+  'toolId',
+  DEFAULT_STATE,
+  {
+    // URL 공유 최적화: UI 전용 상태 제외
+    shareStateFilter: ({ input, option1, option2 }) => ({
+      input,
+      option1,
+      option2,
+      // search, scrollPosition 등 UI 전용 필드는 제외
+    }),
+  }
+);
+```
+
+### 다크 모드 처리
+
+1. **useTheme 훅 사용**: `const { theme, setTheme } = useTheme()`
+2. **DOM 클래스 확인**: CodeMirror 등 외부 라이브러리는 실제 DOM의 `dark` 클래스 확인
+3. **MutationObserver 사용**: 테마 변경 감지
+
+```typescript
+// ✅ 다크 모드 감지 패턴
+const [isDark, setIsDark] = React.useState(() => {
+  if (typeof window === 'undefined') return false;
+  return document.documentElement.classList.contains('dark');
+});
+
+React.useEffect(() => {
+  const observer = new MutationObserver(() => {
+    setIsDark(document.documentElement.classList.contains('dark'));
+  });
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['class'],
+  });
+  return () => observer.disconnect();
+}, []);
+```
+
+### Tailwind CSS 사용 규칙
+
+1. **다크 모드 클래스**: 모든 색상 클래스에 다크 모드 변형 포함
+   - `text-gray-900 dark:text-white`
+   - `bg-white dark:bg-gray-800`
+   - `border-gray-200 dark:border-gray-700`
+
+2. **반응형 클래스**: 모바일 우선 접근
+   - `flex flex-col lg:flex-row`
+   - `p-4 md:p-6`
+
+3. **일관된 색상 팔레트**:
+   - Primary: `blue-600`, `blue-400` (다크 모드)
+   - Success: `emerald-300`, `emerald-700` (다크 모드)
+   - Error: `red-300`, `red-700` (다크 모드)
+   - Background: `gray-50`, `gray-900` (다크 모드)
+
+## 도구 개발 가이드
+
+### 새 도구 추가 절차
+
+1. **도구 디렉토리 생성**: `src/tools/<toolId>/index.tsx`
+
+2. **상태 타입 정의**:
+```typescript
+interface ToolState {
+  input: string;
+  option1: boolean;
+  option2: number;
+  // UI 전용 상태는 별도로 구분 (URL 공유 시 제외)
+  search?: string;
+}
+```
+
+3. **기본 상태 정의**:
+```typescript
+const DEFAULT_STATE: ToolState = {
+  input: '',
+  option1: false,
+  option2: 2,
+};
+```
+
+4. **컴포넌트 구현**:
+```typescript
+const ToolComponent: React.FC = () => {
+  useTitle('Tool Name'); // 페이지 타이틀 설정
+  const { state, updateState, resetState, shareState } = useToolState<ToolState>(
+    'toolId',
+    DEFAULT_STATE,
+    {
+      // URL 공유 최적화 (필요시)
+      shareStateFilter: ({ input, option1, option2 }) => ({
+        input,
+        option1,
+        option2,
+      }),
+    }
+  );
+  
+  // 로직 구현...
+  
+  return (
+    <div className="flex flex-col h-full p-4 md:p-6 max-w-5xl mx-auto">
+      <ToolHeader
+        title="Tool Title"
+        description="Tool description"
+        onReset={resetState}
+        onShare={shareState}
+      />
+      {/* 도구 UI */}
+    </div>
+  );
+};
+```
+
+5. **도구 정의 및 내보내기**:
+```typescript
+export const toolTool: ToolDefinition<ToolState> = {
+  id: 'toolId',
+  title: 'Tool Name',
+  description: 'Short description',
+  path: '/tool-path',
+  icon: IconComponent, // Lucide React 아이콘
+  defaultState: DEFAULT_STATE,
+  Component: ToolComponent,
+};
+```
+
+6. **도구 등록**: `src/tools/index.ts`에 추가
+```typescript
+import { toolTool } from './tool';
+export const tools: ToolDefinition[] = [
+  // ... 기존 도구들
+  toolTool,
+];
+```
+
+7. **SEO 최적화**: `vite-plugin-generate-routes.ts`의 `tools` 배열에 추가
+```typescript
+{
+  id: 'toolId',
+  path: '/tool-path',
+  title: 'Tool Name',
+  description: 'Short description',
+  seoDescription: 'Free online tool description. 150-160자 권장. All processing happens in your browser.',
+  keywords: ['keyword1', 'keyword2', ...], // 5-10개 권장
+  features: ['Feature 1', 'Feature 2', ...], // 5-7개 권장
+}
+```
+
+### 공통 컴포넌트 사용
+
+1. **ToolHeader**: 도구 제목, 설명, Reset/Share 버튼
+2. **EditorPanel**: CodeMirror 기반 입력/출력 패널
+3. **ActionBar**: 액션 버튼 그룹
+4. **ErrorBanner**: 에러 메시지 표시
+5. **OptionLabel**: 옵션 라벨 + Tooltip
+
+### Width 전략
+
+도구별로 최적화된 최대 너비 사용:
+
+- **Wide Group** (`max-w-[90rem]`): 좌우 분할 뷰 도구
+  - JSON Viewer, YAML Converter, Text Diff
+- **Medium Group** (`max-w-5xl`): 상하 배치 도구
+  - URL Encoder, Base64 Converter
+- **Narrow Group** (`max-w-3xl`): 단순 입력 폼 도구
+  - Time Converter, Cron Parser
+
+## URL 공유 최적화
+
+### 필터링 전략
+
+URL 공유 시 필요한 필드만 포함하여 URL 길이를 최소화합니다.
+
+**원칙**:
+- ✅ 포함: 사용자 입력, 설정 옵션
+- ❌ 제외: UI 전용 상태 (검색어, 스크롤 위치), 계산된 값 (파싱 결과)
+
+**구현**:
+```typescript
+useToolState<ToolState>('toolId', DEFAULT_STATE, {
+  shareStateFilter: ({ input, option1, option2 }) => ({
+    input,
+    option1,
+    option2,
+    // search, scrollPosition 등은 제외
+  }),
+});
+```
+
+**도구별 가이드**:
+- JSON: `search` 필드 제외
+- YAML/Diff/Base64/URL: 모든 필드 필요 (필터 없음)
+- Time/Cron: 작은 데이터이므로 필터 없음
+
+## SEO 최적화
+
+### 신규 도구 추가 시 필수 사항
+
+1. **`vite-plugin-generate-routes.ts`에 도구 정보 추가**:
+   - `id`, `path`, `title`, `description`
+   - `seoDescription`: 150-160자, "Free online"으로 시작, 프라이버시 강조
+   - `keywords`: 5-10개, 검색 가능성 높은 키워드
+   - `features`: 5-7개, 핵심 기능 목록
+
+2. **검증**:
+   - `npm run build` 실행 후 `dist/{tool-path}/index.html` 확인
+   - 메타 태그가 올바르게 생성되었는지 확인
+   - `dist/sitemap.xml`에 새 경로 추가 확인
+
+## 에러 처리
+
+1. **에러 표시**: `ErrorBanner` 컴포넌트 사용
+2. **파싱 에러**: 가능하면 line/column 정보 포함
+3. **사용자 친화적 메시지**: 기술적 에러를 사용자가 이해할 수 있는 형태로 변환
+
+```typescript
+// ✅ 좋은 예
+{parseResult.error && (
+  <ErrorBanner
+    message="JSON parsing failed"
+    details={parseResult.error}
+  />
+)}
+
+// ❌ 나쁜 예
+{error && <div>{error.toString()}</div>}
+```
+
+## 성능 최적화
+
+1. **디바운싱**: 입력 필드는 200-500ms 디바운싱
+2. **메모이제이션**: 무거운 계산은 `useMemo` 사용
+3. **조건부 렌더링**: 큰 컴포넌트는 필요할 때만 렌더링
+4. **가상화 고려**: 매우 큰 리스트는 가상화 고려 (현재 미구현)
+
+## 테스트 (향후)
+
+- 테스트 파일 위치: `src/<feature>/__tests__/`
+- 파일 명명: `*.test.ts(x)`
+- 프레임워크: Vitest + React Testing Library
+- 현재는 테스트 없음, 수동 검증
+
+## Git 커밋 규칙
+
+- **커밋 메시지**: 짧은 명령형 주제 (`add base64 swap`, `wire cron parser`)
+- **이슈 참조**: 본문에 `Refs: #42` 형식으로 포함
+- **PR 가이드**: 변경 사항 설명, 스크린샷/GIF 포함, 실행한 명령어 나열
+
+## 빌드 및 배포
+
+### 개발
+```bash
+npm run dev       # http://localhost:5173
+npm run lint      # ESLint 실행
+npm run build     # 타입 체크 + 빌드
+npm run preview   # 빌드 결과 미리보기
+```
+
+### 배포
+- GitHub Pages 자동 배포 (`.github/workflows/deploy.yml`)
+- `main` 브랜치에 push 시 자동 배포
+- 빌드 전에 반드시 `npm run lint`와 `npm run build` 로컬 실행 확인
+
+### 빌드 산출물
+- `dist/`: 빌드 출력 디렉토리 (gitignore)
+- 각 도구별 HTML 파일 자동 생성 (`/json/index.html` 등)
+- SEO 파일: `sitemap.xml`, `robots.txt`, `404.html`
+- `CNAME`: 커스텀 도메인 설정
+
+## 문서 업데이트 원칙
+
+**중요**: 기능, UX 흐름, 도구 옵션이 변경되면 즉시 다음 문서들을 확인하고 갱신:
+
+1. `README.md`: 프로젝트 개요, 시작 가이드
+2. `AGENTS.md`: 기여자 가이드, SEO 최적화 가이드
+3. `SAS.md`: 상세 요구사항 명세
+4. `IMPLEMENTATION_PLAN.md`: 구현 계획 및 체크리스트
+
+문서와 실제 동작이 일치하지 않으면 안 됩니다.
+
+## 주의사항
+
+1. **서버 전송 금지**: 사용자 데이터를 외부 서버로 전송하는 코드 절대 금지
+2. **Analytics 금지**: 추적 코드 추가 금지
+3. **의존성 추가 시 주의**: 새로운 패키지 추가 시 번들 크기와 라이선스 확인
+4. **브라우저 호환성**: 최신 브라우저 대상 (ES2020+)
+5. **접근성**: 키보드 네비게이션, 스크린 리더 고려 (향후 개선)
+
+## 코드 리뷰 체크리스트
+
+새 코드 작성 시 확인:
+
+- [ ] TypeScript 타입이 모두 정의되었는가?
+- [ ] 다크 모드 클래스가 모든 색상에 포함되었는가?
+- [ ] 반응형 클래스가 적절히 사용되었는가?
+- [ ] `useToolState`로 상태를 관리하는가?
+- [ ] 에러 처리가 적절한가?
+- [ ] Toast 알림이 필요한 곳에 사용되었는가?
+- [ ] URL 공유 최적화가 필요한가? (필터링 적용)
+- [ ] SEO 최적화가 완료되었는가? (신규 도구인 경우)
+- [ ] ESLint 오류가 없는가?
+- [ ] 관련 문서가 업데이트되었는가?
+
+---
+
+이 규칙은 프로젝트의 일관성과 품질을 유지하기 위한 가이드라인입니다. 질문이나 개선 제안이 있으면 이슈를 생성하거나 PR을 제출해주세요.
+
