@@ -101,30 +101,9 @@ const JwtTool: React.FC = () => {
       container: `${defaultStyles.container} text-sm font-mono ${
         isDark ? 'text-gray-100' : 'text-gray-900'
       }`,
-      basicChildStyle: `${defaultStyles.basicChildStyle} ${
-        isDark ? 'text-gray-300' : 'text-gray-700'
-      }`,
-      label: `${defaultStyles.label} ${
-        isDark ? 'text-blue-400' : 'text-blue-600'
-      }`,
-      valueText: `${defaultStyles.valueText} ${
-        isDark ? 'text-emerald-300' : 'text-emerald-700'
-      }`,
-      valueNumber: `${defaultStyles.valueNumber} ${
-        isDark ? 'text-purple-300' : 'text-purple-600'
-      }`,
-      valueBoolean: `${defaultStyles.valueBoolean} ${
-        isDark ? 'text-orange-300' : 'text-orange-600'
-      }`,
-      valueNull: `${defaultStyles.valueNull} ${
-        isDark ? 'text-gray-500' : 'text-gray-400'
-      }`,
-      punctuation: `${defaultStyles.punctuation} ${
-        isDark ? 'text-gray-400' : 'text-gray-500'
-      }`,
-      collapseIcon: `${defaultStyles.collapseIcon} ${
-        isDark ? 'text-gray-400' : 'text-gray-600'
-      }`,
+      childFieldsContainer: `${
+        defaultStyles.childFieldsContainer ?? ''
+      } child-fields-container`,
     }),
     [isDark]
   );
@@ -159,7 +138,7 @@ const JwtTool: React.FC = () => {
           signature: signatureRaw,
         },
       };
-    } catch (error) {
+    } catch {
       return null;
     }
   }, [state.token, state.mode]);
@@ -285,7 +264,6 @@ const JwtTool: React.FC = () => {
 
       // HMAC signing
       if (state.algorithm.startsWith('HS') && state.secretKey) {
-        const message = `${headerB64}.${payloadB64}`;
         // This will be handled by async function
         return null; // Will be set by useEffect
       }
@@ -333,7 +311,7 @@ const JwtTool: React.FC = () => {
         const signatureB64 = base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 
         setSignedToken(`${message}.${signatureB64}`);
-      } catch (error) {
+      } catch {
         setSignedToken(null);
       }
     };
@@ -650,10 +628,13 @@ const JwtTool: React.FC = () => {
                   Copy JSON
                 </button>
               </div>
-              <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+              <div className={`bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-200 dark:border-gray-700 ${
+                isDark ? 'bg-gray-800' : ''
+              }`}>
                 <JsonView
+                  key={`jwt-header-${isDark ? 'dark' : 'light'}`}
                   data={decoded.header}
-                  shouldInitiallyExpand={() => true}
+                  shouldExpandNode={() => true}
                   style={jsonViewStyles}
                 />
               </div>
@@ -675,10 +656,13 @@ const JwtTool: React.FC = () => {
                   Copy JSON
                 </button>
               </div>
-              <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+              <div className={`bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-200 dark:border-gray-700 ${
+                isDark ? 'bg-gray-800' : ''
+              }`}>
                 <JsonView
+                  key={`jwt-payload-${isDark ? 'dark' : 'light'}`}
                   data={decoded.payload}
-                  shouldInitiallyExpand={() => true}
+                  shouldExpandNode={() => true}
                   style={jsonViewStyles}
                 />
               </div>
@@ -798,7 +782,7 @@ async function verifyJwtSignature(
     return await crypto.subtle.verify(
       'HMAC',
       cryptoKey,
-      signatureBytes,
+      signatureBytes as unknown as ArrayBuffer,
       messageData
     );
   }
@@ -827,7 +811,7 @@ async function verifyJwtSignature(
 
     const cryptoKey = await crypto.subtle.importKey(
       'spki',
-      binaryDer.buffer,
+      binaryDer.buffer as ArrayBuffer,
       {
         name: 'RSA-PSS',
         hash: hashName,
@@ -847,14 +831,14 @@ async function verifyJwtSignature(
           saltLength: 32,
         },
         cryptoKey,
-        signatureBytes,
+        signatureBytes as unknown as ArrayBuffer,
         messageData
       );
     } catch {
       // RSA-PSS 실패 시 RSASSA-PKCS1-v1_5로 재시도
       const cryptoKeyPKCS1 = await crypto.subtle.importKey(
         'spki',
-        binaryDer.buffer,
+        binaryDer.buffer as ArrayBuffer,
         {
           name: 'RSASSA-PKCS1-v1_5',
           hash: hashName,
@@ -868,7 +852,7 @@ async function verifyJwtSignature(
           name: 'RSASSA-PKCS1-v1_5',
         },
         cryptoKeyPKCS1,
-        signatureBytes,
+        signatureBytes as unknown as ArrayBuffer,
         messageData
       );
     }
@@ -898,7 +882,7 @@ async function verifyJwtSignature(
 
     const cryptoKey = await crypto.subtle.importKey(
       'spki',
-      binaryDer.buffer,
+      binaryDer.buffer as ArrayBuffer,
       {
         name: 'ECDSA',
         namedCurve: curve,

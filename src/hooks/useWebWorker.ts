@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 
 interface UseWebWorkerOptions<TRequest, TResponse> {
-  workerUrl: string | (() => Worker);
+  workerUrl: string | URL | (() => Worker);
   shouldUseWorker: boolean;
   request: TRequest | null;
   onMessage?: (response: TResponse) => void;
@@ -38,21 +38,23 @@ export function useWebWorker<TRequest, TResponse>({
   onMessage,
   onError,
 }: UseWebWorkerOptions<TRequest, TResponse>): UseWebWorkerResult<TResponse> {
+  // Worker 지원 여부 확인
+  const isWorkerSupported = useMemo(() => typeof Worker !== 'undefined', []);
+
   const [result, setResult] = useState<TResponse | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const workerRef = useRef<Worker | null>(null);
 
-  // Worker 지원 여부 확인
-  const isWorkerSupported = useMemo(() => typeof Worker !== 'undefined', []);
-
   // Worker 생성
   useEffect(() => {
+    // Worker를 사용하지 않는 경우 처리하지 않음 (상태는 이미 false)
     if (!shouldUseWorker || !isWorkerSupported || !request) {
-      setIsProcessing(false);
       return;
     }
 
+    // Worker 시작 전 상태 설정 (필수)
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsProcessing(true);
     setError(null);
 
