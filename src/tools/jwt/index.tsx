@@ -1,0 +1,742 @@
+/* eslint-disable react-refresh/only-export-components */
+import React, { useMemo } from 'react';
+import type { ToolDefinition } from '@/tools/types';
+import { Key } from 'lucide-react';
+import { ToolHeader } from '@/components/common/ToolHeader';
+import { EditorPanel } from '@/components/common/EditorPanel';
+import { ErrorBanner } from '@/components/common/ErrorBanner';
+import { useToolState } from '@/hooks/useToolState';
+import { useTitle } from '@/hooks/useTitle';
+import { useTheme } from '@/hooks/useTheme';
+import { copyToClipboard } from '@/lib/clipboard';
+import { JsonView, defaultStyles } from 'react-json-view-lite';
+import 'react-json-view-lite/dist/index.css';
+
+interface JwtToolState {
+  token: string;
+  mode: 'decode' | 'encode';
+  verifyKey: string; // HMAC secret or RSA/ECDSA public key
+}
+
+const DEFAULT_STATE: JwtToolState = {
+  token: '',
+  mode: 'decode',
+  verifyKey: '',
+};
+
+interface DecodedJwt {
+  header: Record<string, unknown>;
+  payload: Record<string, unknown>;
+  signature: string;
+  raw: {
+    header: string;
+    payload: string;
+    signature: string;
+  };
+}
+
+interface ValidationResult {
+  isValid: boolean;
+  isExpired: boolean;
+  isNotYetValid: boolean;
+  signatureVerified: boolean | null; // null = not attempted, true = verified, false = failed
+  signatureError?: string;
+  expiryTime?: number;
+  issuedAt?: number;
+  notBefore?: number;
+}
+
+const JwtTool: React.FC = () => {
+  useTitle('JWT Decoder');
+  const { theme } = useTheme();
+  const { state, updateState, resetState, shareState } =
+    useToolState<JwtToolState>('jwt', DEFAULT_STATE);
+
+  // 다크 모드 감지
+  const [isDark, setIsDark] = React.useState(() => {
+    if (typeof window === 'undefined') return false;
+    return document.documentElement.classList.contains('dark');
+  });
+
+  React.useEffect(() => {
+    const checkTheme = () => {
+      setIsDark(document.documentElement.classList.contains('dark'));
+    };
+
+    checkTheme();
+
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleMediaChange = () => {
+      if (theme === 'system') {
+        checkTheme();
+      }
+    };
+    mediaQuery.addEventListener('change', handleMediaChange);
+
+    return () => {
+      observer.disconnect();
+      mediaQuery.removeEventListener('change', handleMediaChange);
+    };
+  }, [theme]);
+
+  const jsonViewStyles = React.useMemo(
+    () => ({
+      ...defaultStyles,
+      container: `${defaultStyles.container} text-sm font-mono ${
+        isDark ? 'text-gray-100' : 'text-gray-900'
+      }`,
+      basicChildStyle: `${defaultStyles.basicChildStyle} ${
+        isDark ? 'text-gray-300' : 'text-gray-700'
+      }`,
+      label: `${defaultStyles.label} ${
+        isDark ? 'text-blue-400' : 'text-blue-600'
+      }`,
+      valueText: `${defaultStyles.valueText} ${
+        isDark ? 'text-emerald-300' : 'text-emerald-700'
+      }`,
+      valueNumber: `${defaultStyles.valueNumber} ${
+        isDark ? 'text-purple-300' : 'text-purple-600'
+      }`,
+      valueBoolean: `${defaultStyles.valueBoolean} ${
+        isDark ? 'text-orange-300' : 'text-orange-600'
+      }`,
+      valueNull: `${defaultStyles.valueNull} ${
+        isDark ? 'text-gray-500' : 'text-gray-400'
+      }`,
+      punctuation: `${defaultStyles.punctuation} ${
+        isDark ? 'text-gray-400' : 'text-gray-500'
+      }`,
+      collapseIcon: `${defaultStyles.collapseIcon} ${
+        isDark ? 'text-gray-400' : 'text-gray-600'
+      }`,
+    }),
+    [isDark]
+  );
+
+  const decoded = useMemo((): DecodedJwt | null => {
+    if (!state.token || state.mode !== 'decode') {
+      return null;
+    }
+
+    try {
+      const parts = state.token.trim().split('.');
+      if (parts.length !== 3) {
+        throw new Error('Invalid JWT format. Expected 3 parts separated by dots.');
+      }
+
+      const [headerRaw, payloadRaw, signatureRaw] = parts;
+
+      // Base64URL 디코딩
+      const headerJson = base64UrlDecode(headerRaw);
+      const payloadJson = base64UrlDecode(payloadRaw);
+
+      const header = JSON.parse(headerJson);
+      const payload = JSON.parse(payloadJson);
+
+      return {
+        header,
+        payload,
+        signature: signatureRaw,
+        raw: {
+          header: headerRaw,
+          payload: payloadRaw,
+          signature: signatureRaw,
+        },
+      };
+    } catch (error) {
+      return null;
+    }
+  }, [state.token, state.mode]);
+
+  const validation = useMemo((): ValidationResult | null => {
+    if (!decoded) return null;
+
+    const now = Math.floor(Date.now() / 1000);
+    const exp = decoded.payload.exp as number | undefined;
+    const iat = decoded.payload.iat as number | undefined;
+    const nbf = decoded.payload.nbf as number | undefined;
+
+    const isExpired = exp !== undefined && exp < now;
+    const isNotYetValid = nbf !== undefined && nbf > now;
+
+    return {
+      isValid: !isExpired && !isNotYetValid,
+      isExpired,
+      isNotYetValid,
+      signatureVerified: null,
+      expiryTime: exp,
+      issuedAt: iat,
+      notBefore: nbf,
+    };
+  }, [decoded]);
+
+  const [signatureVerification, setSignatureVerification] = React.useState<{
+    verified: boolean | null;
+    error?: string;
+  }>({ verified: null });
+
+  React.useEffect(() => {
+    if (!decoded || !state.verifyKey || state.mode !== 'decode') {
+      setSignatureVerification({ verified: null });
+      return;
+    }
+
+    const verifySignature = async () => {
+      try {
+        const alg = decoded.header.alg as string;
+        const verified = await verifyJwtSignature(
+          state.token,
+          state.verifyKey,
+          alg
+        );
+        setSignatureVerification({ verified });
+      } catch (error) {
+        setSignatureVerification({
+          verified: false,
+          error: (error as Error).message,
+        });
+      }
+    };
+
+    verifySignature();
+  }, [decoded, state.verifyKey, state.token, state.mode]);
+
+  const error = useMemo((): string | null => {
+    if (!state.token || state.mode !== 'decode') {
+      return null;
+    }
+
+    try {
+      const parts = state.token.trim().split('.');
+      if (parts.length !== 3) {
+        return 'Invalid JWT format. Expected 3 parts separated by dots (header.payload.signature).';
+      }
+
+      const [headerRaw, payloadRaw] = parts;
+
+      try {
+        const headerJson = base64UrlDecode(headerRaw);
+        JSON.parse(headerJson);
+      } catch {
+        return 'Failed to decode JWT header. Invalid Base64URL encoding.';
+      }
+
+      try {
+        const payloadJson = base64UrlDecode(payloadRaw);
+        JSON.parse(payloadJson);
+      } catch {
+        return 'Failed to decode JWT payload. Invalid Base64URL encoding.';
+      }
+
+      return null;
+    } catch (error) {
+      return (error as Error).message || 'Failed to decode JWT token.';
+    }
+  }, [state.token, state.mode]);
+
+  const handleCopyHeader = () => {
+    if (decoded) {
+      copyToClipboard(JSON.stringify(decoded.header, null, 2));
+    }
+  };
+
+  const handleCopyPayload = () => {
+    if (decoded) {
+      copyToClipboard(JSON.stringify(decoded.payload, null, 2));
+    }
+  };
+
+  const handleCopySignature = () => {
+    if (decoded) {
+      copyToClipboard(decoded.signature);
+    }
+  };
+
+  return (
+    <div className="flex flex-col h-full p-4 md:p-6 max-w-5xl mx-auto">
+      <ToolHeader
+        title="JWT Decoder"
+        description="Decode JSON Web Tokens to view header, payload, and signature."
+        onReset={resetState}
+        onShare={shareState}
+      />
+
+      <div className="flex-1 flex flex-col gap-6">
+        <EditorPanel
+          title="JWT Token"
+          value={state.token}
+          onChange={(val) => updateState({ token: val })}
+          placeholder="Paste JWT token here (e.g., eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...)"
+          className="h-32"
+          status={error ? 'error' : 'default'}
+        />
+
+        {error && <ErrorBanner message={error} />}
+
+        {decoded && (
+          <div className="flex-1 flex flex-col gap-6">
+            {/* Validation Status */}
+            {validation && (
+              <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                <div className="flex items-center gap-3 mb-3">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    Validation Status
+                  </h3>
+                  {validation.isValid && !validation.isExpired && !validation.isNotYetValid ? (
+                    <span className="px-2 py-1 text-xs font-semibold rounded bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300">
+                      Valid
+                    </span>
+                  ) : (
+                    <span className="px-2 py-1 text-xs font-semibold rounded bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300">
+                      Invalid
+                    </span>
+                  )}
+                </div>
+                <div className="space-y-2 text-sm">
+                  {validation.isExpired && (
+                    <div className="text-red-600 dark:text-red-400">
+                      ⚠ Token has expired
+                      {validation.expiryTime && (
+                        <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
+                          (expired at {new Date(validation.expiryTime * 1000).toLocaleString()})
+                        </span>
+                      )}
+                    </div>
+                  )}
+                  {validation.isNotYetValid && (
+                    <div className="text-orange-600 dark:text-orange-400">
+                      ⚠ Token is not yet valid
+                      {validation.notBefore && (
+                        <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
+                          (valid from {new Date(validation.notBefore * 1000).toLocaleString()})
+                        </span>
+                      )}
+                    </div>
+                  )}
+                  {!validation.isExpired && !validation.isNotYetValid && (
+                    <div className="text-emerald-600 dark:text-emerald-400">
+                      ✓ Token is valid (not expired)
+                    </div>
+                  )}
+                  {validation.issuedAt && (
+                    <div className="text-gray-600 dark:text-gray-400">
+                      Issued at: {new Date(validation.issuedAt * 1000).toLocaleString()}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Signature Verification */}
+            <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+              <div className="flex items-center gap-3 mb-3">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Signature Verification
+                </h3>
+                {signatureVerification.verified === true && (
+                  <span className="px-2 py-1 text-xs font-semibold rounded bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300">
+                    Verified
+                  </span>
+                )}
+                {signatureVerification.verified === false && (
+                  <span className="px-2 py-1 text-xs font-semibold rounded bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300">
+                    Failed
+                  </span>
+                )}
+                {signatureVerification.verified === null && (
+                  <span className="px-2 py-1 text-xs font-semibold rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
+                    Not verified
+                  </span>
+                )}
+              </div>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Verification Key
+                  </label>
+                  <textarea
+                    value={state.verifyKey}
+                    onChange={(e) => updateState({ verifyKey: e.target.value })}
+                    placeholder={
+                      decoded.header.alg?.toString().startsWith('HS')
+                        ? 'Enter HMAC secret key (for HS256, HS384, HS512)'
+                        : decoded.header.alg?.toString().startsWith('RS') || decoded.header.alg?.toString().startsWith('ES')
+                        ? 'Enter public key (PEM format for RS256/RS384/RS512/ES256/ES384/ES512)'
+                        : 'Enter verification key'
+                    }
+                    className="w-full px-3 py-2 text-sm font-mono bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-gray-100"
+                    rows={3}
+                  />
+                </div>
+                {signatureVerification.error && (
+                  <div className="text-sm text-red-600 dark:text-red-400">
+                    Error: {signatureVerification.error}
+                  </div>
+                )}
+                {signatureVerification.verified === null && state.verifyKey && (
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    Enter a key above to verify the signature
+                  </div>
+                )}
+                {signatureVerification.verified === true && (
+                  <div className="text-sm text-emerald-600 dark:text-emerald-400">
+                    ✓ Signature is valid
+                  </div>
+                )}
+                {signatureVerification.verified === false && !signatureVerification.error && (
+                  <div className="text-sm text-red-600 dark:text-red-400">
+                    ✗ Signature verification failed. The token may have been tampered with or the key is incorrect.
+                  </div>
+                )}
+              </div>
+            </div>
+            {/* Header */}
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Header
+                </h3>
+                <button
+                  onClick={handleCopyHeader}
+                  className="px-3 py-1 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+                >
+                  Copy JSON
+                </button>
+              </div>
+              <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                <JsonView
+                  data={decoded.header}
+                  shouldInitiallyExpand={() => true}
+                  style={jsonViewStyles}
+                />
+              </div>
+              <div className="text-xs text-gray-500 dark:text-gray-400 font-mono break-all">
+                Raw: {decoded.raw.header}
+              </div>
+            </div>
+
+            {/* Payload */}
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Payload
+                </h3>
+                <button
+                  onClick={handleCopyPayload}
+                  className="px-3 py-1 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+                >
+                  Copy JSON
+                </button>
+              </div>
+              <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                <JsonView
+                  data={decoded.payload}
+                  shouldInitiallyExpand={() => true}
+                  style={jsonViewStyles}
+                />
+              </div>
+              <div className="text-xs text-gray-500 dark:text-gray-400 font-mono break-all">
+                Raw: {decoded.raw.payload}
+              </div>
+            </div>
+
+            {/* Signature */}
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Signature
+                </h3>
+                <button
+                  onClick={handleCopySignature}
+                  className="px-3 py-1 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+                >
+                  Copy
+                </button>
+              </div>
+              <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                <div className="text-sm font-mono text-gray-900 dark:text-gray-100 break-all">
+                  {decoded.signature}
+                </div>
+              </div>
+              <div className="text-xs text-gray-500 dark:text-gray-400">
+                Note: Signature verification is not performed. This tool only decodes the token.
+              </div>
+            </div>
+          </div>
+        )}
+
+        {!decoded && !error && state.token && state.mode === 'decode' && (
+          <div className="text-center text-gray-500 dark:text-gray-400 py-8">
+            Enter a JWT token to decode it.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Base64URL 디코딩 함수
+function base64UrlDecode(str: string): string {
+  // Base64URL을 일반 Base64로 변환
+  let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+  
+  // 패딩 추가
+  while (base64.length % 4 !== 0) {
+    base64 += '=';
+  }
+
+  // Base64 디코딩
+  const binary = atob(base64);
+  const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+  const decoder = new TextDecoder();
+  return decoder.decode(bytes);
+}
+
+// Base64URL 인코딩 함수
+function base64UrlEncode(str: string): string {
+  const encoder = new TextEncoder();
+  const bytes = encoder.encode(str);
+  const binary = String.fromCharCode(...bytes);
+  const base64 = btoa(binary);
+  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+// Base64URL을 바이트 배열로 디코딩하는 함수
+function base64UrlDecodeToBytes(str: string): Uint8Array {
+  // Base64URL을 일반 Base64로 변환
+  let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+  
+  // 패딩 추가
+  while (base64.length % 4 !== 0) {
+    base64 += '=';
+  }
+
+  // Base64 디코딩하여 바이트 배열로 변환
+  const binary = atob(base64);
+  return Uint8Array.from(binary, (char) => char.charCodeAt(0));
+}
+
+// JWT 서명 검증 함수
+async function verifyJwtSignature(
+  token: string,
+  key: string,
+  algorithm: string
+): Promise<boolean> {
+  const parts = token.split('.');
+  if (parts.length !== 3) {
+    throw new Error('Invalid JWT format');
+  }
+
+  const [headerRaw, payloadRaw, signatureRaw] = parts;
+  const message = `${headerRaw}.${payloadRaw}`;
+  const signatureBytes = base64UrlDecodeToBytes(signatureRaw);
+
+  // HMAC 알고리즘 (HS256, HS384, HS512)
+  if (algorithm.startsWith('HS')) {
+    const hashName = algorithm === 'HS256' ? 'SHA-256' : algorithm === 'HS384' ? 'SHA-384' : 'SHA-512';
+    
+    const encoder = new TextEncoder();
+    const keyData = encoder.encode(key);
+    
+    const cryptoKey = await crypto.subtle.importKey(
+      'raw',
+      keyData,
+      { name: 'HMAC', hash: hashName },
+      false,
+      ['verify']
+    );
+
+    const messageData = encoder.encode(message);
+
+    return await crypto.subtle.verify(
+      'HMAC',
+      cryptoKey,
+      signatureBytes,
+      messageData
+    );
+  }
+
+  // RSA 알고리즘 (RS256, RS384, RS512)
+  if (algorithm.startsWith('RS')) {
+    const hashName = algorithm === 'RS256' ? 'SHA-256' : algorithm === 'RS384' ? 'SHA-384' : 'SHA-512';
+    
+    // PEM 형식의 공개 키 파싱
+    const pemHeader = '-----BEGIN PUBLIC KEY-----';
+    const pemFooter = '-----END PUBLIC KEY-----';
+    let pemKey = key.trim();
+    
+    if (!pemKey.includes(pemHeader)) {
+      // PEM 헤더/푸터가 없으면 추가
+      pemKey = `${pemHeader}\n${pemKey}\n${pemFooter}`;
+    }
+
+    // PEM을 DER로 변환
+    const pemContents = pemKey
+      .replace(pemHeader, '')
+      .replace(pemFooter, '')
+      .replace(/\s/g, '');
+    
+    const binaryDer = Uint8Array.from(atob(pemContents), (c) => c.charCodeAt(0));
+
+    const cryptoKey = await crypto.subtle.importKey(
+      'spki',
+      binaryDer.buffer,
+      {
+        name: 'RSA-PSS',
+        hash: hashName,
+      },
+      false,
+      ['verify']
+    );
+
+    const encoder = new TextEncoder();
+    const messageData = encoder.encode(message);
+
+    // RSA-PSS로 검증 시도
+    try {
+      return await crypto.subtle.verify(
+        {
+          name: 'RSA-PSS',
+          saltLength: 32,
+        },
+        cryptoKey,
+        signatureBytes,
+        messageData
+      );
+    } catch {
+      // RSA-PSS 실패 시 RSASSA-PKCS1-v1_5로 재시도
+      const cryptoKeyPKCS1 = await crypto.subtle.importKey(
+        'spki',
+        binaryDer.buffer,
+        {
+          name: 'RSASSA-PKCS1-v1_5',
+          hash: hashName,
+        },
+        false,
+        ['verify']
+      );
+
+      return await crypto.subtle.verify(
+        {
+          name: 'RSASSA-PKCS1-v1_5',
+        },
+        cryptoKeyPKCS1,
+        signatureBytes,
+        messageData
+      );
+    }
+  }
+
+  // ECDSA 알고리즘 (ES256, ES384, ES512)
+  if (algorithm.startsWith('ES')) {
+    const hashName = algorithm === 'ES256' ? 'SHA-256' : algorithm === 'ES384' ? 'SHA-384' : 'SHA-512';
+    const curve = algorithm === 'ES256' ? 'P-256' : algorithm === 'ES384' ? 'P-384' : 'P-521';
+    const keyLength = algorithm === 'ES256' ? 32 : algorithm === 'ES384' ? 48 : 66;
+    
+    // PEM 형식의 공개 키 파싱
+    const pemHeader = '-----BEGIN PUBLIC KEY-----';
+    const pemFooter = '-----END PUBLIC KEY-----';
+    let pemKey = key.trim();
+    
+    if (!pemKey.includes(pemHeader)) {
+      pemKey = `${pemHeader}\n${pemKey}\n${pemFooter}`;
+    }
+
+    const pemContents = pemKey
+      .replace(pemHeader, '')
+      .replace(pemFooter, '')
+      .replace(/\s/g, '');
+    
+    const binaryDer = Uint8Array.from(atob(pemContents), (c) => c.charCodeAt(0));
+
+    const cryptoKey = await crypto.subtle.importKey(
+      'spki',
+      binaryDer.buffer,
+      {
+        name: 'ECDSA',
+        namedCurve: curve,
+      },
+      false,
+      ['verify']
+    );
+
+    const encoder = new TextEncoder();
+    const messageData = encoder.encode(message);
+    
+    // JWT의 ECDSA 서명은 r과 s 값을 연속으로 배치한 형태 (각각 keyLength 바이트)
+    // Web Crypto API는 DER 형식을 요구하므로 변환 필요
+    if (signatureBytes.length !== keyLength * 2) {
+      throw new Error(`Invalid signature length for ${algorithm}. Expected ${keyLength * 2} bytes.`);
+    }
+
+    // DER 형식으로 변환: SEQUENCE { INTEGER r, INTEGER s }
+    const r = signatureBytes.slice(0, keyLength);
+    const s = signatureBytes.slice(keyLength);
+    
+    // r과 s의 앞부분 0 제거 (DER INTEGER는 leading zero를 제거)
+    let rStart = 0;
+    while (rStart < r.length - 1 && r[rStart] === 0) rStart++;
+    if ((r[rStart] & 0x80) !== 0) rStart--; // 음수 방지
+    
+    let sStart = 0;
+    while (sStart < s.length - 1 && s[sStart] === 0) sStart++;
+    if ((s[sStart] & 0x80) !== 0) sStart--; // 음수 방지
+    
+    const rBytes = r.slice(rStart);
+    const sBytes = s.slice(sStart);
+    
+    // DER 인코딩
+    const derSignature = new Uint8Array(4 + rBytes.length + 4 + sBytes.length);
+    let offset = 0;
+    
+    // SEQUENCE
+    derSignature[offset++] = 0x30;
+    const seqLength = 2 + rBytes.length + 2 + sBytes.length;
+    if (seqLength < 128) {
+      derSignature[offset++] = seqLength;
+    } else {
+      derSignature[offset++] = 0x81;
+      derSignature[offset++] = seqLength;
+    }
+    
+    // INTEGER r
+    derSignature[offset++] = 0x02;
+    derSignature[offset++] = rBytes.length;
+    derSignature.set(rBytes, offset);
+    offset += rBytes.length;
+    
+    // INTEGER s
+    derSignature[offset++] = 0x02;
+    derSignature[offset++] = sBytes.length;
+    derSignature.set(sBytes, offset);
+    
+    return await crypto.subtle.verify(
+      {
+        name: 'ECDSA',
+        hash: hashName,
+      },
+      cryptoKey,
+      derSignature,
+      messageData
+    );
+  }
+
+  throw new Error(`Unsupported algorithm: ${algorithm}. Supported: HS256/HS384/HS512, RS256/RS384/RS512, ES256/ES384/ES512`);
+}
+
+export const jwtTool: ToolDefinition<JwtToolState> = {
+  id: 'jwt',
+  title: 'JWT Decoder',
+  description: 'Decode JSON Web Tokens',
+  icon: Key,
+  path: '/jwt',
+  defaultState: DEFAULT_STATE,
+  Component: JwtTool,
+};
+
