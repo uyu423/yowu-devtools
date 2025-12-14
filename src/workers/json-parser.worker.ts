@@ -5,6 +5,7 @@ interface ParseRequest {
   input: string;
   indent: 2 | 4;
   sortKeys: boolean;
+  requestId?: number | string; // v1.2.0: Request ID for response ordering
 }
 
 interface ParseResponse {
@@ -13,6 +14,7 @@ interface ParseResponse {
   formatted?: string;
   minified?: string;
   error?: string;
+  requestId?: number | string; // v1.2.0: Request ID for response ordering
 }
 
 // JSON 키 정렬 함수
@@ -33,7 +35,7 @@ function sortJsonKeys(value: unknown): unknown {
 
 // Worker 메시지 핸들러
 self.onmessage = (e: MessageEvent<ParseRequest>) => {
-  const { input, indent, sortKeys } = e.data;
+  const { input, indent, sortKeys, requestId } = e.data;
 
   try {
     // JSON 파싱
@@ -51,6 +53,7 @@ self.onmessage = (e: MessageEvent<ParseRequest>) => {
       data: normalized,
       formatted,
       minified,
+      requestId, // Include requestId in response
     };
 
     self.postMessage(response);
@@ -58,6 +61,7 @@ self.onmessage = (e: MessageEvent<ParseRequest>) => {
     const response: ParseResponse = {
       success: false,
       error: (error as Error).message,
+      requestId, // Include requestId in error response
     };
 
     self.postMessage(response);

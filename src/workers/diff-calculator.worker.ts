@@ -9,12 +9,14 @@ interface DiffRequest {
   right: string;
   ignoreWhitespace: boolean;
   ignoreCase: boolean;
+  requestId?: number | string; // v1.2.0: Request ID for response ordering
 }
 
 interface DiffResponse {
   success: boolean;
   diffs?: Diff[];
   error?: string;
+  requestId?: number | string; // v1.2.0: Request ID for response ordering
 }
 
 // Ignore 옵션 적용 함수
@@ -67,7 +69,7 @@ function applyIgnoreOptions(
 
 // Worker 메시지 핸들러
 self.onmessage = (e: MessageEvent<DiffRequest>) => {
-  const { left, right, ignoreWhitespace, ignoreCase } = e.data;
+  const { left, right, ignoreWhitespace, ignoreCase, requestId } = e.data;
 
   try {
     const dmp = new DiffMatchPatch();
@@ -87,6 +89,7 @@ self.onmessage = (e: MessageEvent<DiffRequest>) => {
     const response: DiffResponse = {
       success: true,
       diffs,
+      requestId, // Include requestId in response
     };
 
     self.postMessage(response);
@@ -94,6 +97,7 @@ self.onmessage = (e: MessageEvent<DiffRequest>) => {
     const response: DiffResponse = {
       success: false,
       error: (error as Error).message,
+      requestId, // Include requestId in error response
     };
 
     self.postMessage(response);

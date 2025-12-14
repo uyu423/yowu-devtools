@@ -6,6 +6,8 @@ interface UseWebWorkerOptions<TRequest, TResponse> {
   request: TRequest | null;
   onMessage?: (response: TResponse) => void;
   onError?: (error: Error) => void;
+  // Request ID for ensuring response order (v1.2.0)
+  requestId?: number | string;
 }
 
 interface UseWebWorkerResult<TResponse> {
@@ -37,6 +39,7 @@ export function useWebWorker<TRequest, TResponse>({
   request,
   onMessage,
   onError,
+  requestId,
 }: UseWebWorkerOptions<TRequest, TResponse>): UseWebWorkerResult<TResponse> {
   // Worker 지원 여부 확인
   const isWorkerSupported = useMemo(() => typeof Worker !== 'undefined', []);
@@ -45,6 +48,7 @@ export function useWebWorker<TRequest, TResponse>({
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const workerRef = useRef<Worker | null>(null);
+  const currentRequestIdRef = useRef<number | string | undefined>(undefined);
 
   // Worker 생성
   useEffect(() => {
@@ -57,6 +61,10 @@ export function useWebWorker<TRequest, TResponse>({
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsProcessing(true);
     setError(null);
+
+    // Store current request ID
+    const thisRequestId = requestId ?? Date.now();
+    currentRequestIdRef.current = thisRequestId;
 
     // Worker 생성 (이미 있으면 재사용)
     if (!workerRef.current) {
@@ -78,8 +86,15 @@ export function useWebWorker<TRequest, TResponse>({
     const worker = workerRef.current;
 
     // 메시지 핸들러
-    const handleMessage = (e: MessageEvent<TResponse & { success?: boolean; error?: string }>) => {
-      const data = e.data as TResponse & { success?: boolean; error?: string };
+    const handleMessage = (e: MessageEvent<TResponse & { success?: boolean; error?: string; requestId?: number | string }>) => {
+      const data = e.data as TResponse & { success?: boolean; error?: string; requestId?: number | string };
+      
+      // Check if this response is for the current request (prevent race conditions)
+      const responseRequestId = data.requestId ?? undefined;
+      if (responseRequestId !== undefined && responseRequestId !== currentRequestIdRef.current) {
+        // This response is for an older request, ignore it
+        return;
+      }
       
       if (data.success === false || data.error) {
         const errorMessage = data.error || 'Unknown error occurred';
@@ -107,14 +122,14 @@ export function useWebWorker<TRequest, TResponse>({
     worker.addEventListener('message', handleMessage);
     worker.addEventListener('error', handleError);
 
-    // Worker에 요청 전송
-    worker.postMessage(request);
+    // Worker에 요청 전송 (requestId 포함)
+    worker.postMessage({ ...request, requestId: thisRequestId });
 
     return () => {
       worker.removeEventListener('message', handleMessage);
       worker.removeEventListener('error', handleError);
     };
-  }, [shouldUseWorker, isWorkerSupported, request, workerUrl, onMessage, onError]);
+  }, [shouldUseWorker, isWorkerSupported, request, requestId, workerUrl, onMessage, onError]);
 
   // Worker 정리
   useEffect(() => {
