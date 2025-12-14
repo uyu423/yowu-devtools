@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { useMemo, useState } from 'react';
 import type { ToolDefinition } from '@/tools/types';
-import { Clock } from 'lucide-react';
+import { Clock, Copy } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
 import { OptionLabel } from '@/components/ui/OptionLabel';
@@ -9,6 +9,8 @@ import { Tooltip } from '@/components/ui/Tooltip';
 import { useToolState } from '@/hooks/useToolState';
 import { useTitle } from '@/hooks/useTitle';
 import { format, formatISO } from 'date-fns';
+import { format as formatTz } from 'date-fns-tz';
+import { copyToClipboard } from '@/lib/clipboard';
 
 interface TimeToolState {
   epochInput: string;
@@ -87,6 +89,71 @@ const TimeTool: React.FC = () => {
     setIsoError(null);
     setState(prev => ({ ...prev, epochInput: epochValue, isoInput: isoValue }));
   };
+
+  // Helper functions for various time formats using date-fns and date-fns-tz
+  const formatRFC2822 = (date: Date): string => {
+    // RFC 2822 format: "Mon, 01 Jan 2024 00:00:00 GMT"
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const day = days[date.getUTCDay()];
+    const dayNum = String(date.getUTCDate()).padStart(2, '0');
+    const month = months[date.getUTCMonth()];
+    const year = date.getUTCFullYear();
+    const hours = String(date.getUTCHours()).padStart(2, '0');
+    const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+    const seconds = String(date.getUTCSeconds()).padStart(2, '0');
+    return `${day}, ${dayNum} ${month} ${year} ${hours}:${minutes}:${seconds} GMT`;
+  };
+
+  const formatRFC3339 = (date: Date): string => {
+    // RFC 3339 is essentially ISO 8601 format
+    return formatISO(date);
+  };
+
+  // Timezone-specific formatting using date-fns-tz
+  const formatInTimezone = (date: Date, timeZone: string, formatStr: string): string => {
+    return formatTz(date, formatStr, { timeZone });
+  };
+
+  // Format timezone abbreviation
+  const getTimezoneAbbr = (date: Date, timeZone: string): string => {
+    try {
+      const formatter = new Intl.DateTimeFormat('en-US', {
+        timeZone,
+        timeZoneName: 'short',
+      });
+      const parts = formatter.formatToParts(date);
+      const tzName = parts.find(part => part.type === 'timeZoneName')?.value || '';
+      return tzName;
+    } catch {
+      return '';
+    }
+  };
+
+  // Time format item component
+  const TimeFormatItem: React.FC<{ label: string; value: string; tooltip?: string }> = ({ label, value, tooltip }) => (
+    <div className="group flex items-center justify-between gap-3 py-2 px-3 rounded-md hover:bg-blue-100/50 dark:hover:bg-blue-800/20 transition-colors">
+      <div className="flex-1 min-w-0">
+        {tooltip ? (
+          <Tooltip content={tooltip}>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-help">{label}</span>
+          </Tooltip>
+        ) : (
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{label}</span>
+        )}
+        <div className="mt-1 font-mono text-xs text-gray-600 dark:text-gray-400 break-all">{value}</div>
+      </div>
+      {value !== '-' && (
+        <button
+          onClick={() => copyToClipboard(value, `Copied ${label}`)}
+          className="opacity-0 group-hover:opacity-100 p-1.5 rounded hover:bg-blue-200 dark:hover:bg-blue-700 transition-all flex-shrink-0"
+          title={`Copy ${label}`}
+        >
+          <Copy className="w-3.5 h-3.5 text-gray-600 dark:text-gray-400" />
+        </button>
+      )}
+    </div>
+  );
 
   return (
     <div className="flex flex-col h-full p-4 md:p-6 max-w-3xl mx-auto">
@@ -173,9 +240,122 @@ const TimeTool: React.FC = () => {
           {isoError && <ErrorBanner message="ISO input error" details={isoError} />}
         </div>
 
-        <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-md text-sm text-blue-900 dark:text-blue-100 border border-blue-100 dark:border-blue-800">
-          <p className="flex justify-between"><span className="font-medium">Local Time</span><span className="font-mono">{derivedDate ? format(derivedDate, 'yyyy-MM-dd HH:mm:ss.SSS xxx') : '-'}</span></p>
-          <p className="mt-2 flex justify-between"><span className="font-medium">UTC</span><span className="font-mono">{derivedDate ? derivedDate.toISOString() : '-'}</span></p>
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+          {/* Basic Formats Section */}
+          <div className="px-4 py-3 bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Basic Formats</h3>
+          </div>
+          <div className="p-4 space-y-1">
+            <TimeFormatItem 
+              label="Local Time" 
+              value={derivedDate ? format(derivedDate, 'yyyy-MM-dd HH:mm:ss.SSS xxx') : '-'}
+              tooltip="Local time in your browser's timezone"
+            />
+            <TimeFormatItem 
+              label="UTC" 
+              value={derivedDate ? derivedDate.toISOString() : '-'}
+              tooltip="Coordinated Universal Time (UTC) - standard time reference"
+            />
+            <TimeFormatItem 
+              label="Unix (seconds)" 
+              value={derivedDate ? Math.floor(derivedDate.getTime() / 1000).toString() : '-'}
+              tooltip="Unix timestamp in seconds since January 1, 1970 UTC"
+            />
+            <TimeFormatItem 
+              label="Unix (milliseconds)" 
+              value={derivedDate ? derivedDate.getTime().toString() : '-'}
+              tooltip="Unix timestamp in milliseconds since January 1, 1970 UTC"
+            />
+          </div>
+
+          {/* Standard Formats Section */}
+          <div className="px-4 py-3 bg-gray-50 dark:bg-gray-900/50 border-t border-b border-gray-200 dark:border-gray-700">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Standard Formats</h3>
+          </div>
+          <div className="p-4 space-y-1">
+            <TimeFormatItem 
+              label="RFC 2822" 
+              value={derivedDate ? formatRFC2822(derivedDate) : '-'}
+              tooltip="RFC 2822 format commonly used in email headers"
+            />
+            <TimeFormatItem 
+              label="RFC 3339" 
+              value={derivedDate ? formatRFC3339(derivedDate) : '-'}
+              tooltip="RFC 3339 format (subset of ISO 8601)"
+            />
+            <TimeFormatItem 
+              label="ISO 8601" 
+              value={derivedDate ? formatISO(derivedDate) : '-'}
+              tooltip="ISO 8601 international standard date and time format"
+            />
+          </div>
+
+          {/* Human Readable Formats Section */}
+          <div className="px-4 py-3 bg-gray-50 dark:bg-gray-900/50 border-t border-b border-gray-200 dark:border-gray-700">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Human Readable</h3>
+          </div>
+          <div className="p-4 space-y-1">
+            <TimeFormatItem 
+              label="Human Readable (Global)" 
+              value={derivedDate ? format(derivedDate, 'MMMM dd, yyyy, hh:mm:ss a') : '-'}
+              tooltip="Easy-to-read format with month name and AM/PM"
+            />
+            <TimeFormatItem 
+              label="Human Readable (Korea)" 
+              value={derivedDate ? (() => {
+                const koreaDate = new Date(derivedDate.toLocaleString('en-US', { timeZone: 'Asia/Seoul' }));
+                const year = koreaDate.getFullYear();
+                const month = koreaDate.getMonth() + 1;
+                const day = koreaDate.getDate();
+                const hours24 = koreaDate.getHours();
+                const minutes = koreaDate.getMinutes();
+                const seconds = koreaDate.getSeconds();
+                
+                const ampm = hours24 < 12 ? '오전' : '오후';
+                const hours12 = hours24 === 0 ? 12 : hours24 > 12 ? hours24 - 12 : hours24;
+                
+                return `${year}년 ${month}월 ${day}일 ${ampm} ${hours12}시 ${minutes}분 ${seconds}초`;
+              })() : '-'}
+              tooltip="한국 표준시(KST) 기준의 한국어 형식 날짜 및 시간"
+            />
+            <TimeFormatItem 
+              label="Day of Week" 
+              value={derivedDate ? format(derivedDate, 'EEEE, MMMM dd, yyyy') : '-'}
+              tooltip="Full day name with date"
+            />
+          </div>
+
+          {/* Timezone Formats Section */}
+          <div className="px-4 py-3 bg-gray-50 dark:bg-gray-900/50 border-t border-b border-gray-200 dark:border-gray-700">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Timezone Formats</h3>
+          </div>
+          <div className="p-4 space-y-1">
+            <TimeFormatItem 
+              label={`US Eastern (${derivedDate ? getTimezoneAbbr(derivedDate, 'America/New_York') : 'EST/EDT'})`}
+              value={derivedDate ? `${formatInTimezone(derivedDate, 'America/New_York', 'yyyy-MM-dd HH:mm:ss')} ${getTimezoneAbbr(derivedDate, 'America/New_York')}` : '-'}
+              tooltip="US Eastern Time (America/New_York)"
+            />
+            <TimeFormatItem 
+              label={`US Pacific (${derivedDate ? getTimezoneAbbr(derivedDate, 'America/Los_Angeles') : 'PST/PDT'})`}
+              value={derivedDate ? `${formatInTimezone(derivedDate, 'America/Los_Angeles', 'yyyy-MM-dd HH:mm:ss')} ${getTimezoneAbbr(derivedDate, 'America/Los_Angeles')}` : '-'}
+              tooltip="US Pacific Time (America/Los_Angeles)"
+            />
+            <TimeFormatItem 
+              label={`UK (${derivedDate ? getTimezoneAbbr(derivedDate, 'Europe/London') : 'GMT/BST'})`}
+              value={derivedDate ? `${formatInTimezone(derivedDate, 'Europe/London', 'yyyy-MM-dd HH:mm:ss')} ${getTimezoneAbbr(derivedDate, 'Europe/London')}` : '-'}
+              tooltip="UK Time (Europe/London)"
+            />
+            <TimeFormatItem 
+              label={`Korea/Japan (${derivedDate ? getTimezoneAbbr(derivedDate, 'Asia/Seoul') : 'KST/JST'})`}
+              value={derivedDate ? `${formatInTimezone(derivedDate, 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss')} ${getTimezoneAbbr(derivedDate, 'Asia/Seoul')}` : '-'}
+              tooltip="Korea Standard Time / Japan Standard Time (GMT+9)"
+            />
+            <TimeFormatItem 
+              label={`China (${derivedDate ? getTimezoneAbbr(derivedDate, 'Asia/Shanghai') : 'CST'})`}
+              value={derivedDate ? `${formatInTimezone(derivedDate, 'Asia/Shanghai', 'yyyy-MM-dd HH:mm:ss')} ${getTimezoneAbbr(derivedDate, 'Asia/Shanghai')}` : '-'}
+              tooltip="China Standard Time (Asia/Shanghai)"
+            />
+          </div>
         </div>
       </div>
     </div>
