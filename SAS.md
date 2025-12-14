@@ -2,11 +2,11 @@
 
 ---
 
-# yowu-devtools SRS (v1)
+# yowu-devtools SRS (v1.1)
 
 ## 0. 문서 메타
 
-- 프로젝트명: **yowu-devtools**
+- 프로젝트명: **tools.yowu.dev** (구 yowu-devtools)
 - 목적: 개발자가 자주 쓰는 변환/검증/뷰어 도구를 **서버 없이** 하나의 **정적 웹앱**으로 제공
 - 배포: **GitHub Pages + Custom Domain (`tools.yowu.dev`)**
 - 핵심 원칙:
@@ -41,28 +41,35 @@
 - **테마**: System/Browser 기본 + 사용자 토글(ON/OFF) 제공
 - **키보드 단축키**: 최소 세트 제공
 - **모바일 대응**: Sidebar는 Drawer(햄버거) 형태로 축소
+- **UX 강화** (v1.1 추가):
+  - Toast 알림 (`sonner`) - 복사 성공, 에러 등 피드백
+  - 실시간 변환 (Debounce 300~500ms) - 버튼 클릭 없이 자동 변환
+  - 동적 페이지 타이틀 - 각 툴 페이지 진입 시 브라우저 탭 제목 변경
+  - 그룹별 최적화된 Width 전략 (Wide/Medium/Narrow)
 
 ### 1.2 Out-of-Scope (v1에서 제외)
 
 - 로그인/계정/동기화
 - 서버 기능/백엔드
 - 분석/로그(Analytics) 삽입
-- “외부 API 호출” 기반 기능(예: DNS 조회, HTTP 호출 등)
+- "외부 API 호출" 기반 기능(예: DNS 조회, HTTP 호출 등)
 - PWA/오프라인 캐시(추후 옵션)
 
 ---
 
 ## 2. 사용자 시나리오 (User Stories)
 
-- US-01: 개발 중 JSON을 붙여넣고 **트리로 탐색/검색/복사**하고 싶다.
-- US-02: URL 파라미터를 encode/decode해서 바로 복사하고 싶다.
-- US-03: Base64를 인코딩/디코딩해서 결과를 바로 복사하고 싶다.
+- US-01: 개발 중 JSON을 붙여넣고 **트리로 탐색/검색/복사**하고 싶다. **(Sample Data 로드 버튼 포함)**
+- US-02: URL 파라미터를 encode/decode해서 바로 복사하고 싶다. **(실시간 변환으로 즉시 결과 확인)**
+- US-03: Base64를 인코딩/디코딩해서 결과를 바로 복사하고 싶다. **(Toast 알림으로 복사 성공 확인)**
 - US-04: epoch(ms/s) ↔ ISO 시간을 KST/UTC로 빠르게 바꾸고 싶다.
 - US-05: YAML과 JSON을 상호 변환하고, 오류가 나면 **어느 줄/컬럼인지** 보고 싶다.
 - US-06: 두 텍스트 차이를 **모바일에서도 보기 쉽게** 비교하고 싶다.
 - US-07: cron을 넣으면 사람이 읽는 설명과 다음 실행 시각들을 확인하고 싶다.
 - US-08: 지금 입력한 상태 그대로 **링크로 공유**하고, 받은 사람도 그대로 재현되면 좋겠다.
 - US-09: 다시 접속했을 때 **마지막 작업 상태가 복원**되면 좋겠다.
+- US-10: 각 도구 페이지로 진입 시 **브라우저 탭 타이틀**이 바뀌어 여러 탭을 띄워놓고 작업할 때 식별하기 쉬워야 한다.
+- US-11: 사이드바에서 `yowu.dev` 로고를 클릭해 개발자 블로그로 이동할 수 있다.
 
 ---
 
@@ -93,6 +100,8 @@
   - 사람 읽기: `cronstrue`(로케일 고려) 또는 자체 한글 템플릿
 
 - Share 압축(권장): `lz-string` (URL 길이 완화)
+- Notifications: **Sonner** (Toast 알림)
+- Icons: **Lucide React**
 
 ---
 
@@ -102,14 +111,17 @@
 
 - Left Sidebar: 툴 리스트(초기엔 단순 나열)
 
+  - Header: 로고(yowu.dev 링크) + 타이틀(`tools.yowu.dev`)
   - 툴이 많아질 경우를 대비해 **카테고리 필드**를 모델에 포함(현재 UI에서는 미사용 가능)
+  - Footer: 테마 토글(Light/System/Dark)
+  - 이스터에그: "More coming soon..." 뱃지 (툴 목록 하단)
 
 - Main Area: 선택된 툴 페이지
 - Top Bar(모바일 포함):
 
   - 좌측: 햄버거(모바일에서 Sidebar 오픈)
   - 중앙: 툴 제목
-  - 우측: 검색(옵션), 테마 토글, “Share” 버튼, GitHub 링크
+  - 우측: 검색(옵션), 테마 토글, "Share" 버튼, GitHub 링크
 
 ### 4.2 반응형 규칙
 
@@ -118,6 +130,15 @@
 
   - Sidebar는 Drawer
   - 툴 페이지는 **세로 스택(입력 → 출력)**, Diff는 탭(Left/Right/Result) 또는 간소화 뷰 제공
+
+### 4.3 그룹별 Width 전략 (v1.1 추가)
+
+- **Wide Group** (`max-w-[90rem]`): 좌우 분할 뷰가 핵심인 도구들
+  - JSON Viewer, YAML Converter, Text Diff
+- **Medium Group** (`max-w-5xl`): 텍스트 입력이 주가 되지만 상하 배치인 도구들
+  - URL Encoder, Base64 Converter
+- **Narrow Group** (`max-w-3xl`): 입력 폼이 단순한 도구들
+  - Time Converter, Cron Parser
 
 ---
 
@@ -187,10 +208,10 @@
 
 - 디코딩 실패 시:
 
-  - 사용자에게 “공유 링크가 손상되었거나 버전이 맞지 않습니다” 안내
+  - 사용자에게 "공유 링크가 손상되었거나 버전이 맞지 않습니다" 안내
   - 툴 기본 상태로 fallback
 
-> **중요**: URL 길이 제한이 브라우저/메신저마다 다르므로, v1부터 `lz-string` 기반 “압축 공유”를 기본으로 권장.
+> **중요**: URL 길이 제한이 브라우저/메신저마다 다르므로, v1부터 `lz-string` 기반 "압축 공유"를 기본으로 권장.
 
 ### 5.4 테마 정책
 
@@ -211,6 +232,13 @@
   - `Ctrl/Cmd + Shift + C`: 출력 복사
   - `Esc`: 모달/팔레트 닫기
 
+### 5.6 UX 정책 (v1.1 추가)
+
+- **Real-time Conversion**: 입력 변경 시 300~500ms Debounce 후 자동 변환 시도 (URL, Base64, JSON 등)
+- **Toast 알림**: 복사 성공, 변환 에러 등은 `sonner` Toast로 알림
+- **Validation 힌트**: 입력창 테두리 색상(Red/Green)으로 유효성 힌트 제공 (JSON 등)
+- **동적 타이틀**: 페이지 진입 시 `document.title` 업데이트 (`{ToolName} - tools.yowu.dev`)
+
 ---
 
 ## 6. 성능/최적화 요구사항 (NFR)
@@ -226,7 +254,7 @@
 - NFR-02: 큰 입력(예: 수 MB)에서 에디터/렌더가 과도하게 느려지지 않게 방어 로직 제공
 - NFR-03: 무거운 연산(대형 JSON 파싱, 대형 diff 계산)은 **Web Worker 옵션** 제공
 
-> Web Worker 설명(사용자 이해용): 브라우저에서 **별도 스레드**로 계산을 돌려 UI를 멈추지 않게 하는 기능. v1에서는 “큰 입력일 때 자동으로 Worker 사용” 정도로 내부 구현 옵션으로 둔다.
+> Web Worker 설명(사용자 이해용): 브라우저에서 **별도 스레드**로 계산을 돌려 UI를 멈추지 않게 하는 기능. v1에서는 "큰 입력일 때 자동으로 Worker 사용" 정도로 내부 구현 옵션으로 둔다.
 
 ---
 
@@ -268,12 +296,13 @@ type JsonToolState = {
 
 - FR-J-04: 복사
 
-  - “Copy Pretty”, “Copy Minified”
-  - 트리 노드에서 “Copy JSONPath”, “Copy Value”
+  - "Copy Pretty", "Copy Minified"
+  - 트리 노드에서 "Copy JSONPath", "Copy Value"
 
 - FR-J-05: UX
 
-  - input 변경 시 자동으로 결과 갱신(기본), 단 대형 입력이면 “Apply” 버튼 모드로 전환 가능(옵션)
+  - input 변경 시 자동으로 결과 갱신(기본), 단 대형 입력이면 "Apply" 버튼 모드로 전환 가능(옵션)
+  - **Sample Data 로드 버튼** 제공 (v1.1 추가)
 
 - AC(수용 기준)
 
@@ -304,6 +333,8 @@ type UrlToolState = {
   - encode 시 공백을 `+`로, decode 시 `+`를 공백으로 처리(쿼리스트링 친화)
 
 - FR-U-04: Copy Output
+- FR-U-05: **실시간 자동 변환** (v1.1 추가)
+- FR-U-06: **Input ↔ Output Swap 버튼** (v1.1 추가)
 - AC
 
   - 모드 전환 시 동일 입력으로 즉시 결과가 업데이트
@@ -328,6 +359,8 @@ type Base64ToolState = {
 - FR-B-01: UTF-8 안전 인코딩/디코딩(TextEncoder/TextDecoder 사용)
 - FR-B-02: urlSafe 옵션 시 `+ / =`를 URL-safe 형태로 변환
 - FR-B-03: decode 실패 시 에러 표시
+- FR-B-04: **실시간 자동 변환** (v1.1 추가)
+- FR-B-05: **Input ↔ Output Swap 버튼** (v1.1 추가)
 - AC
 
   - 한글 포함 문자열도 깨지지 않음(UTF-8 보장)
@@ -351,8 +384,9 @@ type TimeToolState = {
 
 - FR-T-01: Epoch → ISO 변환
 - FR-T-02: ISO → Epoch 변환
-- FR-T-03: “Now” 버튼: 현재 시각을 epoch/iso에 즉시 반영
+- FR-T-03: "Now" 버튼: 현재 시각을 epoch/iso에 즉시 반영
 - FR-T-04: timezone 토글에 따라 표시/해석 기준 변경
+- FR-T-05: **실시간 자동 변환** (v1.1 추가)
 - AC
 
   - ms/s 혼동이 적도록 UI에 라벨 명확히 표시
@@ -378,7 +412,7 @@ type YamlJsonToolState = {
 - FR-Y-03: 결과 pretty 출력
 - AC
 
-  - 에러 메시지에 최소한 “어느 줄에서 실패”가 포함
+  - 에러 메시지에 최소한 "어느 줄에서 실패"가 포함
 
 ---
 
@@ -483,7 +517,7 @@ export type ToolDefinition<TState> = {
 
 - PR-01: 사용자 입력 데이터는 **외부로 전송하지 않음**
 - PR-02: Analytics/Tracking 없음
-- PR-03: URL 공유는 사용자가 명시적으로 “Share”를 눌렀을 때만 생성
+- PR-03: URL 공유는 사용자가 명시적으로 "Share"를 눌렀을 때만 생성
 - PR-04: localStorage에 저장된 데이터는 브라우저 내에만 존재(암호화는 v1 범위 밖, 단 안내 문구 가능)
 
 ---
@@ -544,7 +578,7 @@ export type ToolDefinition<TState> = {
 - JWT 디코더(검증 X, payload 표시)
 - UUID v4/v7 생성기
 - QueryString ↔ JSON
-- Hash(SHA-256) 생성기(“보안용 아님” 안내 포함)
+- Hash(SHA-256) 생성기("보안용 아님" 안내 포함)
 - JSONPath 테스트
 - Regex Tester
 - HTML/JSON minify
@@ -552,4 +586,9 @@ export type ToolDefinition<TState> = {
 
 ---
 
-원하면, 다음 단계로 제가 **“AI Agent 실행용 작업 지시서(Tasks + 폴더 구조 + 파일별 TODO + 구현 순서)”**까지 바로 만들어드릴게요. (지금 SRS 기준으로, `src/tools/*`에 각 페이지 스캐폴딩이 자동으로 붙는 형태로요.)
+## 14. 변경 이력 (v1.1)
+
+- **v1.1** (2025-12-14):
+  - 사이드바 UI 개선: 로고(yowu.dev) 추가, GitHub 링크 위치 변경, 이스터에그 뱃지 추가
+  - UX 강화: Toast 알림(`sonner`), 실시간 변환, 동적 타이틀, 그룹별 Width 전략 적용
+  - 프로젝트명 변경: `yowu-devtools` → `tools.yowu.dev`
