@@ -276,6 +276,36 @@ const tools: ToolInfo[] = [
       'Copy individual or all IDs',
     ],
   },
+  {
+    id: 'password',
+    path: '/password',
+    title: 'Password Generator',
+    description: 'Generate secure passwords with customizable options',
+    seoDescription:
+      'Free online password generator. Create strong, secure passwords with customizable length, character types, and exclusion options. Password strength indicator included. All processing happens in your browser.',
+    keywords: [
+      'password generator',
+      'secure password',
+      'random password',
+      'password creator',
+      'strong password',
+      'password maker',
+      'password tool',
+      'password strength',
+      'password checker',
+      'online password generator',
+      'password builder',
+    ],
+    features: [
+      'Customizable password length (4-128 characters)',
+      'Character type selection (uppercase, lowercase, numbers, symbols)',
+      'Exclude similar characters (i, l, 1, L, o, 0, O)',
+      'Exclude ambiguous symbols',
+      'Password strength indicator (entropy-based)',
+      'Batch generation (up to 20 passwords)',
+      'Copy individual or all passwords',
+    ],
+  },
 ];
 
 export function generateRoutes(): Plugin {
