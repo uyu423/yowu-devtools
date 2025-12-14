@@ -332,7 +332,7 @@ export function generateRoutes(): Plugin {
         const structuredData = {
           '@context': 'https://schema.org',
           '@type': 'WebApplication',
-          name: `${tool.title} - tools.yowu.dev`,
+          name: `${tool.title} | Yowu's DevTools`,
           url: toolUrl,
           applicationCategory: 'DeveloperApplication',
           operatingSystem: 'Web',
@@ -350,7 +350,7 @@ export function generateRoutes(): Plugin {
         };
 
         // SEO 최적화된 title 생성 (50-60자 권장)
-        const seoTitle = `${tool.title} - Dev Tool | tools.yowu.dev`;
+        const seoTitle = `${tool.title} | Yowu's DevTools`;
 
         // Description이 160자를 초과하면 자르기 (110-160자 권장)
         const optimizedDescription =
@@ -369,13 +369,13 @@ export function generateRoutes(): Plugin {
     <meta property="og:title" content="${seoTitle}" />
     <meta property="og:description" content="${optimizedDescription}" />
     <meta property="og:image" content="https://tools.yowu.dev/opengraph.png" />
-    <meta property="og:image:alt" content="${tool.title} - Dev Tool" />
-    <meta property="og:site_name" content="tools.yowu.dev" />
+    <meta property="og:image:alt" content="${tool.title} | Yowu's DevTools" />
+    <meta property="og:site_name" content="Yowu's DevTools" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="${seoTitle}" />
     <meta name="twitter:description" content="${optimizedDescription}" />
     <meta name="twitter:image" content="https://tools.yowu.dev/opengraph.png" />
-    <meta name="twitter:image:alt" content="${tool.title} - Dev Tool" />
+    <meta name="twitter:image:alt" content="${tool.title} | Yowu's DevTools" />
     <script type="application/ld+json">${JSON.stringify(
       structuredData,
       null,
