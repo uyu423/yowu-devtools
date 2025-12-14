@@ -3,6 +3,18 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: ['main']
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'index.html'
+      - 'vite.config.ts'
+      - 'vite-plugin-generate-routes.ts'
+      - 'tailwind.config.js'
+      - 'tsconfig*.json'
+      - 'postcss.config.js'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'eslint.config.js'
   workflow_dispatch:
 
 permissions:
