@@ -25,7 +25,10 @@ const DEFAULT_STATE: Base64State = {
 
 const Base64Tool: React.FC = () => {
   useTitle('Base64 Converter');
-  const { state, updateState, resetState, shareState } = useToolState<Base64State>('base64', DEFAULT_STATE);
+  // Base64 tool state contains: input (string), mode, urlSafe
+  // All fields are necessary for sharing - input may be large but required
+  const { state, updateState, resetState, shareState } =
+    useToolState<Base64State>('base64', DEFAULT_STATE);
 
   const conversion = useMemo(() => {
     if (!state.input) {
@@ -54,19 +57,23 @@ const Base64Tool: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full p-4 md:p-6 max-w-5xl mx-auto">
-      <ToolHeader 
-        title="Base64 Converter" 
+      <ToolHeader
+        title="Base64 Converter"
         description="Encode or decode UTF-8 text, including Base64URL."
         onReset={resetState}
         onShare={shareState}
       />
 
       <div className="flex-1 flex flex-col gap-6">
-        <EditorPanel 
+        <EditorPanel
           title={state.mode === 'encode' ? 'Text Input' : 'Base64 Input'}
           value={state.input}
           onChange={(val) => updateState({ input: val })}
-          placeholder={state.mode === 'encode' ? 'Type text to encode...' : 'Paste Base64 string...'}
+          placeholder={
+            state.mode === 'encode'
+              ? 'Type text to encode...'
+              : 'Paste Base64 string...'
+          }
           className="h-40 lg:h-56"
           status={conversion.error ? 'error' : 'default'}
         />
@@ -74,21 +81,25 @@ const Base64Tool: React.FC = () => {
         <ActionBar className="flex-col gap-4 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center bg-gray-100 dark:bg-gray-900 p-1 rounded-lg">
             {['encode', 'decode'].map((mode) => (
-              <button 
+              <button
                 key={mode}
-                className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${state.mode === mode ? 'bg-white dark:bg-gray-800 shadow-sm text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'}`}
-                onClick={() => updateState({ mode: mode as Base64State['mode'] })}
+                className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                  state.mode === mode
+                    ? 'bg-white dark:bg-gray-800 shadow-sm text-blue-600 dark:text-blue-400'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+                }`}
+                onClick={() =>
+                  updateState({ mode: mode as Base64State['mode'] })
+                }
               >
                 {mode === 'encode' ? 'Encode' : 'Decode'}
               </button>
             ))}
           </div>
 
-          <label 
-            className="flex items-center space-x-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer"
-          >
-            <input 
-              type="checkbox" 
+          <label className="flex items-center space-x-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+            <input
+              type="checkbox"
               className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-500 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-0 cursor-pointer"
               checked={state.urlSafe}
               onChange={(e) => updateState({ urlSafe: e.target.checked })}
@@ -109,10 +120,13 @@ const Base64Tool: React.FC = () => {
         </ActionBar>
 
         {conversion.error && (
-          <ErrorBanner message="Base64 conversion failed" details={conversion.error} />
+          <ErrorBanner
+            message="Base64 conversion failed"
+            details={conversion.error}
+          />
         )}
 
-        <EditorPanel 
+        <EditorPanel
           title="Result"
           value={conversion.result}
           readOnly
@@ -124,7 +138,10 @@ const Base64Tool: React.FC = () => {
         <div className="flex justify-end">
           <button
             className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-            onClick={() => conversion.result && copyToClipboard(conversion.result, 'Copied result.')}
+            onClick={() =>
+              conversion.result &&
+              copyToClipboard(conversion.result, 'Copied result.')
+            }
             disabled={!conversion.result}
           >
             Copy Result

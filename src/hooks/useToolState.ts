@@ -1,6 +1,9 @@
 import { useCallback, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
+import {
+  compressToEncodedURIComponent,
+  decompressFromEncodedURIComponent,
+} from 'lz-string';
 import { toast } from 'sonner';
 
 const STORAGE_PREFIX = 'yowu-devtools:v1:tool:';
@@ -23,7 +26,17 @@ function cloneState<T>(state: T): T {
   return JSON.parse(JSON.stringify(state)) as T;
 }
 
-export function useToolState<T extends object>(toolId: string, defaultState: T) {
+export function useToolState<T extends object>(
+  toolId: string,
+  defaultState: T,
+  options?: {
+    /**
+     * Filter function to select only necessary fields for sharing.
+     * This helps reduce URL length by excluding UI-only state or large computed values.
+     */
+    shareStateFilter?: (state: T) => Partial<T>;
+  }
+) {
   const location = useLocation();
   const [state, setState] = useState<T>(() => {
     if (typeof window === 'undefined') {
@@ -54,18 +67,27 @@ export function useToolState<T extends object>(toolId: string, defaultState: T) 
     return cloneState(defaultState);
   });
 
-  const setAndPersist = useCallback((updater: T | ((prev: T) => T)) => {
-    setState(prev => {
-      const next = typeof updater === 'function' ? (updater as (prev: T) => T)(prev) : updater;
-      if (typeof window !== 'undefined') {
-        window.localStorage.setItem(
-          `${STORAGE_PREFIX}${toolId}`,
-          JSON.stringify({ state: next, updatedAt: Date.now() } satisfies StoredToolState<T>),
-        );
-      }
-      return next;
-    });
-  }, [toolId]);
+  const setAndPersist = useCallback(
+    (updater: T | ((prev: T) => T)) => {
+      setState((prev) => {
+        const next =
+          typeof updater === 'function'
+            ? (updater as (prev: T) => T)(prev)
+            : updater;
+        if (typeof window !== 'undefined') {
+          window.localStorage.setItem(
+            `${STORAGE_PREFIX}${toolId}`,
+            JSON.stringify({
+              state: next,
+              updatedAt: Date.now(),
+            } satisfies StoredToolState<T>)
+          );
+        }
+        return next;
+      });
+    },
+    [toolId]
+  );
 
   const resetState = useCallback(() => {
     const base = cloneState(defaultState);
@@ -74,7 +96,15 @@ export function useToolState<T extends object>(toolId: string, defaultState: T) 
 
   const shareState = useCallback(async () => {
     try {
-      const envelope: ShareEnvelope<T> = { v: 1, tool: toolId, state };
+      // Apply filter if provided, otherwise use full state
+      const stateToShare = options?.shareStateFilter
+        ? options.shareStateFilter(state)
+        : state;
+      const envelope: ShareEnvelope<Partial<T>> = {
+        v: 1,
+        tool: toolId,
+        state: stateToShare,
+      };
       const encoded = compressToEncodedURIComponent(JSON.stringify(envelope));
       const baseUrl = `${window.location.origin}${window.location.pathname}${window.location.search}`;
       const shareUrl = `${baseUrl}#${location.pathname}?d=${encoded}`;
@@ -86,11 +116,14 @@ export function useToolState<T extends object>(toolId: string, defaultState: T) 
       toast.error('Unable to copy share link.');
       return null;
     }
-  }, [location.pathname, state, toolId]);
+  }, [location.pathname, state, toolId, options]);
 
-  const applyState = useCallback((partial: Partial<T>) => {
-    setAndPersist(prev => ({ ...prev, ...partial }));
-  }, [setAndPersist]);
+  const applyState = useCallback(
+    (partial: Partial<T>) => {
+      setAndPersist((prev) => ({ ...prev, ...partial }));
+    },
+    [setAndPersist]
+  );
 
   return {
     state,
@@ -105,9 +138,9 @@ function decodePayload<T>(encoded: string, toolId: string) {
   try {
     const json = decompressFromEncodedURIComponent(encoded);
     if (!json) return null;
-    const payload = JSON.parse(json) as ShareEnvelope<T>;
+    const payload = JSON.parse(json) as ShareEnvelope<Partial<T>>;
     if (payload.tool !== toolId) return null;
-    return payload.state;
+    return payload.state as Partial<T>;
   } catch (error) {
     console.error('Failed to decode shared payload', error);
     toast.error('Shared URL is invalid. Restoring default state.');

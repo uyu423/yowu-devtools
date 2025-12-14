@@ -27,18 +27,27 @@ const DEFAULT_STATE: CronToolState = {
 
 const CronTool: React.FC = () => {
   useTitle('Cron Parser');
-  const { state, updateState, resetState, shareState } = useToolState<CronToolState>('cron', DEFAULT_STATE);
+  // Cron tool state is small (expression string, boolean flags, small numbers)
+  // No filter needed - all fields are necessary and small
+  const { state, updateState, resetState, shareState } =
+    useToolState<CronToolState>('cron', DEFAULT_STATE);
 
   const cronResult = useMemo(() => {
     if (!state.expression.trim()) {
-      return { description: '', nextRuns: [] as Date[], error: 'Please enter a cron expression.' };
+      return {
+        description: '',
+        nextRuns: [] as Date[],
+        error: 'Please enter a cron expression.',
+      };
     }
 
     try {
       const parts = state.expression.trim().split(/\s+/);
       const expected = state.hasSeconds ? 6 : 5;
       if (parts.length !== expected) {
-        throw new Error(`Expected ${expected} fields but received ${parts.length}.`);
+        throw new Error(
+          `Expected ${expected} fields but received ${parts.length}.`
+        );
       }
       const options: CronExpressionOptions = {
         currentDate: new Date(),
@@ -61,8 +70,8 @@ const CronTool: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full p-4 md:p-6 max-w-3xl mx-auto">
-      <ToolHeader 
-        title="Cron Parser" 
+      <ToolHeader
+        title="Cron Parser"
         description="Explain cron expressions and preview upcoming runs."
         onReset={resetState}
         onShare={shareState}
@@ -70,19 +79,19 @@ const CronTool: React.FC = () => {
 
       <div className="flex-1 flex flex-col gap-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Cron Expression</label>
-          <input 
-            type="text" 
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Cron Expression
+          </label>
+          <input
+            type="text"
             value={state.expression}
             onChange={(e) => updateState({ expression: e.target.value })}
             className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2 font-mono text-sm shadow-sm focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400"
           />
           <div className="mt-3 flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400">
-            <label 
-              className="inline-flex items-center gap-2 cursor-pointer"
-            >
-              <input 
-                type="checkbox" 
+            <label className="inline-flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
                 className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-500 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-0 cursor-pointer"
                 checked={state.hasSeconds}
                 onChange={(e) => updateState({ hasSeconds: e.target.checked })}
@@ -91,31 +100,33 @@ const CronTool: React.FC = () => {
                 Include seconds field
               </OptionLabel>
             </label>
-            <label 
-              className="inline-flex items-center gap-2"
-            >
+            <label className="inline-flex items-center gap-2">
               <OptionLabel tooltip="Choose whether upcoming runs are calculated in your local timezone or UTC. Local timezone uses your browser's timezone settings, while UTC provides consistent results regardless of location.">
                 Timezone
               </OptionLabel>
-              <select 
+              <select
                 className="rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-2 py-1 text-sm"
                 value={state.timezone}
-                onChange={(e) => updateState({ timezone: e.target.value as CronToolState['timezone'] })}
+                onChange={(e) =>
+                  updateState({
+                    timezone: e.target.value as CronToolState['timezone'],
+                  })
+                }
               >
                 <option value="local">Local</option>
                 <option value="utc">UTC</option>
               </select>
             </label>
-            <label 
-              className="inline-flex items-center gap-2"
-            >
+            <label className="inline-flex items-center gap-2">
               <OptionLabel tooltip="Set how many future executions to generate in the schedule table. This helps you preview when the cron job will run next, making it easier to verify your schedule.">
                 Next runs
               </OptionLabel>
-              <select 
+              <select
                 className="rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-2 py-1 text-sm"
                 value={state.nextCount}
-                onChange={(e) => updateState({ nextCount: Number(e.target.value) as 10 | 20 })}
+                onChange={(e) =>
+                  updateState({ nextCount: Number(e.target.value) as 10 | 20 })
+                }
               >
                 <option value={10}>10 items</option>
                 <option value={20}>20 items</option>
@@ -125,13 +136,20 @@ const CronTool: React.FC = () => {
         </div>
 
         {cronResult.error && (
-          <ErrorBanner message="Cron parsing error" details={cronResult.error} />
+          <ErrorBanner
+            message="Cron parsing error"
+            details={cronResult.error}
+          />
         )}
 
         {!cronResult.error && cronResult.description && (
           <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800 rounded-lg p-4">
-            <h3 className="text-sm font-medium text-blue-900 dark:text-blue-300 uppercase tracking-wider mb-1">Human readable</h3>
-            <p className="text-lg text-blue-800 dark:text-blue-200 font-semibold">{cronResult.description}</p>
+            <h3 className="text-sm font-medium text-blue-900 dark:text-blue-300 uppercase tracking-wider mb-1">
+              Human readable
+            </h3>
+            <p className="text-lg text-blue-800 dark:text-blue-200 font-semibold">
+              {cronResult.description}
+            </p>
           </div>
         )}
 
@@ -139,13 +157,22 @@ const CronTool: React.FC = () => {
           <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-800">
             <div className="bg-gray-50 dark:bg-gray-700 px-4 py-2 border-b border-gray-200 dark:border-gray-600 text-sm font-medium text-gray-700 dark:text-gray-300 flex justify-between">
               <span>Next Scheduled Dates</span>
-              <span className="text-xs text-gray-500 dark:text-gray-400">{state.timezone === 'utc' ? 'UTC timezone' : 'Local timezone'}</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                {state.timezone === 'utc' ? 'UTC timezone' : 'Local timezone'}
+              </span>
             </div>
             <ul className="divide-y divide-gray-100 dark:divide-gray-700">
               {cronResult.nextRuns.map((date, idx) => (
-                <li key={idx} className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 flex justify-between">
-                  <span className="font-mono">{format(date, 'yyyy-MM-dd HH:mm:ss')}</span>
-                  <span className="text-gray-400 dark:text-gray-500">{formatDistanceToNow(date, { addSuffix: true })}</span>
+                <li
+                  key={idx}
+                  className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 flex justify-between"
+                >
+                  <span className="font-mono">
+                    {format(date, 'yyyy-MM-dd HH:mm:ss')}
+                  </span>
+                  <span className="text-gray-400 dark:text-gray-500">
+                    {formatDistanceToNow(date, { addSuffix: true })}
+                  </span>
                 </li>
               ))}
             </ul>

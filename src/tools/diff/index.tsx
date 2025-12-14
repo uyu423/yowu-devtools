@@ -31,7 +31,10 @@ const DEFAULT_STATE: DiffToolState = {
 
 const DiffTool: React.FC = () => {
   useTitle('Text Diff');
-  const { state, updateState, resetState, shareState } = useToolState<DiffToolState>('diff', DEFAULT_STATE);
+  // Diff tool state contains: left (string), right (string), view, ignoreWhitespace, ignoreCase
+  // All fields are necessary for sharing - input strings may be large but required
+  const { state, updateState, resetState, shareState } =
+    useToolState<DiffToolState>('diff', DEFAULT_STATE);
   const debouncedLeft = useDebouncedValue(state.left, 250);
   const debouncedRight = useDebouncedValue(state.right, 250);
 
@@ -40,7 +43,11 @@ const DiffTool: React.FC = () => {
     dmp.Diff_Timeout = 1;
     const rawDiffs = dmp.diff_main(debouncedLeft, debouncedRight);
     dmp.diff_cleanupSemantic(rawDiffs);
-    return applyIgnoreOptions(rawDiffs, state.ignoreWhitespace, state.ignoreCase);
+    return applyIgnoreOptions(
+      rawDiffs,
+      state.ignoreWhitespace,
+      state.ignoreCase
+    );
   }, [debouncedLeft, debouncedRight, state.ignoreWhitespace, state.ignoreCase]);
 
   const stats = useMemo(() => {
@@ -50,23 +57,25 @@ const DiffTool: React.FC = () => {
         if (op === -1) acc.removed += text.length;
         return acc;
       },
-      { added: 0, removed: 0 },
+      { added: 0, removed: 0 }
     );
   }, [diffs]);
 
   const hasDiff = diffs.some(([op]) => op !== 0);
 
   const unifiedExport = useMemo(() => {
-    return diffs.map(([op, text]) => {
-      const prefix = op === 0 ? ' ' : op === 1 ? '+' : '-';
-      return `${prefix}${text}`;
-    }).join('');
+    return diffs
+      .map(([op, text]) => {
+        const prefix = op === 0 ? ' ' : op === 1 ? '+' : '-';
+        return `${prefix}${text}`;
+      })
+      .join('');
   }, [diffs]);
 
   return (
     <div className="flex flex-col h-full p-4 md:p-6 max-w-[90rem] mx-auto">
-      <ToolHeader 
-        title="Text Diff" 
+      <ToolHeader
+        title="Text Diff"
         description="Spot differences between two text blocks instantly."
         onReset={() => resetState()}
         onShare={shareState}
@@ -74,13 +83,13 @@ const DiffTool: React.FC = () => {
 
       <div className="flex flex-col gap-4">
         <div className="grid gap-4 lg:grid-cols-2">
-          <EditorPanel 
+          <EditorPanel
             title="Original"
             value={state.left}
             onChange={(val) => updateState({ left: val })}
             className="h-60"
           />
-          <EditorPanel 
+          <EditorPanel
             title="Modified"
             value={state.right}
             onChange={(val) => updateState({ right: val })}
@@ -93,7 +102,11 @@ const DiffTool: React.FC = () => {
             {(['split', 'unified'] as const).map((view) => (
               <button
                 key={view}
-                className={`rounded-md px-3 py-1.5 ${state.view === view ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'}`}
+                className={`rounded-md px-3 py-1.5 ${
+                  state.view === view
+                    ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-sm'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+                }`}
                 onClick={() => updateState({ view })}
               >
                 {view === 'split' ? 'Split View' : 'Unified View'}
@@ -102,24 +115,22 @@ const DiffTool: React.FC = () => {
           </div>
 
           <div className="flex flex-wrap items-center gap-4 text-sm text-gray-700 dark:text-gray-300">
-            <label 
-              className="flex items-center gap-2 cursor-pointer"
-            >
-              <input 
-                type="checkbox" 
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
                 className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-500 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-0 cursor-pointer"
                 checked={state.ignoreWhitespace}
-                onChange={(e) => updateState({ ignoreWhitespace: e.target.checked })}
+                onChange={(e) =>
+                  updateState({ ignoreWhitespace: e.target.checked })
+                }
               />
               <OptionLabel tooltip="Treat changes that only add or remove whitespace (spaces, tabs, newlines) as no-ops. This helps focus on actual content changes rather than formatting differences.">
                 Ignore Whitespace
               </OptionLabel>
             </label>
-            <label 
-              className="flex items-center gap-2 cursor-pointer"
-            >
-              <input 
-                type="checkbox" 
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
                 className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-500 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-0 cursor-pointer"
                 checked={state.ignoreCase}
                 onChange={(e) => updateState({ ignoreCase: e.target.checked })}
@@ -131,7 +142,10 @@ const DiffTool: React.FC = () => {
             <button
               className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               disabled={!hasDiff}
-              onClick={() => hasDiff && copyToClipboard(unifiedExport, 'Copied unified diff output.')}
+              onClick={() =>
+                hasDiff &&
+                copyToClipboard(unifiedExport, 'Copied unified diff output.')
+              }
             >
               Copy Unified
             </button>
@@ -140,15 +154,23 @@ const DiffTool: React.FC = () => {
 
         <div className="rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 shadow-inner">
           <div className="flex items-center justify-between border-b dark:border-gray-700 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">
-            <span className="font-semibold text-gray-800 dark:text-white">Diff Result</span>
+            <span className="font-semibold text-gray-800 dark:text-white">
+              Diff Result
+            </span>
             <div className="space-x-4 text-xs uppercase tracking-wide">
-              <span className="text-green-600 dark:text-green-400">+{stats.added} chars</span>
-              <span className="text-red-600 dark:text-red-400">-{stats.removed} chars</span>
+              <span className="text-green-600 dark:text-green-400">
+                +{stats.added} chars
+              </span>
+              <span className="text-red-600 dark:text-red-400">
+                -{stats.removed} chars
+              </span>
             </div>
           </div>
 
           {!hasDiff && (
-            <p className="p-4 text-center text-sm text-gray-500 dark:text-gray-400">Both inputs are identical.</p>
+            <p className="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
+              Both inputs are identical.
+            </p>
           )}
 
           {hasDiff && state.view === 'split' && (
@@ -169,21 +191,30 @@ const DiffTool: React.FC = () => {
   );
 };
 
-const DiffPane: React.FC<{ label: string; type: 'left' | 'right'; diffs: Diff[] }> = ({ label, type, diffs }) => {
+const DiffPane: React.FC<{
+  label: string;
+  type: 'left' | 'right';
+  diffs: Diff[];
+}> = ({ label, type, diffs }) => {
   return (
     <div className="min-h-[240px] border-gray-100 dark:border-gray-700">
-      <div className="border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-900 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">{label}</div>
+      <div className="border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-900 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+        {label}
+      </div>
       <pre className="h-full whitespace-pre-wrap break-words p-4 font-mono text-sm text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800">
         {diffs.map(([op, text], idx) => {
           if (type === 'left' && op === 1) return null;
           if (type === 'right' && op === -1) return null;
-          const highlight = op === 0
-            ? ''
-            : op === -1
+          const highlight =
+            op === 0
+              ? ''
+              : op === -1
               ? 'bg-red-100 dark:bg-red-900/60 text-red-800 dark:text-white'
               : 'bg-green-100 dark:bg-green-900/60 text-green-800 dark:text-white';
           return (
-            <span key={`${type}-${idx}`} className={highlight}>{text || '\n'}</span>
+            <span key={`${type}-${idx}`} className={highlight}>
+              {text || '\n'}
+            </span>
           );
         })}
       </pre>
@@ -194,18 +225,28 @@ const DiffPane: React.FC<{ label: string; type: 'left' | 'right'; diffs: Diff[] 
 const UnifiedPane: React.FC<{ diffs: Diff[] }> = ({ diffs }) => (
   <pre className="whitespace-pre-wrap break-words p-4 font-mono text-sm text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800">
     {diffs.map(([op, text], idx) => {
-      const style = op === 0 ? '' : op === 1 ? 'bg-green-100 dark:bg-green-900/60 text-green-800 dark:text-white' : 'bg-red-100 dark:bg-red-900/60 text-red-800 dark:text-white line-through';
+      const style =
+        op === 0
+          ? ''
+          : op === 1
+          ? 'bg-green-100 dark:bg-green-900/60 text-green-800 dark:text-white'
+          : 'bg-red-100 dark:bg-red-900/60 text-red-800 dark:text-white line-through';
       const prefix = op === 0 ? '' : op === 1 ? '+ ' : '- ';
       return (
         <span key={idx} className={style}>
-          {prefix}{text || '\n'}
+          {prefix}
+          {text || '\n'}
         </span>
       );
     })}
   </pre>
 );
 
-function applyIgnoreOptions(diffs: Diff[], ignoreWhitespace: boolean, ignoreCase: boolean) {
+function applyIgnoreOptions(
+  diffs: Diff[],
+  ignoreWhitespace: boolean,
+  ignoreCase: boolean
+) {
   if (!ignoreWhitespace && !ignoreCase) return diffs;
   const normalize = (text: string) => {
     let result = text;

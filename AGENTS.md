@@ -33,6 +33,50 @@ Use Node 20+ / npm 10 to stay in sync with `package-lock.json`. Install dependen
 - Each generated HTML includes tool-specific meta tags for search engine optimization
 - GitHub Pages handles SPA routing via `404.html` redirect script
 
+## URL 공유 최적화
+
+### 필터링 전략
+
+URL 공유 시 필요한 필드만 포함하여 URL 길이를 최소화합니다. `useToolState` 훅의 `shareStateFilter` 옵션을 사용하여 구현합니다.
+
+### 구현 방법
+
+1. **필터 함수 정의**: UI 전용 상태를 제외하고 공유에 필요한 필드만 선택
+
+```typescript
+const { state, shareState } = useToolState<JsonToolState>(
+  'json',
+  DEFAULT_STATE,
+  {
+    shareStateFilter: ({ input, indent, sortKeys, viewMode, expandLevel }) => ({
+      input,
+      indent,
+      sortKeys,
+      viewMode,
+      expandLevel,
+      // search 필드는 UI 전용이므로 제외
+    }),
+  }
+);
+```
+
+2. **필터링 원칙**:
+   - ✅ 포함: 사용자 입력, 설정 옵션
+   - ❌ 제외: UI 전용 상태 (검색어, 스크롤 위치 등), 계산된 값 (파싱 결과 등)
+
+3. **검증**:
+   - Share 버튼 클릭 후 생성된 URL 길이 확인
+   - 공유 링크로 상태가 정확히 복원되는지 확인
+   - 필터링된 필드가 제외되었는지 확인
+
+### 도구별 가이드
+
+- **JSON 도구**: `search` 필드 제외 (UI 전용)
+- **YAML/Diff/Base64/URL**: 모든 필드 필요 (필터 없음)
+- **Time/Cron**: 작은 데이터이므로 필터 없음 (모든 필드 포함)
+
+자세한 내용은 `SAS.md`의 "5.3 URL 공유(입력 포함) 규격" 섹션을 참조하세요.
+
 ### SEO 최적화 가이드 (신규 메뉴 추가 시 필수)
 
 신규 도구를 추가할 때는 반드시 SEO 최적화를 위해 다음 단계를 수행해야 합니다:

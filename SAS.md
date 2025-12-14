@@ -189,6 +189,8 @@
 
 ### 5.3 URL 공유(입력 포함) 규격
 
+#### 5.3.1 기본 구조
+
 - URL 형태(권장):
 
   - `/#/<toolId>?d=<payload>`
@@ -205,15 +207,87 @@
 
 - 인코딩 규칙:
 
-  - `payloadJson` → (옵션) `LZString.compressToEncodedURIComponent(payloadJson)` → `d`
-  - 압축을 쓰지 않는 경우: `base64url(utf8(payloadJson))`
+  - `payloadJson` → `LZString.compressToEncodedURIComponent(payloadJson)` → `d`
+  - **항상 압축 사용**: URL 길이 제한 완화를 위해 `lz-string` 압축을 기본으로 사용
 
 - 디코딩 실패 시:
 
   - 사용자에게 "공유 링크가 손상되었거나 버전이 맞지 않습니다" 안내
   - 툴 기본 상태로 fallback
 
-> **중요**: URL 길이 제한이 브라우저/메신저마다 다르므로, v1부터 `lz-string` 기반 "압축 공유"를 기본으로 권장.
+#### 5.3.2 Payload 최적화 전략 (v1.3 추가)
+
+> **목적**: URL 길이를 최소화하여 브라우저/메신저 제한을 피하고, 공유 링크의 실용성을 높임
+
+- **필터링 원칙**:
+
+  - 공유에 **필요한 필드만** 포함
+  - UI 전용 상태(예: 검색어, 스크롤 위치)는 제외
+  - 계산된 값(예: 파싱 결과, 변환 결과)은 제외
+  - 사용자 입력과 설정 옵션만 포함
+
+- **구현 방식**:
+
+  - `useToolState` 훅에 선택적 `shareStateFilter` 옵션 제공
+  - 필터 함수가 제공되면 공유 시 필터링된 state만 직렬화
+  - 필터가 없으면 전체 state 직렬화 (하위 호환성 유지)
+
+- **도구별 필터링 전략**:
+
+  | 도구 | 포함 필드 | 제외 필드 | 이유 |
+  |------|----------|----------|------|
+  | JSON | `input`, `indent`, `sortKeys`, `viewMode`, `expandLevel` | `search` | 검색어는 UI 전용 상태 |
+  | YAML | `source`, `direction`, `indent` | 없음 | 모든 필드가 공유에 필요 |
+  | Diff | `left`, `right`, `view`, `ignoreWhitespace`, `ignoreCase` | 없음 | 모든 필드가 공유에 필요 |
+  | Base64 | `input`, `mode`, `urlSafe` | 없음 | 모든 필드가 공유에 필요 |
+  | URL | `input`, `mode`, `plusForSpace` | 없음 | 모든 필드가 공유에 필요 |
+  | Time | `epochInput`, `epochUnit`, `isoInput`, `timezone` | 없음 | 모든 필드가 공유에 필요 (작은 데이터) |
+  | Cron | `expression`, `hasSeconds`, `timezone`, `nextCount` | 없음 | 모든 필드가 공유에 필요 (작은 데이터) |
+
+- **구현 예시**:
+
+```typescript
+// JSON 도구 예시: search 필드 제외
+const { state, shareState } = useToolState<JsonToolState>(
+  'json',
+  DEFAULT_STATE,
+  {
+    shareStateFilter: ({ input, indent, sortKeys, viewMode, expandLevel }) => ({
+      input,
+      indent,
+      sortKeys,
+      viewMode,
+      expandLevel,
+      // search 필드는 제외 (UI 전용)
+    }),
+  }
+);
+
+// YAML 도구 예시: 필터 없음 (모든 필드 필요)
+const { state, shareState } = useToolState<YamlToolState>(
+  'yaml',
+  DEFAULT_STATE
+  // 필터 없음 = 모든 필드 포함
+);
+```
+
+- **URL 길이 제한 고려사항**:
+
+  - 브라우저 URL 길이 제한: 일반적으로 2,000~8,000자
+  - 메신저/이메일 공유: 일부 플랫폼은 더 짧은 제한 적용
+  - **권장**: 압축 후 1,500자 이하를 목표로 필터링
+  - 큰 입력값이 있는 도구(JSON, YAML, Diff 등)는 필터링으로도 URL이 길 수 있으나, 압축으로 완화
+
+- **검증 방법**:
+
+  - 각 도구에서 "Share" 버튼 클릭 후 생성된 URL 길이 확인
+  - 공유 링크를 새 탭에서 열어 상태가 정확히 복원되는지 확인
+  - 필터링된 필드가 제외되었는지 확인 (예: JSON의 `search` 필드)
+
+> **중요**: 
+> - URL 길이 제한이 브라우저/메신저마다 다르므로, v1부터 `lz-string` 기반 "압축 공유"를 기본으로 사용
+> - 필터링은 선택적이지만, URL 길이 최적화를 위해 권장됨
+> - 신규 도구 추가 시 필터링 필요성을 평가하고, UI 전용 상태는 반드시 제외
 
 ### 5.4 테마 정책
 
@@ -290,7 +364,7 @@ type JsonToolState = {
   indent: 2 | 4; // 기본 2
   sortKeys: boolean; // 기본 false
   expandLevel: number; // 기본 2 (tree)
-  search: string; // 기본 ""
+  search: string; // 기본 "" - UI 전용 상태 (URL 공유 시 제외)
 };
 ```
 
@@ -525,6 +599,11 @@ export type ToolDefinition<TState> = {
 - 최소 단축키 연결(Cmd/Ctrl+Enter, Copy)
 - localStorage 저장/복원 동작 확인
 - 공유 링크 재현 확인
+- **URL 공유 최적화** (권장):
+  - `shareStateFilter` 옵션 평가: UI 전용 상태(검색어, 스크롤 위치 등)는 제외
+  - 공유에 필요한 필드만 포함하도록 필터 함수 정의
+  - 생성된 URL 길이 확인 (압축 후 1,500자 이하 권장)
+  - 공유 링크로 상태가 정확히 복원되는지 검증
 - **SEO 최적화** (필수):
   - `vite-plugin-generate-routes.ts`의 `tools` 배열에 도구 정보 추가
   - `seoDescription`: 150-160자, 주요 기능 포함, 프라이버시 강조
@@ -663,6 +742,13 @@ export type ToolDefinition<TState> = {
 ---
 
 ## 14. 변경 이력
+
+- **v1.3** (2025-01-XX):
+
+  - URL 공유 기능 최적화: `shareStateFilter` 옵션 추가
+  - JSON 도구: `search` 필드 제외하여 URL 길이 최적화
+  - 각 도구별 필터링 전략 문서화
+  - URL 길이 제한 고려사항 및 검증 방법 추가
 
 - **v1.2** (2025-01-XX):
 

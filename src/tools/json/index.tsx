@@ -36,7 +36,23 @@ const DEFAULT_STATE: JsonToolState = {
 const JsonTool: React.FC = () => {
   useTitle('JSON Viewer');
   const { theme } = useTheme();
-  const { state, updateState, resetState, shareState } = useToolState<JsonToolState>('json', DEFAULT_STATE);
+  const { state, updateState, resetState, shareState } =
+    useToolState<JsonToolState>('json', DEFAULT_STATE, {
+      // Exclude 'search' field as it's UI-only state
+      shareStateFilter: ({
+        input,
+        indent,
+        sortKeys,
+        viewMode,
+        expandLevel,
+      }) => ({
+        input,
+        indent,
+        sortKeys,
+        viewMode,
+        expandLevel,
+      }),
+    });
   const debouncedInput = useDebouncedValue(state.input, 300);
 
   // 다크 모드 감지 - 실제 DOM 클래스를 확인하여 정확한 상태 추적
@@ -76,15 +92,27 @@ const JsonTool: React.FC = () => {
     };
   }, [theme]);
 
-  const jsonViewStyles = React.useMemo(() => ({
-    ...defaultStyles,
-    container: `${defaultStyles.container} text-sm font-mono ${isDark ? 'text-gray-100' : 'text-gray-900'}`,
-    childFieldsContainer: `${defaultStyles.childFieldsContainer ?? ''} child-fields-container`,
-  }), [isDark]);
+  const jsonViewStyles = React.useMemo(
+    () => ({
+      ...defaultStyles,
+      container: `${defaultStyles.container} text-sm font-mono ${
+        isDark ? 'text-gray-100' : 'text-gray-900'
+      }`,
+      childFieldsContainer: `${
+        defaultStyles.childFieldsContainer ?? ''
+      } child-fields-container`,
+    }),
+    [isDark]
+  );
 
   const parseResult = useMemo(() => {
     if (!debouncedInput.trim()) {
-      return { data: null, formatted: '', minified: '', error: null as string | null };
+      return {
+        data: null,
+        formatted: '',
+        minified: '',
+        error: null as string | null,
+      };
     }
 
     try {
@@ -94,7 +122,12 @@ const JsonTool: React.FC = () => {
       const minified = JSON.stringify(normalized);
       return { data: normalized, formatted, minified, error: null };
     } catch (error) {
-      return { data: null, formatted: '', minified: '', error: (error as Error).message };
+      return {
+        data: null,
+        formatted: '',
+        minified: '',
+        error: (error as Error).message,
+      };
     }
   }, [debouncedInput, state.indent, state.sortKeys]);
 
@@ -108,8 +141,8 @@ const JsonTool: React.FC = () => {
 
   return (
     <div className="flex h-full flex-col p-4 md:p-6 max-w-[90rem] mx-auto overflow-hidden">
-      <ToolHeader 
-        title="JSON Pretty Viewer" 
+      <ToolHeader
+        title="JSON Pretty Viewer"
         description="Format JSON instantly and explore the structure as a tree."
         onReset={resetState}
         onShare={shareState}
@@ -118,26 +151,27 @@ const JsonTool: React.FC = () => {
       <div className="flex flex-col gap-6 lg:flex-row flex-1 min-h-0 overflow-hidden">
         <div className="flex flex-col flex-1 min-h-0">
           <div className="mb-3 flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400 shrink-0">
-            <label 
-              className="flex items-center gap-2"
-            >
-              <OptionLabel tooltip="Choose how many spaces to use when pretty-printing JSON output. This affects the indentation level in formatted JSON views." className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+            <label className="flex items-center gap-2">
+              <OptionLabel
+                tooltip="Choose how many spaces to use when pretty-printing JSON output. This affects the indentation level in formatted JSON views."
+                className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+              >
                 Indent
               </OptionLabel>
-              <select 
+              <select
                 className="rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-2 py-1 text-sm"
                 value={state.indent}
-                onChange={(e) => updateState({ indent: Number(e.target.value) as 2 | 4 })}
+                onChange={(e) =>
+                  updateState({ indent: Number(e.target.value) as 2 | 4 })
+                }
               >
                 <option value={2}>2 spaces</option>
                 <option value={4}>4 spaces</option>
               </select>
             </label>
 
-            <label 
-              className="flex items-center gap-2 cursor-pointer"
-            >
-              <input 
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
                 type="checkbox"
                 checked={state.sortKeys}
                 onChange={(e) => updateState({ sortKeys: e.target.checked })}
@@ -148,17 +182,22 @@ const JsonTool: React.FC = () => {
               </OptionLabel>
             </label>
 
-            <label 
-              className="flex items-center gap-2"
-            >
-              <OptionLabel tooltip="Control how many nesting levels automatically expand in the tree view. Set to '∞' for unlimited depth to expand all nested objects and arrays automatically." className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+            <label className="flex items-center gap-2">
+              <OptionLabel
+                tooltip="Control how many nesting levels automatically expand in the tree view. Set to '∞' for unlimited depth to expand all nested objects and arrays automatically."
+                className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+              >
                 Tree Depth
               </OptionLabel>
-              <input 
+              <input
                 type="range"
                 min={1}
                 max={6}
-                value={state.expandLevel === Infinity ? 6 : Math.min(state.expandLevel, 6)}
+                value={
+                  state.expandLevel === Infinity
+                    ? 6
+                    : Math.min(state.expandLevel, 6)
+                }
                 onChange={(e) => {
                   const value = Number(e.target.value);
                   updateState({ expandLevel: value });
@@ -169,13 +208,21 @@ const JsonTool: React.FC = () => {
               </span>
               <button
                 type="button"
-                onClick={() => updateState({ expandLevel: state.expandLevel === Infinity ? 6 : Infinity })}
+                onClick={() =>
+                  updateState({
+                    expandLevel: state.expandLevel === Infinity ? 6 : Infinity,
+                  })
+                }
                 className={`text-xs px-2 py-0.5 rounded transition ${
-                  state.expandLevel === Infinity 
-                    ? 'bg-blue-600 dark:bg-blue-700 text-white' 
+                  state.expandLevel === Infinity
+                    ? 'bg-blue-600 dark:bg-blue-700 text-white'
                     : 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30'
                 }`}
-                title={state.expandLevel === Infinity ? "Set to level 6" : "Expand all levels"}
+                title={
+                  state.expandLevel === Infinity
+                    ? 'Set to level 6'
+                    : 'Expand all levels'
+                }
               >
                 ∞
               </button>
@@ -183,13 +230,15 @@ const JsonTool: React.FC = () => {
           </div>
 
           <div className="flex-1 min-h-0 flex flex-col">
-            <EditorPanel 
+            <EditorPanel
               title="Input JSON"
               value={state.input}
               onChange={(val) => updateState({ input: val })}
               mode="json"
               placeholder='{"key": "value"}'
-              status={!hasInput ? 'default' : parseResult.error ? 'error' : 'success'}
+              status={
+                !hasInput ? 'default' : parseResult.error ? 'error' : 'success'
+              }
               className="flex-1 min-h-0"
             />
           </div>
@@ -205,15 +254,21 @@ const JsonTool: React.FC = () => {
               ].map(({ key, label, icon: Icon }) => (
                 <button
                   key={key}
-                  className={`flex items-center gap-1 rounded-md px-3 py-1.5 transition ${state.viewMode === key ? 'bg-blue-600 text-white' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'}`}
-                  onClick={() => updateState({ viewMode: key as JsonToolState['viewMode'] })}
+                  className={`flex items-center gap-1 rounded-md px-3 py-1.5 transition ${
+                    state.viewMode === key
+                      ? 'bg-blue-600 text-white'
+                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+                  }`}
+                  onClick={() =>
+                    updateState({ viewMode: key as JsonToolState['viewMode'] })
+                  }
                 >
                   <Icon className="h-4 w-4" />
                   {label}
                 </button>
               ))}
             </div>
-            <input 
+            <input
               type="text"
               value={state.search}
               onChange={(e) => updateState({ search: e.target.value })}
@@ -225,30 +280,51 @@ const JsonTool: React.FC = () => {
           <div className="flex-1 min-h-0 flex flex-col rounded-md border dark:border-gray-700 bg-white dark:bg-gray-800 shadow-inner overflow-hidden">
             {!hasInput && (
               <div className="p-4">
-                <p className="text-sm text-gray-500 dark:text-gray-400">Paste JSON on the left to preview the result.</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Paste JSON on the left to preview the result.
+                </p>
               </div>
             )}
             {parseResult.error && (
               <div className="p-4">
-                <ErrorBanner message="JSON parsing failed" details={parseResult.error} />
-              </div>
-            )}
-            {!parseResult.error && state.viewMode === 'tree' && parseResult.data && (
-              <div className={`flex-1 min-h-0 overflow-auto p-4 ${isDark ? 'bg-gray-800' : ''}`}>
-                <JsonView 
-                  key={`json-view-${isDark ? 'dark' : 'light'}`}
-                  data={parseResult.data}
-                  shouldExpandNode={(level) => state.expandLevel === Infinity || level < state.expandLevel}
-                  style={jsonViewStyles}
+                <ErrorBanner
+                  message="JSON parsing failed"
+                  details={parseResult.error}
                 />
               </div>
             )}
-            {!parseResult.error && state.viewMode !== 'tree' && parseResult.formatted && (
-              <pre 
-                className="flex-1 min-h-0 overflow-auto whitespace-pre-wrap break-all font-mono text-sm text-gray-800 dark:text-gray-200 p-4 m-0"
-                dangerouslySetInnerHTML={{ __html: state.viewMode === 'pretty' ? highlightedPretty : escapeHtml(parseResult.minified) }}
-              />
-            )}
+            {!parseResult.error &&
+              state.viewMode === 'tree' &&
+              parseResult.data && (
+                <div
+                  className={`flex-1 min-h-0 overflow-auto p-4 ${
+                    isDark ? 'bg-gray-800' : ''
+                  }`}
+                >
+                  <JsonView
+                    key={`json-view-${isDark ? 'dark' : 'light'}`}
+                    data={parseResult.data}
+                    shouldExpandNode={(level) =>
+                      state.expandLevel === Infinity ||
+                      level < state.expandLevel
+                    }
+                    style={jsonViewStyles}
+                  />
+                </div>
+              )}
+            {!parseResult.error &&
+              state.viewMode !== 'tree' &&
+              parseResult.formatted && (
+                <pre
+                  className="flex-1 min-h-0 overflow-auto whitespace-pre-wrap break-all font-mono text-sm text-gray-800 dark:text-gray-200 p-4 m-0"
+                  dangerouslySetInnerHTML={{
+                    __html:
+                      state.viewMode === 'pretty'
+                        ? highlightedPretty
+                        : escapeHtml(parseResult.minified),
+                  }}
+                />
+              )}
           </div>
         </div>
       </div>
@@ -258,14 +334,20 @@ const JsonTool: React.FC = () => {
           <button
             className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             disabled={!isValid}
-            onClick={() => isValid && copyToClipboard(parseResult.formatted, 'Copied pretty JSON.')}
+            onClick={() =>
+              isValid &&
+              copyToClipboard(parseResult.formatted, 'Copied pretty JSON.')
+            }
           >
             Copy Pretty
           </button>
           <button
             className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             disabled={!isValid}
-            onClick={() => isValid && copyToClipboard(parseResult.minified, 'Copied minified JSON.')}
+            onClick={() =>
+              isValid &&
+              copyToClipboard(parseResult.minified, 'Copied minified JSON.')
+            }
           >
             Copy Minified
           </button>
@@ -308,7 +390,9 @@ function highlightMatches(value: string, query: string) {
   while ((match = regex.exec(value)) !== null) {
     const before = value.slice(lastIndex, match.index);
     result += escapeHtml(before);
-    result += `<mark class="bg-yellow-200 dark:bg-yellow-800 text-gray-900 dark:text-yellow-100">${escapeHtml(match[0])}</mark>`;
+    result += `<mark class="bg-yellow-200 dark:bg-yellow-800 text-gray-900 dark:text-yellow-100">${escapeHtml(
+      match[0]
+    )}</mark>`;
     lastIndex = regex.lastIndex;
   }
 
