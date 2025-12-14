@@ -238,6 +238,15 @@ Sitemap: https://tools.yowu.dev/sitemap.xml`;
       fs.writeFileSync(path.join(distDir, 'robots.txt'), robots, 'utf-8');
       console.log('✅ Generated: robots.txt');
 
+      // .nojekyll 파일 생성 (Jekyll 비활성화)
+      fs.writeFileSync(path.join(distDir, '.nojekyll'), '', 'utf-8');
+      console.log('✅ Generated: .nojekyll');
+
+      // CNAME 파일 생성 (커스텀 도메인용)
+      const cname = 'tools.yowu.dev';
+      fs.writeFileSync(path.join(distDir, 'CNAME'), cname, 'utf-8');
+      console.log(`✅ Generated: CNAME (${cname})`);
+
       console.log('\n🎉 All route HTML files and SEO files generated successfully!');
     },
   };
