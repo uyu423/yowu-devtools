@@ -310,8 +310,22 @@ export function generateRoutes(): Plugin {
                 ''
               );
 
-            // 메타 태그를 head 시작 부분에 삽입
-            return `<head>${metaTags.trim()}${cleanedHead}</head>`;
+            // URL 정규화 스크립트 추가 (React Router가 올바른 경로를 인식하도록)
+            // 즉시 실행되어야 하므로 head에 배치 (React Router 로드 전)
+            const urlNormalizeScript = `
+    <script>
+      // /json/index.html -> /json으로 URL 변경 (React Router가 올바르게 작동하도록)
+      // 즉시 실행하여 React Router가 로드되기 전에 URL을 정규화
+      (function() {
+        if (window.location.pathname.endsWith('/index.html')) {
+          var newPath = window.location.pathname.replace(/\\/index\\.html$/, '');
+          window.history.replaceState(null, '', newPath + window.location.search + window.location.hash);
+        }
+      })();
+    </script>`;
+
+            // 메타 태그와 URL 정규화 스크립트를 head 시작 부분에 삽입
+            return `<head>${metaTags.trim()}${urlNormalizeScript}${cleanedHead}</head>`;
           }
         );
 
@@ -336,7 +350,10 @@ export function generateRoutes(): Plugin {
       });
 
       // 404.html 생성 (SPA 라우팅 지원)
-      // 알려진 경로 목록 생성
+      // GitHub Pages는 404 오류 시 이 파일을 반환합니다.
+      // 각 경로에 대해 별도의 index.html 파일이 존재하므로,
+      // 404.html이 실행되는 경우는 GitHub Pages가 자동으로 찾지 못한 경우입니다.
+      // 이 경우 해당 경로의 index.html로 리다이렉트합니다.
       const knownPaths = ['/', ...tools.map((tool) => tool.path)];
       const knownPathsStr = JSON.stringify(knownPaths);
 
@@ -370,12 +387,13 @@ export function generateRoutes(): Plugin {
       
       if (isKnownPath && path !== '/') {
         // 알려진 경로인 경우 (루트 제외)
-        // GitHub Pages가 /json 요청 시 /json/index.html을 자동으로 찾지 못하는 경우를 대비해
-        // 명시적으로 index.html 경로로 리다이렉트
+        // 해당 경로의 index.html 파일이 존재하므로 리다이렉트
+        // 예: /json -> /json/index.html
         sessionStorage.setItem(redirectKey, '1');
         window.location.replace(path + '/index.html' + search + hash);
       } else {
         // 루트 경로이거나 알려진 경로가 아닌 경우
+        // 루트 index.html로 리다이렉트 (React Router가 처리)
         sessionStorage.removeItem(redirectKey);
         window.location.replace('/index.html' + search + hash);
       }
