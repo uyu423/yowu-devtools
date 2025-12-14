@@ -4,6 +4,8 @@ import { tools } from '@/tools';
 import { Toaster } from 'sonner';
 import { useTheme } from '@/hooks/useTheme';
 import { useRecentTools } from '@/hooks/useRecentTools';
+import { usePWA } from '@/hooks/usePWA';
+import { PWAUpdatePrompt } from '@/components/common/PWAUpdatePrompt';
 import { useEffect } from 'react';
 import { Github } from 'lucide-react';
 
@@ -123,10 +125,22 @@ function App() {
   // Ensure theme is initialized at app level
   useTheme();
   
+  // PWA 기능 (업데이트 알림, 설치 프롬프트, 오프라인 감지)
+  const pwa = usePWA();
+  
   return (
     <AppLayout>
       <Toaster position="bottom-center" />
       <AppContent />
+      <PWAUpdatePrompt
+        needRefresh={pwa.needRefresh}
+        offlineReady={pwa.offlineReady}
+        isOnline={pwa.isOnline}
+        onUpdate={pwa.updateServiceWorker}
+        onClose={pwa.closePrompt}
+        onInstall={pwa.installApp}
+        isInstallable={pwa.isInstallable}
+      />
     </AppLayout>
   );
 }
