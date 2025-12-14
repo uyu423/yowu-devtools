@@ -215,7 +215,7 @@ function fromUrlSafe(value: string) {
 
 export const base64Tool: ToolDefinition<Base64State> = {
   id: 'base64',
-  title: 'Base64',
+  title: 'Base64 Converter',
   description: 'Base64 Encode/Decode',
   path: '/base64',
   icon: Binary,
