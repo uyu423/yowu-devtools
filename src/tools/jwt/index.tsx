@@ -16,12 +16,21 @@ interface JwtToolState {
   token: string;
   mode: 'decode' | 'encode';
   verifyKey: string; // HMAC secret or RSA/ECDSA public key
+  // Encoding fields
+  headerJson: string;
+  payloadJson: string;
+  algorithm: 'none' | 'HS256' | 'HS384' | 'HS512';
+  secretKey: string; // For HMAC signing
 }
 
 const DEFAULT_STATE: JwtToolState = {
   token: '',
   mode: 'decode',
   verifyKey: '',
+  headerJson: JSON.stringify({ alg: 'HS256', typ: 'JWT' }, null, 2),
+  payloadJson: JSON.stringify({ sub: '1234567890', name: 'John Doe' }, null, 2),
+  algorithm: 'HS256',
+  secretKey: '',
 };
 
 interface DecodedJwt {
@@ -47,10 +56,11 @@ interface ValidationResult {
 }
 
 const JwtTool: React.FC = () => {
-  useTitle('JWT Decoder');
   const { theme } = useTheme();
   const { state, updateState, resetState, shareState } =
     useToolState<JwtToolState>('jwt', DEFAULT_STATE);
+  
+  useTitle(state.mode === 'decode' ? 'JWT Decoder' : 'JWT Encoder');
 
   // 다크 모드 감지
   const [isDark, setIsDark] = React.useState(() => {
@@ -258,26 +268,257 @@ const JwtTool: React.FC = () => {
     }
   };
 
+  // Encoding logic
+  const encodedToken = useMemo((): string | null => {
+    if (state.mode !== 'encode') return null;
+
+    try {
+      const header = JSON.parse(state.headerJson);
+      const payload = JSON.parse(state.payloadJson);
+
+      const headerB64 = base64UrlEncode(JSON.stringify(header));
+      const payloadB64 = base64UrlEncode(JSON.stringify(payload));
+
+      if (state.algorithm === 'none') {
+        return `${headerB64}.${payloadB64}.`;
+      }
+
+      // HMAC signing
+      if (state.algorithm.startsWith('HS') && state.secretKey) {
+        const message = `${headerB64}.${payloadB64}`;
+        // This will be handled by async function
+        return null; // Will be set by useEffect
+      }
+
+      return `${headerB64}.${payloadB64}.`;
+    } catch {
+      return null;
+    }
+  }, [state.mode, state.headerJson, state.payloadJson, state.algorithm, state.secretKey]);
+
+  const [signedToken, setSignedToken] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (state.mode !== 'encode' || state.algorithm === 'none' || !state.secretKey) {
+      setSignedToken(null);
+      return;
+    }
+
+    const signToken = async () => {
+      try {
+        const header = JSON.parse(state.headerJson);
+        const payload = JSON.parse(state.payloadJson);
+
+        const headerB64 = base64UrlEncode(JSON.stringify(header));
+        const payloadB64 = base64UrlEncode(JSON.stringify(payload));
+        const message = `${headerB64}.${payloadB64}`;
+
+        const hashName = state.algorithm === 'HS256' ? 'SHA-256' : state.algorithm === 'HS384' ? 'SHA-384' : 'SHA-512';
+        const encoder = new TextEncoder();
+        const keyData = encoder.encode(state.secretKey);
+        const messageData = encoder.encode(message);
+
+        const cryptoKey = await crypto.subtle.importKey(
+          'raw',
+          keyData,
+          { name: 'HMAC', hash: hashName },
+          false,
+          ['sign']
+        );
+
+        const signature = await crypto.subtle.sign('HMAC', cryptoKey, messageData);
+        const signatureArray = new Uint8Array(signature);
+        const binary = String.fromCharCode(...signatureArray);
+        const base64 = btoa(binary);
+        const signatureB64 = base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+
+        setSignedToken(`${message}.${signatureB64}`);
+      } catch (error) {
+        setSignedToken(null);
+      }
+    };
+
+    signToken();
+  }, [state.mode, state.headerJson, state.payloadJson, state.algorithm, state.secretKey]);
+
+  const finalToken = state.algorithm === 'none' ? encodedToken : signedToken;
+
+  const encodeError = useMemo((): string | null => {
+    if (state.mode !== 'encode') return null;
+
+    try {
+      JSON.parse(state.headerJson);
+    } catch {
+      return 'Invalid JSON in header';
+    }
+
+    try {
+      JSON.parse(state.payloadJson);
+    } catch {
+      return 'Invalid JSON in payload';
+    }
+
+    if (state.algorithm !== 'none' && !state.secretKey) {
+      return 'Secret key is required for signing';
+    }
+
+    return null;
+  }, [state.mode, state.headerJson, state.payloadJson, state.algorithm, state.secretKey]);
+
+  const handleCopyToken = () => {
+    if (finalToken) {
+      copyToClipboard(finalToken);
+    }
+  };
+
   return (
     <div className="flex flex-col h-full p-4 md:p-6 max-w-5xl mx-auto">
       <ToolHeader
-        title="JWT Decoder"
-        description="Decode JSON Web Tokens to view header, payload, and signature."
+        title={state.mode === 'decode' ? 'JWT Decoder' : 'JWT Encoder'}
+        description={
+          state.mode === 'decode'
+            ? 'Decode JSON Web Tokens to view header, payload, and signature.'
+            : 'Encode JSON Web Tokens from header and payload.'
+        }
         onReset={resetState}
         onShare={shareState}
       />
 
-      <div className="flex-1 flex flex-col gap-6">
-        <EditorPanel
-          title="JWT Token"
-          value={state.token}
-          onChange={(val) => updateState({ token: val })}
-          placeholder="Paste JWT token here (e.g., eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...)"
-          className="h-32"
-          status={error ? 'error' : 'default'}
-        />
+      {/* Mode Toggle */}
+      <div className="flex gap-2 mb-4">
+        <button
+          onClick={() => updateState({ mode: 'decode' })}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            state.mode === 'decode'
+              ? 'bg-blue-600 text-white'
+              : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+          }`}
+        >
+          Decode
+        </button>
+        <button
+          onClick={() => updateState({ mode: 'encode' })}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            state.mode === 'encode'
+              ? 'bg-blue-600 text-white'
+              : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+          }`}
+        >
+          Encode
+        </button>
+      </div>
 
-        {error && <ErrorBanner message={error} />}
+      <div className="flex-1 flex flex-col gap-6">
+        {state.mode === 'decode' ? (
+          <>
+            <EditorPanel
+              title="JWT Token"
+              value={state.token}
+              onChange={(val) => updateState({ token: val })}
+              placeholder="Paste JWT token here (e.g., eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...)"
+              className="h-32"
+              status={error ? 'error' : 'default'}
+            />
+
+            {error && <ErrorBanner message={error} />}
+          </>
+        ) : (
+          <>
+            {/* Header Input */}
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Header (JSON)
+                </label>
+              </div>
+              <EditorPanel
+                title=""
+                value={state.headerJson}
+                onChange={(val) => updateState({ headerJson: val })}
+                placeholder='{"alg":"HS256","typ":"JWT"}'
+                className="h-32"
+                status={encodeError?.includes('header') ? 'error' : 'default'}
+              />
+            </div>
+
+            {/* Payload Input */}
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Payload (JSON)
+                </label>
+              </div>
+              <EditorPanel
+                title=""
+                value={state.payloadJson}
+                onChange={(val) => updateState({ payloadJson: val })}
+                placeholder='{"sub":"1234567890","name":"John Doe"}'
+                className="h-32"
+                status={encodeError?.includes('payload') ? 'error' : 'default'}
+              />
+            </div>
+
+            {/* Algorithm Selection */}
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Algorithm
+              </label>
+              <select
+                value={state.algorithm}
+                onChange={(e) => updateState({ algorithm: e.target.value as JwtToolState['algorithm'] })}
+                className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-gray-100"
+              >
+                <option value="none">None (unsigned)</option>
+                <option value="HS256">HS256</option>
+                <option value="HS384">HS384</option>
+                <option value="HS512">HS512</option>
+              </select>
+            </div>
+
+            {/* Secret Key Input (for HMAC) */}
+            {state.algorithm !== 'none' && (
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Secret Key
+                </label>
+                <input
+                  type="text"
+                  value={state.secretKey}
+                  onChange={(e) => updateState({ secretKey: e.target.value })}
+                  placeholder="Enter secret key for signing"
+                  className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-gray-100"
+                />
+              </div>
+            )}
+
+            {encodeError && <ErrorBanner message={encodeError} />}
+
+            {/* Encoded Token Output */}
+            {finalToken && (
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Encoded JWT Token
+                  </label>
+                  <button
+                    onClick={handleCopyToken}
+                    className="px-3 py-1 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+                  >
+                    Copy Token
+                  </button>
+                </div>
+                <EditorPanel
+                  title=""
+                  value={finalToken}
+                  onChange={() => {}} // Read-only
+                  placeholder=""
+                  className="h-32"
+                  readOnly
+                />
+              </div>
+            )}
+          </>
+        )}
 
         {decoded && (
           <div className="flex-1 flex flex-col gap-6">
@@ -733,7 +974,7 @@ async function verifyJwtSignature(
 export const jwtTool: ToolDefinition<JwtToolState> = {
   id: 'jwt',
   title: 'JWT Decoder',
-  description: 'Decode JSON Web Tokens',
+  description: 'Decode and encode JSON Web Tokens',
   icon: Key,
   path: '/jwt',
   defaultState: DEFAULT_STATE,
