@@ -324,11 +324,7 @@ const JsonTool: React.FC = () => {
             {!parseResult.error &&
               state.viewMode === 'tree' &&
               parseResult.data && (
-                <div
-                  className={`flex-1 min-h-0 overflow-auto p-4 ${
-                    isDark ? 'bg-gray-800' : ''
-                  }`}
-                >
+                <div className="flex-1 min-h-0 overflow-auto p-4">
                   <JsonView
                     key={`json-view-${isDark ? 'dark' : 'light'}`}
                     data={parseResult.data}

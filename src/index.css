@@ -76,16 +76,27 @@ input[type="radio"]:checked::after {
   background-color: rgb(59 130 246);
 }
 
-/* react-json-view-lite 다크 모드 스타일 */
+/* react-json-view-lite 스타일 */
 /* CSS Modules를 사용하므로 속성 선택자를 사용하여 오버라이드 */
 
-/* 배경색 - 밝은 회색을 다크 모드 배경으로 변경 */
+/* 배경색 - 밝은 회색을 투명하게 변경 (밝은 모드) */
+[class*="_2IvMF"] {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* JSON 뷰의 모든 배경 요소 투명화 (밝은 모드) */
+[class*="_GzYRV"] {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* 다크 모드에서도 투명 유지 */
 .dark [class*="_2IvMF"] {
   background: transparent !important;
   background-color: transparent !important;
 }
 
-/* JSON 뷰의 모든 배경 요소 투명화 */
 .dark [class*="_GzYRV"] {
   background: transparent !important;
   background-color: transparent !important;

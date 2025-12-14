@@ -597,9 +597,7 @@ const JwtTool: React.FC = () => {
                   Copy JSON
                 </button>
               </div>
-              <div className={`bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-200 dark:border-gray-700 ${
-                isDark ? 'bg-gray-800' : ''
-              }`}>
+              <div className="rounded-lg p-4 border border-gray-200 dark:border-gray-700">
                 <JsonView
                   key={`jwt-header-${isDark ? 'dark' : 'light'}`}
                   data={decoded.header}
@@ -625,9 +623,7 @@ const JwtTool: React.FC = () => {
                   Copy JSON
                 </button>
               </div>
-              <div className={`bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-200 dark:border-gray-700 ${
-                isDark ? 'bg-gray-800' : ''
-              }`}>
+              <div className="rounded-lg p-4 border border-gray-200 dark:border-gray-700">
                 <JsonView
                   key={`jwt-payload-${isDark ? 'dark' : 'light'}`}
                   data={decoded.payload}
