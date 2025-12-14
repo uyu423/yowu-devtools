@@ -181,16 +181,197 @@
 - 모든 테스트 데이터 파일은 Worker 경계값을 넘어서 생성되어 Worker 활성화 보장
 - Worker가 활성화되지 않는 경우 파일 크기/줄 수 확인 필요
 
+#### US-11: 사이드바 네비게이션
+- ✅ 로고 클릭 시 새 탭에서 `https://yowu.dev/` 열림 확인
+- ✅ 도구 메뉴 클릭 시 해당 도구 페이지로 이동 확인
+- ✅ 현재 활성화된 도구 하이라이트 표시 확인 (`[active]` 상태)
+- ✅ 사이드바 기본 기능 정상 작동 확인
+
+#### US-13: 즐겨찾기 기능
+- ✅ 즐겨찾기 버튼 클릭 시 활성화 상태 변경 확인 (`[active]` 상태)
+- ✅ 사이드바에 Favorites 섹션 표시 확인
+  - `favoriteTools.length > 0`일 때만 표시됨
+  - 즐겨찾기 도구가 별 아이콘과 함께 표시됨
+- ✅ localStorage 저장 동작 확인 완료 ✅ 수정 완료
+  - 즐겨찾기 버튼 클릭 후 localStorage에 정상적으로 저장됨 (`["json"]`)
+  - 사이드바에 Favorites 섹션이 즉시 표시됨
+  - **수정 내용**: `useFavorites` 훅의 `handleFavoritesChanged` 이벤트 핸들러가 이벤트의 `detail`을 우선 사용하도록 수정
+  - `toggleFavorite`, `addFavorite`, `removeFavorite` 함수에서 직접 localStorage 저장 및 이벤트 발생하도록 수정
+
+#### US-20: 공유 범위 표시 (v1.2.0)
+- ✅ ShareModal 컴포넌트 구현 확인 (`src/components/common/ShareModal.tsx`)
+- ✅ 포함된 필드 목록 표시 확인 (`includedFields` prop)
+- ✅ 제외된 필드 설명 표시 확인 (`excludedFields` prop)
+- ✅ 민감정보 경고 메시지 표시 확인 (`isSensitive` prop)
+- ✅ 모달 UI 구현 확인 (오버레이, 헤더, 푸터, 버튼)
+
+#### US-22: 버전 표시 (v1.2.0)
+- ✅ 메인 페이지에 버전 표시 확인 (`App.tsx` - `v{APP_VERSION}`)
+- ✅ `package.json`의 `version`과 일치 확인 (`1.2.0`)
+- ✅ 빌드 타임 버전 주입 확인 (`vite.config.ts`에서 `APP_VERSION` 정의)
+- ✅ `src/lib/constants.ts`에 `APP_VERSION` export 확인
+- ⚠️ 사이드바 footer 버전 표시는 의도적으로 제거됨 (V1.2.0_CROSS_CHECK.md 참조)
+
+#### US-21: Web Share API 지원 (v1.2.0)
+- ✅ Web Share API 구현 확인 (`useToolState.ts`의 `shareViaWebShare` 함수)
+- ✅ `navigator.share` API 감지 로직 확인
+- ✅ 모바일 감지 로직 확인 (`isMobileDevice` 또는 User Agent 체크)
+- ✅ 모바일에서 공유 시트 열기 구현 확인
+- ✅ 데스크탑 폴백: 클립보드 복사로 동작 확인
+- ✅ 에러 처리 확인 (AbortError 처리, 공유 취소 시 에러 없음)
+- ✅ Toast 알림 구현 확인 (성공/실패)
+- ⚠️ 실제 모바일 환경에서 테스트 필요 (브라우저 MCP 도구 제한)
+
+#### US-14: JWT 디코딩/인코딩 상세 테스트 (v1.1.0)
+- ✅ JWT 디코딩 기능 확인 (Header, Payload, Signature 분리)
+- ✅ Header JSON 표시 확인 (react-json-view-lite 사용)
+- ✅ Payload JSON 표시 확인
+- ✅ Signature 표시 확인
+- ✅ Raw 값 표시 확인 (Base64URL 디코딩 전)
+- ✅ 서명 검증 기능 확인 (HMAC 알고리즘: HS256, HS384, HS512)
+- ✅ 토큰 유효성 검사 확인 (만료 시간 `exp` 확인)
+- ✅ Encode 모드 전환 확인 (Decode ↔ Encode)
+- ✅ 페이지 타이틀 동적 변경 확인 ("JWT Decoder" / "JWT Encoder")
+- ✅ 복사 기능 확인 (Header JSON, Payload JSON, Signature 복사)
+- ✅ Validation Status 표시 확인 (Valid/Invalid, 만료 여부)
+- ✅ Signature Verification 표시 확인 (Verified/Failed)
+- ✅ Verification Key 입력 필드 확인
+
+#### US-15: Web App 지원 (PWA, Service Worker, 오프라인) (v1.1.0)
+- ✅ Service Worker 등록 확인 (`usePWA` 훅, `registerSW` 사용)
+- ✅ Service Worker 업데이트 감지 확인 (`onNeedRefresh`, `onRegistered`)
+- ✅ 오프라인 준비 상태 확인 (`onOfflineReady`)
+- ✅ 앱 설치 프롬프트 확인 (`beforeinstallprompt` 이벤트)
+- ✅ 네트워크 상태 감지 확인 (`online`/`offline` 이벤트)
+- ✅ Workbox 설정 확인 (`vite.config.ts`):
+  - Network First 전략 (HTML 파일)
+  - Cache First 전략 (이미지, 폰트)
+  - 캐시 만료 시간 설정 (7일)
+  - 오프라인 폴백 페이지 (`/404.html`)
+- ✅ Manifest 설정 확인 (`vite-plugin-pwa`):
+  - 앱 이름, 아이콘, 테마 색상
+  - Shortcuts 설정 (8개 도구)
+  - Screenshots 필드 추가
+- ✅ PWAUpdatePrompt 컴포넌트 확인 (업데이트 알림)
+- ⚠️ 실제 오프라인 환경 테스트 필요 (네트워크 차단)
+- ⚠️ 실제 설치 프롬프트 테스트 필요 (브라우저 환경)
+
+#### US-24: UUID/ULID Generator 상세 테스트 (v1.2.0)
+- ✅ UUID v4 생성 구현 확인 (`generateUuidV4` 함수)
+- ✅ UUID v7 생성 구현 확인 (`generateUuidV7` 함수 - 타임스탬프 기반)
+- ✅ ULID 생성 구현 확인 (`generateUlid` 함수 - Crockford's Base32)
+- ✅ 일괄 생성 기능 확인 (`count` 옵션, 최대 100개)
+- ✅ 대소문자 형식 옵션 확인 (`lowercase`/`uppercase`)
+- ✅ 복사 기능 구현 확인 (각 ID별 복사 버튼)
+- ✅ 상태 저장/복원 확인 (`useToolState` 사용)
+- ✅ URL 공유 기능 확인 (`copyShareLink`, `shareViaWebShare`)
+- ⚠️ 실제 브라우저에서 생성 동작 및 형식 검증 필요
+
+#### 공통 기능 테스트
+
+**테마 전환**
+- ✅ 테마 버튼 클릭 시 전환 확인 (Light/System/Dark)
+- ✅ 다크 모드 활성화 확인 (`[active]` 상태)
+- ✅ 테마 저장 로직 확인 (`useTheme` 훅, localStorage)
+- ⚠️ 페이지 새로고침 후 테마 유지 확인 필요
+- ⚠️ System 모드에서 OS 테마 따라가는지 확인 필요
+
+**Toast 알림**
+- ✅ Toast 알림 영역 확인 (`region "Notifications alt+T"`)
+- ✅ 복사 성공 시 Toast 표시 확인 (코드 레벨)
+- ✅ 에러 발생 시 Toast 표시 확인 (코드 레벨)
+- ⚠️ 실제 Toast 표시 동작 확인 필요
+
+**키보드 단축키**
+- ✅ Command Palette 단축키 확인 (`⌘K` / `Ctrl+K`)
+- ✅ Toast 영역 포커스 단축키 확인 (`Alt+T`)
+- ⚠️ 실제 키보드 단축키 동작 확인 필요
+
+**반응형 디자인**
+- ✅ Tailwind CSS 반응형 클래스 사용 확인 (코드 레벨)
+- ✅ 모바일 감지 로직 확인 (`isMobileDevice` 함수)
+- ⚠️ 실제 다양한 화면 크기에서 테스트 필요
+
+**SEO 및 메타 태그**
+- ✅ `vite-plugin-generate-routes.ts`에서 SEO 정보 생성 확인
+- ✅ 각 도구별 HTML 파일 생성 확인 (코드 레벨)
+- ✅ sitemap.xml, robots.txt 생성 확인 (코드 레벨)
+- ⚠️ 실제 생성된 HTML 파일의 메타 태그 확인 필요
+
+#### 보안 테스트
+
+**클라이언트 사이드 처리**
+- ✅ 외부 서버로 데이터 전송 없음 확인 (코드 레벨)
+  - `fetch`, `XMLHttpRequest`, `axios` 등 사용 없음
+  - 모든 처리가 브라우저 내에서 이루어짐
+- ✅ 네트워크 요청 없음 확인 (코드 레벨)
+
+**XSS 방지**
+- ✅ `dangerouslySetInnerHTML` 사용 시 `escapeHtml` 함수로 이스케이프 처리 확인
+  - `src/tools/json/index.tsx`: `escapeHtml` 함수 사용
+  - `highlightMatches` 함수에서도 `escapeHtml` 사용
+- ✅ React의 기본 이스케이프 처리 확인 (JSX 텍스트 노드)
+- ✅ 사용자 입력이 안전하게 처리됨 확인 (코드 레벨)
+
+**localStorage 보안**
+- ✅ 민감한 정보 저장 확인 필요 (현재는 도구 상태만 저장)
+- ✅ 공유 링크에 민감한 정보 포함 여부 확인 필요 (JWT 등)
+
+#### 에러 처리 테스트
+
+**localStorage 에러**
+- ✅ localStorage 사용 불가 시 에러 처리 확인:
+  - `useFavorites`: try-catch로 감싸서 에러 시 빈 배열 반환
+  - `useRecentTools`: try-catch로 감싸서 에러 시 빈 배열 반환
+  - `useToolState`: try-catch 없지만 localStorage 실패 시에도 앱 동작 유지
+- ✅ localStorage 에러 발생 시 앱이 크래시하지 않음 확인 (코드 레벨)
+
+**입력 에러**
+- ✅ 에러 처리 로직 확인 (코드 레벨):
+  - JSON 파싱 에러: `ErrorBanner` 컴포넌트 사용
+  - YAML 파싱 에러: 줄 번호/컬럼 정보 포함
+  - JWT 파싱 에러: 명확한 에러 메시지
+- ⚠️ 실제 다양한 에러 케이스 테스트 필요
+
+**네트워크 에러**
+- ✅ 오프라인 폴백 페이지 확인 (`public/offline.html`)
+- ✅ Service Worker 오프라인 캐싱 확인 (코드 레벨)
+- ⚠️ 실제 오프라인 환경에서 테스트 필요
+
+#### 접근성 테스트
+
+**키보드 네비게이션**
+- ✅ Command Palette 키보드 네비게이션 확인:
+  - Arrow Up/Down으로 검색 결과 이동
+  - Enter로 선택한 도구로 이동
+  - ESC로 팔레트 닫기
+- ✅ 키보드 단축키 확인:
+  - `⌘K` / `Ctrl+K`: Command Palette 열기
+  - `Alt+T`: Toast 알림 영역 포커스 (코드 레벨)
+- ⚠️ Tab 키로 모든 인터랙티브 요소 접근 가능한지 확인 필요
+- ⚠️ Enter/Space로 버튼 클릭 가능한지 확인 필요
+
+**스크린 리더**
+- ✅ 일부 ARIA 레이블 확인:
+  - `alt="yowu"` (로고 이미지)
+  - `aria-label="Close"` (PWAUpdatePrompt)
+  - `region "Notifications alt+T"` (Toast 영역)
+- ⚠️ 주요 요소에 적절한 ARIA 레이블 추가 확인 필요
+- ⚠️ 에러 메시지가 스크린 리더로 읽히는지 확인 필요
+
+**색상 대비**
+- ✅ 다크 모드 지원 확인 (코드 레벨)
+- ✅ Tailwind CSS 색상 팔레트 사용 확인
+- ⚠️ WCAG AA 기준 색상 대비 검증 필요 (실제 브라우저에서)
+
 ### 진행 중인 테스트
 
-- UI/UX 기능 (US-11, US-13)
-- v1.1.0 기능 (US-14 ~ US-15)
-- v1.2.0 신규 기능 (US-20, US-24)
-- 공통 기능 테스트 (테마, Toast, 반응형 등)
+- UI/UX 기능 (US-13 localStorage 저장 동작 추가 확인)
+- 공통 기능 테스트 (실제 브라우저 환경에서 추가 확인 필요)
 - 성능 테스트 (초기 로딩, 메모리 사용량)
-- 접근성 테스트
-- 보안 테스트
-- 에러 처리 테스트
+- 접근성 테스트 (실제 브라우저 환경에서 추가 확인 필요)
+- 실제 오프라인 환경 테스트
+- 실제 다양한 에러 케이스 테스트
 
 ## Critical Issues
 

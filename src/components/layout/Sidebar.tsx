@@ -27,9 +27,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
     .map(({ toolId }) => getToolById(toolId))
     .filter((tool): tool is NonNullable<typeof tool> => tool !== undefined);
 
-  // 즐겨찾기/최근 사용에 포함되지 않은 도구 목록
+  // 최근 사용에 포함되지 않은 도구 목록 (즐겨찾기는 All Tools에도 표시)
   const otherTools = tools.filter(
-    (tool) => !favorites.includes(tool.id) && !recentTools.some((rt) => rt.toolId === tool.id)
+    (tool) => !recentTools.some((rt) => rt.toolId === tool.id)
   );
 
   return (
