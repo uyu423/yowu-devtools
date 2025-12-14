@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { useMemo } from 'react';
 import type { ToolDefinition } from '@/tools/types';
-import { FileDiff } from 'lucide-react';
+import { FileDiff, Copy } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { EditorPanel } from '@/components/common/EditorPanel';
 import { ActionBar } from '@/components/common/ActionBar';
@@ -265,16 +265,6 @@ const DiffTool: React.FC = () => {
             >
               Download Unified
             </FileDownload>
-            <button
-              className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-              disabled={!hasDiff}
-              onClick={() =>
-                hasDiff &&
-                copyToClipboard(unifiedExport, 'Copied unified diff output.')
-              }
-            >
-              Copy Unified
-            </button>
           </div>
         </ActionBar>
 
@@ -283,6 +273,17 @@ const DiffTool: React.FC = () => {
             <span className="font-semibold text-gray-800 dark:text-white">
               Diff Result
             </span>
+            <button
+              onClick={() =>
+                hasDiff &&
+                copyToClipboard(unifiedExport, 'Copied unified diff output.')
+              }
+              disabled={!hasDiff}
+              className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Copy Unified Diff"
+            >
+              <Copy className="w-4 h-4" />
+            </button>
             <div className="space-x-4 text-xs uppercase tracking-wide">
               <span className="text-green-600 dark:text-green-400">
                 +{stats.added} chars

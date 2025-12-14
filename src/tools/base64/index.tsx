@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { useMemo } from 'react';
 import type { ToolDefinition } from '@/tools/types';
-import { Binary, RefreshCw } from 'lucide-react';
+import { Binary, RefreshCw, Copy } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { EditorPanel } from '@/components/common/EditorPanel';
 import { ActionBar } from '@/components/common/ActionBar';
@@ -126,26 +126,31 @@ const Base64Tool: React.FC = () => {
           />
         )}
 
-        <EditorPanel
-          title="Result"
-          value={conversion.result}
-          readOnly
-          placeholder="Result will appear here..."
-          className="h-40 lg:h-56"
-          status={conversion.error ? 'error' : 'success'}
-        />
-
-        <div className="flex justify-end">
-          <button
-            className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-            onClick={() =>
-              conversion.result &&
-              copyToClipboard(conversion.result, 'Copied result.')
-            }
-            disabled={!conversion.result}
-          >
-            Copy Result
-          </button>
+        <div className="flex flex-col">
+          <div className="flex items-center justify-between px-3 py-1.5 border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-900 shrink-0 rounded-t-md border border-b-0">
+            <span className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+              Result
+            </span>
+            <button
+              onClick={() =>
+                conversion.result &&
+                copyToClipboard(conversion.result, 'Copied result.')
+              }
+              disabled={!conversion.result}
+              className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Copy Result"
+            >
+              <Copy className="w-4 h-4" />
+            </button>
+          </div>
+          <EditorPanel
+            title=""
+            value={conversion.result}
+            readOnly
+            placeholder="Result will appear here..."
+            className="h-40 lg:h-56 rounded-t-none"
+            status={conversion.error ? 'error' : 'success'}
+          />
         </div>
       </div>
     </div>

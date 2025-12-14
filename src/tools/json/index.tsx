@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { useMemo } from 'react';
 import type { ToolDefinition } from '@/tools/types';
-import { FileJson, ListTree, Rows4, Text } from 'lucide-react';
+import { FileJson, ListTree, Rows4, Text, Copy } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { EditorPanel } from '@/components/common/EditorPanel';
 import { ActionBar } from '@/components/common/ActionBar';
@@ -379,30 +379,73 @@ const JsonTool: React.FC = () => {
             {!parseResult.error &&
               state.viewMode === 'tree' &&
               parseResult.data && (
-                <div className="flex-1 min-h-0 overflow-auto p-4">
-                  <JsonView
-                    key={`json-view-${isDark ? 'dark' : 'light'}`}
-                    data={parseResult.data}
-                    shouldExpandNode={(level) =>
-                      state.expandLevel === Infinity ||
-                      level < state.expandLevel
-                    }
-                    style={jsonViewStyles}
-                  />
+                <div className="flex flex-col flex-1 min-h-0">
+                  <div className="flex items-center justify-between px-4 pt-4 pb-2 shrink-0">
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Tree View
+                    </span>
+                    <button
+                      onClick={() =>
+                        isValid &&
+                        copyToClipboard(parseResult.formatted, 'Copied JSON.')
+                      }
+                      disabled={!isValid}
+                      className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      title="Copy JSON"
+                    >
+                      <Copy className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <div className="flex-1 min-h-0 overflow-auto p-4">
+                    <JsonView
+                      key={`json-view-${isDark ? 'dark' : 'light'}`}
+                      data={parseResult.data}
+                      shouldExpandNode={(level) =>
+                        state.expandLevel === Infinity ||
+                        level < state.expandLevel
+                      }
+                      style={jsonViewStyles}
+                    />
+                  </div>
                 </div>
               )}
             {!parseResult.error &&
               state.viewMode !== 'tree' &&
               parseResult.formatted && (
-                <pre
-                  className="flex-1 min-h-0 overflow-auto whitespace-pre-wrap break-all font-mono text-sm text-gray-800 dark:text-gray-200 p-4 m-0"
-                  dangerouslySetInnerHTML={{
-                    __html:
-                      state.viewMode === 'pretty'
-                        ? highlightedPretty
-                        : escapeHtml(parseResult.minified),
-                  }}
-                />
+                <div className="flex flex-col flex-1 min-h-0">
+                  <div className="flex items-center justify-between px-4 pt-4 pb-2 shrink-0">
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {state.viewMode === 'pretty' ? 'Pretty JSON' : 'Minified JSON'}
+                    </span>
+                    <button
+                      onClick={() =>
+                        isValid &&
+                        copyToClipboard(
+                          state.viewMode === 'pretty'
+                            ? parseResult.formatted
+                            : parseResult.minified,
+                          state.viewMode === 'pretty'
+                            ? 'Copied pretty JSON.'
+                            : 'Copied minified JSON.'
+                        )
+                      }
+                      disabled={!isValid}
+                      className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      title={`Copy ${state.viewMode === 'pretty' ? 'Pretty' : 'Minified'} JSON`}
+                    >
+                      <Copy className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <pre
+                    className="flex-1 min-h-0 overflow-auto whitespace-pre-wrap break-all font-mono text-sm text-gray-800 dark:text-gray-200 p-4 m-0"
+                    dangerouslySetInnerHTML={{
+                      __html:
+                        state.viewMode === 'pretty'
+                          ? highlightedPretty
+                          : escapeHtml(parseResult.minified),
+                    }}
+                  />
+                </div>
               )}
           </div>
         </div>
@@ -428,26 +471,6 @@ const JsonTool: React.FC = () => {
           >
             Download Minified
           </FileDownload>
-          <button
-            className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-            disabled={!isValid}
-            onClick={() =>
-              isValid &&
-              copyToClipboard(parseResult.formatted, 'Copied pretty JSON.')
-            }
-          >
-            Copy Pretty
-          </button>
-          <button
-            className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-            disabled={!isValid}
-            onClick={() =>
-              isValid &&
-              copyToClipboard(parseResult.minified, 'Copied minified JSON.')
-            }
-          >
-            Copy Minified
-          </button>
         </div>
       </ActionBar>
     </div>

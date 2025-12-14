@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { useMemo } from 'react';
 import type { ToolDefinition } from '@/tools/types';
-import { FileCode2, ArrowRightLeft } from 'lucide-react';
+import { FileCode2, ArrowRightLeft, Copy } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { EditorPanel } from '@/components/common/EditorPanel';
 import { ActionBar } from '@/components/common/ActionBar';
@@ -187,22 +187,40 @@ const YamlTool: React.FC = () => {
             </div>
           )}
           {!isProcessing && (
-            <EditorPanel
-              title={
-                state.direction === 'yaml2json' ? 'JSON Output' : 'YAML Output'
-              }
-              value={conversion.output}
-              readOnly
-              mode={state.direction === 'yaml2json' ? 'json' : 'yaml'}
-              className="h-full"
-              status={
-                conversion.error
-                  ? 'error'
-                  : conversion.output
-                  ? 'success'
-                  : 'default'
-              }
-            />
+            <div className="flex flex-col h-full">
+              <div className="flex items-center justify-between px-3 py-1.5 border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-900 shrink-0">
+                <span className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                  {state.direction === 'yaml2json' ? 'JSON Output' : 'YAML Output'}
+                </span>
+                <button
+                  onClick={() =>
+                    conversion.output &&
+                    copyToClipboard(conversion.output, 'Copied output.')
+                  }
+                  disabled={!conversion.output || !!conversion.error}
+                  className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Copy Output"
+                >
+                  <Copy className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="flex-1 min-h-0">
+                <EditorPanel
+                  title=""
+                  value={conversion.output}
+                  readOnly
+                  mode={state.direction === 'yaml2json' ? 'json' : 'yaml'}
+                  className="h-full"
+                  status={
+                    conversion.error
+                      ? 'error'
+                      : conversion.output
+                      ? 'success'
+                      : 'default'
+                  }
+                />
+              </div>
+            </div>
           )}
         </div>
       </div>
@@ -241,16 +259,6 @@ const YamlTool: React.FC = () => {
           >
             Download
           </FileDownload>
-          <button
-            className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-            disabled={!conversion.output || !!conversion.error}
-            onClick={() =>
-              conversion.output &&
-              copyToClipboard(conversion.output, 'Copied output.')
-            }
-          >
-            Copy Output
-          </button>
         </div>
       </ActionBar>
     </div>
