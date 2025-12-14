@@ -70,12 +70,12 @@ const Base64Tool: React.FC = () => {
           status={conversion.error ? 'error' : 'default'}
         />
 
-        <ActionBar className="flex-col gap-4 rounded-lg border bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center bg-gray-100 p-1 rounded-lg">
+        <ActionBar className="flex-col gap-4 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center bg-gray-100 dark:bg-gray-900 p-1 rounded-lg">
             {['encode', 'decode'].map((mode) => (
               <button 
                 key={mode}
-                className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${state.mode === mode ? 'bg-white shadow-sm text-blue-600' : 'text-gray-600 hover:text-gray-900'}`}
+                className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${state.mode === mode ? 'bg-white dark:bg-gray-800 shadow-sm text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'}`}
                 onClick={() => updateState({ mode: mode as Base64State['mode'] })}
               >
                 {mode === 'encode' ? 'Encode' : 'Decode'}
@@ -84,12 +84,12 @@ const Base64Tool: React.FC = () => {
           </div>
 
           <label 
-            className="flex items-center space-x-2 text-sm text-gray-700"
+            className="flex items-center space-x-2 text-sm text-gray-700 dark:text-gray-300"
             title="Use the URL-safe Base64 alphabet (- and _) and omit padding for link-friendly strings."
           >
             <input 
               type="checkbox" 
-              className="rounded border-gray-300"
+              className="rounded border-gray-300 dark:border-gray-600"
               checked={state.urlSafe}
               onChange={(e) => updateState({ urlSafe: e.target.checked })}
             />
@@ -97,7 +97,7 @@ const Base64Tool: React.FC = () => {
           </label>
 
           <button
-            className="inline-flex items-center gap-2 rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700"
+            className="inline-flex items-center gap-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             onClick={handleSwap}
             disabled={!conversion.result}
           >
@@ -121,7 +121,7 @@ const Base64Tool: React.FC = () => {
 
         <div className="flex justify-end">
           <button
-            className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 disabled:opacity-50"
+            className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             onClick={() => conversion.result && copyToClipboard(conversion.result, 'Copied result.')}
             disabled={!conversion.result}
           >

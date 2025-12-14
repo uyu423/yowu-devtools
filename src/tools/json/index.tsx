@@ -49,7 +49,7 @@ const SAMPLE_JSON = `{
 
 const jsonViewStyles = {
   ...defaultStyles,
-  container: `${defaultStyles.container} text-sm font-mono text-gray-900`,
+  container: `${defaultStyles.container} text-sm font-mono text-gray-900 dark:text-gray-100`,
   childFieldsContainer: `${defaultStyles.childFieldsContainer ?? ''} child-fields-container`,
 };
 
@@ -83,7 +83,7 @@ const JsonTool: React.FC = () => {
   const isValid = !!parseResult.data && !parseResult.error;
 
   return (
-    <div className="flex h-full flex-col p-4 md:p-6">
+    <div className="flex h-full flex-col p-4 md:p-6 max-w-[90rem] mx-auto overflow-hidden">
       <ToolHeader 
         title="JSON Pretty Viewer" 
         description="Format JSON instantly and explore the structure as a tree."
@@ -91,26 +91,28 @@ const JsonTool: React.FC = () => {
         onShare={shareState}
       />
 
-      <div className="flex flex-col gap-6 lg:flex-row">
-        <div className="flex-1 min-h-[360px]">
-          <EditorPanel 
-            title="Input JSON"
-            value={state.input}
-            onChange={(val) => updateState({ input: val })}
-            mode="json"
-            placeholder='{"key": "value"}'
-            status={!hasInput ? 'default' : parseResult.error ? 'error' : 'success'}
-            className="h-full"
-          />
+      <div className="flex flex-col gap-6 lg:flex-row flex-1 min-h-0 overflow-hidden">
+        <div className="flex flex-col flex-1 min-h-0">
+          <div className="flex-1 min-h-0 flex flex-col">
+            <EditorPanel 
+              title="Input JSON"
+              value={state.input}
+              onChange={(val) => updateState({ input: val })}
+              mode="json"
+              placeholder='{"key": "value"}'
+              status={!hasInput ? 'default' : parseResult.error ? 'error' : 'success'}
+              className="flex-1 min-h-0"
+            />
+          </div>
 
-          <div className="mt-3 flex flex-wrap gap-4 text-sm text-gray-600">
+          <div className="mt-3 flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400 shrink-0">
             <label 
               className="flex items-center gap-2"
               title="Choose how many spaces to use when pretty-printing JSON output."
             >
-              <span className="text-xs font-medium uppercase tracking-wider text-gray-500">Indent</span>
+              <span className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Indent</span>
               <select 
-                className="rounded-md border border-gray-200 px-2 py-1 text-sm"
+                className="rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-2 py-1 text-sm"
                 value={state.indent}
                 onChange={(e) => updateState({ indent: Number(e.target.value) as 2 | 4 })}
               >
@@ -127,7 +129,7 @@ const JsonTool: React.FC = () => {
                 type="checkbox"
                 checked={state.sortKeys}
                 onChange={(e) => updateState({ sortKeys: e.target.checked })}
-                className="rounded border-gray-300"
+                className="rounded border-gray-300 dark:border-gray-600"
               />
               <span>Sort keys</span>
             </label>
@@ -136,7 +138,7 @@ const JsonTool: React.FC = () => {
               className="flex items-center gap-2"
               title="Control how many nesting levels automatically expand in the tree view."
             >
-              <span className="text-xs font-medium uppercase tracking-wider text-gray-500">Tree Depth</span>
+              <span className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Tree Depth</span>
               <input 
                 type="range"
                 min={1}
@@ -144,14 +146,14 @@ const JsonTool: React.FC = () => {
                 value={state.expandLevel}
                 onChange={(e) => updateState({ expandLevel: Number(e.target.value) })}
               />
-              <span className="tabular-nums text-xs text-gray-500">{state.expandLevel}</span>
+              <span className="tabular-nums text-xs text-gray-500 dark:text-gray-400">{state.expandLevel}</span>
             </label>
           </div>
         </div>
 
-        <div className="flex-1 min-h-[360px]">
-          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-            <div className="flex gap-1 rounded-lg border bg-white p-1 text-sm font-medium shadow-sm">
+        <div className="flex flex-col flex-1 min-h-0">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2 shrink-0">
+            <div className="flex gap-1 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 p-1 text-sm font-medium shadow-sm">
               {[
                 { key: 'tree', label: 'Tree', icon: ListTree },
                 { key: 'pretty', label: 'Pretty', icon: Rows4 },
@@ -159,7 +161,7 @@ const JsonTool: React.FC = () => {
               ].map(({ key, label, icon: Icon }) => (
                 <button
                   key={key}
-                  className={`flex items-center gap-1 rounded-md px-3 py-1.5 transition ${state.viewMode === key ? 'bg-blue-600 text-white' : 'text-gray-600 hover:text-gray-900'}`}
+                  className={`flex items-center gap-1 rounded-md px-3 py-1.5 transition ${state.viewMode === key ? 'bg-blue-600 text-white' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'}`}
                   onClick={() => updateState({ viewMode: key as JsonToolState['viewMode'] })}
                 >
                   <Icon className="h-4 w-4" />
@@ -172,19 +174,23 @@ const JsonTool: React.FC = () => {
               value={state.search}
               onChange={(e) => updateState({ search: e.target.value })}
               placeholder="Search..."
-              className="h-9 w-full max-w-xs rounded-md border border-gray-200 px-3 text-sm"
+              className="h-9 w-full max-w-xs rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 text-sm placeholder-gray-400 dark:placeholder-gray-500"
             />
           </div>
 
-          <div className="h-full rounded-md border bg-white p-4 shadow-inner">
+          <div className="flex-1 min-h-0 flex flex-col rounded-md border dark:border-gray-700 bg-white dark:bg-gray-800 shadow-inner overflow-hidden">
             {!hasInput && (
-              <p className="text-sm text-gray-500">Paste JSON on the left to preview the result.</p>
+              <div className="p-4">
+                <p className="text-sm text-gray-500 dark:text-gray-400">Paste JSON on the left to preview the result.</p>
+              </div>
             )}
             {parseResult.error && (
-              <ErrorBanner message="JSON parsing failed" details={parseResult.error} />
+              <div className="p-4">
+                <ErrorBanner message="JSON parsing failed" details={parseResult.error} />
+              </div>
             )}
             {!parseResult.error && state.viewMode === 'tree' && parseResult.data && (
-              <div className="h-full overflow-auto">
+              <div className="flex-1 min-h-0 overflow-auto p-4">
                 <JsonView 
                   data={parseResult.data}
                   shouldExpandNode={(level) => level < state.expandLevel}
@@ -194,7 +200,7 @@ const JsonTool: React.FC = () => {
             )}
             {!parseResult.error && state.viewMode !== 'tree' && parseResult.formatted && (
               <pre 
-                className="h-full overflow-auto whitespace-pre-wrap break-all font-mono text-sm text-gray-800"
+                className="flex-1 min-h-0 overflow-auto whitespace-pre-wrap break-all font-mono text-sm text-gray-800 dark:text-gray-200 p-4 m-0"
                 dangerouslySetInnerHTML={{ __html: state.viewMode === 'pretty' ? highlightedPretty : escapeHtml(parseResult.minified) }}
               />
             )}
@@ -202,24 +208,24 @@ const JsonTool: React.FC = () => {
         </div>
       </div>
 
-      <ActionBar className="mt-6 flex-wrap justify-between border-t pt-4">
+      <ActionBar className="mt-6 flex-wrap justify-between border-t dark:border-gray-700 pt-4 shrink-0">
         <div className="flex flex-wrap gap-2">
           <button
-            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+            className="rounded-md bg-blue-600 dark:bg-blue-700 px-4 py-2 text-sm font-medium text-white disabled:opacity-50 hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
             disabled={!isValid}
             onClick={() => isValid && updateState({ input: parseResult.formatted })}
           >
             Format
           </button>
           <button
-            className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 disabled:opacity-50"
+            className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             disabled={!isValid}
             onClick={() => isValid && updateState({ input: parseResult.minified })}
           >
             Minify
           </button>
           <button
-            className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700"
+            className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             onClick={() => updateState({ input: SAMPLE_JSON })}
           >
             Sample Data
@@ -227,14 +233,14 @@ const JsonTool: React.FC = () => {
         </div>
         <div className="flex flex-wrap gap-2">
           <button
-            className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 disabled:opacity-50"
+            className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             disabled={!isValid}
             onClick={() => isValid && copyToClipboard(parseResult.formatted, 'Copied pretty JSON.')}
           >
             Copy Pretty
           </button>
           <button
-            className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 disabled:opacity-50"
+            className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             disabled={!isValid}
             onClick={() => isValid && copyToClipboard(parseResult.minified, 'Copied minified JSON.')}
           >
@@ -279,7 +285,7 @@ function highlightMatches(value: string, query: string) {
   while ((match = regex.exec(value)) !== null) {
     const before = value.slice(lastIndex, match.index);
     result += escapeHtml(before);
-    result += `<mark class="bg-yellow-200 text-gray-900">${escapeHtml(match[0])}</mark>`;
+    result += `<mark class="bg-yellow-200 dark:bg-yellow-800 text-gray-900 dark:text-yellow-100">${escapeHtml(match[0])}</mark>`;
     lastIndex = regex.lastIndex;
   }
 

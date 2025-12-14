@@ -77,11 +77,11 @@ const YamlTool: React.FC = () => {
         <div className="flex-none flex items-center justify-center px-2">
           <button 
             onClick={handleSwap}
-            className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"
+            className="p-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors"
             title="Switch Direction"
             disabled={!!conversion.error || !conversion.output}
           >
-            <ArrowRightLeft className="w-5 h-5 text-gray-600" />
+            <ArrowRightLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
           </button>
         </div>
         <div className="flex-1 flex flex-col min-h-0">
@@ -90,7 +90,7 @@ const YamlTool: React.FC = () => {
             value={conversion.output}
             readOnly
             mode={state.direction === 'yaml2json' ? 'json' : 'yaml'}
-            className="h-full bg-gray-50"
+            className="h-full"
             status={conversion.error ? 'error' : conversion.output ? 'success' : 'default'}
           />
         </div>
@@ -102,12 +102,12 @@ const YamlTool: React.FC = () => {
 
       <ActionBar className="mt-4 flex-wrap items-center justify-between">
         <label 
-          className="flex items-center gap-2 text-sm text-gray-700"
+          className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300"
           title="Adjust the indentation width used when formatting converted output."
         >
           <span>Indent</span>
           <select 
-            className="rounded-md border px-2 py-1"
+            className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-2 py-1"
             value={state.indent}
             onChange={(e) => updateState({ indent: Number(e.target.value) as 2 | 4 })}
           >
@@ -116,7 +116,7 @@ const YamlTool: React.FC = () => {
           </select>
         </label>
         <button
-          className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 disabled:opacity-50"
+          className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
           disabled={!conversion.output || !!conversion.error}
           onClick={() => conversion.output && copyToClipboard(conversion.output, 'Copied output.')}
         >

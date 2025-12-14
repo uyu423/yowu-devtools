@@ -87,12 +87,12 @@ const DiffTool: React.FC = () => {
           />
         </div>
 
-        <ActionBar className="flex flex-wrap items-center justify-between rounded-lg border bg-white p-4 shadow-sm">
-          <div className="inline-flex items-center rounded-lg border bg-gray-50 p-1 text-sm font-medium">
+        <ActionBar className="flex flex-wrap items-center justify-between rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm">
+          <div className="inline-flex items-center rounded-lg border dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-1 text-sm font-medium">
             {(['split', 'unified'] as const).map((view) => (
               <button
                 key={view}
-                className={`rounded-md px-3 py-1.5 ${state.view === view ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+                className={`rounded-md px-3 py-1.5 ${state.view === view ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'}`}
                 onClick={() => updateState({ view })}
               >
                 {view === 'split' ? 'Split View' : 'Unified View'}
@@ -100,14 +100,14 @@ const DiffTool: React.FC = () => {
             ))}
           </div>
 
-          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-700">
+          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-700 dark:text-gray-300">
             <label 
               className="flex items-center gap-2"
               title="Treat changes that only add or remove whitespace as no-ops."
             >
               <input 
                 type="checkbox" 
-                className="rounded border-gray-300"
+                className="rounded border-gray-300 dark:border-gray-600"
                 checked={state.ignoreWhitespace}
                 onChange={(e) => updateState({ ignoreWhitespace: e.target.checked })}
               />
@@ -119,14 +119,14 @@ const DiffTool: React.FC = () => {
             >
               <input 
                 type="checkbox" 
-                className="rounded border-gray-300"
+                className="rounded border-gray-300 dark:border-gray-600"
                 checked={state.ignoreCase}
                 onChange={(e) => updateState({ ignoreCase: e.target.checked })}
               />
               <span>Ignore Case</span>
             </label>
             <button
-              className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 disabled:opacity-50"
+              className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               disabled={!hasDiff}
               onClick={() => hasDiff && copyToClipboard(unifiedExport, 'Copied unified diff output.')}
             >
@@ -135,17 +135,17 @@ const DiffTool: React.FC = () => {
           </div>
         </ActionBar>
 
-        <div className="rounded-lg border bg-white shadow-inner">
-          <div className="flex items-center justify-between border-b px-4 py-2 text-sm text-gray-600">
-            <span className="font-semibold text-gray-800">Diff Result</span>
+        <div className="rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 shadow-inner">
+          <div className="flex items-center justify-between border-b dark:border-gray-700 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">
+            <span className="font-semibold text-gray-800 dark:text-white">Diff Result</span>
             <div className="space-x-4 text-xs uppercase tracking-wide">
-              <span className="text-green-600">+{stats.added} chars</span>
-              <span className="text-red-600">-{stats.removed} chars</span>
+              <span className="text-green-600 dark:text-green-400">+{stats.added} chars</span>
+              <span className="text-red-600 dark:text-red-400">-{stats.removed} chars</span>
             </div>
           </div>
 
           {!hasDiff && (
-            <p className="p-4 text-center text-sm text-gray-500">Both inputs are identical.</p>
+            <p className="p-4 text-center text-sm text-gray-500 dark:text-gray-400">Both inputs are identical.</p>
           )}
 
           {hasDiff && state.view === 'split' && (
@@ -168,17 +168,17 @@ const DiffTool: React.FC = () => {
 
 const DiffPane: React.FC<{ label: string; type: 'left' | 'right'; diffs: Diff[] }> = ({ label, type, diffs }) => {
   return (
-    <div className="min-h-[240px] border-gray-100">
-      <div className="border-b bg-gray-50 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-gray-500">{label}</div>
-      <pre className="h-full whitespace-pre-wrap break-words p-4 font-mono text-sm text-gray-800">
+    <div className="min-h-[240px] border-gray-100 dark:border-gray-700">
+      <div className="border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-900 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">{label}</div>
+      <pre className="h-full whitespace-pre-wrap break-words p-4 font-mono text-sm text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800">
         {diffs.map(([op, text], idx) => {
           if (type === 'left' && op === 1) return null;
           if (type === 'right' && op === -1) return null;
           const highlight = op === 0
             ? ''
             : op === -1
-              ? 'bg-red-100 text-red-800'
-              : 'bg-green-100 text-green-800';
+              ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
+              : 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300';
           return (
             <span key={`${type}-${idx}`} className={highlight}>{text || '\n'}</span>
           );
@@ -189,9 +189,9 @@ const DiffPane: React.FC<{ label: string; type: 'left' | 'right'; diffs: Diff[] 
 };
 
 const UnifiedPane: React.FC<{ diffs: Diff[] }> = ({ diffs }) => (
-  <pre className="whitespace-pre-wrap break-words p-4 font-mono text-sm text-gray-800">
+  <pre className="whitespace-pre-wrap break-words p-4 font-mono text-sm text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800">
     {diffs.map(([op, text], idx) => {
-      const style = op === 0 ? '' : op === 1 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800 line-through';
+      const style = op === 0 ? '' : op === 1 ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 line-through';
       const prefix = op === 0 ? '' : op === 1 ? '+ ' : '- ';
       return (
         <span key={idx} className={style}>
