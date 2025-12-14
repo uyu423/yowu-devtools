@@ -351,9 +351,15 @@ export function generateRoutes(): Plugin {
 
       // 404.html 생성 (SPA 라우팅 지원)
       // GitHub Pages는 404 오류 시 이 파일을 반환합니다.
-      // 각 경로에 대해 별도의 index.html 파일이 존재하므로,
-      // 404.html이 실행되는 경우는 GitHub Pages가 자동으로 찾지 못한 경우입니다.
-      // 이 경우 해당 경로의 index.html로 리다이렉트합니다.
+      //
+      // 문제: .nojekyll 파일이 있으면 GitHub Pages가 디렉토리 인덱싱을 하지 않아
+      // /json 요청 시 /json/index.html을 자동으로 찾지 못합니다.
+      //
+      // 해결: 각 경로에 대해 별도의 index.html 파일을 생성했지만,
+      // GitHub Pages가 이를 찾지 못하므로 404.html에서 명시적으로 리다이렉트합니다.
+      //
+      // SEO를 위해 각 경로의 HTML 파일은 유지하되,
+      // 404.html에서는 알려진 경로를 해당 경로의 index.html로 리다이렉트합니다.
       const knownPaths = ['/', ...tools.map((tool) => tool.path)];
       const knownPathsStr = JSON.stringify(knownPaths);
 
@@ -372,12 +378,11 @@ export function generateRoutes(): Plugin {
       var search = window.location.search;
       var hash = window.location.hash;
       
-      // 중복 리다이렉트 방지 (sessionStorage 사용)
-      var redirectKey = 'redirect_' + path + search + hash;
-      if (sessionStorage.getItem(redirectKey)) {
-        // 이미 리다이렉트를 시도했는데 다시 404.html이 로드된 경우
-        // 무한 루프 방지를 위해 루트로 리다이렉트
-        sessionStorage.removeItem(redirectKey);
+      // /index.html로 끝나는 경우는 이미 리다이렉트된 것으로 간주
+      // 하지만 404.html이 실행되었다는 것은 파일을 찾지 못했다는 의미
+      // 이 경우 루트 index.html로 리다이렉트하고 React Router가 처리하도록 함
+      if (path.endsWith('/index.html')) {
+        // /json/index.html -> /index.html로 리다이렉트 (React Router가 /json 경로 처리)
         window.location.replace('/index.html' + search + hash);
         return;
       }
@@ -389,12 +394,13 @@ export function generateRoutes(): Plugin {
         // 알려진 경로인 경우 (루트 제외)
         // 해당 경로의 index.html 파일이 존재하므로 리다이렉트
         // 예: /json -> /json/index.html
-        sessionStorage.setItem(redirectKey, '1');
+        // 
+        // 참고: .nojekyll 파일이 있으면 GitHub Pages가 자동으로 찾지 못하므로
+        // 명시적으로 리다이렉트해야 합니다.
         window.location.replace(path + '/index.html' + search + hash);
       } else {
         // 루트 경로이거나 알려진 경로가 아닌 경우
         // 루트 index.html로 리다이렉트 (React Router가 처리)
-        sessionStorage.removeItem(redirectKey);
         window.location.replace('/index.html' + search + hash);
       }
     })();
