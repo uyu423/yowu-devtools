@@ -38,7 +38,100 @@ const DiffTool: React.FC = () => {
   const debouncedLeft = useDebouncedValue(state.left, 250);
   const debouncedRight = useDebouncedValue(state.right, 250);
 
-  const diffs = useMemo(() => {
+  // Worker 사용 여부 결정
+  const shouldUseWorker = React.useMemo(() => {
+    if (typeof Worker === 'undefined') {
+      return false;
+    }
+    const leftSize = new Blob([debouncedLeft]).size;
+    const rightSize = new Blob([debouncedRight]).size;
+    const leftLines = debouncedLeft.split('\n').length;
+    const rightLines = debouncedRight.split('\n').length;
+    return (
+      leftSize > 500_000 ||
+      rightSize > 500_000 ||
+      leftLines > 10_000 ||
+      rightLines > 10_000
+    );
+  }, [debouncedLeft, debouncedRight]);
+
+  // Worker 상태 관리
+  const [isProcessing, setIsProcessing] = React.useState(false);
+  const workerRef = React.useRef<Worker | null>(null);
+
+  // Worker를 사용한 diff 결과
+  const [workerDiffs, setWorkerDiffs] = React.useState<Diff[]>([]);
+
+  // Worker 초기화 및 메시지 처리
+  React.useEffect(() => {
+    if (!shouldUseWorker) {
+      setIsProcessing(false);
+      return;
+    }
+
+    setIsProcessing(true);
+
+    // Worker 생성
+    if (!workerRef.current) {
+      workerRef.current = new Worker(
+        new URL('../workers/diff-calculator.worker.ts', import.meta.url),
+        { type: 'module' }
+      );
+    }
+
+    const worker = workerRef.current;
+
+    // 메시지 핸들러
+    const handleMessage = (e: MessageEvent<{
+      success: boolean;
+      diffs?: Diff[];
+      error?: string;
+    }>) => {
+      if (e.data.success && e.data.diffs) {
+        setWorkerDiffs(e.data.diffs);
+      } else {
+        setWorkerDiffs([]);
+      }
+      setIsProcessing(false);
+    };
+
+    worker.addEventListener('message', handleMessage);
+
+    // Worker에 diff 계산 요청 전송
+    worker.postMessage({
+      left: debouncedLeft,
+      right: debouncedRight,
+      ignoreWhitespace: state.ignoreWhitespace,
+      ignoreCase: state.ignoreCase,
+    });
+
+    return () => {
+      worker.removeEventListener('message', handleMessage);
+    };
+  }, [
+    debouncedLeft,
+    debouncedRight,
+    state.ignoreWhitespace,
+    state.ignoreCase,
+    shouldUseWorker,
+  ]);
+
+  // Worker 정리
+  React.useEffect(() => {
+    return () => {
+      if (workerRef.current) {
+        workerRef.current.terminate();
+        workerRef.current = null;
+      }
+    };
+  }, []);
+
+  // 메인 스레드 diff 계산 (작은 데이터용)
+  const mainThreadDiffs = useMemo(() => {
+    if (shouldUseWorker) {
+      return [];
+    }
+
     const dmp = new DiffMatchPatch();
     dmp.Diff_Timeout = 1;
     const rawDiffs = dmp.diff_main(debouncedLeft, debouncedRight);
@@ -48,7 +141,16 @@ const DiffTool: React.FC = () => {
       state.ignoreWhitespace,
       state.ignoreCase
     );
-  }, [debouncedLeft, debouncedRight, state.ignoreWhitespace, state.ignoreCase]);
+  }, [
+    debouncedLeft,
+    debouncedRight,
+    state.ignoreWhitespace,
+    state.ignoreCase,
+    shouldUseWorker,
+  ]);
+
+  // 최종 diff 결과 (Worker 또는 메인 스레드)
+  const diffs = shouldUseWorker ? workerDiffs : mainThreadDiffs;
 
   const stats = useMemo(() => {
     return diffs.reduce(
@@ -167,7 +269,15 @@ const DiffTool: React.FC = () => {
             </div>
           </div>
 
-          {!hasDiff && (
+          {isProcessing && (
+            <div className="p-4">
+              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 dark:border-gray-600 border-t-blue-600 dark:border-t-blue-400"></div>
+                Calculating diff for large text...
+              </div>
+            </div>
+          )}
+          {!isProcessing && !hasDiff && (
             <p className="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
               Both inputs are identical.
             </p>
