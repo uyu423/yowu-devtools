@@ -147,6 +147,26 @@ export function useToolState<T extends object>(
       // Query parameter must be before hash to be readable by location.search
       // BrowserRouter doesn't use hash routing, so we can use query parameter directly
       const shareUrl = `${window.location.origin}${location.pathname}?d=${encoded}`;
+      
+      // Try Web Share API first (mobile)
+      if (navigator.share && typeof navigator.share === 'function') {
+        try {
+          await navigator.share({
+            title: `Share ${toolId} state`,
+            text: `Check out this ${toolId} tool state`,
+            url: shareUrl,
+          });
+          toast.success('Shared successfully.');
+          return shareUrl;
+        } catch (shareError) {
+          // User cancelled or share failed, fallback to clipboard
+          if ((shareError as Error).name !== 'AbortError') {
+            console.warn('Web Share API failed, falling back to clipboard:', shareError);
+          }
+        }
+      }
+      
+      // Fallback to clipboard
       await navigator.clipboard?.writeText(shareUrl);
       toast.success('Share link copied.');
       return shareUrl;
@@ -156,6 +176,24 @@ export function useToolState<T extends object>(
       return null;
     }
   }, [location.pathname, state, toolId, options]);
+
+  // Get share state info (for ShareModal)
+  const getShareStateInfo = useCallback(() => {
+    const stateToShare = options?.shareStateFilter
+      ? options.shareStateFilter(state)
+      : state;
+    
+    const includedFields = Object.keys(stateToShare);
+    const excludedFields = options?.shareStateFilter
+      ? Object.keys(state).filter(key => !(key in stateToShare))
+      : [];
+    
+    return {
+      includedFields,
+      excludedFields,
+      stateToShare,
+    };
+  }, [state, options]);
 
   const applyState = useCallback(
     (partial: Partial<T>) => {
@@ -170,6 +208,7 @@ export function useToolState<T extends object>(
     updateState: applyState,
     resetState,
     shareState,
+    getShareStateInfo, // v1.2.0: Get share state info for ShareModal
   } as const;
 }
 
