@@ -1137,9 +1137,9 @@ export type ToolDefinition<TState> = {
     - 앱 내 표시 버전: `__APP_VERSION__` (빌드 타임 주입)로 사이드바 footer에 노출
     - `package.json` 버전과 실제 서비스 버전 동기화
     - CHANGELOG.md 추가 (Git tag 기반 릴리즈 노트)
-  - **신규 도구 추가** (1~2개):
-    - Hash/Checksum 도구 (SHA-256/SHA-1/MD5 + HMAC 옵션) - WebCrypto API 사용
-    - UUID/ULID 생성기 (v1.2.0 또는 v1.3.0)
+  - **신규 도구 추가** ✅:
+    - Hash/Checksum Generator (SHA-256/SHA-1/SHA-384/SHA-512 + HMAC 옵션) - WebCrypto API 사용 ✅
+    - UUID/ULID Generator (UUID v4/v7, ULID, 일괄 생성) ✅
 
 - **v1.3** (2025-01-XX):
 

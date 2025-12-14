@@ -22,6 +22,9 @@ An open toolbox for developers who would rather keep sensitive snippets on their
 - **Command Palette** (v1.2.0): Fast tool navigation with `⌘K` / `Ctrl+K` keyboard shortcut.
 - **File Workflow** (v1.2.0): Drag & drop files and download results for JSON, YAML, and Diff tools.
 - **Enhanced Share** (v1.2.0): Improved sharing with Web Share API support and privacy warnings.
+- **PWA Polish** (v1.2.0): Extended shortcuts for all tools and screenshots support.
+- **Version Display** (v1.2.0): App version shown in sidebar footer.
+- **New Tools** (v1.2.0): Hash Generator and UUID/ULID Generator added.
 
 ## Release Notes
 

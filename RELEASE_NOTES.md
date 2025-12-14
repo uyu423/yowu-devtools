@@ -26,8 +26,8 @@
   - Build-time version injection from `package.json`
   - Version synchronization between package.json and service
 - ✨ **New Tools**:
-  - Hash/Checksum Generator: SHA-256, SHA-1, MD5, HMAC support (WebCrypto API)
-  - UUID/ULID Generator: Generate UUID v4/v7 and ULID (optional, may be in v1.3.0)
+  - Hash Generator: SHA-256, SHA-1, SHA-384, SHA-512, HMAC support (WebCrypto API)
+  - UUID/ULID Generator: Generate UUID v4/v7 and ULID with batch generation (up to 100 IDs)
 
 **Improvements:**
 
