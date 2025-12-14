@@ -18,7 +18,7 @@ export default defineConfig({
     react(),
     generateRoutes(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       includeAssets: [
         'favicon.svg',
         'opengraph.png',
