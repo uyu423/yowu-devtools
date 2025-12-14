@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation, Link } from 'react-router-dom';
 
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Github } from 'lucide-react';
@@ -8,7 +8,7 @@ import { tools } from '@/tools';
 import { useEffect } from 'react';
 import { usePWA } from '@/hooks/usePWA';
 import { useRecentTools } from '@/hooks/useRecentTools';
-import { useResolvedTheme } from '@/hooks/useTheme';
+import { useResolvedTheme } from '@/hooks/useThemeHooks';
 import { APP_VERSION } from '@/lib/constants';
 
 function AppContent() {
@@ -98,9 +98,9 @@ function AppContent() {
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {tools.map((tool) => (
-                  <a
+                  <Link
                     key={tool.id}
-                    href={tool.path}
+                    to={tool.path}
                     className="group block p-5 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-md transition-all bg-white dark:bg-gray-800"
                   >
                     <div className="flex items-start mb-2">
@@ -114,7 +114,7 @@ function AppContent() {
                     <div className="text-sm text-gray-600 dark:text-gray-400">
                       {tool.description}
                     </div>
-                  </a>
+                  </Link>
                 ))}
               </div>
             </div>

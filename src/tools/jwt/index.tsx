@@ -7,7 +7,7 @@ import { EditorPanel } from '@/components/common/EditorPanel';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
 import { useToolState } from '@/hooks/useToolState';
 import { useTitle } from '@/hooks/useTitle';
-import { useResolvedTheme } from '@/hooks/useTheme';
+import { useResolvedTheme } from '@/hooks/useThemeHooks';
 import { copyToClipboard } from '@/lib/clipboard';
 import { JsonView, defaultStyles } from 'react-json-view-lite';
 import 'react-json-view-lite/dist/index.css';
@@ -815,8 +815,8 @@ async function verifyJwtSignature(
     return await crypto.subtle.verify(
       'HMAC',
       cryptoKey,
-      signatureBuffer,
-      messageData
+      signatureBuffer as ArrayBuffer,
+      messageData.buffer as ArrayBuffer
     );
   }
 
@@ -864,8 +864,8 @@ async function verifyJwtSignature(
           saltLength: 32,
         },
         cryptoKey,
-        signatureBytes.buffer,
-        messageData
+        signatureBytes.buffer as ArrayBuffer,
+        messageData.buffer as ArrayBuffer
       );
     } catch {
       // RSA-PSS 실패 시 RSASSA-PKCS1-v1_5로 재시도
@@ -885,8 +885,8 @@ async function verifyJwtSignature(
           name: 'RSASSA-PKCS1-v1_5',
         },
         cryptoKeyPKCS1,
-        signatureBytes.buffer,
-        messageData
+        signatureBytes.buffer as ArrayBuffer,
+        messageData.buffer as ArrayBuffer
       );
     }
   }

@@ -1,10 +1,10 @@
-import type { ReactNode } from 'react';
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { ThemeContext } from './themeContext';
 
 export type Theme = 'light' | 'dark' | 'system';
 export type ResolvedTheme = Exclude<Theme, 'system'>;
 
-interface ThemeContextValue {
+export interface ThemeContextValue {
   theme: Theme;
   resolvedTheme: ResolvedTheme;
   setTheme: (nextTheme: Theme) => void;
@@ -13,7 +13,6 @@ interface ThemeContextValue {
 const THEME_STORAGE_KEY = 'yowu-devtools:theme';
 const THEME_CLASSES: ResolvedTheme[] = ['light', 'dark'];
 
-const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 const getStoredTheme = (): Theme => {
   if (typeof window === 'undefined') {
@@ -47,32 +46,35 @@ const applyThemeClass = (resolvedTheme: ResolvedTheme) => {
 
 function useProvideTheme(): ThemeContextValue {
   const [theme, setTheme] = useState<Theme>(() => getStoredTheme());
-  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>(() =>
-    theme === 'system' ? getSystemPreference() : theme
-  );
+  // Track system preference changes to trigger useMemo recalculation
+  const [systemPreferenceCounter, setSystemPreferenceCounter] = useState(0);
+  
+  // Calculate resolved theme using useMemo to avoid setState in effect
+  const resolvedTheme = useMemo<ResolvedTheme>(() => {
+    return theme === 'system' ? getSystemPreference() : theme;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [theme, systemPreferenceCounter]);
 
   // Sync DOM + localStorage whenever theme changes
   useEffect(() => {
     if (typeof window !== 'undefined') {
       window.localStorage.setItem(THEME_STORAGE_KEY, theme);
     }
-
-    const nextResolved = theme === 'system' ? getSystemPreference() : theme;
-    setResolvedTheme(nextResolved);
-    applyThemeClass(nextResolved);
-  }, [theme]);
+    applyThemeClass(resolvedTheme);
+  }, [theme, resolvedTheme]);
 
   // Subscribe to system preference only when theme === 'system'
+  // Update counter state in event handler (acceptable, not in effect body)
   useEffect(() => {
     if (theme !== 'system' || typeof window === 'undefined') {
       return;
     }
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = (event: MediaQueryListEvent) => {
-      const nextResolved = event.matches ? 'dark' : 'light';
-      setResolvedTheme(nextResolved);
-      applyThemeClass(nextResolved);
+    const handleChange = () => {
+      // Update counter to trigger useMemo recalculation
+      // This is in an event handler callback, not directly in effect body
+      setSystemPreferenceCounter((prev) => prev + 1);
     };
 
     mediaQuery.addEventListener('change', handleChange);
@@ -93,19 +95,8 @@ function useProvideTheme(): ThemeContextValue {
   );
 }
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
+// Internal ThemeProvider - exported for use in ThemeProvider component file
+export function ThemeProviderInternal({ children }: { children: React.ReactNode }) {
   const value = useProvideTheme();
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
-}
-
-export function useTheme() {
-  const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error('useTheme must be used within a ThemeProvider');
-  }
-  return context;
-}
-
-export function useResolvedTheme() {
-  return useTheme().resolvedTheme;
 }

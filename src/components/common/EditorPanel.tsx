@@ -3,7 +3,7 @@ import CodeMirror from '@uiw/react-codemirror';
 import { EditorView } from '@codemirror/view';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { cn } from '@/lib/utils';
-import { useResolvedTheme } from '@/hooks/useTheme';
+import { useResolvedTheme } from '@/hooks/useThemeHooks';
 
 // We'll add more extensions later based on mode
 interface EditorPanelProps {
