@@ -61,68 +61,68 @@ src/
   - [x] `sonner` Setup
   - [x] `useTitle` Hook
 
-### Phase 3: 도구별 기능 구현 (Logic Implementation) - **Current**
+### Phase 3: 도구별 기능 구현 (Logic Implementation) - **완료**
 
 각 도구별로 **로직 연결 + 실시간 변환 + 에러 처리 + Toast 알림**을 구현합니다.
 
 **1. JSON Pretty Viewer** (Priority: High)
 
-- [ ] **Dependencies**: `react-json-view` 설치
-- [ ] **Logic**:
-  - [ ] 입력 JSON 파싱 (`JSON.parse`) 및 에러 핸들링
-  - [ ] 유효성 검사 (테두리 색상 표시)
-  - [ ] **Sample Data** 로드 버튼 기능
-  - [ ] **Tree View** 컴포넌트 연동
-  - [ ] Format / Minify 기능
-  - [ ] Copy to Clipboard (w/ Toast)
+- [x] **Dependencies**: `react-json-view-lite` 설치
+- [x] **Logic**:
+  - [x] 입력 JSON 파싱 (`JSON.parse`) 및 에러 핸들링
+  - [x] 유효성 검사 (테두리 색상 표시)
+  - [x] **Sample Data** 로드 버튼 기능
+  - [x] **Tree View** 컴포넌트 연동
+  - [x] Format / Minify 기능
+  - [x] Copy to Clipboard (w/ Toast)
 
 **2. URL Encode/Decode**
 
-- [ ] **Logic**:
-  - [ ] `encodeURIComponent` / `decodeURIComponent`
-  - [ ] 실시간 자동 변환 (Debounce)
-  - [ ] Error Handling (Decode 실패 시)
-  - [ ] **Swap Input/Output** 버튼
+- [x] **Logic**:
+  - [x] `encodeURIComponent` / `decodeURIComponent`
+  - [x] 실시간 자동 변환 (Debounce)
+  - [x] Error Handling (Decode 실패 시)
+  - [x] **Swap Input/Output** 버튼
 
 **3. Base64 Encode/Decode**
 
-- [ ] **Logic**:
-  - [ ] UTF-8 Safe Encoding/Decoding (`TextEncoder`/`TextDecoder`)
-  - [ ] URL Safe 옵션 처리 (`-` ↔ `+`, `_` ↔ `/`)
-  - [ ] 실시간 자동 변환
-  - [ ] **Swap Input/Output** 버튼
+- [x] **Logic**:
+  - [x] UTF-8 Safe Encoding/Decoding (`TextEncoder`/`TextDecoder`)
+  - [x] URL Safe 옵션 처리 (`-` ↔ `+`, `_` ↔ `/`)
+  - [x] 실시간 자동 변환
+  - [x] **Swap Input/Output** 버튼
 
 **4. Epoch/ISO Converter**
 
-- [ ] **Dependencies**: `date-fns` 설치
-- [ ] **Logic**:
-  - [ ] Epoch(ms/s) ↔ ISO 양방향 실시간 변환
-  - [ ] **Set to Now** 타이머 기능
-  - [ ] Timezone 처리 (UTC/Local)
+- [x] **Dependencies**: `date-fns` 설치
+- [x] **Logic**:
+  - [x] Epoch(ms/s) ↔ ISO 양방향 실시간 변환
+  - [x] **Set to Now** 타이머 기능
+  - [x] Timezone 처리 (UTC/Local)
 
 **5. YAML ↔ JSON**
 
-- [ ] **Dependencies**: `yaml` 설치
-- [ ] **Logic**:
-  - [ ] YAML 파싱 및 JSON 변환
-  - [ ] JSON 파싱 및 YAML 변환
-  - [ ] 에러 라인 감지 및 표시
+- [x] **Dependencies**: `yaml` 설치
+- [x] **Logic**:
+  - [x] YAML 파싱 및 JSON 변환
+  - [x] JSON 파싱 및 YAML 변환
+  - [x] 에러 라인 감지 및 표시
 
 **6. Text Diff**
 
-- [ ] **Dependencies**: `diff-match-patch` 설치
-- [ ] **Logic**:
-  - [ ] 텍스트 비교 알고리즘 수행
-  - [ ] 결과 HTML 렌더링 (Insert/Delete 하이라이트)
-  - [ ] Ignore Whitespace 옵션 적용
+- [x] **Dependencies**: `diff-match-patch` 설치
+- [x] **Logic**:
+  - [x] 텍스트 비교 알고리즘 수행
+  - [x] 결과 HTML 렌더링 (Insert/Delete 하이라이트)
+  - [x] Ignore Whitespace 옵션 적용
 
 **7. Cron Parser**
 
-- [ ] **Dependencies**: `cron-parser`, `cronstrue` 설치
-- [ ] **Logic**:
-  - [ ] Cron 식 파싱 및 유효성 검사
-  - [ ] Human Readable Description 생성
-  - [ ] Next Run Times 계산
+- [x] **Dependencies**: `cron-parser`, `cronstrue` 설치
+- [x] **Logic**:
+  - [x] Cron 식 파싱 및 유효성 검사
+  - [x] Human Readable Description 생성
+  - [x] Next Run Times 계산
 
 ### Phase 4: 마무리기능 및 배포 (Polish & Deploy)
 

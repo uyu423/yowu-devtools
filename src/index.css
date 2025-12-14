@@ -5,3 +5,8 @@
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
+
+.child-fields-container {
+  margin: 0;
+  padding-left: 1rem;
+}

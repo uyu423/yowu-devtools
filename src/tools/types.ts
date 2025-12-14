@@ -1,6 +1,6 @@
 import React from 'react';
 
-export interface ToolDefinition<TState = any> {
+export interface ToolDefinition<TState = unknown> {
   id: string;
   title: string;
   description: string;
@@ -16,4 +16,3 @@ export interface ToolDefinition<TState = any> {
   // encodeState?: (state: TState) => unknown;
   // decodeState?: (raw: any) => TState;
 }
-

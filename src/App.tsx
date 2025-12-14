@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { tools } from '@/tools';
 import { Toaster } from 'sonner';
@@ -13,7 +12,7 @@ function App() {
           <div className="p-8 max-w-2xl">
             <h1 className="text-3xl font-bold mb-4">Welcome to yowu-devtools</h1>
             <p className="text-gray-600 mb-8">
-              개발자에게 필요한 유용한 도구 모음입니다. 왼쪽 사이드바에서 도구를 선택하세요.
+              A curated toolbox for everyday developer conversions. Pick a tool from the sidebar to get started.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {tools.map(tool => (

@@ -1,76 +1,172 @@
-import React, { useState } from 'react';
+/* eslint-disable react-refresh/only-export-components */
+import React, { useMemo } from 'react';
 import type { ToolDefinition } from '@/tools/types';
-import { Binary } from 'lucide-react';
+import { Binary, RefreshCw } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { EditorPanel } from '@/components/common/EditorPanel';
 import { ActionBar } from '@/components/common/ActionBar';
+import { ErrorBanner } from '@/components/common/ErrorBanner';
+import { useToolState } from '@/hooks/useToolState';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
+import { useTitle } from '@/hooks/useTitle';
+import { copyToClipboard } from '@/lib/clipboard';
+
+interface Base64State {
+  input: string;
+  mode: 'encode' | 'decode';
+  urlSafe: boolean;
+}
+
+const DEFAULT_STATE: Base64State = {
+  input: '',
+  mode: 'encode',
+  urlSafe: false,
+};
 
 const Base64Tool: React.FC = () => {
-  const [input, setInput] = useState('');
-  const [mode, setMode] = useState<'encode' | 'decode'>('encode');
-  
+  useTitle('Base64 Converter');
+  const { state, updateState, resetState, shareState } = useToolState<Base64State>('base64', DEFAULT_STATE);
+  const debouncedInput = useDebouncedValue(state.input, 200);
+
+  const conversion = useMemo(() => {
+    if (!debouncedInput) {
+      return { result: '', error: null as string | null };
+    }
+    try {
+      if (state.mode === 'encode') {
+        let encoded = encodeBase64(debouncedInput);
+        if (state.urlSafe) encoded = toUrlSafe(encoded);
+        return { result: encoded, error: null };
+      }
+      const source = state.urlSafe ? fromUrlSafe(debouncedInput) : debouncedInput;
+      return { result: decodeBase64(source), error: null };
+    } catch (error) {
+      return { result: '', error: (error as Error).message };
+    }
+  }, [debouncedInput, state.mode, state.urlSafe]);
+
+  const handleSwap = () => {
+    if (!conversion.result) return;
+    updateState({
+      input: conversion.result,
+      mode: state.mode === 'encode' ? 'decode' : 'encode',
+    });
+  };
+
   return (
     <div className="flex flex-col h-full p-4 md:p-6 max-w-5xl mx-auto">
       <ToolHeader 
         title="Base64 Converter" 
-        description="Encode and decode Base64 data with UTF-8 support."
-        onReset={() => setInput('')}
+        description="Encode or decode UTF-8 text, including Base64URL."
+        onReset={resetState}
+        onShare={shareState}
       />
-      
-      <div className="flex-1 flex flex-col gap-6">
-        <div className="flex-1">
-          <EditorPanel 
-            title={mode === 'encode' ? 'Text Input' : 'Base64 Input'}
-            value={input}
-            onChange={setInput}
-            placeholder={mode === 'encode' ? 'Type text to encode...' : 'Paste Base64 string...'}
-            className="h-48 lg:h-64"
-          />
-        </div>
 
-        <ActionBar className="justify-center flex-col sm:flex-row gap-4">
+      <div className="flex-1 flex flex-col gap-6">
+        <EditorPanel 
+          title={state.mode === 'encode' ? 'Text Input' : 'Base64 Input'}
+          value={state.input}
+          onChange={(val) => updateState({ input: val })}
+          placeholder={state.mode === 'encode' ? 'Type text to encode...' : 'Paste Base64 string...'}
+          className="h-40 lg:h-56"
+          status={conversion.error ? 'error' : 'default'}
+        />
+
+        <ActionBar className="flex-col gap-4 rounded-lg border bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center bg-gray-100 p-1 rounded-lg">
-            <button 
-              className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${mode === 'encode' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-600 hover:text-gray-900'}`}
-              onClick={() => setMode('encode')}
-            >
-              Encode
-            </button>
-            <button 
-              className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${mode === 'decode' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-600 hover:text-gray-900'}`}
-              onClick={() => setMode('decode')}
-            >
-              Decode
-            </button>
+            {['encode', 'decode'].map((mode) => (
+              <button 
+                key={mode}
+                className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${state.mode === mode ? 'bg-white shadow-sm text-blue-600' : 'text-gray-600 hover:text-gray-900'}`}
+                onClick={() => updateState({ mode: mode as Base64State['mode'] })}
+              >
+                {mode === 'encode' ? 'Encode' : 'Decode'}
+              </button>
+            ))}
           </div>
-          
+
           <label className="flex items-center space-x-2 text-sm text-gray-700">
-            <input type="checkbox" className="rounded border-gray-300" />
+            <input 
+              type="checkbox" 
+              className="rounded border-gray-300"
+              checked={state.urlSafe}
+              onChange={(e) => updateState({ urlSafe: e.target.checked })}
+            />
             <span>URL Safe</span>
           </label>
+
+          <button
+            className="inline-flex items-center gap-2 rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700"
+            onClick={handleSwap}
+            disabled={!conversion.result}
+          >
+            <RefreshCw className="h-4 w-4" />
+            Input/Output Swap
+          </button>
         </ActionBar>
 
-        <div className="flex-1">
-          <EditorPanel 
-            title="Result"
-            value="" 
-            readOnly
-            placeholder="Result will appear here..."
-            className="h-48 lg:h-64 bg-gray-50"
-          />
+        {conversion.error && (
+          <ErrorBanner message="Base64 conversion failed" details={conversion.error} />
+        )}
+
+        <EditorPanel 
+          title="Result"
+          value={conversion.result}
+          readOnly
+          placeholder="Result will appear here..."
+          className="h-40 lg:h-56"
+          status={conversion.error ? 'error' : 'success'}
+        />
+
+        <div className="flex justify-end">
+          <button
+            className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 disabled:opacity-50"
+            onClick={() => conversion.result && copyToClipboard(conversion.result, 'Copied result.')}
+            disabled={!conversion.result}
+          >
+            Copy Result
+          </button>
         </div>
       </div>
     </div>
   );
 };
 
-export const base64Tool: ToolDefinition = {
+function encodeBase64(value: string) {
+  const encoder = new TextEncoder();
+  const bytes = encoder.encode(value);
+  let binary = '';
+  bytes.forEach((byte) => {
+    binary += String.fromCharCode(byte);
+  });
+  return btoa(binary);
+}
+
+function decodeBase64(value: string) {
+  const binary = atob(value);
+  const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+  const decoder = new TextDecoder();
+  return decoder.decode(bytes);
+}
+
+function toUrlSafe(value: string) {
+  return value.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+}
+
+function fromUrlSafe(value: string) {
+  let normalized = value.replace(/-/g, '+').replace(/_/g, '/');
+  while (normalized.length % 4 !== 0) {
+    normalized += '=';
+  }
+  return normalized;
+}
+
+export const base64Tool: ToolDefinition<Base64State> = {
   id: 'base64',
   title: 'Base64',
   description: 'Base64 Encode/Decode',
   path: '/base64',
   icon: Binary,
-  defaultState: {},
+  defaultState: DEFAULT_STATE,
   Component: Base64Tool,
 };
-

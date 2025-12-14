@@ -1,73 +1,42 @@
-# React + TypeScript + Vite
+# tools.yowu.dev
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React + TypeScript + Vite playground that bundles everyday developer utilities (JSON viewer, URL/Base64 converters, cron helper, diff tool, etc.) into a single fast, client-only experience. Phase 3 now wires up the business logic for every tool plus toast feedback, live conversion, and persistent state sharing.
 
-Currently, two official plugins are available:
+## Stack
+- React 19, Vite 7, TypeScript 5.9
+- Tailwind CSS + CodeMirror 6 for the UI/editor experience
+- Utility libs: `react-json-view-lite`, `yaml`, `diff-match-patch`, `cron-parser`, `cronstrue`, `date-fns`, `lz-string`, `sonner`
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Available tools
+- **JSON Pretty Viewer** – formatting, tree navigation, key sorting, sample data, copy pretty/minified
+- **URL Encode/Decode** – live encode/decode with `+` for spaces and swap support
+- **Base64 Converter** – UTF-8 safe, Base64URL toggle, swap, clipboard
+- **Epoch / ISO Converter** – ms/s + timezone toggles, validation, “Set to Now”
+- **YAML ↔ JSON** – bidirectional parsing with error locations and indent control
+- **Text Diff** – split/unified views, ignore whitespace/case, unified export
+- **Cron Parser** – validates expressions, humanizes schedules, lists upcoming runs
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Getting started
+```bash
+npm install        # install deps
+npm run dev        # start Vite dev server (http://localhost:5173)
+npm run lint       # ESLint
+npm run build      # type-check + production bundle
+npm run preview    # serve the dist/ output
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Project layout
 ```
+src/
+  components/      shared layout + common UI
+  hooks/           theme, title, tool-state utilities
+  tools/           individual tool implementations
+  lib/             helpers (clipboard, classnames)
+```
+Shared contributor guidelines live in `AGENTS.md`.
+
+## Documentation updates
+Feature changes must always be reflected in the markdown docs at the same time. After modifying any tool, workflow, or requirement, review `README.md`, `AGENTS.md`, `SAS.md`, and other spec notes to ensure they describe the new behavior. Keeping these references fresh is part of the definition of done for every change.
+
+## Deployment
+A GitHub Pages workflow (`.github/workflows/deploy.yml`) builds `dist/`, uploads it as a Pages artifact, and deploys to the `github-pages` environment every push to `main`. Update DNS/CNAME to `tools.yowu.dev` when ready.
