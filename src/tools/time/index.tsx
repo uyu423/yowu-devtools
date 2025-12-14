@@ -581,6 +581,8 @@ export const timeTool: ToolDefinition<TimeToolState> = {
   description: 'Epoch <-> ISO converter',
   path: '/time',
   icon: Clock,
+  keywords: ['time', 'epoch', 'timestamp', 'iso', 'date', 'convert', 'utc', 'kst'],
+  category: 'converter',
   defaultState: DEFAULT_STATE,
   Component: TimeTool,
 };

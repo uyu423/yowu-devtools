@@ -3,9 +3,10 @@ import { Navigate, Route, Routes, useLocation, Link } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Github } from 'lucide-react';
 import { PWAUpdatePrompt } from '@/components/common/PWAUpdatePrompt';
+import { CommandPalette } from '@/components/common/CommandPalette';
 import { Toaster } from 'sonner';
 import { tools } from '@/tools';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { usePWA } from '@/hooks/usePWA';
 import { useRecentTools } from '@/hooks/useRecentTools';
 import { useResolvedTheme } from '@/hooks/useThemeHooks';
@@ -155,6 +156,21 @@ function App() {
   // PWA 기능 (업데이트 알림, 설치 프롬프트, 오프라인 감지)
   const pwa = usePWA();
   const resolvedTheme = useResolvedTheme();
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+
+  // Command Palette keyboard shortcut (⌘K / Ctrl+K)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check for ⌘K (Mac) or Ctrl+K (Windows/Linux)
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsCommandPaletteOpen((prev) => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   return (
     <AppLayout>
@@ -171,6 +187,10 @@ function App() {
         }}
       />
       <AppContent />
+      <CommandPalette
+        isOpen={isCommandPaletteOpen}
+        onClose={() => setIsCommandPaletteOpen(false)}
+      />
       <PWAUpdatePrompt
         needRefresh={pwa.needRefresh}
         offlineReady={pwa.offlineReady}

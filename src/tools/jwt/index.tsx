@@ -994,6 +994,8 @@ export const jwtTool: ToolDefinition<JwtToolState> = {
   description: 'Decode and encode JSON Web Tokens',
   icon: Key,
   path: '/jwt',
+  keywords: ['jwt', 'token', 'decode', 'encode', 'json', 'web', 'token', 'verify'],
+  category: 'parser',
   defaultState: DEFAULT_STATE,
   Component: JwtTool,
 };

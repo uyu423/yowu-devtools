@@ -157,6 +157,8 @@ export const urlTool: ToolDefinition<UrlToolState> = {
   id: 'url',
   title: 'URL Encoder',
   description: 'Encode/Decode URL strings',
+  keywords: ['url', 'encode', 'decode', 'percent', 'uri', 'query', 'parameter'],
+  category: 'converter',
   path: '/url',
   icon: Link,
   defaultState: DEFAULT_STATE,

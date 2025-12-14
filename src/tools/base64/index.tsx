@@ -187,6 +187,8 @@ export const base64Tool: ToolDefinition<Base64State> = {
   description: 'Base64 Encode/Decode',
   path: '/base64',
   icon: Binary,
+  keywords: ['base64', 'encode', 'decode', 'base64url', 'urlsafe'],
+  category: 'converter',
   defaultState: DEFAULT_STATE,
   Component: Base64Tool,
 };

@@ -6,6 +6,9 @@ import { ToolHeader } from '@/components/common/ToolHeader';
 import { EditorPanel } from '@/components/common/EditorPanel';
 import { ActionBar } from '@/components/common/ActionBar';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
+import { FileInput, FileInputButton } from '@/components/common/FileInput';
+import { FileDownload } from '@/components/common/FileDownload';
+import { getMimeType } from '@/lib/fileUtils';
 import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
 import { useTitle } from '@/hooks/useTitle';
@@ -38,6 +41,16 @@ const YamlTool: React.FC = () => {
     [state.source]
   );
 
+  // Request ID for Worker response ordering (v1.2.0)
+  const [requestId, setRequestId] = React.useState<number | undefined>(undefined);
+  
+  // Generate request ID when source changes
+  React.useEffect(() => {
+    if (shouldUseWorker && state.source.trim()) {
+      setRequestId((prev) => (prev ?? 0) + 1);
+    }
+  }, [shouldUseWorker, state.source]);
+
   // Worker를 사용한 변환
   const { result: workerResult, isProcessing } = useWebWorker<
     { source: string; direction: 'yaml2json' | 'json2yaml'; indent: 2 | 4 },
@@ -52,6 +65,7 @@ const YamlTool: React.FC = () => {
           indent: state.indent,
         }
       : null,
+    requestId,
   });
 
   // 메인 스레드 변환 (작은 데이터용)
@@ -118,6 +132,32 @@ const YamlTool: React.FC = () => {
 
       <div className="flex-1 flex flex-col lg:flex-row gap-4 min-h-0">
         <div className="flex-1 flex flex-col min-h-0">
+          {!state.source && (
+            <div className="mb-3">
+              <FileInput
+                onFileLoad={(content) => {
+                  updateState({ source: content });
+                }}
+                accept={state.direction === 'yaml2json' ? '.yaml,.yml,text/yaml' : '.json,application/json'}
+                maxSize={50 * 1024 * 1024} // 50MB
+                className="w-full"
+              />
+            </div>
+          )}
+          {state.source && (
+            <div className="mb-2 flex items-center justify-between">
+              <FileInputButton
+                onFileLoad={(content) => {
+                  updateState({ source: content });
+                }}
+                accept={state.direction === 'yaml2json' ? '.yaml,.yml,text/yaml' : '.json,application/json'}
+                maxSize={50 * 1024 * 1024}
+                className="text-xs px-2 py-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                Load File
+              </FileInputButton>
+            </div>
+          )}
           <EditorPanel
             title={
               state.direction === 'yaml2json' ? 'YAML Input' : 'JSON Input'
@@ -191,16 +231,27 @@ const YamlTool: React.FC = () => {
             <option value={4}>4 spaces</option>
           </select>
         </label>
-        <button
-          className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-          disabled={!conversion.output || !!conversion.error}
-          onClick={() =>
-            conversion.output &&
-            copyToClipboard(conversion.output, 'Copied output.')
-          }
-        >
-          Copy Output
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <FileDownload
+            content={conversion.output || ''}
+            fileName={state.direction === 'yaml2json' ? 'output.json' : 'output.yaml'}
+            mimeType={state.direction === 'yaml2json' ? getMimeType('json') : getMimeType('yaml')}
+            disabled={!conversion.output || !!conversion.error}
+            className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+          >
+            Download
+          </FileDownload>
+          <button
+            className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            disabled={!conversion.output || !!conversion.error}
+            onClick={() =>
+              conversion.output &&
+              copyToClipboard(conversion.output, 'Copied output.')
+            }
+          >
+            Copy Output
+          </button>
+        </div>
       </ActionBar>
     </div>
   );
@@ -212,6 +263,8 @@ export const yamlTool: ToolDefinition<YamlToolState> = {
   description: 'YAML <-> JSON converter',
   path: '/yaml',
   icon: FileCode2,
+  keywords: ['yaml', 'yml', 'json', 'convert', 'transform', 'parser'],
+  category: 'converter',
   defaultState: DEFAULT_STATE,
   Component: YamlTool,
 };

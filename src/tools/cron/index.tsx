@@ -189,6 +189,8 @@ export const cronTool: ToolDefinition<CronToolState> = {
   description: 'Cron expression explainer',
   path: '/cron',
   icon: Timer,
+  keywords: ['cron', 'schedule', 'expression', 'parser', 'explain', 'next'],
+  category: 'parser',
   defaultState: DEFAULT_STATE,
   Component: CronTool,
 };

@@ -7,6 +7,10 @@ export interface ToolDefinition<TState = unknown> {
   icon?: React.ElementType; // LucideIcon
   path: string; // URL path (e.g., '/json')
   
+  // Command Palette support (v1.2.0)
+  keywords?: string[]; // Search keywords for Command Palette
+  category?: string; // Tool category (e.g., 'converter', 'viewer', 'generator')
+  
   defaultState: TState;
   
   // Component to render

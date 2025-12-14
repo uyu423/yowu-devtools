@@ -6,6 +6,10 @@ import { ToolHeader } from '@/components/common/ToolHeader';
 import { EditorPanel } from '@/components/common/EditorPanel';
 import { ActionBar } from '@/components/common/ActionBar';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
+import { FileInput, FileInputButton } from '@/components/common/FileInput';
+import { FileDownload } from '@/components/common/FileDownload';
+import { ShareModal } from '@/components/common/ShareModal';
+import { getMimeType } from '@/lib/fileUtils';
 import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
@@ -37,7 +41,7 @@ const DEFAULT_STATE: JsonToolState = {
 const JsonTool: React.FC = () => {
   useTitle('JSON Viewer');
   const resolvedTheme = useResolvedTheme();
-  const { state, updateState, resetState, shareState } =
+  const { state, updateState, resetState, shareState, getShareStateInfo } =
     useToolState<JsonToolState>('json', DEFAULT_STATE, {
       // Exclude 'search' field as it's UI-only state
       shareStateFilter: ({
@@ -54,6 +58,9 @@ const JsonTool: React.FC = () => {
         expandLevel,
       }),
     });
+  
+  const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
+  const shareInfo = getShareStateInfo();
   const debouncedInput = useDebouncedValue(state.input, 300);
 
   // Worker 사용 여부 결정
@@ -77,6 +84,16 @@ const JsonTool: React.FC = () => {
     [isDark]
   );
 
+  // Request ID for Worker response ordering (v1.2.0)
+  const [requestId, setRequestId] = React.useState<number | undefined>(undefined);
+  
+  // Generate request ID when input changes
+  React.useEffect(() => {
+    if (shouldUseWorker && debouncedInput.trim()) {
+      setRequestId((prev) => (prev ?? 0) + 1);
+    }
+  }, [shouldUseWorker, debouncedInput]);
+
   // Worker를 사용한 파싱
   const { result: workerResult, isProcessing } = useWebWorker<
     { input: string; indent: 2 | 4; sortKeys: boolean },
@@ -91,6 +108,7 @@ const JsonTool: React.FC = () => {
           sortKeys: state.sortKeys,
         }
       : null,
+    requestId,
   });
 
   // Worker 결과를 파싱 결과 형식으로 변환
@@ -165,7 +183,18 @@ const JsonTool: React.FC = () => {
         title="JSON Pretty Viewer"
         description="Format JSON instantly and explore the structure as a tree."
         onReset={resetState}
-        onShare={shareState}
+        onShare={() => setIsShareModalOpen(true)}
+      />
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        onConfirm={async () => {
+          setIsShareModalOpen(false);
+          await shareState();
+        }}
+        includedFields={shareInfo.includedFields}
+        excludedFields={shareInfo.excludedFields}
+        toolName="JSON Viewer"
       />
 
       <div className="flex flex-col gap-6 lg:flex-row flex-1 min-h-0 overflow-hidden">
@@ -250,6 +279,32 @@ const JsonTool: React.FC = () => {
           </div>
 
           <div className="flex-1 min-h-0 flex flex-col">
+            {!state.input && (
+              <div className="mb-3">
+                <FileInput
+                  onFileLoad={(content) => {
+                    updateState({ input: content });
+                  }}
+                  accept=".json,application/json"
+                  maxSize={50 * 1024 * 1024} // 50MB
+                  className="w-full"
+                />
+              </div>
+            )}
+            {state.input && (
+              <div className="mb-2 flex items-center justify-between">
+                <FileInputButton
+                  onFileLoad={(content) => {
+                    updateState({ input: content });
+                  }}
+                  accept=".json,application/json"
+                  maxSize={50 * 1024 * 1024}
+                  className="text-xs px-2 py-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                >
+                  Load File
+                </FileInputButton>
+              </div>
+            )}
             <EditorPanel
               title="Input JSON"
               value={state.input}
@@ -355,6 +410,24 @@ const JsonTool: React.FC = () => {
 
       <ActionBar className="mt-6 flex-wrap justify-end border-t dark:border-gray-700 pt-4 shrink-0">
         <div className="flex flex-wrap gap-2">
+          <FileDownload
+            content={parseResult.formatted || ''}
+            fileName="output.json"
+            mimeType={getMimeType('json')}
+            disabled={!isValid}
+            className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+          >
+            Download Pretty
+          </FileDownload>
+          <FileDownload
+            content={parseResult.minified || ''}
+            fileName="output.min.json"
+            mimeType={getMimeType('json')}
+            disabled={!isValid}
+            className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+          >
+            Download Minified
+          </FileDownload>
           <button
             className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             disabled={!isValid}
@@ -430,6 +503,8 @@ export const jsonTool: ToolDefinition<JsonToolState> = {
   description: 'Pretty print and traverse JSON',
   path: '/json',
   icon: FileJson,
+  keywords: ['json', 'viewer', 'formatter', 'prettify', 'parse', 'tree', 'beautify'],
+  category: 'viewer',
   defaultState: DEFAULT_STATE,
   Component: JsonTool,
 };

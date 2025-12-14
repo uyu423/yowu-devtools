@@ -5,6 +5,9 @@ import { FileDiff } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { EditorPanel } from '@/components/common/EditorPanel';
 import { ActionBar } from '@/components/common/ActionBar';
+import { FileInput, FileInputButton } from '@/components/common/FileInput';
+import { FileDownload } from '@/components/common/FileDownload';
+import { getMimeType } from '@/lib/fileUtils';
 import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
@@ -46,6 +49,16 @@ const DiffTool: React.FC = () => {
     return leftShouldUse || rightShouldUse;
   }, [debouncedLeft, debouncedRight]);
 
+  // Request ID for Worker response ordering (v1.2.0)
+  const [requestId, setRequestId] = React.useState<number | undefined>(undefined);
+  
+  // Generate request ID when inputs change
+  React.useEffect(() => {
+    if (shouldUseWorker && (!!debouncedLeft || !!debouncedRight)) {
+      setRequestId((prev) => (prev ?? 0) + 1);
+    }
+  }, [shouldUseWorker, debouncedLeft, debouncedRight]);
+
   // Worker를 사용한 diff 계산
   const { result: workerResult, isProcessing } = useWebWorker<
     { left: string; right: string; ignoreWhitespace: boolean; ignoreCase: boolean },
@@ -61,6 +74,7 @@ const DiffTool: React.FC = () => {
           ignoreCase: state.ignoreCase,
         }
       : null,
+    requestId,
   });
 
   // 메인 스레드 diff 계산 (작은 데이터용)
@@ -130,18 +144,74 @@ const DiffTool: React.FC = () => {
 
       <div className="flex flex-col gap-4">
         <div className="grid gap-4 lg:grid-cols-2">
-          <EditorPanel
-            title="Original"
-            value={state.left}
-            onChange={(val) => updateState({ left: val })}
-            className="h-60"
-          />
-          <EditorPanel
-            title="Modified"
-            value={state.right}
-            onChange={(val) => updateState({ right: val })}
-            className="h-60"
-          />
+          <div className="flex flex-col">
+            {!state.left && (
+              <div className="mb-3">
+                <FileInput
+                  onFileLoad={(content) => {
+                    updateState({ left: content });
+                  }}
+                  accept=".txt,text/plain"
+                  maxSize={50 * 1024 * 1024} // 50MB
+                  className="w-full"
+                />
+              </div>
+            )}
+            {state.left && (
+              <div className="mb-2 flex items-center justify-between">
+                <FileInputButton
+                  onFileLoad={(content) => {
+                    updateState({ left: content });
+                  }}
+                  accept=".txt,text/plain"
+                  maxSize={50 * 1024 * 1024}
+                  className="text-xs px-2 py-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                >
+                  Load File
+                </FileInputButton>
+              </div>
+            )}
+            <EditorPanel
+              title="Original"
+              value={state.left}
+              onChange={(val) => updateState({ left: val })}
+              className="h-60"
+            />
+          </div>
+          <div className="flex flex-col">
+            {!state.right && (
+              <div className="mb-3">
+                <FileInput
+                  onFileLoad={(content) => {
+                    updateState({ right: content });
+                  }}
+                  accept=".txt,text/plain"
+                  maxSize={50 * 1024 * 1024} // 50MB
+                  className="w-full"
+                />
+              </div>
+            )}
+            {state.right && (
+              <div className="mb-2 flex items-center justify-between">
+                <FileInputButton
+                  onFileLoad={(content) => {
+                    updateState({ right: content });
+                  }}
+                  accept=".txt,text/plain"
+                  maxSize={50 * 1024 * 1024}
+                  className="text-xs px-2 py-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                >
+                  Load File
+                </FileInputButton>
+              </div>
+            )}
+            <EditorPanel
+              title="Modified"
+              value={state.right}
+              onChange={(val) => updateState({ right: val })}
+              className="h-60"
+            />
+          </div>
         </div>
 
         <ActionBar className="flex flex-wrap items-center justify-between rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm">
@@ -186,6 +256,15 @@ const DiffTool: React.FC = () => {
                 Ignore Case
               </OptionLabel>
             </label>
+            <FileDownload
+              content={unifiedExport}
+              fileName="diff.txt"
+              mimeType={getMimeType('txt')}
+              disabled={!hasDiff}
+              className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            >
+              Download Unified
+            </FileDownload>
             <button
               className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               disabled={!hasDiff}
@@ -349,6 +428,8 @@ export const diffTool: ToolDefinition<DiffToolState> = {
   description: 'Compare two texts',
   path: '/diff',
   icon: FileDiff,
+  keywords: ['diff', 'compare', 'difference', 'text', 'unified', 'side'],
+  category: 'viewer',
   defaultState: DEFAULT_STATE,
   Component: DiffTool,
 };
