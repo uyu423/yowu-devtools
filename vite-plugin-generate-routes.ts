@@ -336,25 +336,50 @@ export function generateRoutes(): Plugin {
       });
 
       // 404.html 생성 (SPA 라우팅 지원)
+      // 알려진 경로 목록 생성
+      const knownPaths = ['/', ...tools.map((tool) => tool.path)];
+      const knownPathsStr = JSON.stringify(knownPaths);
+
       const redirectScript = `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
   <title>Redirecting...</title>
   <script>
-    // GitHub Pages 404.html 리다이렉트
-    var path = window.location.pathname;
-    var search = window.location.search;
-    var hash = window.location.hash;
-    var url = path.split('/').pop();
-    
-    if (url && url !== '404.html') {
-      // 라우트가 존재하는 경우 해당 경로로 리다이렉트
-      window.location.replace(path + search + hash);
-    } else {
-      // 루트로 리다이렉트
-      window.location.replace('/' + search + hash);
-    }
+    (function() {
+      // GitHub Pages 404.html 리다이렉트
+      // 알려진 경로 목록
+      var knownPaths = ${knownPathsStr};
+      
+      var path = window.location.pathname;
+      var search = window.location.search;
+      var hash = window.location.hash;
+      
+      // 중복 리다이렉트 방지 (sessionStorage 사용)
+      var redirectKey = 'redirect_' + path + search + hash;
+      if (sessionStorage.getItem(redirectKey)) {
+        // 이미 리다이렉트를 시도했는데 다시 404.html이 로드된 경우
+        // 무한 루프 방지를 위해 루트로 리다이렉트
+        sessionStorage.removeItem(redirectKey);
+        window.location.replace('/index.html' + search + hash);
+        return;
+      }
+      
+      // 알려진 경로인지 확인
+      var isKnownPath = knownPaths.includes(path);
+      
+      if (isKnownPath && path !== '/') {
+        // 알려진 경로인 경우 (루트 제외)
+        // GitHub Pages가 /json 요청 시 /json/index.html을 자동으로 찾지 못하는 경우를 대비해
+        // 명시적으로 index.html 경로로 리다이렉트
+        sessionStorage.setItem(redirectKey, '1');
+        window.location.replace(path + '/index.html' + search + hash);
+      } else {
+        // 루트 경로이거나 알려진 경로가 아닌 경우
+        sessionStorage.removeItem(redirectKey);
+        window.location.replace('/index.html' + search + hash);
+      }
+    })();
   </script>
 </head>
 <body>

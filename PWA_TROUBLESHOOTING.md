@@ -126,3 +126,4 @@ window.addEventListener('beforeinstallprompt', (e) => {
 3. 시크릿 모드에서 테스트
 4. 다른 기기에서 테스트
 
+
