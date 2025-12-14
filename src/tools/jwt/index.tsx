@@ -973,7 +973,7 @@ async function verifyJwtSignature(
 
 export const jwtTool: ToolDefinition<JwtToolState> = {
   id: 'jwt',
-  title: 'JWT Decoder',
+  title: 'JWT Decoder/Encoder',
   description: 'Decode and encode JSON Web Tokens',
   icon: Key,
   path: '/jwt',
