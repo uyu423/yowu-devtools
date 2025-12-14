@@ -173,10 +173,11 @@ const HashTool: React.FC = () => {
       </div>
 
       {/* Options */}
-      <div className="mb-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-        <div className="flex flex-wrap items-end gap-4">
+      <div className="mb-4 space-y-4">
+        {/* Algorithm and Format */}
+        <div className="flex flex-wrap gap-4">
           <OptionLabel tooltip="Select hash algorithm">
-            <label className="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Algorithm
             </label>
             <select
@@ -197,7 +198,7 @@ const HashTool: React.FC = () => {
           </OptionLabel>
 
           <OptionLabel tooltip="Select output format">
-            <label className="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Format
             </label>
             <select
@@ -213,47 +214,52 @@ const HashTool: React.FC = () => {
               <option value="base64">Base64</option>
             </select>
           </OptionLabel>
+        </div>
 
-          <OptionLabel tooltip="Enable HMAC authentication">
-            <label className="flex items-center cursor-pointer pt-6">
+        {/* HMAC Option */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            HMAC Authentication
+          </label>
+          <div className="flex items-center gap-2">
+            <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
                 checked={state.hmac}
                 onChange={(e) => updateState({ hmac: e.target.checked })}
-                className="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-0 cursor-pointer"
+                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
-              <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">HMAC</span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">Enable HMAC</span>
             </label>
-          </OptionLabel>
-        </div>
-
-        {state.hmac && (
-          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <label className="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
-              HMAC Key
-            </label>
-            <input
-              type="text"
-              value={state.hmacKey}
-              onChange={(e) => updateState({ hmacKey: e.target.value })}
-              placeholder="Enter HMAC key..."
-              className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
           </div>
-        )}
+          {state.hmac && (
+            <div className="mt-3">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                HMAC Key
+              </label>
+              <input
+                type="text"
+                value={state.hmacKey}
+                onChange={(e) => updateState({ hmacKey: e.target.value })}
+                placeholder="Enter HMAC key..."
+                className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Output */}
-      <div className="flex-1 min-h-0 flex flex-col">
-        <div className="flex items-center justify-between mb-2 shrink-0">
+      <div className="mb-4 flex-1 min-h-0">
+        <div className="flex items-center justify-between mb-2">
           <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            Result {isCalculating && <span className="text-gray-500 font-normal">(Calculating...)</span>}
+            Hash Result {isCalculating && <span className="text-gray-500 font-normal">(Calculating...)</span>}
           </label>
           <button
             onClick={handleCopy}
             disabled={!hashResult || isCalculating}
             className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            title="Copy Hash"
+            title="Copy hash"
           >
             <Copy className="w-4 h-4" />
           </button>
@@ -265,7 +271,6 @@ const HashTool: React.FC = () => {
             placeholder="Hash result will appear here..."
             mode="text"
             readOnly={true}
-            className="h-full"
           />
         </div>
       </div>
