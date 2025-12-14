@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 
 const STORAGE_KEY = 'yowu-devtools:v1:app:recentTools';
-const MAX_RECENT_TOOLS = 5;
+const MAX_RECENT_TOOLS = 3;
 
 export interface RecentTool {
   toolId: string;
