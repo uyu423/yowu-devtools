@@ -6,7 +6,7 @@ import { ToolHeader } from '@/components/common/ToolHeader';
 import { EditorPanel } from '@/components/common/EditorPanel';
 import { ActionBar } from '@/components/common/ActionBar';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
-import { FileInput, FileInputButton } from '@/components/common/FileInput';
+import { FileInput } from '@/components/common/FileInput';
 import { FileDownload } from '@/components/common/FileDownload';
 import { getMimeType } from '@/lib/fileUtils';
 import { OptionLabel } from '@/components/ui/OptionLabel';
@@ -71,6 +71,7 @@ const YamlTool: React.FC = () => {
         }
       : null,
     requestId,
+    timeout: 10_000, // 10 seconds timeout
   });
 
   // 메인 스레드 변환 (작은 데이터용)
@@ -143,32 +144,6 @@ const YamlTool: React.FC = () => {
 
       <div className="flex-1 flex flex-col lg:flex-row gap-4 min-h-0">
         <div className="flex-1 flex flex-col min-h-0">
-          {!state.source && (
-            <div className="mb-3">
-              <FileInput
-                onFileLoad={(content) => {
-                  updateState({ source: content });
-                }}
-                accept={state.direction === 'yaml2json' ? '.yaml,.yml,text/yaml' : '.json,application/json'}
-                maxSize={50 * 1024 * 1024} // 50MB
-                className="w-full"
-              />
-            </div>
-          )}
-          {state.source && (
-            <div className="mb-2 flex items-center justify-between">
-              <FileInputButton
-                onFileLoad={(content) => {
-                  updateState({ source: content });
-                }}
-                accept={state.direction === 'yaml2json' ? '.yaml,.yml,text/yaml' : '.json,application/json'}
-                maxSize={50 * 1024 * 1024}
-                className="text-xs px-2 py-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-              >
-                Load File
-              </FileInputButton>
-            </div>
-          )}
           <EditorPanel
             title={
               state.direction === 'yaml2json' ? 'YAML Input' : 'JSON Input'
@@ -179,6 +154,16 @@ const YamlTool: React.FC = () => {
             className="h-full"
             status={conversion.error ? 'error' : 'default'}
           />
+          <div className="mt-3">
+            <FileInput
+              onFileLoad={(content) => {
+                updateState({ source: content });
+              }}
+              accept={state.direction === 'yaml2json' ? '.yaml,.yml,text/yaml' : '.json,application/json'}
+              maxSize={50 * 1024 * 1024} // 50MB
+              className="w-full"
+            />
+          </div>
         </div>
         <div className="flex-none flex items-center justify-center px-2">
           <button

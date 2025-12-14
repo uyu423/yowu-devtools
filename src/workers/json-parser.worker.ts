@@ -38,6 +38,17 @@ self.onmessage = (e: MessageEvent<ParseRequest>) => {
   const { input, indent, sortKeys, requestId } = e.data;
 
   try {
+    // 테스트용: 타임아웃 테스트를 위한 인위적 지연 (15초)
+    // 실제 프로덕션에서는 제거해야 함
+    const isTimeoutTest = input.includes('__TIMEOUT_TEST__');
+    if (isTimeoutTest) {
+      // 15초 대기하여 타임아웃 발생시키기
+      const startTime = Date.now();
+      while (Date.now() - startTime < 15_000) {
+        // Busy wait
+      }
+    }
+
     // JSON 파싱
     const parsed = JSON.parse(input);
     

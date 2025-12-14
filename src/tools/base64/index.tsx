@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, { useMemo } from 'react';
+import React from 'react';
 import type { ToolDefinition } from '@/tools/types';
 import { Binary, RefreshCw, Copy } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
@@ -8,6 +8,7 @@ import { ActionBar } from '@/components/common/ActionBar';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
 import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useTitle } from '@/hooks/useTitle';
 import { copyToClipboard } from '@/lib/clipboard';
 import { isMobileDevice } from '@/lib/utils';
@@ -34,23 +35,24 @@ const Base64Tool: React.FC = () => {
   const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
   const shareInfo = getShareStateInfo();
   const isMobile = isMobileDevice();
+  const debouncedInput = useDebouncedValue(state.input, 300);
 
-  const conversion = useMemo(() => {
-    if (!state.input) {
+  const conversion = React.useMemo(() => {
+    if (!debouncedInput) {
       return { result: '', error: null as string | null };
     }
     try {
       if (state.mode === 'encode') {
-        let encoded = encodeBase64(state.input);
+        let encoded = encodeBase64(debouncedInput);
         if (state.urlSafe) encoded = toUrlSafe(encoded);
         return { result: encoded, error: null };
       }
-      const source = state.urlSafe ? fromUrlSafe(state.input) : state.input;
+      const source = state.urlSafe ? fromUrlSafe(debouncedInput) : debouncedInput;
       return { result: decodeBase64(source), error: null };
     } catch (error) {
       return { result: '', error: (error as Error).message };
     }
-  }, [state.input, state.mode, state.urlSafe]);
+  }, [debouncedInput, state.mode, state.urlSafe]);
 
   const handleSwap = () => {
     if (!conversion.result) return;
@@ -182,10 +184,13 @@ const Base64Tool: React.FC = () => {
 function encodeBase64(value: string) {
   const encoder = new TextEncoder();
   const bytes = encoder.encode(value);
+  // Use chunking for large data to avoid "Maximum call stack size exceeded" error
+  const chunkSize = 8192;
   let binary = '';
-  bytes.forEach((byte) => {
-    binary += String.fromCharCode(byte);
-  });
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    const chunk = bytes.slice(i, i + chunkSize);
+    binary += String.fromCharCode(...chunk);
+  }
   return btoa(binary);
 }
 

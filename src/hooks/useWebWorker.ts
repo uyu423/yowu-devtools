@@ -8,6 +8,8 @@ interface UseWebWorkerOptions<TRequest, TResponse> {
   onError?: (error: Error) => void;
   // Request ID for ensuring response order (v1.2.0)
   requestId?: number | string;
+  // Timeout in milliseconds (default: 10000ms = 10 seconds)
+  timeout?: number;
 }
 
 interface UseWebWorkerResult<TResponse> {
@@ -40,6 +42,7 @@ export function useWebWorker<TRequest, TResponse>({
   onMessage,
   onError,
   requestId,
+  timeout = 10_000, // Default 10 seconds
 }: UseWebWorkerOptions<TRequest, TResponse>): UseWebWorkerResult<TResponse> {
   // Worker 지원 여부 확인
   const isWorkerSupported = useMemo(() => typeof Worker !== 'undefined', []);
@@ -49,6 +52,7 @@ export function useWebWorker<TRequest, TResponse>({
   const [error, setError] = useState<string | null>(null);
   const workerRef = useRef<Worker | null>(null);
   const currentRequestIdRef = useRef<number | string | undefined>(undefined);
+  const timeoutRef = useRef<number | null>(null);
 
   // Worker 생성
   useEffect(() => {
@@ -96,6 +100,12 @@ export function useWebWorker<TRequest, TResponse>({
         return;
       }
       
+      // 타임아웃 클리어 (성공적으로 응답 받음)
+      if (timeoutRef.current !== null) {
+        window.clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+      
       if (data.success === false || data.error) {
         const errorMessage = data.error || 'Unknown error occurred';
         setError(errorMessage);
@@ -112,6 +122,12 @@ export function useWebWorker<TRequest, TResponse>({
 
     // 에러 핸들러
     const handleError = (e: ErrorEvent) => {
+      // 타임아웃 클리어 (에러 발생 시)
+      if (timeoutRef.current !== null) {
+        window.clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+      
       const errorMessage = e.message || 'Worker error occurred';
       setError(errorMessage);
       setResult(null);
@@ -122,14 +138,35 @@ export function useWebWorker<TRequest, TResponse>({
     worker.addEventListener('message', handleMessage);
     worker.addEventListener('error', handleError);
 
+    // 타임아웃 설정
+    timeoutRef.current = window.setTimeout(() => {
+      // 타임아웃 발생 시 Worker 종료 및 에러 표시
+      const timeoutError = `Processing timeout: The operation took longer than ${timeout / 1000} seconds and was cancelled. The input may be too large to process.`;
+      setError(timeoutError);
+      setResult(null);
+      setIsProcessing(false);
+      onError?.(new Error(timeoutError));
+      
+      // Worker 종료 (새 요청을 위해 재생성됨)
+      if (workerRef.current) {
+        workerRef.current.terminate();
+        workerRef.current = null;
+      }
+    }, timeout);
+
     // Worker에 요청 전송 (requestId 포함)
     worker.postMessage({ ...request, requestId: thisRequestId });
 
     return () => {
       worker.removeEventListener('message', handleMessage);
       worker.removeEventListener('error', handleError);
+      // 타임아웃 클리어
+      if (timeoutRef.current !== null) {
+        window.clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
     };
-  }, [shouldUseWorker, isWorkerSupported, request, requestId, workerUrl, onMessage, onError]);
+  }, [shouldUseWorker, isWorkerSupported, request, requestId, timeout, workerUrl, onMessage, onError]);
 
   // Worker 정리
   useEffect(() => {

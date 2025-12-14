@@ -97,6 +97,13 @@ const HashTool: React.FC = () => {
         const encoder = new TextEncoder();
         const data = encoder.encode(debouncedInput);
 
+        // 타임아웃 설정 (10초)
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          setTimeout(() => {
+            reject(new Error('Processing timeout: The operation took longer than 10 seconds and was cancelled. The input may be too large to process.'));
+          }, 10_000);
+        });
+
         let hashBuffer: ArrayBuffer;
 
         if (state.hmac && debouncedHmacKey.trim()) {
@@ -104,15 +111,21 @@ const HashTool: React.FC = () => {
           const keyData = encoder.encode(debouncedHmacKey);
           const hashName = state.algorithm === 'MD5' ? 'SHA-256' : state.algorithm; // MD5 doesn't support HMAC, use SHA-256
 
-          const cryptoKey = await crypto.subtle.importKey(
-            'raw',
-            keyData,
-            { name: 'HMAC', hash: hashName },
-            false,
-            ['sign']
-          );
+          const cryptoKey = await Promise.race([
+            crypto.subtle.importKey(
+              'raw',
+              keyData,
+              { name: 'HMAC', hash: hashName },
+              false,
+              ['sign']
+            ),
+            timeoutPromise,
+          ]);
 
-          hashBuffer = await crypto.subtle.sign('HMAC', cryptoKey, data);
+          hashBuffer = await Promise.race([
+            crypto.subtle.sign('HMAC', cryptoKey, data),
+            timeoutPromise,
+          ]);
         } else {
           // Regular hash calculation
           // Note: WebCrypto API doesn't support MD5, so we'll show an error for MD5
@@ -122,7 +135,10 @@ const HashTool: React.FC = () => {
             return;
           }
 
-          hashBuffer = await crypto.subtle.digest(state.algorithm, data);
+          hashBuffer = await Promise.race([
+            crypto.subtle.digest(state.algorithm, data),
+            timeoutPromise,
+          ]);
         }
 
         const result =

@@ -6,7 +6,7 @@ import { ToolHeader } from '@/components/common/ToolHeader';
 import { EditorPanel } from '@/components/common/EditorPanel';
 import { ActionBar } from '@/components/common/ActionBar';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
-import { FileInput, FileInputButton } from '@/components/common/FileInput';
+import { FileInput } from '@/components/common/FileInput';
 import { FileDownload } from '@/components/common/FileDownload';
 import { ShareModal } from '@/components/common/ShareModal';
 import { getMimeType } from '@/lib/fileUtils';
@@ -65,10 +65,10 @@ const JsonTool: React.FC = () => {
   const isMobile = isMobileDevice();
   const debouncedInput = useDebouncedValue(state.input, 300);
 
-  // Worker 사용 여부 결정
+  // Worker 사용 여부 결정 (디바운싱 전 state.input을 기준으로 결정하여 붙여넣기 시 즉시 Worker 모드 전환)
   const shouldUseWorker = React.useMemo(
-    () => shouldUseWorkerForText(debouncedInput, 1_000_000, 10_000),
-    [debouncedInput]
+    () => shouldUseWorkerForText(state.input, 1_000_000, 10_000),
+    [state.input]
   );
 
   const isDark = resolvedTheme === 'dark';
@@ -111,6 +111,7 @@ const JsonTool: React.FC = () => {
         }
       : null,
     requestId,
+    timeout: 10_000, // 10 seconds timeout
   });
 
   // Worker 결과를 파싱 결과 형식으로 변환
@@ -289,32 +290,6 @@ const JsonTool: React.FC = () => {
           </div>
 
           <div className="flex-1 min-h-0 flex flex-col">
-            {!state.input && (
-              <div className="mb-3">
-                <FileInput
-                  onFileLoad={(content) => {
-                    updateState({ input: content });
-                  }}
-                  accept=".json,application/json"
-                  maxSize={50 * 1024 * 1024} // 50MB
-                  className="w-full"
-                />
-              </div>
-            )}
-            {state.input && (
-              <div className="mb-2 flex items-center justify-between">
-                <FileInputButton
-                  onFileLoad={(content) => {
-                    updateState({ input: content });
-                  }}
-                  accept=".json,application/json"
-                  maxSize={50 * 1024 * 1024}
-                  className="text-xs px-2 py-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                >
-                  Load File
-                </FileInputButton>
-              </div>
-            )}
             <EditorPanel
               title="Input JSON"
               value={state.input}
@@ -326,6 +301,16 @@ const JsonTool: React.FC = () => {
               }
               className="flex-1 min-h-0"
             />
+            <div className="mt-3">
+              <FileInput
+                onFileLoad={(content) => {
+                  updateState({ input: content });
+                }}
+                accept=".json,application/json"
+                maxSize={50 * 1024 * 1024} // 50MB
+                className="w-full"
+              />
+            </div>
           </div>
         </div>
 

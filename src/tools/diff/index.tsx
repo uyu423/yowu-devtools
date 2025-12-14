@@ -5,7 +5,7 @@ import { FileDiff, Copy } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { EditorPanel } from '@/components/common/EditorPanel';
 import { ActionBar } from '@/components/common/ActionBar';
-import { FileInput, FileInputButton } from '@/components/common/FileInput';
+import { FileInput } from '@/components/common/FileInput';
 import { FileDownload } from '@/components/common/FileDownload';
 import { getMimeType } from '@/lib/fileUtils';
 import { OptionLabel } from '@/components/ui/OptionLabel';
@@ -47,12 +47,12 @@ const DiffTool: React.FC = () => {
   const debouncedLeft = useDebouncedValue(state.left, 250);
   const debouncedRight = useDebouncedValue(state.right, 250);
 
-  // Worker 사용 여부 결정
+  // Worker 사용 여부 결정 (디바운싱 전 state.left/right를 기준으로 결정하여 붙여넣기 시 즉시 Worker 모드 전환)
   const shouldUseWorker = React.useMemo(() => {
-    const leftShouldUse = shouldUseWorkerForText(debouncedLeft, 500_000, 10_000);
-    const rightShouldUse = shouldUseWorkerForText(debouncedRight, 500_000, 10_000);
+    const leftShouldUse = shouldUseWorkerForText(state.left, 500_000, 10_000);
+    const rightShouldUse = shouldUseWorkerForText(state.right, 500_000, 10_000);
     return leftShouldUse || rightShouldUse;
-  }, [debouncedLeft, debouncedRight]);
+  }, [state.left, state.right]);
 
   // Request ID for Worker response ordering (v1.2.0)
   const [requestId, setRequestId] = React.useState<number | undefined>(undefined);
@@ -80,6 +80,7 @@ const DiffTool: React.FC = () => {
         }
       : null,
     requestId,
+    timeout: 10_000, // 10 seconds timeout
   });
 
   // 메인 스레드 diff 계산 (작은 데이터용)
@@ -156,72 +157,40 @@ const DiffTool: React.FC = () => {
       <div className="flex flex-col gap-4">
         <div className="grid gap-4 lg:grid-cols-2">
           <div className="flex flex-col">
-            {!state.left && (
-              <div className="mb-3">
-                <FileInput
-                  onFileLoad={(content) => {
-                    updateState({ left: content });
-                  }}
-                  accept=".txt,text/plain"
-                  maxSize={50 * 1024 * 1024} // 50MB
-                  className="w-full"
-                />
-              </div>
-            )}
-            {state.left && (
-              <div className="mb-2 flex items-center justify-between">
-                <FileInputButton
-                  onFileLoad={(content) => {
-                    updateState({ left: content });
-                  }}
-                  accept=".txt,text/plain"
-                  maxSize={50 * 1024 * 1024}
-                  className="text-xs px-2 py-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                >
-                  Load File
-                </FileInputButton>
-              </div>
-            )}
             <EditorPanel
               title="Original"
               value={state.left}
               onChange={(val) => updateState({ left: val })}
               className="h-60"
             />
+            <div className="mt-3">
+              <FileInput
+                onFileLoad={(content) => {
+                  updateState({ left: content });
+                }}
+                accept=".txt,text/plain"
+                maxSize={50 * 1024 * 1024} // 50MB
+                className="w-full"
+              />
+            </div>
           </div>
           <div className="flex flex-col">
-            {!state.right && (
-              <div className="mb-3">
-                <FileInput
-                  onFileLoad={(content) => {
-                    updateState({ right: content });
-                  }}
-                  accept=".txt,text/plain"
-                  maxSize={50 * 1024 * 1024} // 50MB
-                  className="w-full"
-                />
-              </div>
-            )}
-            {state.right && (
-              <div className="mb-2 flex items-center justify-between">
-                <FileInputButton
-                  onFileLoad={(content) => {
-                    updateState({ right: content });
-                  }}
-                  accept=".txt,text/plain"
-                  maxSize={50 * 1024 * 1024}
-                  className="text-xs px-2 py-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                >
-                  Load File
-                </FileInputButton>
-              </div>
-            )}
             <EditorPanel
               title="Modified"
               value={state.right}
               onChange={(val) => updateState({ right: val })}
               className="h-60"
             />
+            <div className="mt-3">
+              <FileInput
+                onFileLoad={(content) => {
+                  updateState({ right: content });
+                }}
+                accept=".txt,text/plain"
+                maxSize={50 * 1024 * 1024} // 50MB
+                className="w-full"
+              />
+            </div>
           </div>
         </div>
 
