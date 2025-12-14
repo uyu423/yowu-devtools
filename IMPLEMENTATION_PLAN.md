@@ -6,13 +6,12 @@
 
 ## 1. 프로젝트 현황
 
-- **상태**: Phase 2 완료 (UI Scaffolding & Architecture Setup)
-- **현재 버전**: v0.1.0 (UI Only)
+- **상태**: Phase 3 완료 (Logic Implementation), Phase 4 부분 완료
+- **현재 버전**: v1.0.0 (Core Features Complete)
 - **주요 변경점**:
-  - 그룹별 Width 최적화 적용
-  - 사이드바 UI 개선 (로고, 이스터에그, 테마 토글)
-  - `sonner` Toast 라이브러리 추가
-  - `useTitle` 훅 추가
+  - Phase 3: 모든 도구 기능 구현 완료 (JSON, URL, Base64, Time, YAML, Diff, Cron)
+  - Phase 4: CI/CD 및 배포 설정 완료
+  - 남은 작업: Command Palette (Ctrl+K) 구현, manifest.json 추가
 
 ---
 
@@ -127,6 +126,7 @@ src/
 ### Phase 4: 마무리기능 및 배포 (Polish & Deploy)
 
 - [ ] **Command Palette**: `Ctrl+K` 툴 검색 구현
-- [ ] **Metadata**: `manifest.json`, Favicon, Title 설정
-- [ ] **CI/CD**: GitHub Actions (`.github/workflows/deploy.yml`) 작성
-- [ ] **Deployment**: GitHub Pages 배포 확인 및 Custom Domain 설정
+- [x] **Metadata**: Favicon, Title, Meta Tags 설정 완료
+  - [ ] `manifest.json` 추가 (PWA 지원용, 선택사항)
+- [x] **CI/CD**: GitHub Actions (`.github/workflows/deploy.yml`) 작성 완료
+- [x] **Deployment**: GitHub Pages 배포 확인 및 Custom Domain 설정 완료 (`dist/CNAME` 확인)

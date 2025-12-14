@@ -15,68 +15,178 @@ interface ToolInfo {
 
 // 도구 정보 (SEO 최적화된 상세 정보 포함)
 const tools: ToolInfo[] = [
-  { 
-    id: 'json', 
-    path: '/json', 
-    title: 'JSON Viewer', 
+  {
+    id: 'json',
+    path: '/json',
+    title: 'JSON Viewer',
     description: 'Pretty print and traverse JSON',
-    seoDescription: 'Free online JSON viewer, formatter, and validator. Pretty print JSON with syntax highlighting, tree view, search, and copy features. All processing happens in your browser - no data sent to servers.',
-    keywords: ['json viewer', 'json formatter', 'json prettifier', 'json validator', 'json parser', 'json tree', 'json beautifier', 'online json tool'],
-    features: ['Pretty print JSON', 'Tree view navigation', 'Search and highlight', 'Minify JSON', 'Sort keys', 'Copy formatted JSON']
+    seoDescription:
+      'Free online JSON viewer, formatter, and validator. Pretty print JSON with syntax highlighting, tree view, search, and copy features. All processing happens in your browser - no data sent to servers.',
+    keywords: [
+      'json viewer',
+      'json formatter',
+      'json prettifier',
+      'json validator',
+      'json parser',
+      'json tree',
+      'json beautifier',
+      'online json tool',
+    ],
+    features: [
+      'Pretty print JSON',
+      'Tree view navigation',
+      'Search and highlight',
+      'Minify JSON',
+      'Sort keys',
+      'Copy formatted JSON',
+    ],
   },
-  { 
-    id: 'url', 
-    path: '/url', 
-    title: 'URL Encoder', 
+  {
+    id: 'url',
+    path: '/url',
+    title: 'URL Encoder',
     description: 'Encode/Decode URL strings',
-    seoDescription: 'Free URL encoder and decoder tool. Encode special characters in URLs, decode URL-encoded strings, and handle query parameters safely. Client-side processing ensures your data stays private.',
-    keywords: ['url encoder', 'url decoder', 'url encode', 'url decode', 'percent encoding', 'url encoding tool', 'query string encoder'],
-    features: ['URL encoding', 'URL decoding', 'Query parameter encoding', 'Plus sign for spaces option', 'Real-time conversion']
+    seoDescription:
+      'Free URL encoder and decoder tool. Encode special characters in URLs, decode URL-encoded strings, and handle query parameters safely. Client-side processing ensures your data stays private.',
+    keywords: [
+      'url encoder',
+      'url decoder',
+      'url encode',
+      'url decode',
+      'percent encoding',
+      'url encoding tool',
+      'query string encoder',
+    ],
+    features: [
+      'URL encoding',
+      'URL decoding',
+      'Query parameter encoding',
+      'Plus sign for spaces option',
+      'Real-time conversion',
+    ],
   },
-  { 
-    id: 'base64', 
-    path: '/base64', 
-    title: 'Base64', 
+  {
+    id: 'base64',
+    path: '/base64',
+    title: 'Base64',
     description: 'Base64 Encode/Decode',
-    seoDescription: 'Free Base64 encoder and decoder. Convert text to Base64 and vice versa. Supports UTF-8 encoding, URL-safe Base64, and handles Unicode characters. All processing happens locally in your browser.',
-    keywords: ['base64 encoder', 'base64 decoder', 'base64 encode', 'base64 decode', 'base64url', 'base64 converter', 'text to base64'],
-    features: ['Base64 encoding', 'Base64 decoding', 'URL-safe Base64', 'UTF-8 support', 'Unicode handling', 'Input/output swap']
+    seoDescription:
+      'Free Base64 encoder and decoder. Convert text to Base64 and vice versa. Supports UTF-8 encoding, URL-safe Base64, and handles Unicode characters. All processing happens locally in your browser.',
+    keywords: [
+      'base64 encoder',
+      'base64 decoder',
+      'base64 encode',
+      'base64 decode',
+      'base64url',
+      'base64 converter',
+      'text to base64',
+    ],
+    features: [
+      'Base64 encoding',
+      'Base64 decoding',
+      'URL-safe Base64',
+      'UTF-8 support',
+      'Unicode handling',
+      'Input/output swap',
+    ],
   },
-  { 
-    id: 'time', 
-    path: '/time', 
-    title: 'Time Converter', 
+  {
+    id: 'time',
+    path: '/time',
+    title: 'Time Converter',
     description: 'Epoch <-> ISO converter',
-    seoDescription: 'Free epoch timestamp converter. Convert Unix timestamps (epoch time) to human-readable dates and vice versa. Supports milliseconds and seconds, local time and UTC. Perfect for developers working with timestamps.',
-    keywords: ['epoch converter', 'unix timestamp', 'timestamp converter', 'epoch to date', 'date to epoch', 'unix time converter', 'iso 8601 converter'],
-    features: ['Epoch to ISO conversion', 'ISO to epoch conversion', 'Milliseconds and seconds support', 'Local and UTC timezone', 'Current time button']
+    seoDescription:
+      'Free epoch timestamp converter. Convert Unix timestamps (epoch time) to human-readable dates and vice versa. Supports milliseconds and seconds, local time and UTC. Perfect for developers working with timestamps.',
+    keywords: [
+      'epoch converter',
+      'unix timestamp',
+      'timestamp converter',
+      'epoch to date',
+      'date to epoch',
+      'unix time converter',
+      'iso 8601 converter',
+    ],
+    features: [
+      'Epoch to ISO conversion',
+      'ISO to epoch conversion',
+      'Milliseconds and seconds support',
+      'Local and UTC timezone',
+      'Current time button',
+    ],
   },
-  { 
-    id: 'yaml', 
-    path: '/yaml', 
-    title: 'YAML Converter', 
+  {
+    id: 'yaml',
+    path: '/yaml',
+    title: 'YAML Converter',
     description: 'YAML <-> JSON converter',
-    seoDescription: 'Free YAML to JSON converter and vice versa. Convert between YAML and JSON formats instantly. Includes error detection with line and column numbers. All conversion happens in your browser for maximum privacy.',
-    keywords: ['yaml to json', 'json to yaml', 'yaml converter', 'yaml parser', 'yaml formatter', 'yaml json converter', 'yaml validator'],
-    features: ['YAML to JSON conversion', 'JSON to YAML conversion', 'Bidirectional conversion', 'Error detection with line numbers', 'Customizable indentation']
+    seoDescription:
+      'Free YAML to JSON converter and vice versa. Convert between YAML and JSON formats instantly. Includes error detection with line and column numbers. All conversion happens in your browser for maximum privacy.',
+    keywords: [
+      'yaml to json',
+      'json to yaml',
+      'yaml converter',
+      'yaml parser',
+      'yaml formatter',
+      'yaml json converter',
+      'yaml validator',
+    ],
+    features: [
+      'YAML to JSON conversion',
+      'JSON to YAML conversion',
+      'Bidirectional conversion',
+      'Error detection with line numbers',
+      'Customizable indentation',
+    ],
   },
-  { 
-    id: 'diff', 
-    path: '/diff', 
-    title: 'Text Diff', 
+  {
+    id: 'diff',
+    path: '/diff',
+    title: 'Text Diff',
     description: 'Compare two texts',
-    seoDescription: 'Free text diff tool. Compare two text blocks side-by-side or in unified view. Highlight differences, ignore whitespace or case, and export unified diff format. Perfect for code reviews and text comparison.',
-    keywords: ['text diff', 'diff tool', 'text compare', 'diff checker', 'text difference', 'unified diff', 'side by side diff'],
-    features: ['Side-by-side comparison', 'Unified diff view', 'Ignore whitespace option', 'Ignore case option', 'Character-level diff statistics', 'Export unified diff']
+    seoDescription:
+      'Free text diff tool. Compare two text blocks side-by-side or in unified view. Highlight differences, ignore whitespace or case, and export unified diff format. Perfect for code reviews and text comparison.',
+    keywords: [
+      'text diff',
+      'diff tool',
+      'text compare',
+      'diff checker',
+      'text difference',
+      'unified diff',
+      'side by side diff',
+    ],
+    features: [
+      'Side-by-side comparison',
+      'Unified diff view',
+      'Ignore whitespace option',
+      'Ignore case option',
+      'Character-level diff statistics',
+      'Export unified diff',
+    ],
   },
-  { 
-    id: 'cron', 
-    path: '/cron', 
-    title: 'Cron Parser', 
+  {
+    id: 'cron',
+    path: '/cron',
+    title: 'Cron Parser',
     description: 'Cron expression explainer',
-    seoDescription: 'Free cron expression parser and validator. Understand cron expressions with human-readable descriptions. View next execution times, validate cron syntax, and learn cron format. Supports 5-field and 6-field cron expressions.',
-    keywords: ['cron parser', 'cron expression', 'cron validator', 'cron generator', 'cron schedule', 'cron explainer', 'cron calculator'],
-    features: ['Cron expression parsing', 'Human-readable descriptions', 'Next execution times', '5-field and 6-field support', 'Timezone support', 'Syntax validation']
+    seoDescription:
+      'Free cron expression parser and validator. Understand cron expressions with human-readable descriptions. View next execution times, validate cron syntax, and learn cron format. Supports 5-field and 6-field cron expressions.',
+    keywords: [
+      'cron parser',
+      'cron expression',
+      'cron validator',
+      'cron generator',
+      'cron schedule',
+      'cron explainer',
+      'cron calculator',
+    ],
+    features: [
+      'Cron expression parsing',
+      'Human-readable descriptions',
+      'Next execution times',
+      '5-field and 6-field support',
+      'Timezone support',
+      'Syntax validation',
+    ],
   },
 ];
 
@@ -99,28 +209,28 @@ export function generateRoutes(): Plugin {
       function generateToolHtml(tool: ToolInfo, baseHtml: string): string {
         const toolUrl = `https://tools.yowu.dev${tool.path}`;
         const keywordsStr = tool.keywords.join(', ');
-        
+
         // 구조화된 데이터 (JSON-LD) 생성
         const structuredData = {
-          "@context": "https://schema.org",
-          "@type": "WebApplication",
-          "name": `${tool.title} - tools.yowu.dev`,
-          "url": toolUrl,
-          "applicationCategory": "DeveloperApplication",
-          "operatingSystem": "Web",
-          "description": tool.seoDescription,
-          "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "USD"
+          '@context': 'https://schema.org',
+          '@type': 'WebApplication',
+          name: `${tool.title} - tools.yowu.dev`,
+          url: toolUrl,
+          applicationCategory: 'DeveloperApplication',
+          operatingSystem: 'Web',
+          description: tool.seoDescription,
+          offers: {
+            '@type': 'Offer',
+            price: '0',
+            priceCurrency: 'USD',
           },
-          "featureList": tool.features,
-          "creator": {
-            "@type": "Person",
-            "name": "yowu"
-          }
+          featureList: tool.features,
+          creator: {
+            '@type': 'Person',
+            name: 'yowu',
+          },
         };
-        
+
         // 메타 태그 생성
         const metaTags = `
     <title>${tool.title} - tools.yowu.dev</title>
@@ -137,45 +247,52 @@ export function generateRoutes(): Plugin {
     <meta name="twitter:title" content="${tool.title} - tools.yowu.dev" />
     <meta name="twitter:description" content="${tool.seoDescription}" />
     <meta name="twitter:image" content="https://tools.yowu.dev/opengraph.png" />
-    <script type="application/ld+json">${JSON.stringify(structuredData, null, 2)}</script>
+    <script type="application/ld+json">${JSON.stringify(
+      structuredData,
+      null,
+      2
+    )}</script>
   `;
-        
+
         // 기존 head 태그에 메타 태그 추가
-        let modifiedHtml = baseHtml.replace(
+        const modifiedHtml = baseHtml.replace(
           /<head>([\s\S]*?)<\/head>/i,
           (_match, headContent) => {
             // 기존 title과 meta description, 구조화된 데이터 제거 (있는 경우)
-            let cleanedHead = headContent
+            const cleanedHead = headContent
               .replace(/<title>.*?<\/title>/gi, '')
               .replace(/<meta\s+name=["']description["'][^>]*>/gi, '')
               .replace(/<meta\s+name=["']keywords["'][^>]*>/gi, '')
               .replace(/<link\s+rel=["']canonical["'][^>]*>/gi, '')
               .replace(/<meta\s+property=["']og:[^>]*>/gi, '')
               .replace(/<meta\s+name=["']twitter:[^>]*>/gi, '')
-              .replace(/<script\s+type=["']application\/ld\+json["'][^>]*>[\s\S]*?<\/script>/gi, '');
-            
+              .replace(
+                /<script\s+type=["']application\/ld\+json["'][^>]*>[\s\S]*?<\/script>/gi,
+                ''
+              );
+
             // 메타 태그를 head 시작 부분에 삽입
             return `<head>${metaTags.trim()}${cleanedHead}</head>`;
           }
         );
-        
+
         return modifiedHtml;
       }
 
       // 각 도구 경로에 대해 디렉토리 생성 및 HTML 파일 복사
-      tools.forEach(tool => {
+      tools.forEach((tool) => {
         const toolDir = path.join(distDir, tool.path.slice(1)); // '/json' -> 'json'
-        
+
         // 디렉토리 생성
         if (!fs.existsSync(toolDir)) {
           fs.mkdirSync(toolDir, { recursive: true });
         }
-        
+
         // HTML 파일 생성
         const toolHtml = generateToolHtml(tool, indexHtml);
         const toolHtmlPath = path.join(toolDir, 'index.html');
         fs.writeFileSync(toolHtmlPath, toolHtml, 'utf-8');
-        
+
         console.log(`✅ Generated: ${tool.path}/index.html`);
       });
 
@@ -218,12 +335,16 @@ export function generateRoutes(): Plugin {
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
-${tools.map(tool => `  <url>
+${tools
+  .map(
+    (tool) => `  <url>
     <loc>https://tools.yowu.dev${tool.path}</loc>
     <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-  </url>`).join('\n')}
+  </url>`
+  )
+  .join('\n')}
 </urlset>`;
 
       fs.writeFileSync(path.join(distDir, 'sitemap.xml'), sitemap, 'utf-8');
@@ -247,8 +368,9 @@ Sitemap: https://tools.yowu.dev/sitemap.xml`;
       fs.writeFileSync(path.join(distDir, 'CNAME'), cname, 'utf-8');
       console.log(`✅ Generated: CNAME (${cname})`);
 
-      console.log('\n🎉 All route HTML files and SEO files generated successfully!');
+      console.log(
+        '\n🎉 All route HTML files and SEO files generated successfully!'
+      );
     },
   };
 }
-

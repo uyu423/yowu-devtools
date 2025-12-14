@@ -611,6 +611,14 @@ export type ToolDefinition<TState> = {
   - 다크 모드 완전 지원 (모든 컴포넌트 및 도구)
 
 - **v1.1** (2025-12-14):
+
   - 사이드바 UI 개선: 로고(yowu.dev) 추가, GitHub 링크 위치 변경, 이스터에그 뱃지 추가
   - UX 강화: Toast 알림(`sonner`), 실시간 변환, 동적 타이틀, 그룹별 Width 전략 적용
   - 프로젝트명 변경: `yowu-devtools` → `tools.yowu.dev`
+
+- **v1.0.0** (2025-01-XX):
+  - 초기 릴리스: Phase 0~3 완료
+  - 7개 핵심 도구 구현 완료 (JSON Viewer, URL Encoder, Base64 Converter, Time Converter, YAML Converter, Text Diff, Cron Parser)
+  - 공통 기능 구현: 상태 저장/복원, URL 공유, 테마 지원, Toast 알림
+  - CI/CD 및 GitHub Pages 배포 설정 완료
+  - SEO 최적화: BrowserRouter, 도구별 HTML 파일 생성, sitemap.xml, robots.txt
