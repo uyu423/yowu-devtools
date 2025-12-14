@@ -206,7 +206,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
 
       {/* Footer / Theme Toggle */}
       <div className="p-4 border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 transition-colors">
-        <div className="flex items-center justify-between bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+        <div className="flex items-center justify-between bg-gray-100 dark:bg-gray-800 rounded-lg p-1 mb-2">
            <button 
              onClick={() => setTheme('light')}
              className={cn(
@@ -243,6 +243,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
            >
              <Moon className="w-3.5 h-3.5" />
            </button>
+        </div>
+        {/* Version Display */}
+        <div className="text-center">
+          <span className="text-[10px] text-gray-500 dark:text-gray-400 font-mono">
+            v{import.meta.env.APP_VERSION || '1.2.0'}
+          </span>
         </div>
       </div>
     </div>

@@ -1,6 +1,5 @@
 import React from 'react';
 import { X, Share2, AlertTriangle } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 interface ShareModalProps {
   isOpen: boolean;
