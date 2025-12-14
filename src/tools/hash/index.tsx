@@ -44,7 +44,7 @@ const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
 };
 
 const HashTool: React.FC = () => {
-  useTitle('Hash/Checksum Generator');
+  useTitle('Hash Generator');
   const { state, updateState, resetState, shareState } = useToolState<HashToolState>(
     'hash',
     DEFAULT_STATE,
@@ -153,22 +153,13 @@ const HashTool: React.FC = () => {
   return (
     <div className="flex flex-col h-full p-4 md:p-6 max-w-5xl mx-auto">
       <ToolHeader
-        title="Hash/Checksum Generator"
-        description="Calculate hash values (SHA-256, SHA-1, SHA-384, SHA-512) and HMAC signatures"
+        title="Hash Generator"
+        description="Calculate hash values and HMAC signatures"
         onReset={resetState}
         onShare={shareState}
       />
 
-      {/* Security Warning */}
-      <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-        <p className="text-sm text-amber-800 dark:text-amber-200">
-          <strong>Note:</strong> This tool is for checksum verification and data integrity checks only.
-          It is not suitable for security purposes (e.g., password hashing). Use proper cryptographic
-          libraries for security-critical applications.
-        </p>
-      </div>
-
-      {error && <ErrorBanner message={error} />}
+      {error && <ErrorBanner message={error} className="mb-4" />}
 
       {/* Input */}
       <div className="mb-4">
@@ -182,10 +173,10 @@ const HashTool: React.FC = () => {
       </div>
 
       {/* Options */}
-      <div className="mb-4 space-y-3">
-        <div className="flex flex-wrap gap-4">
+      <div className="mb-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+        <div className="flex flex-wrap items-end gap-4">
           <OptionLabel tooltip="Select hash algorithm">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
               Algorithm
             </label>
             <select
@@ -201,13 +192,13 @@ const HashTool: React.FC = () => {
               <option value="SHA-1">SHA-1</option>
               <option value="SHA-384">SHA-384</option>
               <option value="SHA-512">SHA-512</option>
-              <option value="MD5">MD5 (Not supported by WebCrypto)</option>
+              <option value="MD5">MD5 (Not supported)</option>
             </select>
           </OptionLabel>
 
-          <OptionLabel tooltip="Select output format (Hex or Base64)">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Output Format
+          <OptionLabel tooltip="Select output format">
+            <label className="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
+              Format
             </label>
             <select
               value={state.outputFormat}
@@ -223,22 +214,22 @@ const HashTool: React.FC = () => {
             </select>
           </OptionLabel>
 
-          <OptionLabel tooltip="Enable HMAC (Hash-based Message Authentication Code)">
-            <label className="flex items-center cursor-pointer">
+          <OptionLabel tooltip="Enable HMAC authentication">
+            <label className="flex items-center cursor-pointer pt-6">
               <input
                 type="checkbox"
                 checked={state.hmac}
                 onChange={(e) => updateState({ hmac: e.target.checked })}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                className="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-0 cursor-pointer"
               />
-              <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Enable HMAC</span>
+              <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">HMAC</span>
             </label>
           </OptionLabel>
         </div>
 
         {state.hmac && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <label className="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
               HMAC Key
             </label>
             <input
@@ -253,10 +244,10 @@ const HashTool: React.FC = () => {
       </div>
 
       {/* Output */}
-      <div className="mb-4">
-        <div className="flex items-center justify-between mb-2">
+      <div className="flex-1 min-h-0 flex flex-col">
+        <div className="flex items-center justify-between mb-2 shrink-0">
           <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            Hash Result {isCalculating && <span className="text-gray-500">(Calculating...)</span>}
+            Result {isCalculating && <span className="text-gray-500 font-normal">(Calculating...)</span>}
           </label>
           <button
             onClick={handleCopy}
@@ -267,13 +258,23 @@ const HashTool: React.FC = () => {
             <Copy className="w-4 h-4" />
           </button>
         </div>
-        <EditorPanel
-          value={hashResult || (isCalculating ? 'Calculating...' : '')}
-          onChange={() => {}} // Read-only
-          placeholder="Hash result will appear here..."
-          mode="text"
-          readOnly={true}
-        />
+        <div className="flex-1 min-h-0">
+          <EditorPanel
+            value={hashResult || (isCalculating ? 'Calculating...' : '')}
+            onChange={() => {}} // Read-only
+            placeholder="Hash result will appear here..."
+            mode="text"
+            readOnly={true}
+            className="h-full"
+          />
+        </div>
+      </div>
+
+      {/* Security Note */}
+      <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <p className="text-xs text-gray-500 dark:text-gray-400">
+          <strong className="text-gray-700 dark:text-gray-300">Note:</strong> For checksum verification only. Not suitable for security purposes.
+        </p>
       </div>
     </div>
   );
@@ -281,8 +282,8 @@ const HashTool: React.FC = () => {
 
 export const hashTool: ToolDefinition<HashToolState> = {
   id: 'hash',
-  title: 'Hash/Checksum Generator',
-  description: 'Calculate hash values (SHA-256, SHA-1, SHA-384, SHA-512) and HMAC signatures',
+  title: 'Hash Generator',
+  description: 'Calculate hash values and HMAC signatures',
   path: '/hash',
   icon: Hash,
   keywords: [
