@@ -1,5 +1,46 @@
 # Release Notes
 
+## v1.2.1 (January 2025) - Regex & Hash Enhancement
+
+**New Features:**
+
+- ✨ **Regex Tester**: Test and visualize regular expressions
+  - Pattern matching with visual highlights (full matches and capture groups)
+  - Named capture groups support (`(?<name>...)`)
+  - Group-specific color coding (same group = same color across matches)
+  - Replacement preview with `$1`, `$2`, `$<name>` support
+  - Flags toggle (g, i, m, s, u, y, d, v)
+  - Match list panel with click-to-scroll functionality
+  - Performance protection (debounce, backtracking warnings)
+  - JavaScript RegExp engine (browser-native)
+
+**Enhancements:**
+
+- 🚀 **Hash/HMAC Generator Improvements**:
+  - File hash support: Calculate hash for files (drag & drop or file picker)
+  - Base64URL encoding option added (hex, base64, base64url)
+  - HMAC key encoding options (raw-text, hex, base64)
+  - Random key generation button (WebCrypto generateKey)
+  - HMAC verification section: Enter expected MAC → shows match status (OK/Fail)
+  - File metadata display (name, size, lastModified)
+  - Processing status indicator (loading spinner, progress for large files)
+  - Security enhancement: HMAC keys are NOT saved to share links/localStorage by default
+  - Algorithm cleanup: SHA-256 and SHA-512 only (removed MD5, SHA-1, SHA-384)
+
+**Improvements:**
+
+- 🔒 Enhanced security for HMAC keys (not shared by default)
+- 📁 File-based workflow for hash calculation
+- 🎨 Better visual feedback for regex matches and groups
+- ⚡ Performance optimizations for regex testing
+
+**Technical:**
+
+- Extended Hash tool state schema for file support
+- Regex tool implementation with overlay highlighting
+- HMAC key security policy implementation
+- File reading via `file.arrayBuffer()` API
+
 ## v1.2.0 (December 2024) - Power-user Release
 
 **New Features:**

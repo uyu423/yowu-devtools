@@ -1,0 +1,329 @@
+{
+  "features": {
+    "characterClasses": {
+      "name": "Character Classes",
+      "description": "Predefined character sets for matching specific types of characters",
+      "patterns": [
+        {
+          "pattern": "\\\\d",
+          "name": "Digit",
+          "description": "Matches any digit (0-9). Equivalent to [0-9].",
+          "example": "\\d+ matches one or more digits"
+        },
+        {
+          "pattern": "\\\\D",
+          "name": "Non-digit",
+          "description": "Matches any character that is not a digit. Equivalent to [^0-9].",
+          "example": "\\D+ matches one or more non-digit characters"
+        },
+        {
+          "pattern": "\\\\w",
+          "name": "Word Character",
+          "description": "Matches any word character (alphanumeric plus underscore). Equivalent to [A-Za-z0-9_].",
+          "example": "\\w+ matches one or more word characters"
+        },
+        {
+          "pattern": "\\\\W",
+          "name": "Non-word Character",
+          "description": "Matches any non-word character. Equivalent to [^A-Za-z0-9_].",
+          "example": "\\W+ matches one or more non-word characters"
+        },
+        {
+          "pattern": "\\\\s",
+          "name": "Whitespace",
+          "description": "Matches any whitespace character (space, tab, newline, etc.).",
+          "example": "\\s+ matches one or more whitespace characters"
+        },
+        {
+          "pattern": "\\\\S",
+          "name": "Non-whitespace",
+          "description": "Matches any non-whitespace character.",
+          "example": "\\S+ matches one or more non-whitespace characters"
+        },
+        {
+          "pattern": "\\\\.",
+          "name": "Dot (Escaped)",
+          "description": "Matches a literal dot character. The dot (.) without escape matches any character except newline.",
+          "example": "\\. matches a literal dot"
+        },
+        {
+          "pattern": "\\\\n",
+          "name": "Newline",
+          "description": "Matches a newline character.",
+          "example": "\\n matches a newline"
+        },
+        {
+          "pattern": "\\\\t",
+          "name": "Tab",
+          "description": "Matches a tab character.",
+          "example": "\\t matches a tab"
+        },
+        {
+          "pattern": "\\\\r",
+          "name": "Carriage Return",
+          "description": "Matches a carriage return character.",
+          "example": "\\r matches a carriage return"
+        }
+      ]
+    },
+    "quantifiers": {
+      "name": "Quantifiers",
+      "description": "Specify how many times a character, group, or character class should be matched",
+      "patterns": [
+        {
+          "pattern": "\\*",
+          "name": "Zero or More",
+          "description": "Matches zero or more occurrences of the preceding element.",
+          "example": "a* matches zero or more 'a' characters"
+        },
+        {
+          "pattern": "\\+",
+          "name": "One or More",
+          "description": "Matches one or more occurrences of the preceding element.",
+          "example": "a+ matches one or more 'a' characters"
+        },
+        {
+          "pattern": "\\?",
+          "name": "Zero or One",
+          "description": "Matches zero or one occurrence of the preceding element (makes it optional).",
+          "example": "a? matches zero or one 'a' character"
+        },
+        {
+          "pattern": "\\{[0-9]+\\}",
+          "name": "Exactly N",
+          "description": "Matches exactly n occurrences of the preceding element.",
+          "example": "a{3} matches exactly three 'a' characters"
+        },
+        {
+          "pattern": "\\{[0-9]+,\\}",
+          "name": "N or More",
+          "description": "Matches n or more occurrences of the preceding element.",
+          "example": "a{3,} matches three or more 'a' characters"
+        },
+        {
+          "pattern": "\\{[0-9]+,[0-9]+\\}",
+          "name": "Between N and M",
+          "description": "Matches between n and m occurrences of the preceding element.",
+          "example": "a{3,5} matches between three and five 'a' characters"
+        },
+        {
+          "pattern": "\\*\\?",
+          "name": "Lazy Zero or More",
+          "description": "Non-greedy (lazy) version of *. Matches as few characters as possible.",
+          "example": "a*? matches zero or more 'a' characters (lazy)"
+        },
+        {
+          "pattern": "\\+\\?",
+          "name": "Lazy One or More",
+          "description": "Non-greedy (lazy) version of +. Matches as few characters as possible.",
+          "example": "a+? matches one or more 'a' characters (lazy)"
+        },
+        {
+          "pattern": "\\?\\?",
+          "name": "Lazy Zero or One",
+          "description": "Non-greedy (lazy) version of ?.",
+          "example": "a?? matches zero or one 'a' character (lazy)"
+        }
+      ]
+    },
+    "anchors": {
+      "name": "Anchors",
+      "description": "Assert positions in the string without consuming characters",
+      "patterns": [
+        {
+          "pattern": "^",
+          "name": "Start of String",
+          "description": "Matches the start of the string (or start of line with 'm' flag).",
+          "example": "^abc matches 'abc' at the start of the string"
+        },
+        {
+          "pattern": "$",
+          "name": "End of String",
+          "description": "Matches the end of the string (or end of line with 'm' flag).",
+          "example": "abc$ matches 'abc' at the end of the string"
+        },
+        {
+          "pattern": "\\\\b",
+          "name": "Word Boundary",
+          "description": "Matches a word boundary (between a word character and a non-word character).",
+          "example": "\\bword\\b matches 'word' as a whole word"
+        },
+        {
+          "pattern": "\\\\B",
+          "name": "Non-word Boundary",
+          "description": "Matches a position that is not a word boundary.",
+          "example": "\\Bword\\B matches 'word' not at word boundaries"
+        }
+      ]
+    },
+    "groups": {
+      "name": "Groups",
+      "description": "Group parts of a pattern together and capture or reference them",
+      "patterns": [
+        {
+          "pattern": "\\([^?]",
+          "name": "Capturing Group",
+          "description": "Groups and captures the matched text. Can be referenced with $1, $2, etc.",
+          "example": "(abc) captures 'abc' as group 1"
+        },
+        {
+          "pattern": "\\(\\?:",
+          "name": "Non-capturing Group",
+          "description": "Groups without capturing. Useful for applying quantifiers without creating a capture group.",
+          "example": "(?:abc) groups 'abc' without capturing"
+        },
+        {
+          "pattern": "\\(\\?<[a-zA-Z_][a-zA-Z0-9_]*>",
+          "name": "Named Capturing Group",
+          "description": "Creates a named capture group that can be referenced by name.",
+          "example": "(?<name>abc) captures 'abc' as group named 'name'"
+        },
+        {
+          "pattern": "\\(\\?=",
+          "name": "Positive Lookahead",
+          "description": "Asserts that what follows matches the pattern, but doesn't consume characters.",
+          "example": "abc(?=def) matches 'abc' only if followed by 'def'"
+        },
+        {
+          "pattern": "\\(\\?!",
+          "name": "Negative Lookahead",
+          "description": "Asserts that what follows does NOT match the pattern.",
+          "example": "abc(?!def) matches 'abc' only if NOT followed by 'def'"
+        },
+        {
+          "pattern": "\\(\\?<=",
+          "name": "Positive Lookbehind",
+          "description": "Asserts that what precedes matches the pattern, but doesn't consume characters.",
+          "example": "(?<=abc)def matches 'def' only if preceded by 'abc'"
+        },
+        {
+          "pattern": "\\(\\?<!",
+          "name": "Negative Lookbehind",
+          "description": "Asserts that what precedes does NOT match the pattern.",
+          "example": "(?<!abc)def matches 'def' only if NOT preceded by 'abc'"
+        },
+        {
+          "pattern": "\\\\[0-9]+",
+          "name": "Backreference",
+          "description": "References a previously captured group by number.",
+          "example": "(abc)\\1 matches 'abcabc'"
+        },
+        {
+          "pattern": "\\\\k<[a-zA-Z_][a-zA-Z0-9_]*>",
+          "name": "Named Backreference",
+          "description": "References a previously captured named group.",
+          "example": "(?<name>abc)\\k<name> matches 'abcabc'"
+        }
+      ]
+    },
+    "characterSets": {
+      "name": "Character Sets",
+      "description": "Match any one of a set of characters",
+      "patterns": [
+        {
+          "pattern": "\\[[^\\]]+\\]",
+          "name": "Character Class",
+          "description": "Matches any one character from the set. Use ^ at the start to negate.",
+          "example": "[abc] matches 'a', 'b', or 'c'"
+        },
+        {
+          "pattern": "\\[\\^[^\\]]+\\]",
+          "name": "Negated Character Class",
+          "description": "Matches any character NOT in the set.",
+          "example": "[^abc] matches any character except 'a', 'b', or 'c'"
+        },
+        {
+          "pattern": "\\[[^\\]]*-[^\\]]*\\]",
+          "name": "Character Range",
+          "description": "Matches a range of characters.",
+          "example": "[a-z] matches any lowercase letter"
+        }
+      ]
+    },
+    "flags": {
+      "name": "Flags",
+      "description": "Modify the behavior of the regular expression",
+      "patterns": [
+        {
+          "pattern": "g",
+          "name": "Global",
+          "description": "Find all matches rather than stopping after the first match.",
+          "example": "/pattern/g finds all occurrences"
+        },
+        {
+          "pattern": "i",
+          "name": "Case Insensitive",
+          "description": "Case-insensitive matching.",
+          "example": "/pattern/i matches 'Pattern', 'PATTERN', etc."
+        },
+        {
+          "pattern": "m",
+          "name": "Multiline",
+          "description": "Makes ^ and $ match the start/end of each line, not just the string.",
+          "example": "/^pattern$/m matches 'pattern' at the start of any line"
+        },
+        {
+          "pattern": "s",
+          "name": "DotAll",
+          "description": "Makes . match newline characters as well.",
+          "example": "/pattern./s allows . to match newlines"
+        },
+        {
+          "pattern": "u",
+          "name": "Unicode",
+          "description": "Enables full Unicode matching. Treats pattern as a sequence of Unicode code points.",
+          "example": "/\\u{1F600}/u matches Unicode emoji"
+        },
+        {
+          "pattern": "y",
+          "name": "Sticky",
+          "description": "Matches only from the index indicated by the lastIndex property.",
+          "example": "/pattern/y matches only at lastIndex"
+        },
+        {
+          "pattern": "d",
+          "name": "HasIndices",
+          "description": "Generates indices for substring matches.",
+          "example": "/pattern/d includes indices in match results"
+        },
+        {
+          "pattern": "v",
+          "name": "UnicodeSets",
+          "description": "Enables Unicode set mode with improved character class handling.",
+          "example": "/[\\p{Letter}]/v matches Unicode letter properties"
+        }
+      ]
+    },
+    "unicode": {
+      "name": "Unicode Features",
+      "description": "Unicode-specific matching capabilities",
+      "patterns": [
+        {
+          "pattern": "\\\\u[0-9A-Fa-f]{4}",
+          "name": "Unicode Escape",
+          "description": "Matches a Unicode character by its code point.",
+          "example": "\\u0041 matches 'A'"
+        },
+        {
+          "pattern": "\\\\u\\{[0-9A-Fa-f]+\\}",
+          "name": "Unicode Code Point",
+          "description": "Matches a Unicode character by its code point (requires 'u' flag).",
+          "example": "\\u{1F600} matches 😀"
+        },
+        {
+          "pattern": "\\\\p\\{[^}]+\\}",
+          "name": "Unicode Property",
+          "description": "Matches characters with a specific Unicode property (requires 'u' or 'v' flag).",
+          "example": "\\p{Letter} matches any Unicode letter"
+        },
+        {
+          "pattern": "\\\\P\\{[^}]+\\}",
+          "name": "Negated Unicode Property",
+          "description": "Matches characters without a specific Unicode property.",
+          "example": "\\P{Letter} matches any non-letter character"
+        }
+      ]
+    }
+  }
+}
+

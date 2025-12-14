@@ -25,6 +25,8 @@ An open toolbox for developers who would rather keep sensitive snippets on their
 - **PWA Polish** (v1.2.0): Extended shortcuts for all tools and screenshots support.
 - **Version Display** (v1.2.0): App version shown in sidebar footer.
 - **New Tools** (v1.2.0): Hash Generator, UUID/ULID Generator, and URL Parser added.
+- **Hash/HMAC Enhancement** (v1.2.1): File hash support, Base64URL encoding, HMAC key encoding options, random key generation, and verification section.
+- **Regex Tester** (v1.2.1): Test and visualize regular expressions with match highlighting, capture groups, and replacement preview.
 
 ## Release Notes
 
