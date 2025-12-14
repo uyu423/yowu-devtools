@@ -525,6 +525,13 @@ export type ToolDefinition<TState> = {
 - 최소 단축키 연결(Cmd/Ctrl+Enter, Copy)
 - localStorage 저장/복원 동작 확인
 - 공유 링크 재현 확인
+- **SEO 최적화** (필수):
+  - `vite-plugin-generate-routes.ts`의 `tools` 배열에 도구 정보 추가
+  - `seoDescription`: 150-160자, 주요 기능 포함, 프라이버시 강조
+  - `keywords`: 5-10개, 검색 가능성 높은 키워드
+  - `features`: 5-7개, 핵심 기능 목록
+  - 빌드 후 `dist/{tool-path}/index.html`에서 메타 태그 확인
+  - `dist/sitemap.xml`에 새 경로 추가 확인
 
 ---
 
@@ -569,6 +576,49 @@ export type ToolDefinition<TState> = {
   - `sitemap.xml`: 모든 페이지를 검색 엔진에 알림
   - `robots.txt`: 검색 엔진 크롤링 허용 및 sitemap 위치 지정
 - Vite 플러그인: `vite-plugin-generate-routes.ts`가 빌드 후 자동으로 라우트 HTML 생성
+
+#### 신규 도구 추가 시 SEO 최적화 필수 사항
+
+신규 도구를 추가할 때는 반드시 `vite-plugin-generate-routes.ts`의 `tools` 배열에 다음 정보를 포함해야 합니다:
+
+1. **필수 필드**:
+
+   - `id`: 도구 식별자 (소문자, 하이픈 사용)
+   - `path`: 라우트 경로 (`/tool-name` 형식)
+   - `title`: 도구 이름
+   - `description`: 짧은 설명
+   - `seoDescription`: SEO 최적화된 상세 설명 (150-160자 권장)
+   - `keywords`: 검색 키워드 배열 (5-10개 권장)
+   - `features`: 주요 기능 목록 (5-7개 권장)
+
+2. **SEO 설명 작성 원칙**:
+
+   - "Free" 또는 "Free online"으로 시작
+   - 주요 기능을 간결하게 나열
+   - "All processing happens in your browser" 등 프라이버시 강조
+   - 150-160자 이내로 작성
+
+3. **키워드 선택 원칙**:
+
+   - 사용자 검색 패턴 고려
+   - 동의어 및 변형어 포함
+   - 자연스러운 키워드 사용 (스터핑 방지)
+
+4. **자동 생성되는 SEO 요소**:
+
+   - Title 태그: `{title} - tools.yowu.dev`
+   - Meta description, keywords
+   - Canonical URL
+   - Open Graph 태그 (og:title, og:description, og:url, og:image)
+   - Twitter Card 태그
+   - JSON-LD 구조화된 데이터 (WebApplication 스키마)
+
+5. **검증**:
+   - `npm run build` 실행 후 `dist/{tool-path}/index.html` 확인
+   - `dist/sitemap.xml`에 새 경로 추가 확인
+   - 메타 태그가 올바르게 생성되었는지 확인
+
+자세한 가이드는 `AGENTS.md`의 "SEO 최적화 가이드" 섹션을 참조하세요.
 
 ---
 

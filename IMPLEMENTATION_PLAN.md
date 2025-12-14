@@ -131,3 +131,5 @@ src/
   - [ ] `manifest.json` 추가 (PWA 지원용, 선택사항)
 - [x] **CI/CD**: GitHub Actions (`.github/workflows/deploy.yml`) 작성 완료
 - [x] **Deployment**: GitHub Pages 배포 확인 및 Custom Domain 설정 완료 (`dist/CNAME` 확인)
+- [x] **SEO 최적화**: 각 도구별 HTML 파일 자동 생성 및 메타 태그 설정 완료
+  - 신규 도구 추가 시 `vite-plugin-generate-routes.ts`에 SEO 정보 필수 추가 (자세한 가이드는 `AGENTS.md` 참조)

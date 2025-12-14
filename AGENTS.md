@@ -32,3 +32,97 @@ Use Node 20+ / npm 10 to stay in sync with `package-lock.json`. Install dependen
 - Custom Vite plugin (`vite-plugin-generate-routes.ts`) handles route HTML generation
 - Each generated HTML includes tool-specific meta tags for search engine optimization
 - GitHub Pages handles SPA routing via `404.html` redirect script
+
+### SEO 최적화 가이드 (신규 메뉴 추가 시 필수)
+
+신규 도구를 추가할 때는 반드시 SEO 최적화를 위해 다음 단계를 수행해야 합니다:
+
+1. **`vite-plugin-generate-routes.ts`에 도구 정보 추가**
+   - 파일 상단의 `tools` 배열에 새 도구 정보를 추가합니다.
+   - 다음 필드들을 포함해야 합니다:
+     ```typescript
+     {
+       id: 'tool-id',              // 도구 ID (소문자, 하이픈 사용)
+       path: '/tool-path',          // 라우트 경로
+       title: 'Tool Name',          // 도구 이름
+       description: 'Short description',  // 짧은 설명
+       seoDescription: '...',       // SEO 최적화된 상세 설명 (150-160자 권장)
+       keywords: [                  // 검색 키워드 배열 (5-10개 권장)
+         'keyword1',
+         'keyword2',
+         // ...
+       ],
+       features: [                  // 주요 기능 목록
+         'Feature 1',
+         'Feature 2',
+         // ...
+       ],
+     }
+     ```
+
+2. **SEO 설명 작성 가이드**
+   - `seoDescription`: 150-160자 권장 (검색 결과에 표시됨)
+   - "Free" 또는 "Free online"으로 시작하여 무료 도구임을 명시
+   - 주요 기능을 간결하게 나열
+   - "All processing happens in your browser" 또는 "Client-side processing" 등 프라이버시 강조 문구 포함
+   - 예시:
+     ```
+     'Free online JSON viewer, formatter, and validator. Pretty print JSON with syntax highlighting, tree view, search, and copy features. All processing happens in your browser - no data sent to servers.'
+     ```
+
+3. **키워드 선택 가이드**
+   - 사용자가 검색할 가능성이 높은 키워드 포함
+   - 도구의 주요 기능을 나타내는 키워드
+   - 동의어 및 변형어 포함 (예: "encoder" / "encode", "converter" / "converter tool")
+   - 5-10개 권장, 너무 많으면 스팸으로 인식될 수 있음
+   - 예시:
+     ```typescript
+     keywords: [
+       'json viewer',
+       'json formatter',
+       'json prettifier',
+       'json validator',
+       'json parser',
+       'json tree',
+       'json beautifier',
+       'online json tool',
+     ]
+     ```
+
+4. **기능 목록 작성 가이드**
+   - 도구의 주요 기능을 간결하게 나열
+   - 사용자가 기대할 수 있는 핵심 기능 위주
+   - 5-7개 권장
+   - 예시:
+     ```typescript
+     features: [
+       'Pretty print JSON',
+       'Tree view navigation',
+       'Search and highlight',
+       'Minify JSON',
+       'Sort keys',
+       'Copy formatted JSON',
+     ]
+     ```
+
+5. **자동 생성되는 SEO 요소**
+   - 빌드 시 다음이 자동으로 생성됩니다:
+     - `<title>` 태그: `{title} - tools.yowu.dev`
+     - `<meta name="description">`: `seoDescription` 사용
+     - `<meta name="keywords">`: `keywords` 배열을 쉼표로 구분
+     - `<link rel="canonical">`: `https://tools.yowu.dev{path}`
+     - Open Graph 태그 (og:title, og:description, og:url, og:image)
+     - Twitter Card 태그 (twitter:title, twitter:description, twitter:image)
+     - JSON-LD 구조화된 데이터 (WebApplication 스키마)
+
+6. **검증 방법**
+   - `npm run build` 실행 후 `dist/{tool-path}/index.html` 파일 확인
+   - 생성된 HTML의 `<head>` 섹션에 모든 메타 태그가 포함되어 있는지 확인
+   - `dist/sitemap.xml`에 새 도구 경로가 추가되었는지 확인
+   - 브라우저 개발자 도구로 메타 태그 검증 (예: Open Graph Debugger)
+
+7. **주의사항**
+   - SEO 정보는 실제 도구 기능과 일치해야 함 (과장된 설명 금지)
+   - 키워드 스터핑 방지 (자연스러운 키워드 사용)
+   - 각 도구마다 고유한 `seoDescription`과 `keywords` 사용 (중복 방지)
+   - 빌드 후 반드시 생성된 HTML 파일 확인
