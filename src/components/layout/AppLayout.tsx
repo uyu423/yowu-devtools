@@ -1,0 +1,47 @@
+import React from 'react';
+import { Sidebar } from './Sidebar';
+import { Menu } from 'lucide-react';
+
+export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
+
+  return (
+    <div className="flex h-screen bg-gray-50 text-gray-900 overflow-hidden">
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-20 lg:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <div className={`
+        fixed inset-y-0 left-0 z-30 w-64 bg-white border-r transform transition-transform duration-200 ease-in-out lg:translate-x-0 lg:static
+        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+      `}>
+        <Sidebar onCloseMobile={() => setIsSidebarOpen(false)} />
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* Mobile Header */}
+        <div className="h-14 border-b bg-white flex items-center px-4 lg:hidden shrink-0">
+          <button 
+            onClick={() => setIsSidebarOpen(true)}
+            className="p-2 -ml-2 rounded-md hover:bg-gray-100"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+          <span className="ml-2 font-semibold">yowu-devtools</span>
+        </div>
+
+        {/* Scrollable Area */}
+        <main className="flex-1 overflow-auto">
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+};
+
