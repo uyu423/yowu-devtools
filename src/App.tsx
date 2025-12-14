@@ -19,7 +19,7 @@ function AppContent() {
   // 메인 페이지 타이틀 설정
   useEffect(() => {
     if (location.pathname === '/') {
-      document.title = "Free Online Developer Tools | Yowu's DevTools";
+      document.title = "Yowu's DevTools | Developer Tools";
     }
   }, [location.pathname]);
 
