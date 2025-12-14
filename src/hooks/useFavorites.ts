@@ -23,6 +23,8 @@ function saveFavorites(favorites: string[]): void {
   
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(favorites));
+    // Dispatch custom event to notify other components in the same tab
+    window.dispatchEvent(new CustomEvent('favorites-changed', { detail: favorites }));
   } catch (error) {
     console.error('Failed to save favorites:', error);
   }
@@ -70,7 +72,7 @@ export function useFavorites() {
     saveFavorites([]);
   }, []);
 
-  // localStorage 변경 감지 (다른 탭에서 변경된 경우)
+  // localStorage 변경 감지 (다른 탭에서 변경된 경우 + 같은 탭에서 변경된 경우)
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === STORAGE_KEY) {
@@ -78,8 +80,19 @@ export function useFavorites() {
       }
     };
 
+    const handleFavoritesChanged = (e: CustomEvent<string[]>) => {
+      setFavorites(e.detail);
+    };
+
+    // 다른 탭에서 변경된 경우
     window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    // 같은 탭에서 변경된 경우
+    window.addEventListener('favorites-changed', handleFavoritesChanged as EventListener);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('favorites-changed', handleFavoritesChanged as EventListener);
+    };
   }, []);
 
   return {
