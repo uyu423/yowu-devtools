@@ -12,6 +12,109 @@
 
 - `chrome-devtools` 혹은 `playwright` MCP 도구를 사용하여 직접 테스트
 
+## 테스트 데이터 디렉토리
+
+대형 입력 케이스 테스트를 위해 `test-data/` 디렉토리에 테스트 데이터 파일들이 준비되어 있습니다.
+
+### 사용 가능한 테스트 데이터
+
+- **`test-data/large-json.json`**: 대형 JSON 파일 (약 40-80MB)
+  - 10,000개의 중첩된 객체 포함
+  - JSON Viewer, YAML Converter 테스트에 사용
+- **`test-data/large-yaml.yaml`**: 대형 YAML 파일 (약 20MB)
+
+  - 5,000개의 아이템 포함
+  - YAML Converter 테스트에 사용
+
+- **`test-data/large-text-1.txt`**: 대형 텍스트 파일 1 (약 1MB)
+
+  - 10,000줄 이상의 텍스트
+  - Text Diff 테스트의 원본 파일로 사용
+
+- **`test-data/large-text-2.txt`**: 대형 텍스트 파일 2 (약 1MB)
+
+  - `large-text-1.txt`와 유사하지만 일부 수정된 버전
+  - Text Diff 테스트의 수정된 파일로 사용
+
+- **`test-data/large-base64.txt`**: 대형 Base64 인코딩된 데이터 (약 1MB)
+  - Base64 Encode/Decode 테스트에 사용
+
+### 테스트 데이터 사용 방법
+
+#### 방법 1: 파일 드래그 앤 드롭
+
+1. 브라우저에서 도구 페이지 열기
+2. 입력 필드에 `test-data/` 디렉토리의 파일을 드래그 앤 드롭
+3. 파일이 자동으로 로드되어 처리되는지 확인
+
+#### 방법 2: 파일 선택 버튼 (지원되는 경우)
+
+1. 도구의 입력 필드에서 파일 선택 버튼 클릭
+2. `test-data/` 디렉토리에서 해당 파일 선택
+3. 파일이 로드되어 처리되는지 확인
+
+#### 방법 3: 프로그래밍 방식 (MCP 브라우저 테스트)
+
+```javascript
+// 예시: JSON Viewer에서 큰 JSON 파일 로드
+// 방법 A: fetch로 파일 읽어서 입력 필드에 직접 입력
+const fileContent = await fetch('/test-data/large-json.json').then((r) =>
+  r.text()
+);
+document.querySelector('textarea').value = fileContent;
+// 입력 이벤트 트리거 (필요시)
+document
+  .querySelector('textarea')
+  .dispatchEvent(new Event('input', { bubbles: true }));
+
+// 방법 B: File API 사용 (파일 입력이 지원되는 경우)
+const fileInput = document.querySelector('input[type="file"]');
+const response = await fetch('/test-data/large-json.json');
+const blob = await response.blob();
+const file = new File([blob], 'large-json.json', { type: 'application/json' });
+const dataTransfer = new DataTransfer();
+dataTransfer.items.add(file);
+fileInput.files = dataTransfer.files;
+fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+```
+
+### 대형 입력 케이스 테스트 시나리오
+
+#### US-01: JSON Pretty Viewer (대형 데이터)
+
+- [ ] `test-data/large-json.json` 파일 로드 (약 2.3MB, Worker 경계: >1MB)
+- [ ] 파싱 성능 확인 (1MB 이상일 때 Web Worker 사용 여부)
+- [ ] Tree View 렌더링 성능 확인
+- [ ] UI 프리징 없이 처리되는지 확인
+- [ ] 브라우저 DevTools → Sources → Workers에서 Worker 활성화 확인
+
+#### US-05: YAML ↔ JSON 변환 (대형 데이터)
+
+- [ ] `test-data/large-yaml.yaml` 파일 로드 (약 604KB, Worker 경계: >500KB)
+- [ ] JSON 변환 성능 확인 (500KB 이상일 때 Web Worker 사용 여부)
+- [ ] UI 프리징 없이 처리되는지 확인
+- [ ] 브라우저 DevTools → Sources → Workers에서 Worker 활성화 확인
+
+#### US-06: Text Diff (대형 데이터)
+
+- [ ] `test-data/large-text-1.txt`와 `large-text-2.txt` 로드 (약 10,500줄, Worker 경계: >10,000줄)
+- [ ] Diff 계산 성능 확인 (10,000줄 이상일 때 Web Worker 사용 여부)
+- [ ] UI 프리징 없이 처리되는지 확인
+- [ ] 브라우저 DevTools → Sources → Workers에서 Worker 활성화 확인
+
+#### US-03: Base64 Encode/Decode (대형 데이터)
+
+- [ ] `test-data/large-base64.txt` 파일 로드 (약 1.4MB)
+- [ ] 디코딩 성능 확인
+- [ ] UI 프리징 없이 처리되는지 확인
+
+### 주의사항
+
+- 테스트 데이터 파일들은 Git에 포함되어 있어 프로젝트 클론 시 자동으로 사용할 수 있습니다.
+- 파일 크기가 크므로 브라우저 메모리 사용량에 주의하세요.
+- Web Worker가 활성화되어 있는지 확인하세요 (큰 데이터 처리 시).
+- 테스트 데이터 파일 상세 정보는 `test-data/README.md`를 참조하세요.
+
 ---
 
 ## 1. 기본 기능 테스트
@@ -42,6 +145,18 @@
 
   - [ ] Sample Data 버튼 클릭 시 예제 JSON 로드 확인
   - [ ] 로드된 데이터가 즉시 파싱되어 표시되는지 확인
+
+- [ ] **대형 데이터 처리 (Web Worker)**
+
+  - [ ] `test-data/large-json.json` 파일 로드 (약 2.3MB, Worker 경계: >1MB)
+  - [ ] 파싱 시 UI 프리징 없이 처리되는지 확인
+  - [ ] **Web Worker 활성화 검증**:
+    - [ ] 브라우저 DevTools 열기 (F12)
+    - [ ] Sources 탭 → Workers 섹션 확인
+    - [ ] `json-parser.worker.ts` Worker가 생성되었는지 확인
+    - [ ] 또는 Console에서 `performance.getEntriesByType('resource')` 실행하여 worker 스크립트 로드 확인
+  - [ ] Tree View 렌더링 성능 확인
+  - [ ] 로딩 인디케이터가 표시되는지 확인 (Worker 처리 중)
 
 - [ ] **검색 기능**
 
@@ -90,6 +205,12 @@
 
   - [ ] Swap 버튼 클릭 시 입력/출력 교체 확인
   - [ ] 교체 후 즉시 재변환되는지 확인
+
+- [ ] **대형 데이터 처리**
+
+  - [ ] `test-data/large-base64.txt` 파일 로드 (약 1MB)
+  - [ ] 디코딩 성능 확인
+  - [ ] UI 프리징 없이 처리되는지 확인
 
 - [ ] **복사 기능**
   - [ ] Copy 버튼 클릭 시 결과 복사 확인
@@ -177,6 +298,18 @@
   - [ ] 에러 메시지에 줄 번호/컬럼 정보 포함 확인
   - [ ] 잘못된 JSON 입력 시 에러 메시지 표시 확인
 
+- [ ] **대형 데이터 처리 (Web Worker)**
+
+  - [ ] `test-data/large-yaml.yaml` 파일 로드 (약 604KB, Worker 경계: >500KB)
+  - [ ] JSON 변환 시 UI 프리징 없이 처리되는지 확인
+  - [ ] **Web Worker 활성화 검증**:
+    - [ ] 브라우저 DevTools 열기 (F12)
+    - [ ] Sources 탭 → Workers 섹션 확인
+    - [ ] `yaml-converter.worker.ts` Worker가 생성되었는지 확인
+    - [ ] 또는 Console에서 `performance.getEntriesByType('resource')` 실행하여 worker 스크립트 로드 확인
+  - [ ] 변환 성능 확인
+  - [ ] 로딩 인디케이터가 표시되는지 확인 (Worker 처리 중)
+
 - [ ] **실시간 변환**
 
   - [ ] 입력 변경 시 즉시 변환 결과 업데이트 확인
@@ -215,6 +348,18 @@
 
   - [ ] 큰 텍스트(10,000줄 이상) 비교 시 Worker 사용 확인
   - [ ] UI 프리징 없는지 확인
+
+- [ ] **대형 데이터 처리 (Web Worker)**
+
+  - [ ] `test-data/large-text-1.txt`와 `large-text-2.txt` 파일 로드 (약 10,500줄, Worker 경계: >10,000줄)
+  - [ ] Diff 계산 시 UI 프리징 없이 처리되는지 확인
+  - [ ] **Web Worker 활성화 검증**:
+    - [ ] 브라우저 DevTools 열기 (F12)
+    - [ ] Sources 탭 → Workers 섹션 확인
+    - [ ] `diff-calculator.worker.ts` Worker가 생성되었는지 확인
+    - [ ] 또는 Console에서 `performance.getEntriesByType('resource')` 실행하여 worker 스크립트 로드 확인
+  - [ ] Diff 계산 성능 확인
+  - [ ] 로딩 인디케이터가 표시되는지 확인 (Worker 처리 중)
 
 - [ ] **복사 기능**
   - [ ] Copy 버튼 클릭 시 Diff 결과 복사 확인
@@ -677,17 +822,49 @@
 
 ### 테스트 환경
 
-- 날짜: ****\_\_\_****
-- 브라우저: ****\_\_\_****
-- 버전: ****\_\_\_****
-- OS: ****\_\_\_****
+- 날짜: \***\*\_\_\_\*\***
+- 브라우저: \***\*\_\_\_\*\***
+- 버전: \***\*\_\_\_\*\***
+- OS: \***\*\_\_\_\*\***
 
 ### 통과/실패 요약
 
-- 총 테스트 항목: ****\_\_\_****
-- 통과: ****\_\_\_****
-- 실패: ****\_\_\_****
-- 건너뜀: ****\_\_\_****
+- 총 테스트 항목: \***\*\_\_\_\*\***
+- 통과: \***\*\_\_\_\*\***
+- 실패: \***\*\_\_\_\*\***
+- 건너뜀: \***\*\_\_\_\*\***
+
+### 발견된 이슈 기록 방법
+
+**중요**: 테스트 중 발견된 문제나 버그는 이 체크리스트에 기록하지 않고, 별도의 버전별 이슈 문서에 기록합니다.
+
+- **파일 위치**: `TEST_ISSUES_v{버전}.md` (예: `TEST_ISSUES_v1.1.0.md`)
+- **기록 내용**:
+  - 발견된 버그/문제점
+  - 재현 단계
+  - 예상 동작 vs 실제 동작
+  - 우선순위 (Critical/High/Medium/Low)
+  - 관련된 테스트 항목 (US-XX)
+- **파일 생성 시점**: 테스트 중 문제 발견 시 즉시 생성
+- **파일 업데이트**: 추가 문제 발견 시 계속 업데이트
+
+**예시 파일 구조**:
+
+```markdown
+# Test Issues - v1.1.0
+
+## Critical Issues
+
+- [ ] US-XX: 문제 설명...
+
+## High Priority Issues
+
+- [ ] US-YY: 문제 설명...
+
+## Medium Priority Issues
+
+- [ ] US-ZZ: 문제 설명...
+```
 
 ### 발견된 이슈
 
@@ -701,5 +878,5 @@
 
 - 각 테스트 항목은 실제 사용자 시나리오를 기반으로 작성되었습니다.
 - 테스트 시 실제 사용자처럼 다양한 입력값을 사용해보세요.
-- 발견된 버그나 개선사항은 이슈 트래커에 기록하세요.
+- 발견된 버그나 개선사항은 별도의 버전별 이슈 문서(`TEST_ISSUES_v{버전}.md`)에 기록하세요.
 - 정기적으로 이 체크리스트를 업데이트하여 새로운 기능을 반영하세요.
