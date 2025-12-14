@@ -14,6 +14,8 @@ import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useTitle } from '@/hooks/useTitle';
 import { useWebWorker, shouldUseWorkerForText } from '@/hooks/useWebWorker';
 import { copyToClipboard } from '@/lib/clipboard';
+import { isMobileDevice } from '@/lib/utils';
+import { ShareModal } from '@/components/common/ShareModal';
 import DiffMatchPatch from 'diff-match-patch';
 import type { Diff } from 'diff-match-patch';
 
@@ -37,8 +39,11 @@ const DiffTool: React.FC = () => {
   useTitle('Text Diff');
   // Diff tool state contains: left (string), right (string), view, ignoreWhitespace, ignoreCase
   // All fields are necessary for sharing - input strings may be large but required
-  const { state, updateState, resetState, shareState } =
+  const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
     useToolState<DiffToolState>('diff', DEFAULT_STATE);
+  const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
+  const shareInfo = getShareStateInfo();
+  const isMobile = isMobileDevice();
   const debouncedLeft = useDebouncedValue(state.left, 250);
   const debouncedRight = useDebouncedValue(state.right, 250);
 
@@ -139,7 +144,13 @@ const DiffTool: React.FC = () => {
         title="Text Diff"
         description="Spot differences between two text blocks instantly."
         onReset={() => resetState()}
-        onShare={shareState}
+        onShare={async () => {
+          if (isMobile) {
+            setIsShareModalOpen(true);
+          } else {
+            await copyShareLink();
+          }
+        }}
       />
 
       <div className="flex flex-col gap-4">
@@ -322,6 +333,17 @@ const DiffTool: React.FC = () => {
           )}
         </div>
       </div>
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        onConfirm={async () => {
+          setIsShareModalOpen(false);
+          await shareViaWebShare();
+        }}
+        includedFields={shareInfo.includedFields}
+        excludedFields={shareInfo.excludedFields}
+        toolName="Text Diff"
+      />
     </div>
   );
 };

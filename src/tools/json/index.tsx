@@ -17,6 +17,7 @@ import { useTitle } from '@/hooks/useTitle';
 import { useResolvedTheme } from '@/hooks/useThemeHooks';
 import { useWebWorker, shouldUseWorkerForText } from '@/hooks/useWebWorker';
 import { copyToClipboard } from '@/lib/clipboard';
+import { isMobileDevice } from '@/lib/utils';
 import { JsonView, defaultStyles } from 'react-json-view-lite';
 import 'react-json-view-lite/dist/index.css';
 
@@ -41,7 +42,7 @@ const DEFAULT_STATE: JsonToolState = {
 const JsonTool: React.FC = () => {
   useTitle('JSON Viewer');
   const resolvedTheme = useResolvedTheme();
-  const { state, updateState, resetState, shareState, getShareStateInfo } =
+  const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
     useToolState<JsonToolState>('json', DEFAULT_STATE, {
       // Exclude 'search' field as it's UI-only state
       shareStateFilter: ({
@@ -61,6 +62,7 @@ const JsonTool: React.FC = () => {
   
   const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
   const shareInfo = getShareStateInfo();
+  const isMobile = isMobileDevice();
   const debouncedInput = useDebouncedValue(state.input, 300);
 
   // Worker 사용 여부 결정
@@ -183,14 +185,22 @@ const JsonTool: React.FC = () => {
         title="JSON Pretty Viewer"
         description="Format JSON instantly and explore the structure as a tree."
         onReset={resetState}
-        onShare={() => setIsShareModalOpen(true)}
+        onShare={async () => {
+          if (isMobile) {
+            // Mobile: Show ShareModal, then use Web Share API
+            setIsShareModalOpen(true);
+          } else {
+            // PC: Copy to clipboard immediately
+            await copyShareLink();
+          }
+        }}
       />
       <ShareModal
         isOpen={isShareModalOpen}
         onClose={() => setIsShareModalOpen(false)}
         onConfirm={async () => {
           setIsShareModalOpen(false);
-          await shareState();
+          await shareViaWebShare();
         }}
         includedFields={shareInfo.includedFields}
         excludedFields={shareInfo.excludedFields}

@@ -9,6 +9,8 @@ import { useToolState } from '@/hooks/useToolState';
 import { useTitle } from '@/hooks/useTitle';
 import { useResolvedTheme } from '@/hooks/useThemeHooks';
 import { copyToClipboard } from '@/lib/clipboard';
+import { isMobileDevice } from '@/lib/utils';
+import { ShareModal } from '@/components/common/ShareModal';
 import { JsonView, defaultStyles } from 'react-json-view-lite';
 import 'react-json-view-lite/dist/index.css';
 
@@ -57,8 +59,11 @@ interface ValidationResult {
 
 const JwtTool: React.FC = () => {
   const resolvedTheme = useResolvedTheme();
-  const { state, updateState, resetState, shareState } =
+  const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
     useToolState<JwtToolState>('jwt', DEFAULT_STATE);
+  const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
+  const shareInfo = getShareStateInfo();
+  const isMobile = isMobileDevice();
   
   useTitle(state.mode === 'decode' ? 'JWT Decoder' : 'JWT Encoder');
 
@@ -369,7 +374,13 @@ const JwtTool: React.FC = () => {
             : 'Encode JSON Web Tokens from header and payload.'
         }
         onReset={resetState}
-        onShare={shareState}
+        onShare={async () => {
+          if (isMobile) {
+            setIsShareModalOpen(true);
+          } else {
+            await copyShareLink();
+          }
+        }}
       />
 
       {/* Mode Toggle */}
@@ -726,6 +737,18 @@ const JwtTool: React.FC = () => {
           </div>
         )}
       </div>
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        onConfirm={async () => {
+          setIsShareModalOpen(false);
+          await shareViaWebShare();
+        }}
+        includedFields={shareInfo.includedFields}
+        excludedFields={shareInfo.excludedFields}
+        toolName="JWT"
+        isSensitive={true}
+      />
     </div>
   );
 };

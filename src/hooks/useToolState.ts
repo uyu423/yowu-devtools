@@ -132,41 +132,24 @@ export function useToolState<T extends object>(
     setAndPersist(base);
   }, [defaultState, setAndPersist]);
 
-  const shareState = useCallback(async () => {
+  // Generate share URL without copying/sharing
+  const generateShareUrl = useCallback(() => {
+    const stateToShare = options?.shareStateFilter
+      ? options.shareStateFilter(state)
+      : state;
+    const envelope: ShareEnvelope<Partial<T>> = {
+      v: 1,
+      tool: toolId,
+      state: stateToShare,
+    };
+    const encoded = compressToEncodedURIComponent(JSON.stringify(envelope));
+    return `${window.location.origin}${location.pathname}?d=${encoded}`;
+  }, [location.pathname, state, toolId, options]);
+
+  // Copy share link to clipboard (PC)
+  const copyShareLink = useCallback(async () => {
     try {
-      // Apply filter if provided, otherwise use full state
-      const stateToShare = options?.shareStateFilter
-        ? options.shareStateFilter(state)
-        : state;
-      const envelope: ShareEnvelope<Partial<T>> = {
-        v: 1,
-        tool: toolId,
-        state: stateToShare,
-      };
-      const encoded = compressToEncodedURIComponent(JSON.stringify(envelope));
-      // Query parameter must be before hash to be readable by location.search
-      // BrowserRouter doesn't use hash routing, so we can use query parameter directly
-      const shareUrl = `${window.location.origin}${location.pathname}?d=${encoded}`;
-      
-      // Try Web Share API first (mobile)
-      if (navigator.share && typeof navigator.share === 'function') {
-        try {
-          await navigator.share({
-            title: `Share ${toolId} state`,
-            text: `Check out this ${toolId} tool state`,
-            url: shareUrl,
-          });
-          toast.success('Shared successfully.');
-          return shareUrl;
-        } catch (shareError) {
-          // User cancelled or share failed, fallback to clipboard
-          if ((shareError as Error).name !== 'AbortError') {
-            console.warn('Web Share API failed, falling back to clipboard:', shareError);
-          }
-        }
-      }
-      
-      // Fallback to clipboard
+      const shareUrl = generateShareUrl();
       await navigator.clipboard?.writeText(shareUrl);
       toast.success('Share link copied.');
       return shareUrl;
@@ -175,7 +158,51 @@ export function useToolState<T extends object>(
       toast.error('Unable to copy share link.');
       return null;
     }
-  }, [location.pathname, state, toolId, options]);
+  }, [generateShareUrl]);
+
+  // Share via Web Share API (mobile)
+  const shareViaWebShare = useCallback(async () => {
+    try {
+      const shareUrl = generateShareUrl();
+      if (navigator.share && typeof navigator.share === 'function') {
+        await navigator.share({
+          title: `Share ${toolId} state`,
+          text: `Check out this ${toolId} tool state`,
+          url: shareUrl,
+        });
+        toast.success('Shared successfully.');
+        return shareUrl;
+      } else {
+        // Fallback to clipboard if Web Share API not available
+        await navigator.clipboard?.writeText(shareUrl);
+        toast.success('Share link copied.');
+        return shareUrl;
+      }
+    } catch (error) {
+      // User cancelled or share failed
+      if ((error as Error).name === 'AbortError') {
+        return null;
+      }
+      console.error(error);
+      toast.error('Unable to share.');
+      return null;
+    }
+  }, [generateShareUrl, toolId]);
+
+  // Legacy shareState function (kept for backward compatibility, but deprecated)
+  // Use copyShareLink (PC) or shareViaWebShare (mobile) instead
+  const shareState = useCallback(async () => {
+    // Detect if mobile device
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    ) || (window.matchMedia && window.matchMedia('(max-width: 768px)').matches);
+
+    if (isMobile && navigator.share && typeof navigator.share === 'function') {
+      return shareViaWebShare();
+    } else {
+      return copyShareLink();
+    }
+  }, [copyShareLink, shareViaWebShare]);
 
   // Get share state info (for ShareModal)
   const getShareStateInfo = useCallback(() => {
@@ -207,7 +234,10 @@ export function useToolState<T extends object>(
     setState: setAndPersist,
     updateState: applyState,
     resetState,
-    shareState,
+    shareState, // Legacy: Use copyShareLink or shareViaWebShare instead
+    generateShareUrl, // Generate share URL without copying/sharing
+    copyShareLink, // PC: Copy to clipboard immediately
+    shareViaWebShare, // Mobile: Use Web Share API
     getShareStateInfo, // v1.2.0: Get share state info for ShareModal
   } as const;
 }

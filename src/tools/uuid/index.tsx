@@ -9,6 +9,8 @@ import { useToolState } from '@/hooks/useToolState';
 import { useTitle } from '@/hooks/useTitle';
 import { copyToClipboard } from '@/lib/clipboard';
 import { toast } from 'sonner';
+import { isMobileDevice } from '@/lib/utils';
+import { ShareModal } from '@/components/common/ShareModal';
 
 interface UuidToolState {
   type: 'uuid-v4' | 'uuid-v7' | 'ulid';
@@ -93,7 +95,7 @@ const generateUlid = (): string => {
 
 const UuidTool: React.FC = () => {
   useTitle('UUID/ULID Generator');
-  const { state, updateState, resetState, shareState } = useToolState<UuidToolState>(
+  const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } = useToolState<UuidToolState>(
     'uuid',
     DEFAULT_STATE,
     {
@@ -105,6 +107,9 @@ const UuidTool: React.FC = () => {
     }
   );
 
+  const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
+  const shareInfo = getShareStateInfo();
+  const isMobile = React.useMemo(() => isMobileDevice(), []);
   const [generatedIds, setGeneratedIds] = React.useState<string[]>([]);
 
   const generateIds = React.useCallback(() => {
@@ -151,7 +156,13 @@ const UuidTool: React.FC = () => {
         title="UUID/ULID Generator"
         description="Generate UUID v4, UUID v7, and ULID identifiers"
         onReset={resetState}
-        onShare={shareState}
+        onShare={async () => {
+          if (isMobile) {
+            setIsShareModalOpen(true);
+          } else {
+            await copyShareLink();
+          }
+        }}
       />
 
       {/* Options */}
@@ -269,6 +280,17 @@ const UuidTool: React.FC = () => {
           )}
         </div>
       </div>
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        onConfirm={async () => {
+          setIsShareModalOpen(false);
+          await shareViaWebShare();
+        }}
+        includedFields={shareInfo.includedFields}
+        excludedFields={shareInfo.excludedFields}
+        toolName="UUID/ULID Generator"
+      />
     </div>
   );
 };

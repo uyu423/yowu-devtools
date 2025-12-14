@@ -14,6 +14,8 @@ import { useToolState } from '@/hooks/useToolState';
 import { useTitle } from '@/hooks/useTitle';
 import { useWebWorker, shouldUseWorkerForText } from '@/hooks/useWebWorker';
 import { copyToClipboard } from '@/lib/clipboard';
+import { isMobileDevice } from '@/lib/utils';
+import { ShareModal } from '@/components/common/ShareModal';
 import YAML from 'yaml';
 
 interface YamlToolState {
@@ -32,8 +34,11 @@ const YamlTool: React.FC = () => {
   useTitle('YAML Converter');
   // YAML tool state contains: source (input string), direction, indent
   // All fields are necessary for sharing - input may be large but required
-  const { state, updateState, resetState, shareState } =
+  const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
     useToolState<YamlToolState>('yaml', DEFAULT_STATE);
+  const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
+  const shareInfo = getShareStateInfo();
+  const isMobile = isMobileDevice();
 
   // Worker 사용 여부 결정
   const shouldUseWorker = React.useMemo(
@@ -127,7 +132,13 @@ const YamlTool: React.FC = () => {
         title="YAML ↔ JSON"
         description="Convert both directions and inspect parse errors quickly."
         onReset={resetState}
-        onShare={shareState}
+        onShare={async () => {
+          if (isMobile) {
+            setIsShareModalOpen(true);
+          } else {
+            await copyShareLink();
+          }
+        }}
       />
 
       <div className="flex-1 flex flex-col lg:flex-row gap-4 min-h-0">
@@ -261,6 +272,17 @@ const YamlTool: React.FC = () => {
           </FileDownload>
         </div>
       </ActionBar>
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        onConfirm={async () => {
+          setIsShareModalOpen(false);
+          await shareViaWebShare();
+        }}
+        includedFields={shareInfo.includedFields}
+        excludedFields={shareInfo.excludedFields}
+        toolName="YAML Converter"
+      />
     </div>
   );
 };

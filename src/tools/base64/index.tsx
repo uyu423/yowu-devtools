@@ -10,6 +10,8 @@ import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
 import { useTitle } from '@/hooks/useTitle';
 import { copyToClipboard } from '@/lib/clipboard';
+import { isMobileDevice } from '@/lib/utils';
+import { ShareModal } from '@/components/common/ShareModal';
 
 interface Base64State {
   input: string;
@@ -27,8 +29,11 @@ const Base64Tool: React.FC = () => {
   useTitle('Base64 Converter');
   // Base64 tool state contains: input (string), mode, urlSafe
   // All fields are necessary for sharing - input may be large but required
-  const { state, updateState, resetState, shareState } =
+  const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
     useToolState<Base64State>('base64', DEFAULT_STATE);
+  const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
+  const shareInfo = getShareStateInfo();
+  const isMobile = isMobileDevice();
 
   const conversion = useMemo(() => {
     if (!state.input) {
@@ -61,7 +66,24 @@ const Base64Tool: React.FC = () => {
         title="Base64 Converter"
         description="Encode or decode UTF-8 text, including Base64URL."
         onReset={resetState}
-        onShare={shareState}
+        onShare={async () => {
+          if (isMobile) {
+            setIsShareModalOpen(true);
+          } else {
+            await copyShareLink();
+          }
+        }}
+      />
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        onConfirm={async () => {
+          setIsShareModalOpen(false);
+          await shareViaWebShare();
+        }}
+        includedFields={shareInfo.includedFields}
+        excludedFields={shareInfo.excludedFields}
+        toolName="Base64 Converter"
       />
 
       <div className="flex-1 flex flex-col gap-6">

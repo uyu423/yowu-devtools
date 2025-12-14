@@ -9,7 +9,8 @@ import { useToolState } from '@/hooks/useToolState';
 import { useTitle } from '@/hooks/useTitle';
 import { copyToClipboard } from '@/lib/clipboard';
 import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
+import { cn, isMobileDevice } from '@/lib/utils';
+import { ShareModal } from '@/components/common/ShareModal';
 
 interface PasswordToolState {
   length: number;
@@ -139,7 +140,7 @@ function generatePassword(state: PasswordToolState): string {
 
 const PasswordTool: React.FC = () => {
   useTitle('Password Generator');
-  const { state, updateState, resetState, shareState } = useToolState<PasswordToolState>(
+  const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } = useToolState<PasswordToolState>(
     'password',
     DEFAULT_STATE,
     {
@@ -156,6 +157,9 @@ const PasswordTool: React.FC = () => {
     }
   );
 
+  const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
+  const shareInfo = getShareStateInfo();
+  const isMobile = React.useMemo(() => isMobileDevice(), []);
   const [passwords, setPasswords] = React.useState<string[]>([]);
   const [error, setError] = React.useState<string | null>(null);
 
@@ -234,7 +238,13 @@ const PasswordTool: React.FC = () => {
         title="Password Generator"
         description="Generate secure passwords with customizable options"
         onReset={resetState}
-        onShare={shareState}
+        onShare={async () => {
+          if (isMobile) {
+            setIsShareModalOpen(true);
+          } else {
+            await copyShareLink();
+          }
+        }}
       />
 
       {/* Options */}
@@ -467,6 +477,17 @@ const PasswordTool: React.FC = () => {
           )}
         </div>
       </div>
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        onConfirm={async () => {
+          setIsShareModalOpen(false);
+          await shareViaWebShare();
+        }}
+        includedFields={shareInfo.includedFields}
+        excludedFields={shareInfo.excludedFields}
+        toolName="Password Generator"
+      />
     </div>
   );
 };

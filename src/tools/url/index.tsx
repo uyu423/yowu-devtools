@@ -11,6 +11,8 @@ import { useToolState } from '@/hooks/useToolState';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useTitle } from '@/hooks/useTitle';
 import { copyToClipboard } from '@/lib/clipboard';
+import { isMobileDevice } from '@/lib/utils';
+import { ShareModal } from '@/components/common/ShareModal';
 
 interface UrlToolState {
   input: string;
@@ -28,8 +30,11 @@ const UrlTool: React.FC = () => {
   useTitle('URL Encoder');
   // URL tool state contains: input (string), mode, plusForSpace
   // All fields are necessary for sharing - input may be large but required
-  const { state, updateState, resetState, shareState } =
+  const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
     useToolState<UrlToolState>('url', DEFAULT_STATE);
+  const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
+  const shareInfo = getShareStateInfo();
+  const isMobile = isMobileDevice();
   const debouncedInput = useDebouncedValue(state.input, 200);
 
   const conversion = useMemo(() => {
@@ -70,7 +75,24 @@ const UrlTool: React.FC = () => {
         title="URL Encode/Decode"
         description="Safely transform query params or path segments."
         onReset={resetState}
-        onShare={shareState}
+        onShare={async () => {
+          if (isMobile) {
+            setIsShareModalOpen(true);
+          } else {
+            await copyShareLink();
+          }
+        }}
+      />
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        onConfirm={async () => {
+          setIsShareModalOpen(false);
+          await shareViaWebShare();
+        }}
+        includedFields={shareInfo.includedFields}
+        excludedFields={shareInfo.excludedFields}
+        toolName="URL Encoder"
       />
       <div className="flex-1 flex flex-col gap-6">
         <EditorPanel
