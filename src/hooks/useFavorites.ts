@@ -76,22 +76,25 @@ export function useFavorites() {
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === STORAGE_KEY) {
+        // localStorage에서 직접 읽어서 상태 업데이트
         setFavorites(getFavorites());
       }
     };
 
-    const handleFavoritesChanged = (e: CustomEvent<string[]>) => {
-      setFavorites(e.detail);
+    const handleFavoritesChanged = () => {
+      // 커스텀 이벤트 발생 시 localStorage에서 직접 읽어서 상태 업데이트
+      // 이렇게 하면 클로저 문제를 피하고 항상 최신 값을 가져올 수 있음
+      setFavorites(getFavorites());
     };
 
     // 다른 탭에서 변경된 경우
     window.addEventListener('storage', handleStorageChange);
     // 같은 탭에서 변경된 경우
-    window.addEventListener('favorites-changed', handleFavoritesChanged as EventListener);
+    window.addEventListener('favorites-changed', handleFavoritesChanged);
     
     return () => {
       window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('favorites-changed', handleFavoritesChanged as EventListener);
+      window.removeEventListener('favorites-changed', handleFavoritesChanged);
     };
   }, []);
 
