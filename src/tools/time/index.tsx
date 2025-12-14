@@ -26,6 +26,31 @@ const DEFAULT_STATE: TimeToolState = {
   timezone: 'local',
 };
 
+// Time format item component
+const TimeFormatItem: React.FC<{ label: string; value: string; tooltip?: string }> = ({ label, value, tooltip }) => (
+  <div className="group flex items-center justify-between gap-3 py-2 px-3 rounded-md hover:bg-blue-100/50 dark:hover:bg-blue-800/20 transition-colors">
+    <div className="flex-1 min-w-0">
+      {tooltip ? (
+        <Tooltip content={tooltip}>
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-help">{label}</span>
+        </Tooltip>
+      ) : (
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{label}</span>
+      )}
+      <div className="mt-1 font-mono text-xs text-gray-600 dark:text-gray-400 break-all">{value}</div>
+    </div>
+    {value !== '-' && (
+      <button
+        onClick={() => copyToClipboard(value, `Copied ${label}`)}
+        className="opacity-0 group-hover:opacity-100 p-1.5 rounded hover:bg-blue-200 dark:hover:bg-blue-700 transition-all flex-shrink-0"
+        title={`Copy ${label}`}
+      >
+        <Copy className="w-3.5 h-3.5 text-gray-600 dark:text-gray-400" />
+      </button>
+    )}
+  </div>
+);
+
 const TimeTool: React.FC = () => {
   useTitle('Time Converter');
   const { state, setState, resetState, shareState } = useToolState<TimeToolState>('time', DEFAULT_STATE);
@@ -129,31 +154,6 @@ const TimeTool: React.FC = () => {
       return '';
     }
   };
-
-  // Time format item component
-  const TimeFormatItem: React.FC<{ label: string; value: string; tooltip?: string }> = ({ label, value, tooltip }) => (
-    <div className="group flex items-center justify-between gap-3 py-2 px-3 rounded-md hover:bg-blue-100/50 dark:hover:bg-blue-800/20 transition-colors">
-      <div className="flex-1 min-w-0">
-        {tooltip ? (
-          <Tooltip content={tooltip}>
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-help">{label}</span>
-          </Tooltip>
-        ) : (
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{label}</span>
-        )}
-        <div className="mt-1 font-mono text-xs text-gray-600 dark:text-gray-400 break-all">{value}</div>
-      </div>
-      {value !== '-' && (
-        <button
-          onClick={() => copyToClipboard(value, `Copied ${label}`)}
-          className="opacity-0 group-hover:opacity-100 p-1.5 rounded hover:bg-blue-200 dark:hover:bg-blue-700 transition-all flex-shrink-0"
-          title={`Copy ${label}`}
-        >
-          <Copy className="w-3.5 h-3.5 text-gray-600 dark:text-gray-400" />
-        </button>
-      )}
-    </div>
-  );
 
   return (
     <div className="flex flex-col h-full p-4 md:p-6 max-w-3xl mx-auto">

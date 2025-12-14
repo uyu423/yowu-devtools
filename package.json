@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "npm run lint",
     "build": "tsc -b && vite build",
     "build:check": "npm run build && npm run lint",
     "lint": "eslint .",
