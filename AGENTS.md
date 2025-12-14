@@ -126,3 +126,14 @@ Use Node 20+ / npm 10 to stay in sync with `package-lock.json`. Install dependen
    - 키워드 스터핑 방지 (자연스러운 키워드 사용)
    - 각 도구마다 고유한 `seoDescription`과 `keywords` 사용 (중복 방지)
    - 빌드 후 반드시 생성된 HTML 파일 확인
+   - **Title 길이**: 50-60자 권장 (자동으로 " - Free Online Tool | tools.yowu.dev" 접미사 추가)
+   - **Description 길이**: 110-160자 권장 (160자 초과 시 자동으로 잘림)
+
+8. **Open Graph 이미지 최적화**
+   - 이미지 파일: `public/opengraph.png`
+   - 권장 크기: 1200x630px (Facebook/LinkedIn 표준)
+   - 이미지에 Call-to-Action 포함 권장:
+     - "Try Now", "Get Started", "Use Free Tool" 등의 텍스트
+     - 브랜드 색상과 대비되는 버튼 스타일
+     - 도구의 핵심 가치 제안 포함
+   - 이미지 alt 텍스트는 자동으로 `og:image:alt` 및 `twitter:image:alt` 메타 태그에 포함됨

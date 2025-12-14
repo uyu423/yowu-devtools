@@ -21,7 +21,7 @@ const tools: ToolInfo[] = [
     title: 'JSON Viewer',
     description: 'Pretty print and traverse JSON',
     seoDescription:
-      'Free online JSON viewer, formatter, and validator. Pretty print JSON with syntax highlighting, tree view, search, and copy features. All processing happens in your browser - no data sent to servers.',
+      'Free online JSON viewer, formatter, and validator. Pretty print JSON with syntax highlighting, tree view, search, and copy features.',
     keywords: [
       'json viewer',
       'json formatter',
@@ -47,7 +47,7 @@ const tools: ToolInfo[] = [
     title: 'URL Encoder',
     description: 'Encode/Decode URL strings',
     seoDescription:
-      'Free URL encoder and decoder tool. Encode special characters in URLs, decode URL-encoded strings, and handle query parameters safely. Client-side processing ensures your data stays private.',
+      'Free URL encoder and decoder tool. Encode special characters in URLs, decode URL-encoded strings, and handle query parameters safely.',
     keywords: [
       'url encoder',
       'url decoder',
@@ -71,7 +71,7 @@ const tools: ToolInfo[] = [
     title: 'Base64',
     description: 'Base64 Encode/Decode',
     seoDescription:
-      'Free Base64 encoder and decoder. Convert text to Base64 and vice versa. Supports UTF-8 encoding, URL-safe Base64, and handles Unicode characters. All processing happens locally in your browser.',
+      'Free Base64 encoder and decoder. Convert text to Base64 and vice versa. Supports UTF-8 encoding and URL-safe Base64. All processing happens in your browser.',
     keywords: [
       'base64 encoder',
       'base64 decoder',
@@ -96,7 +96,7 @@ const tools: ToolInfo[] = [
     title: 'Time Converter',
     description: 'Epoch <-> ISO converter',
     seoDescription:
-      'Free epoch timestamp converter. Convert Unix timestamps (epoch time) to human-readable dates and vice versa. Supports milliseconds and seconds, local time and UTC. Perfect for developers working with timestamps.',
+      'Free epoch timestamp converter. Convert Unix timestamps to human-readable dates and vice versa. Supports milliseconds, seconds, local time, and UTC.',
     keywords: [
       'epoch converter',
       'unix timestamp',
@@ -120,7 +120,7 @@ const tools: ToolInfo[] = [
     title: 'YAML Converter',
     description: 'YAML <-> JSON converter',
     seoDescription:
-      'Free YAML to JSON converter and vice versa. Convert between YAML and JSON formats instantly. Includes error detection with line and column numbers. All conversion happens in your browser for maximum privacy.',
+      'Free YAML to JSON converter and vice versa. Convert between YAML and JSON formats instantly. Includes error detection with line numbers.',
     keywords: [
       'yaml to json',
       'json to yaml',
@@ -144,7 +144,7 @@ const tools: ToolInfo[] = [
     title: 'Text Diff',
     description: 'Compare two texts',
     seoDescription:
-      'Free text diff tool. Compare two text blocks side-by-side or in unified view. Highlight differences, ignore whitespace or case, and export unified diff format. Perfect for code reviews and text comparison.',
+      'Free text diff tool. Compare two text blocks side-by-side or in unified view. Highlight differences, ignore whitespace or case. Perfect for code reviews.',
     keywords: [
       'text diff',
       'diff tool',
@@ -169,7 +169,7 @@ const tools: ToolInfo[] = [
     title: 'Cron Parser',
     description: 'Cron expression explainer',
     seoDescription:
-      'Free cron expression parser and validator. Understand cron expressions with human-readable descriptions. View next execution times, validate cron syntax, and learn cron format. Supports 5-field and 6-field cron expressions.',
+      'Free cron expression parser and validator. Understand cron expressions with human-readable descriptions. View next execution times and validate cron syntax.',
     keywords: [
       'cron parser',
       'cron expression',
@@ -231,22 +231,33 @@ export function generateRoutes(): Plugin {
           },
         };
 
+        // SEO 최적화된 title 생성 (50-60자 권장)
+        const seoTitle = `${tool.title} - Free Online Tool | tools.yowu.dev`;
+
+        // Description이 160자를 초과하면 자르기 (110-160자 권장)
+        const optimizedDescription =
+          tool.seoDescription.length > 160
+            ? tool.seoDescription.substring(0, 157) + '...'
+            : tool.seoDescription;
+
         // 메타 태그 생성
         const metaTags = `
-    <title>${tool.title} - tools.yowu.dev</title>
-    <meta name="description" content="${tool.seoDescription}" />
+    <title>${seoTitle}</title>
+    <meta name="description" content="${optimizedDescription}" />
     <meta name="keywords" content="${keywordsStr}" />
     <link rel="canonical" href="${toolUrl}" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="${toolUrl}" />
-    <meta property="og:title" content="${tool.title} - tools.yowu.dev" />
-    <meta property="og:description" content="${tool.seoDescription}" />
+    <meta property="og:title" content="${seoTitle}" />
+    <meta property="og:description" content="${optimizedDescription}" />
     <meta property="og:image" content="https://tools.yowu.dev/opengraph.png" />
+    <meta property="og:image:alt" content="${tool.title} - Free Online Tool" />
     <meta property="og:site_name" content="tools.yowu.dev" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="${tool.title} - tools.yowu.dev" />
-    <meta name="twitter:description" content="${tool.seoDescription}" />
+    <meta name="twitter:title" content="${seoTitle}" />
+    <meta name="twitter:description" content="${optimizedDescription}" />
     <meta name="twitter:image" content="https://tools.yowu.dev/opengraph.png" />
+    <meta name="twitter:image:alt" content="${tool.title} - Free Online Tool" />
     <script type="application/ld+json">${JSON.stringify(
       structuredData,
       null,
