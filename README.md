@@ -1,42 +1,44 @@
 # tools.yowu.dev
 
-A React + TypeScript + Vite playground that bundles everyday developer utilities (JSON viewer, URL/Base64 converters, cron helper, diff tool, etc.) into a single fast, client-only experience. Phase 3 now wires up the business logic for every tool plus toast feedback, live conversion, and persistent state sharing.
+An open toolbox for developers who would rather keep sensitive snippets on their own machines. Too many “free” web converters quietly ship data to unknown backends, so this project keeps every transformation inside the browser, publishes every line of code, and documents the UX decisions in the open. The goal is simple: make the common chores (JSON inspection, cron sanity checks, quick diffs, etc.) pleasant **and** trustworthy.
 
-## Stack
-- React 19, Vite 7, TypeScript 5.9
-- Tailwind CSS + CodeMirror 6 for the UI/editor experience
-- Utility libs: `react-json-view-lite`, `yaml`, `diff-match-patch`, `cron-parser`, `cronstrue`, `date-fns`, `lz-string`, `sonner`
+## Why it exists
 
-## Available tools
-- **JSON Pretty Viewer** – formatting, tree navigation, key sorting, sample data, copy pretty/minified
-- **URL Encode/Decode** – live encode/decode with `+` for spaces and swap support
-- **Base64 Converter** – UTF-8 safe, Base64URL toggle, swap, clipboard
-- **Epoch / ISO Converter** – ms/s + timezone toggles, validation, “Set to Now”
-- **YAML ↔ JSON** – bidirectional parsing with error locations and indent control
-- **Text Diff** – split/unified views, ignore whitespace/case, unified export
-- **Cron Parser** – validates expressions, humanizes schedules, lists upcoming runs
+- **Transparent processing** – no servers, no trackers, and an auditable codebase. If a tool claims to only prettify JSON, you should be able to confirm that’s all it does.
+- **Shareable but private by default** – nothing leaves the tab unless you explicitly create a share link; even then the payload stays compressed inside the URL fragment.
+- **Composable workspace** – a single layout, persistent state per tool, and theme controls so you’re not juggling a dozen shady tabs during a debugging session.
+
+## Highlights
+
+- Client-only React + Vite app with Tailwind styling and CodeMirror editors.
+- Tool registry under `src/tools/` keeps features isolated but consistent (state storage, sharing, theming).
+- Toast-powered feedback for copy/share actions, and live conversion flows tuned for quick iteration.
+- LocalStorage + share-links let you hand off repro cases without inventing screenshots.
+
+For the full specification, UX rules, and backlog, read `SAS.md`. This README intentionally stays high level so we avoid duplicating that source of truth.
 
 ## Getting started
+
 ```bash
-npm install        # install deps
-npm run dev        # start Vite dev server (http://localhost:5173)
-npm run lint       # ESLint
-npm run build      # type-check + production bundle
-npm run preview    # serve the dist/ output
+npm install
+npm run dev       # http://localhost:5173
+npm run lint
+npm run build
+npm run preview
 ```
 
-## Project layout
+## Repository layout
+
 ```
 src/
-  components/      shared layout + common UI
-  hooks/           theme, title, tool-state utilities
-  tools/           individual tool implementations
-  lib/             helpers (clipboard, classnames)
+  components/   shared layout + primitives (ToolHeader, ActionBar, etc.)
+  hooks/        tool state, title, theme helpers
+  lib/          clipboard + misc utilities
+  tools/        each self-contained feature (json, url, base64, ...)
 ```
-Shared contributor guidelines live in `AGENTS.md`.
 
-## Documentation updates
-Feature changes must always be reflected in the markdown docs at the same time. After modifying any tool, workflow, or requirement, review `README.md`, `AGENTS.md`, `SAS.md`, and other spec notes to ensure they describe the new behavior. Keeping these references fresh is part of the definition of done for every change.
+Shared contributor instructions live in `AGENTS.md`; treat them as the working agreement before sending any PRs.
 
 ## Deployment
-A GitHub Pages workflow (`.github/workflows/deploy.yml`) builds `dist/`, uploads it as a Pages artifact, and deploys to the `github-pages` environment every push to `main`. Update DNS/CNAME to `tools.yowu.dev` when ready.
+
+Pushes to `main` trigger `.github/workflows/deploy.yml`, which builds `dist/` and updates GitHub Pages under the `tools.yowu.dev` custom domain. Always run `npm run lint` and `npm run build` locally before merging to keep the pipeline green.
