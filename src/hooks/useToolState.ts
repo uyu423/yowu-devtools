@@ -5,6 +5,7 @@ import {
   decompressFromEncodedURIComponent,
 } from 'lz-string';
 import { toast } from 'sonner';
+import { getToolById } from '../tools';
 
 const STORAGE_PREFIX = 'yowu-devtools:v1:tool:';
 
@@ -164,11 +165,18 @@ export function useToolState<T extends object>(
   const shareViaWebShare = useCallback(async () => {
     try {
       const shareUrl = generateShareUrl();
+      const tool = getToolById(toolId);
+      const toolTitle = tool?.title || toolId;
+
+      // Format share text with title at top, privacy message, then URL at the end
+      // Include URL in text instead of separate 'url' parameter to control the order
+      const shareTitle = `🔗 ${toolTitle} - tools.yowu.dev`;
+      const shareText = `${shareTitle}\n\nAll processing happens in your browser - your data stays private. 🛡️\n\n${shareUrl}`;
+
       if (navigator.share && typeof navigator.share === 'function') {
         await navigator.share({
-          title: `Share ${toolId} state`,
-          text: `Check out this ${toolId} tool state`,
-          url: shareUrl,
+          title: shareTitle,
+          text: shareText,
         });
         toast.success('Shared successfully.');
         return shareUrl;
@@ -193,9 +201,11 @@ export function useToolState<T extends object>(
   // Use copyShareLink (PC) or shareViaWebShare (mobile) instead
   const shareState = useCallback(async () => {
     // Detect if mobile device
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-      navigator.userAgent
-    ) || (window.matchMedia && window.matchMedia('(max-width: 768px)').matches);
+    const isMobile =
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      ) ||
+      (window.matchMedia && window.matchMedia('(max-width: 768px)').matches);
 
     if (isMobile && navigator.share && typeof navigator.share === 'function') {
       return shareViaWebShare();
@@ -209,12 +219,12 @@ export function useToolState<T extends object>(
     const stateToShare = options?.shareStateFilter
       ? options.shareStateFilter(state)
       : state;
-    
+
     const includedFields = Object.keys(stateToShare);
     const excludedFields = options?.shareStateFilter
-      ? Object.keys(state).filter(key => !(key in stateToShare))
+      ? Object.keys(state).filter((key) => !(key in stateToShare))
       : [];
-    
+
     return {
       includedFields,
       excludedFields,
