@@ -6,7 +6,8 @@ import { timeTool } from './time';
 import { yamlTool } from './yaml';
 import { diffTool } from './diff';
 import { cronTool } from './cron';
-import { jwtTool } from './jwt';
+import { jwtDecoderTool } from './jwt-decoder';
+import { jwtEncoderTool } from './jwt-encoder';
 import { hashTool } from './hash';
 import { uuidTool } from './uuid';
 import { passwordTool } from './password';
@@ -19,7 +20,8 @@ export const tools: ToolDefinition[] = [
   yamlTool,
   diffTool,
   cronTool,
-  jwtTool,
+  jwtDecoderTool,
+  jwtEncoderTool,
   hashTool,
   uuidTool,
   passwordTool,
