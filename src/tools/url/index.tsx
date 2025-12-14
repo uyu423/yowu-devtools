@@ -89,7 +89,10 @@ const UrlTool: React.FC = () => {
             ))}
           </div>
 
-          <label className="flex items-center space-x-2 text-sm text-gray-700">
+          <label 
+            className="flex items-center space-x-2 text-sm text-gray-700"
+            title="Encode spaces as '+' like HTML forms instead of the default '%20'."
+          >
             <input 
               type="checkbox" 
               className="rounded border-gray-300" 

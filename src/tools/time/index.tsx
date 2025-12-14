@@ -100,7 +100,11 @@ const TimeTool: React.FC = () => {
             <label className="text-sm font-medium text-gray-700">Epoch Timestamp</label>
             <div className="flex items-center space-x-4 text-sm">
               {(['ms', 's'] as const).map(unit => (
-                <label key={unit} className="inline-flex items-center gap-2">
+                <label 
+                  key={unit} 
+                  className="inline-flex items-center gap-2"
+                  title={unit === 'ms' ? 'Interpret the epoch value as milliseconds since 1970-01-01 UTC.' : 'Interpret the epoch value as seconds since 1970-01-01 UTC.'}
+                >
                   <input 
                     type="radio" 
                     name="epoch-unit" 
@@ -138,6 +142,7 @@ const TimeTool: React.FC = () => {
                   key={tz}
                   onClick={() => handleTimezoneChange(tz)}
                   className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide ${state.timezone === tz ? 'border-blue-600 text-blue-600' : 'border-gray-300 text-gray-500'}`}
+                  title={tz === 'local' ? 'Display ISO conversions relative to your local timezone.' : 'Display ISO conversions relative to UTC.'}
                 >
                   {tz === 'local' ? 'Local' : 'UTC'}
                 </button>

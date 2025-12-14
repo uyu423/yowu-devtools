@@ -7,7 +7,6 @@ import { EditorPanel } from '@/components/common/EditorPanel';
 import { ActionBar } from '@/components/common/ActionBar';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
 import { useToolState } from '@/hooks/useToolState';
-import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useTitle } from '@/hooks/useTitle';
 import { copyToClipboard } from '@/lib/clipboard';
 
@@ -26,24 +25,23 @@ const DEFAULT_STATE: Base64State = {
 const Base64Tool: React.FC = () => {
   useTitle('Base64 Converter');
   const { state, updateState, resetState, shareState } = useToolState<Base64State>('base64', DEFAULT_STATE);
-  const debouncedInput = useDebouncedValue(state.input, 200);
 
   const conversion = useMemo(() => {
-    if (!debouncedInput) {
+    if (!state.input) {
       return { result: '', error: null as string | null };
     }
     try {
       if (state.mode === 'encode') {
-        let encoded = encodeBase64(debouncedInput);
+        let encoded = encodeBase64(state.input);
         if (state.urlSafe) encoded = toUrlSafe(encoded);
         return { result: encoded, error: null };
       }
-      const source = state.urlSafe ? fromUrlSafe(debouncedInput) : debouncedInput;
+      const source = state.urlSafe ? fromUrlSafe(state.input) : state.input;
       return { result: decodeBase64(source), error: null };
     } catch (error) {
       return { result: '', error: (error as Error).message };
     }
-  }, [debouncedInput, state.mode, state.urlSafe]);
+  }, [state.input, state.mode, state.urlSafe]);
 
   const handleSwap = () => {
     if (!conversion.result) return;
@@ -85,7 +83,10 @@ const Base64Tool: React.FC = () => {
             ))}
           </div>
 
-          <label className="flex items-center space-x-2 text-sm text-gray-700">
+          <label 
+            className="flex items-center space-x-2 text-sm text-gray-700"
+            title="Use the URL-safe Base64 alphabet (- and _) and omit padding for link-friendly strings."
+          >
             <input 
               type="checkbox" 
               className="rounded border-gray-300"

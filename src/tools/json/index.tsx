@@ -104,7 +104,10 @@ const JsonTool: React.FC = () => {
           />
 
           <div className="mt-3 flex flex-wrap gap-4 text-sm text-gray-600">
-            <label className="flex items-center gap-2">
+            <label 
+              className="flex items-center gap-2"
+              title="Choose how many spaces to use when pretty-printing JSON output."
+            >
               <span className="text-xs font-medium uppercase tracking-wider text-gray-500">Indent</span>
               <select 
                 className="rounded-md border border-gray-200 px-2 py-1 text-sm"
@@ -116,7 +119,10 @@ const JsonTool: React.FC = () => {
               </select>
             </label>
 
-            <label className="flex items-center gap-2">
+            <label 
+              className="flex items-center gap-2"
+              title="Order object keys alphabetically before formatting or rendering the view."
+            >
               <input 
                 type="checkbox"
                 checked={state.sortKeys}
@@ -126,7 +132,10 @@ const JsonTool: React.FC = () => {
               <span>Sort keys</span>
             </label>
 
-            <label className="flex items-center gap-2">
+            <label 
+              className="flex items-center gap-2"
+              title="Control how many nesting levels automatically expand in the tree view."
+            >
               <span className="text-xs font-medium uppercase tracking-wider text-gray-500">Tree Depth</span>
               <input 
                 type="range"

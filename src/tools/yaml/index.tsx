@@ -7,7 +7,6 @@ import { EditorPanel } from '@/components/common/EditorPanel';
 import { ActionBar } from '@/components/common/ActionBar';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
 import { useToolState } from '@/hooks/useToolState';
-import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useTitle } from '@/hooks/useTitle';
 import { copyToClipboard } from '@/lib/clipboard';
 import YAML from 'yaml';
@@ -27,16 +26,15 @@ const DEFAULT_STATE: YamlToolState = {
 const YamlTool: React.FC = () => {
   useTitle('YAML Converter');
   const { state, updateState, resetState, shareState } = useToolState<YamlToolState>('yaml', DEFAULT_STATE);
-  const debouncedInput = useDebouncedValue(state.source, 250);
 
   const conversion = useMemo(() => {
-    if (!debouncedInput.trim()) return { output: '', error: null as string | null };
+    if (!state.source.trim()) return { output: '', error: null as string | null };
     try {
       if (state.direction === 'yaml2json') {
-        const parsed = YAML.parse(debouncedInput);
+        const parsed = YAML.parse(state.source);
         return { output: JSON.stringify(parsed, null, state.indent), error: null };
       }
-      const parsed = JSON.parse(debouncedInput);
+      const parsed = JSON.parse(state.source);
       return { output: YAML.stringify(parsed, { indent: state.indent }), error: null };
     } catch (error) {
       const err = error as YAML.YAMLParseError | Error;
@@ -46,7 +44,7 @@ const YamlTool: React.FC = () => {
       }
       return { output: '', error: err.message };
     }
-  }, [debouncedInput, state.direction, state.indent]);
+  }, [state.source, state.direction, state.indent]);
 
   const handleSwap = () => {
     if (conversion.error || !conversion.output) return;
@@ -103,7 +101,10 @@ const YamlTool: React.FC = () => {
       )}
 
       <ActionBar className="mt-4 flex-wrap items-center justify-between">
-        <label className="flex items-center gap-2 text-sm text-gray-700">
+        <label 
+          className="flex items-center gap-2 text-sm text-gray-700"
+          title="Adjust the indentation width used when formatting converted output."
+        >
           <span>Indent</span>
           <select 
             className="rounded-md border px-2 py-1"

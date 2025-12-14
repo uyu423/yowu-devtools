@@ -5,7 +5,6 @@ import { Timer } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
 import { useToolState } from '@/hooks/useToolState';
-import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useTitle } from '@/hooks/useTitle';
 import { format, formatDistanceToNow } from 'date-fns';
 import CronExpressionParser, { type CronExpressionOptions } from 'cron-parser';
@@ -28,15 +27,14 @@ const DEFAULT_STATE: CronToolState = {
 const CronTool: React.FC = () => {
   useTitle('Cron Parser');
   const { state, updateState, resetState, shareState } = useToolState<CronToolState>('cron', DEFAULT_STATE);
-  const debouncedExpression = useDebouncedValue(state.expression, 300);
 
   const cronResult = useMemo(() => {
-    if (!debouncedExpression.trim()) {
+    if (!state.expression.trim()) {
       return { description: '', nextRuns: [] as Date[], error: 'Please enter a cron expression.' };
     }
 
     try {
-      const parts = debouncedExpression.trim().split(/\s+/);
+      const parts = state.expression.trim().split(/\s+/);
       const expected = state.hasSeconds ? 6 : 5;
       if (parts.length !== expected) {
         throw new Error(`Expected ${expected} fields but received ${parts.length}.`);
@@ -45,12 +43,12 @@ const CronTool: React.FC = () => {
         currentDate: new Date(),
         tz: state.timezone === 'utc' ? 'UTC' : undefined,
       };
-      const expression = CronExpressionParser.parse(debouncedExpression, options);
+      const expression = CronExpressionParser.parse(state.expression, options);
       const runs: Date[] = [];
       for (let i = 0; i < state.nextCount; i++) {
         runs.push(expression.next().toDate());
       }
-      const description = cronstrue.toString(debouncedExpression, {
+      const description = cronstrue.toString(state.expression, {
         use24HourTimeFormat: true,
         throwExceptionOnParseError: true,
       });
@@ -58,7 +56,7 @@ const CronTool: React.FC = () => {
     } catch (error) {
       return { description: '', nextRuns: [], error: (error as Error).message };
     }
-  }, [debouncedExpression, state.hasSeconds, state.nextCount, state.timezone]);
+  }, [state.expression, state.hasSeconds, state.nextCount, state.timezone]);
 
   return (
     <div className="flex flex-col h-full p-4 md:p-6 max-w-3xl mx-auto">
@@ -79,7 +77,10 @@ const CronTool: React.FC = () => {
             className="block w-full rounded-md border border-gray-300 px-3 py-2 font-mono text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500"
           />
           <div className="mt-3 flex flex-wrap gap-4 text-sm text-gray-600">
-            <label className="inline-flex items-center gap-2">
+            <label 
+              className="inline-flex items-center gap-2"
+              title="Switch to the 6-field cron format that includes a leading seconds column."
+            >
               <input 
                 type="checkbox" 
                 className="rounded border-gray-300"
@@ -88,7 +89,10 @@ const CronTool: React.FC = () => {
               />
               <span>Include seconds field</span>
             </label>
-            <label className="inline-flex items-center gap-2">
+            <label 
+              className="inline-flex items-center gap-2"
+              title="Choose whether upcoming runs are calculated in your local timezone or UTC."
+            >
               <span>Timezone</span>
               <select 
                 className="rounded-md border px-2 py-1"
@@ -99,7 +103,10 @@ const CronTool: React.FC = () => {
                 <option value="utc">UTC</option>
               </select>
             </label>
-            <label className="inline-flex items-center gap-2">
+            <label 
+              className="inline-flex items-center gap-2"
+              title="Set how many future executions to generate in the schedule table."
+            >
               <span>Next runs</span>
               <select 
                 className="rounded-md border px-2 py-1"

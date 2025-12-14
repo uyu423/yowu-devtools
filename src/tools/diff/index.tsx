@@ -101,7 +101,10 @@ const DiffTool: React.FC = () => {
           </div>
 
           <div className="flex flex-wrap items-center gap-4 text-sm text-gray-700">
-            <label className="flex items-center gap-2">
+            <label 
+              className="flex items-center gap-2"
+              title="Treat changes that only add or remove whitespace as no-ops."
+            >
               <input 
                 type="checkbox" 
                 className="rounded border-gray-300"
@@ -110,7 +113,10 @@ const DiffTool: React.FC = () => {
               />
               <span>Ignore Whitespace</span>
             </label>
-            <label className="flex items-center gap-2">
+            <label 
+              className="flex items-center gap-2"
+              title="Compare both inputs case-insensitively."
+            >
               <input 
                 type="checkbox" 
                 className="rounded border-gray-300"
