@@ -19,6 +19,9 @@ An open toolbox for developers who would rather keep sensitive snippets on their
 - **Enhanced Sidebar** (v1.1.0): Recent tools and favorites for quick access, all stored locally.
 - **Web App support** (v1.1.0): Install as a Chrome app for standalone usage with offline caching.
 - **Performance optimized** (v1.1.0): Web Workers prevent UI freezing when processing large data.
+- **Command Palette** (v1.2.0): Fast tool navigation with `⌘K` / `Ctrl+K` keyboard shortcut.
+- **File Workflow** (v1.2.0): Drag & drop files and download results for JSON, YAML, and Diff tools.
+- **Enhanced Share** (v1.2.0): Improved sharing with Web Share API support and privacy warnings.
 
 ## Release Notes
 

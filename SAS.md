@@ -2,7 +2,7 @@
 
 ---
 
-# yowu-devtools SRS (v1.1)
+# yowu-devtools SRS (v1.2)
 
 ## 0. 문서 메타
 
@@ -87,6 +87,14 @@
 - US-14: JWT 토큰을 디코딩해서 payload를 확인하고 싶다. (v1.1.0)
 - US-15: Chrome 앱으로 등록해 독립 창에서 사용하고 싶다. (v1.1.0)
 - US-16: 큰 JSON이나 텍스트를 처리할 때 UI가 멈추지 않았으면 좋겠다. (v1.1.0)
+- US-17: 키보드만으로 도구를 빠르게 찾고 이동하고 싶다. (v1.2.0)
+- US-18: 파일을 드래그 앤 드롭하거나 선택해서 바로 열고 싶다. (v1.2.0)
+- US-19: 변환 결과를 파일로 다운로드하고 싶다. (v1.2.0)
+- US-20: 공유 링크에 어떤 데이터가 포함되는지 명확히 알고 싶다. (v1.2.0)
+- US-21: 모바일에서 공유 링크를 쉽게 공유하고 싶다. (v1.2.0)
+- US-22: 앱 버전을 확인하고 싶다. (v1.2.0)
+- US-23: 문자열의 해시값(SHA-256 등)을 계산하고 싶다. (v1.2.0)
+- US-24: UUID나 ULID를 빠르게 생성하고 싶다. (v1.2.0)
 
 ---
 
@@ -318,7 +326,10 @@ const { state, shareState } = useToolState<YamlToolState>(
 
 - 전역
 
-  - `Ctrl/Cmd + K`: 툴 검색/빠른 이동(간단한 커맨드 팔레트)
+  - `Ctrl/Cmd + K`: **Command Palette 열기** (v1.2.0)
+    - 도구 검색 및 빠른 이동
+    - 즐겨찾기 토글, 최근 도구 접근 등 빠른 액션
+    - ESC로 닫기
   - `Ctrl/Cmd + /`: 현재 툴 도움말 토글(옵션)
 
 - 툴 공통(가능한 툴에 적용)
@@ -488,6 +499,7 @@ if ('serviceWorker' in navigator) {
 - **폴백**: Worker를 지원하지 않는 환경에서는 메인 스레드에서 처리
 - **로딩 인디케이터**: Worker 처리 중에는 로딩 상태 표시
 - **에러 처리**: Worker 내부 에러를 메인 스레드로 전달하여 표시
+- **응답 순서 보장** (v1.2.0): `requestId` 기반으로 연속 요청 시 최신 응답만 반영
 
 #### Worker 파일 구조
 
@@ -498,6 +510,77 @@ src/
     diff-calculator.worker.ts # Diff 계산 Worker
     yaml-converter.worker.ts  # YAML 변환 Worker
 ```
+
+### 5.11 Command Palette (v1.2.0 추가)
+
+#### 목적
+
+키보드만으로 도구를 빠르게 찾고 이동할 수 있는 UX 제공
+
+#### 기능 요구사항
+
+- **단축키**: `⌘K` (Mac) / `Ctrl+K` (Windows/Linux)
+- **검색 기능**:
+  - 도구 제목 기반 검색
+  - 키워드 기반 검색 (Fuzzy search)
+  - 실시간 필터링
+- **빠른 액션**:
+  - 엔터로 도구 이동
+  - 즐겨찾기 토글 (선택적)
+  - 최근 도구 접근
+- **모바일 지원**: 상단 "Search" 버튼으로 동일 UI 제공
+
+#### 구현 포인트
+
+- `ToolDefinition`에 `keywords`, `category` 필드 추가
+- 사이드바와 동일한 데이터 소스 재사용
+- ESC로 닫기, 키보드 네비게이션 지원
+
+### 5.12 파일 워크플로우 (v1.2.0 추가)
+
+#### 목적
+
+파일 기반 작업을 빠르게 수행할 수 있는 워크플로우 제공
+
+#### 기능 요구사항
+
+- **파일 열기**:
+  - Drag & Drop 지원
+  - 파일 선택 다이얼로그
+  - 공통 컴포넌트로 모든 도구에 재사용 가능
+- **파일 저장**:
+  - 출력 다운로드 버튼
+  - 파일 확장자 자동 감지 (`.json`, `.yml`, `.txt` 등)
+- **성능**:
+  - 큰 파일은 Worker로 처리
+  - `requestId` 기반 응답 순서 보장 (연속 입력 시 결과 뒤섞임 방지)
+
+#### 적용 도구
+
+- JSON Viewer: `.json` 파일 열기/저장
+- YAML Converter: `.yaml`, `.yml` 파일 열기/저장
+- Text Diff: `.txt` 파일 열기/저장
+
+### 5.13 공유(Share) 고도화 (v1.2.0 추가)
+
+#### 목적
+
+공유 링크의 안전성과 이해 가능성 향상
+
+#### 기능 요구사항
+
+- **공유 범위 표시**: 어떤 데이터가 공유되는지 명확히 표시
+  - 입력만 공유 / 입력 + 옵션 공유 구분
+- **Web Share API 지원**: 모바일에서 공유 시트 바로 열기
+- **민감정보 경고**: JWT 등 민감한 도구는 기본적으로 payload 최소화
+- **URL 스키마 버전 관리**: `#v=1&tool=json&payload=...` 형식으로 호환성 유지
+- **저장 옵션**: LocalStorage 저장 데이터와 공유 데이터 분리 옵션 제공
+
+#### 구현 포인트
+
+- 공유 링크 생성 시 범위 표시 모달/토스트
+- Web Share API 지원 (지원 브라우저에서만)
+- 민감정보 경고 메시지 강화
 
 ---
 
@@ -756,6 +839,61 @@ type JwtToolState = {
 
 ---
 
+### 7.9 Hash/Checksum Generator (`toolId: hash`) (v1.2.0 추가)
+
+#### 상태
+
+```ts
+type HashToolState = {
+  input: string;
+  algorithm: 'SHA-256' | 'SHA-1' | 'MD5' | 'SHA-384' | 'SHA-512'; // 기본 SHA-256
+  hmac: boolean; // 기본 false
+  hmacKey: string; // HMAC 사용 시 키
+};
+```
+
+#### 기능
+
+- FR-H-01: 문자열의 해시값 계산 (WebCrypto API 사용)
+- FR-H-02: HMAC 옵션 지원 (HMAC-SHA-256, HMAC-SHA-1 등)
+- FR-H-03: 여러 알고리즘 지원 (SHA-256, SHA-1, MD5, SHA-384, SHA-512)
+- FR-H-04: 결과를 Hex 또는 Base64 형식으로 표시
+- FR-H-05: **주의**: "보안용이 아님" 안내 메시지 표시
+- AC
+
+  - 입력 문자열의 해시값이 즉시 계산됨
+  - HMAC 키 입력 시 HMAC 해시 계산
+  - WebCrypto API 미지원 브라우저에서는 폴백 메시지 표시
+
+---
+
+### 7.10 UUID/ULID Generator (`toolId: uuid`) (v1.2.0 추가)
+
+#### 상태
+
+```ts
+type UuidToolState = {
+  type: 'uuid-v4' | 'uuid-v7' | 'ulid'; // 기본 uuid-v4
+  count: number; // 기본 1, 최대 100
+  format: 'lowercase' | 'uppercase'; // 기본 lowercase
+};
+```
+
+#### 기능
+
+- FR-UUID-01: UUID v4 생성 (랜덤 UUID)
+- FR-UUID-02: UUID v7 생성 (타임스탬프 기반, 시간순 정렬 가능)
+- FR-UUID-03: ULID 생성 (UUID v7과 유사하지만 더 짧음)
+- FR-UUID-04: 여러 개 일괄 생성 (최대 100개)
+- FR-UUID-05: 생성된 ID 복사 (단일/일괄)
+- AC
+
+  - 버튼 클릭 시 즉시 생성
+  - 일괄 생성 시 목록으로 표시
+  - 각 ID별 개별 복사 버튼 제공
+
+---
+
 ## 8. 확장성 설계 (신규 툴 추가가 쉬운 구조)
 
 ### 8.1 Tool 플러그인 계약(인터페이스)
@@ -766,13 +904,14 @@ export type ToolDefinition<TState> = {
   title: string;
   description: string;
   icon?: ReactNode;
-  category?: string; // 미래 대비
-  route: string; // "/json" 형태 (HashRouter 기준)
+  category?: string; // 카테고리 (v1.2.0: Command Palette에서 사용)
+  keywords?: string[]; // 검색 키워드 (v1.2.0: Command Palette에서 사용)
+  path: string; // "/json" 형태 (BrowserRouter 기준)
   defaultState: TState;
 
-  // URL 공유/복원
-  encodeState: (state: TState) => unknown; // JSON-safe
-  decodeState: (raw: any) => TState; // validation 포함
+  // URL 공유/복원 (선택적, useToolState에서 처리)
+  // encodeState?: (state: TState) => unknown; // JSON-safe
+  // decodeState?: (raw: any) => TState; // validation 포함
 
   // React page
   Component: React.FC;
@@ -927,13 +1066,15 @@ export type ToolDefinition<TState> = {
 ## 13. 향후 추가하기 좋은 도구 Backlog(참고)
 
 - ~~JWT 디코더(검증 X, payload 표시)~~ ✅ v1.1.0에서 구현 완료
-- UUID v4/v7 생성기
+- ~~Hash(SHA-256) 생성기("보안용 아님" 안내 포함)~~ ✅ v1.2.0에서 구현 예정
+- ~~UUID v4/v7 생성기~~ ✅ v1.2.0 또는 v1.3.0에서 구현 예정
 - QueryString ↔ JSON
-- Hash(SHA-256) 생성기("보안용 아님" 안내 포함)
 - JSONPath 테스트
 - Regex Tester
 - HTML/JSON minify
 - Case Converter
+- Color Converter (HEX, RGB, HSL)
+- QR Code Generator
 
 ---
 
@@ -968,6 +1109,37 @@ export type ToolDefinition<TState> = {
     - YAML 변환: 큰 파일 처리 시 자동 Worker 사용
     - `useWebWorker` 공통 훅 구현으로 코드 재사용성 향상
     - 로딩 인디케이터 추가
+
+- **v1.2.0** (2025-01-XX):
+
+  - **Command Palette** ✅:
+    - `⌘K` / `Ctrl+K` 단축키로 도구 검색 및 빠른 이동
+    - 도구 제목/키워드 기반 검색 (Fuzzy search)
+    - 즐겨찾기 토글, 최근 도구 접근 등 빠른 액션 지원
+    - 모바일에서는 상단 "Search" 버튼으로 동일 UI 제공
+    - `ToolDefinition`에 `keywords`, `category` 필드 추가 (레지스트리 기반 확장)
+  - **파일 워크플로우 표준화** ✅:
+    - Drag & Drop / 파일 선택으로 입력 채우기 (공통 컴포넌트)
+    - 출력 "다운로드" 버튼 (`.json`, `.yml`, `.txt` 등)
+    - 큰 파일 처리 시 Worker 사용, 응답 순서 보장 (`requestId` 기반)
+    - JSON/YAML/Diff 도구에 파일 열기/저장 지원
+  - **공유(Share) 고도화** ✅:
+    - 공유 링크 생성 시 어떤 데이터가 공유되는지 범위 표시
+    - Web Share API 지원 (모바일 공유 시트)
+    - 민감정보 경고 메시지 강화
+    - URL 공유 스키마 버전 관리 (`#v=1&tool=json&payload=...`)
+    - LocalStorage 저장 데이터와 공유 데이터 분리 옵션
+  - **PWA 폴리싱** ✅:
+    - `manifest.json` shortcuts: 8개 도구 전부 추가
+    - Screenshots 추가 (데스크톱/모바일 2~4장)
+    - 업데이트 감지 시 "새 버전 있음 → 새로고침" 토스트/배너 정교화
+  - **버전/릴리즈 체계 정리** ✅:
+    - 앱 내 표시 버전: `__APP_VERSION__` (빌드 타임 주입)로 사이드바 footer에 노출
+    - `package.json` 버전과 실제 서비스 버전 동기화
+    - CHANGELOG.md 추가 (Git tag 기반 릴리즈 노트)
+  - **신규 도구 추가** (1~2개):
+    - Hash/Checksum 도구 (SHA-256/SHA-1/MD5 + HMAC 옵션) - WebCrypto API 사용
+    - UUID/ULID 생성기 (v1.2.0 또는 v1.3.0)
 
 - **v1.3** (2025-01-XX):
 

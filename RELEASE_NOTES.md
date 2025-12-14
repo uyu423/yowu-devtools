@@ -1,5 +1,51 @@
 # Release Notes
 
+## v1.2.0 (January 2025) - Power-user Release
+
+**New Features:**
+
+- ✨ **Command Palette**: Fast tool navigation with `⌘K` / `Ctrl+K`
+  - Search tools by title or keywords (Fuzzy search)
+  - Quick actions: Navigate, toggle favorites, access recent tools
+  - Mobile support: "Search" button in header
+- ✨ **File Workflow**: Drag & drop and file download support
+  - Drag & drop files or use file picker to load input
+  - Download results as files (`.json`, `.yml`, `.txt`, etc.)
+  - Available in JSON, YAML, and Diff tools
+  - Worker response ordering guaranteed with `requestId` for large files
+- ✨ **Enhanced Share**: Improved sharing experience
+  - Shows what data is included in share links
+  - Web Share API support for mobile devices
+  - Enhanced privacy warnings for sensitive tools (JWT)
+  - URL schema versioning for compatibility
+- ✨ **PWA Polish**: Complete PWA installation experience
+  - All 8 tools added to shortcuts
+  - Screenshots for desktop and mobile
+  - Improved update notifications and refresh prompts
+- ✨ **Version Display**: App version shown in sidebar footer
+  - Build-time version injection from `package.json`
+  - Version synchronization between package.json and service
+- ✨ **New Tools**:
+  - Hash/Checksum Generator: SHA-256, SHA-1, MD5, HMAC support (WebCrypto API)
+  - UUID/ULID Generator: Generate UUID v4/v7 and ULID (optional, may be in v1.3.0)
+
+**Improvements:**
+
+- 🎯 Better keyboard navigation with Command Palette
+- 📁 File-based workflow for faster iteration
+- 🔒 Enhanced privacy controls and warnings
+- 📱 Better mobile sharing experience
+- 🎨 Improved PWA installation and update UX
+- 📊 Version tracking and release notes
+
+**Technical:**
+
+- Extended `ToolDefinition` with `keywords` and `category` fields
+- Worker response ordering with `requestId` to prevent race conditions
+- Web Share API integration with clipboard fallback
+- Build-time version injection via Vite environment variables
+- CHANGELOG.md for Git tag-based release notes
+
 ## v1.1.1 (January 2025)
 
 **Bug Fixes:**
