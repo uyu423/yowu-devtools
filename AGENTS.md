@@ -73,7 +73,174 @@ Use TypeScript + JSX with 2-space indentation and functional components. Compone
 There are no automated tests yet; when adding them, colocate specs inside `src/<feature>/__tests__/` and name files `*.test.ts(x)`. Prefer Vitest + React Testing Library for component coverage, and mock expensive editor/diff interactions. Always document new manual verification steps in PRs until suites exist.
 
 ## Commit & Pull Request Guidelines
-Write short imperative commit subjects (`add base64 swap`, `wire cron parser`). Reference issues in the body (`Refs: #42`) when relevant. Pull requests should describe the change, include screenshots/GIFs for UI updates, and list any commands executed (`dev`, `lint`, `build`). Rebase on `main`, ensure lint/build succeed locally, and request review only when green.
+
+### 커밋 단위 규칙
+
+**원칙**: 각 커밋은 논리적으로 독립적이고 완전한 작업 단위여야 합니다.
+
+1. **기능 단위로 커밋**
+   - 하나의 기능이나 변경사항을 하나의 커밋으로 묶습니다
+   - 예: Command Palette 기능 전체, 파일 워크플로우 전체
+   - ❌ 나쁜 예: 여러 기능을 한 번에 커밋
+   - ✅ 좋은 예: 각 기능을 별도 커밋
+
+2. **관련 파일은 함께 커밋**
+   - 하나의 기능에 관련된 모든 파일 변경사항을 함께 커밋합니다
+   - 예: 새 도구 추가 시 컴포넌트, 타입, SEO 설정을 함께 커밋
+
+3. **문서 업데이트는 별도 커밋 가능**
+   - 코드 변경과 문서 업데이트를 분리할 수 있습니다
+   - 단, 코드 변경과 밀접하게 연관된 문서는 함께 커밋 가능
+
+4. **빌드/테스트 통과 후 커밋**
+   - 커밋 전에 반드시 `npm run lint`와 `npm run build`가 성공하는지 확인
+   - 실패한 빌드는 커밋하지 않음
+
+### 커밋 메시지 작성 규칙
+
+**형식**: `<type>: <subject>`
+
+#### 커밋 타입 (Conventional Commits)
+
+- `feat:` - 새로운 기능 추가
+- `fix:` - 버그 수정
+- `refactor:` - 코드 리팩토링 (기능 변경 없음)
+- `docs:` - 문서 변경
+- `chore:` - 빌드 설정, 도구 설정 등
+- `style:` - 코드 포맷팅, 세미콜론 누락 등 (기능 변경 없음)
+- `test:` - 테스트 코드 추가/수정
+- `perf:` - 성능 개선
+
+#### 주제 (Subject) 작성 규칙
+
+1. **명령형 문장 사용** (동사로 시작)
+   - ✅ `Add Command Palette feature`
+   - ✅ `Fix favorites sync issue`
+   - ❌ `Added Command Palette feature`
+   - ❌ `Fixing favorites sync issue`
+
+2. **50자 이내로 작성**
+   - 첫 줄은 간결하고 명확하게
+   - 필요시 본문에 상세 설명 추가
+
+3. **영문으로 작성**
+   - 프로젝트의 일관성을 위해 커밋 메시지는 영문으로 작성
+   - 한국어는 본문에만 사용 가능
+
+4. **구체적으로 작성**
+   - 무엇을 변경했는지 명확히 표현
+   - ✅ `Add UUID/ULID Generator tool`
+   - ❌ `Add new tool`
+   - ✅ `Fix favorites sync by reading from localStorage`
+   - ❌ `Fix bug`
+
+#### 본문 (Body) 작성 규칙
+
+본문은 선택사항이지만, 복잡한 변경사항의 경우 반드시 포함합니다.
+
+1. **변경 이유 설명**
+   - 왜 이 변경이 필요한지 설명
+   - 문제점이나 개선 사항 명시
+
+2. **변경 내용 상세 설명**
+   - 주요 변경사항 나열
+   - 기술적 세부사항 포함 가능
+
+3. **이슈 참조**
+   - 관련 이슈가 있으면 `Refs: #42` 형식으로 참조
+
+4. **영문 또는 한글 모두 사용 가능**
+   - 본문은 개발자 간 소통을 위한 것이므로 한글 사용 가능
+
+#### 커밋 메시지 예시
+
+**기능 추가 (feat)**:
+```
+feat: Add Command Palette (⌘K / Ctrl+K)
+
+- Implement fuzzy search for tools
+- Add keyboard navigation (arrow keys, Enter, ESC)
+- Integrate with favorites and recent tools
+- Add mobile support via Search button
+```
+
+**버그 수정 (fix)**:
+```
+fix: Fix favorites sync by reading from localStorage in event handler
+
+- Change event handler to read directly from localStorage instead of using event detail
+- This avoids closure issues and ensures the latest value is always used
+- Fixes issue where Sidebar favorites didn't update immediately when toggled in Command Palette
+```
+
+**리팩토링 (refactor)**:
+```
+refactor: Improve Hash Generator UI layout and styling
+
+- Simplify title to "Hash Generator"
+- Group options into a card-like structure
+- Move security warning to concise note at bottom
+- Improve visual harmony with other tools
+```
+
+**문서 업데이트 (docs)**:
+```
+docs: Update development documents for v1.2.0 completion
+
+- Update SAS.md with completed v1.2.0 features
+- Update IMPLEMENTATION_PLAN.md with Phase 6 completion status
+- Update RELEASE_NOTES.md with v1.2.0 release notes
+- Update TEST_CHECKLIST.md with new test scenarios
+```
+
+**설정 변경 (chore)**:
+```
+chore: Update deploy.yml
+
+- Update Node.js version to 20
+- Add cache configuration for faster builds
+```
+
+### Pull Request 작성 규칙
+
+1. **제목**: 커밋 메시지와 동일한 형식 사용
+2. **설명**:
+   - 변경 사항 요약
+   - 변경 이유 및 배경
+   - 테스트 방법 및 결과
+   - 스크린샷/GIF (UI 변경 시)
+   - 실행한 명령어 목록 (`npm run dev`, `npm run lint`, `npm run build`)
+3. **체크리스트**:
+   - [ ] `npm run lint` 통과
+   - [ ] `npm run build` 통과
+   - [ ] 관련 문서 업데이트 (필요시)
+   - [ ] 테스트 완료
+
+### 커밋 예시 (실제 프로젝트에서 사용된 패턴)
+
+```bash
+# 기능 추가
+feat: Add Command Palette (⌘K / Ctrl+K)
+feat: Add UUID/ULID Generator tool
+feat: Enhance share functionality with ShareModal and Web Share API
+
+# 버그 수정
+fix: Fix favorites sync by reading from localStorage in event handler
+fix: Improve PWA update detection and notification
+
+# 리팩토링
+refactor: Improve Hash Generator UI layout and styling
+refactor: Add copy icon buttons to all tools for consistent UX
+
+# 문서
+docs: Update development documents for v1.2.0 completion
+docs: v1.2.0 requirements
+
+# 설정
+chore: update deploy.yml
+```
+
+**참고**: Rebase on `main`, ensure lint/build succeed locally, and request review only when green.
 
 ## Environment & Deployment Notes
 Use Node 20+ / npm 10 to stay in sync with `package-lock.json`. Install dependencies with npm only. GitHub Pages deployment is handled by `.github/workflows/deploy.yml`; verify `npm run build` before merging to `main` because pushes trigger a deploy. Whenever a feature, UX flow, or tool option changes, immediately review and refresh all relevant docs (`README.md`, `AGENTS.md`, `SAS.md`, implementation notes) so instructions never drift from the actual behavior.
@@ -483,6 +650,25 @@ if (shouldUseWorker(input)) {
   processInMainThread(input);
 }
 ```
+
+## 문서 구조
+
+### Root 디렉토리 (즉시 참고 문서)
+- `README.md`: 프로젝트 개요 및 시작 가이드
+- `AGENTS.md`: AI Agent 작업 가이드 (이 문서)
+- `.cursorrules`: Cursor IDE 규칙
+- `SAS.md`: 상세 요구사항 명세 (Software Architecture Specification)
+- `IMPLEMENTATION_PLAN.md`: 구현 계획 및 체크리스트
+- `RELEASE_NOTES.md`: 릴리스 노트
+- `TEST_CHECKLIST.md`: 테스트 체크리스트
+
+### docs/ 디렉토리 (기타 문서)
+- `docs/V1.2.0_CROSS_CHECK.md`: v1.2.0 크로스 체크 결과
+- `docs/PWA_TROUBLESHOOTING.md`: PWA 트러블슈팅 가이드
+- `docs/TEST_RESULTS_v1.1.0.md`: v1.1.0 테스트 결과
+- `docs/TEST_ISSUES_v1.1.0.md`: v1.1.0 테스트 이슈
+
+**참고**: 핵심 개발 문서(`SAS.md`, `IMPLEMENTATION_PLAN.md`, `RELEASE_NOTES.md`, `TEST_CHECKLIST.md`)는 root에 두고, 나머지 기타 자질구레한 문서들(크로스 체크 결과, 트러블슈팅 가이드, 테스트 결과 등)은 `docs/` 하위에 생성하세요.
 
 ### 주의사항
 

@@ -1,16 +1,21 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { useMemo } from 'react';
 import type { ToolDefinition } from '@/tools/types';
-import { FileDiff } from 'lucide-react';
+import { FileDiff, Copy } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { EditorPanel } from '@/components/common/EditorPanel';
 import { ActionBar } from '@/components/common/ActionBar';
+import { FileInput } from '@/components/common/FileInput';
+import { FileDownload } from '@/components/common/FileDownload';
+import { getMimeType } from '@/lib/fileUtils';
 import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useTitle } from '@/hooks/useTitle';
 import { useWebWorker, shouldUseWorkerForText } from '@/hooks/useWebWorker';
 import { copyToClipboard } from '@/lib/clipboard';
+import { isMobileDevice } from '@/lib/utils';
+import { ShareModal } from '@/components/common/ShareModal';
 import DiffMatchPatch from 'diff-match-patch';
 import type { Diff } from 'diff-match-patch';
 
@@ -34,17 +39,30 @@ const DiffTool: React.FC = () => {
   useTitle('Text Diff');
   // Diff tool state contains: left (string), right (string), view, ignoreWhitespace, ignoreCase
   // All fields are necessary for sharing - input strings may be large but required
-  const { state, updateState, resetState, shareState } =
+  const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
     useToolState<DiffToolState>('diff', DEFAULT_STATE);
+  const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
+  const shareInfo = getShareStateInfo();
+  const isMobile = isMobileDevice();
   const debouncedLeft = useDebouncedValue(state.left, 250);
   const debouncedRight = useDebouncedValue(state.right, 250);
 
-  // Worker 사용 여부 결정
+  // Worker 사용 여부 결정 (디바운싱 전 state.left/right를 기준으로 결정하여 붙여넣기 시 즉시 Worker 모드 전환)
   const shouldUseWorker = React.useMemo(() => {
-    const leftShouldUse = shouldUseWorkerForText(debouncedLeft, 500_000, 10_000);
-    const rightShouldUse = shouldUseWorkerForText(debouncedRight, 500_000, 10_000);
+    const leftShouldUse = shouldUseWorkerForText(state.left, 500_000, 10_000);
+    const rightShouldUse = shouldUseWorkerForText(state.right, 500_000, 10_000);
     return leftShouldUse || rightShouldUse;
-  }, [debouncedLeft, debouncedRight]);
+  }, [state.left, state.right]);
+
+  // Request ID for Worker response ordering (v1.2.0)
+  const [requestId, setRequestId] = React.useState<number | undefined>(undefined);
+  
+  // Generate request ID when inputs change
+  React.useEffect(() => {
+    if (shouldUseWorker && (!!debouncedLeft || !!debouncedRight)) {
+      setRequestId((prev) => (prev ?? 0) + 1);
+    }
+  }, [shouldUseWorker, debouncedLeft, debouncedRight]);
 
   // Worker를 사용한 diff 계산
   const { result: workerResult, isProcessing } = useWebWorker<
@@ -61,6 +79,8 @@ const DiffTool: React.FC = () => {
           ignoreCase: state.ignoreCase,
         }
       : null,
+    requestId,
+    timeout: 10_000, // 10 seconds timeout
   });
 
   // 메인 스레드 diff 계산 (작은 데이터용)
@@ -125,23 +145,53 @@ const DiffTool: React.FC = () => {
         title="Text Diff"
         description="Spot differences between two text blocks instantly."
         onReset={() => resetState()}
-        onShare={shareState}
+        onShare={async () => {
+          if (isMobile) {
+            setIsShareModalOpen(true);
+          } else {
+            await copyShareLink();
+          }
+        }}
       />
 
       <div className="flex flex-col gap-4">
         <div className="grid gap-4 lg:grid-cols-2">
-          <EditorPanel
-            title="Original"
-            value={state.left}
-            onChange={(val) => updateState({ left: val })}
-            className="h-60"
-          />
-          <EditorPanel
-            title="Modified"
-            value={state.right}
-            onChange={(val) => updateState({ right: val })}
-            className="h-60"
-          />
+          <div className="flex flex-col">
+            <EditorPanel
+              title="Original"
+              value={state.left}
+              onChange={(val) => updateState({ left: val })}
+              className="h-60"
+            />
+            <div className="mt-3">
+              <FileInput
+                onFileLoad={(content) => {
+                  updateState({ left: content });
+                }}
+                accept=".txt,text/plain"
+                maxSize={50 * 1024 * 1024} // 50MB
+                className="w-full"
+              />
+            </div>
+          </div>
+          <div className="flex flex-col">
+            <EditorPanel
+              title="Modified"
+              value={state.right}
+              onChange={(val) => updateState({ right: val })}
+              className="h-60"
+            />
+            <div className="mt-3">
+              <FileInput
+                onFileLoad={(content) => {
+                  updateState({ right: content });
+                }}
+                accept=".txt,text/plain"
+                maxSize={50 * 1024 * 1024} // 50MB
+                className="w-full"
+              />
+            </div>
+          </div>
         </div>
 
         <ActionBar className="flex flex-wrap items-center justify-between rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm">
@@ -186,16 +236,15 @@ const DiffTool: React.FC = () => {
                 Ignore Case
               </OptionLabel>
             </label>
-            <button
-              className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            <FileDownload
+              content={unifiedExport}
+              fileName="diff.txt"
+              mimeType={getMimeType('txt')}
               disabled={!hasDiff}
-              onClick={() =>
-                hasDiff &&
-                copyToClipboard(unifiedExport, 'Copied unified diff output.')
-              }
+              className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             >
-              Copy Unified
-            </button>
+              Download Unified
+            </FileDownload>
           </div>
         </ActionBar>
 
@@ -204,6 +253,17 @@ const DiffTool: React.FC = () => {
             <span className="font-semibold text-gray-800 dark:text-white">
               Diff Result
             </span>
+            <button
+              onClick={() =>
+                hasDiff &&
+                copyToClipboard(unifiedExport, 'Copied unified diff output.')
+              }
+              disabled={!hasDiff}
+              className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Copy Unified Diff"
+            >
+              <Copy className="w-4 h-4" />
+            </button>
             <div className="space-x-4 text-xs uppercase tracking-wide">
               <span className="text-green-600 dark:text-green-400">
                 +{stats.added} chars
@@ -242,6 +302,17 @@ const DiffTool: React.FC = () => {
           )}
         </div>
       </div>
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        onConfirm={async () => {
+          setIsShareModalOpen(false);
+          await shareViaWebShare();
+        }}
+        includedFields={shareInfo.includedFields}
+        excludedFields={shareInfo.excludedFields}
+        toolName="Text Diff"
+      />
     </div>
   );
 };
@@ -349,6 +420,8 @@ export const diffTool: ToolDefinition<DiffToolState> = {
   description: 'Compare two texts',
   path: '/diff',
   icon: FileDiff,
+  keywords: ['diff', 'compare', 'difference', 'text', 'unified', 'side'],
+  category: 'viewer',
   defaultState: DEFAULT_STATE,
   Component: DiffTool,
 };

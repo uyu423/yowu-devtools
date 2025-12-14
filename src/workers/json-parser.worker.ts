@@ -5,6 +5,7 @@ interface ParseRequest {
   input: string;
   indent: 2 | 4;
   sortKeys: boolean;
+  requestId?: number | string; // v1.2.0: Request ID for response ordering
 }
 
 interface ParseResponse {
@@ -13,6 +14,7 @@ interface ParseResponse {
   formatted?: string;
   minified?: string;
   error?: string;
+  requestId?: number | string; // v1.2.0: Request ID for response ordering
 }
 
 // JSON 키 정렬 함수
@@ -33,9 +35,20 @@ function sortJsonKeys(value: unknown): unknown {
 
 // Worker 메시지 핸들러
 self.onmessage = (e: MessageEvent<ParseRequest>) => {
-  const { input, indent, sortKeys } = e.data;
+  const { input, indent, sortKeys, requestId } = e.data;
 
   try {
+    // 테스트용: 타임아웃 테스트를 위한 인위적 지연 (15초)
+    // 실제 프로덕션에서는 제거해야 함
+    const isTimeoutTest = input.includes('__TIMEOUT_TEST__');
+    if (isTimeoutTest) {
+      // 15초 대기하여 타임아웃 발생시키기
+      const startTime = Date.now();
+      while (Date.now() - startTime < 15_000) {
+        // Busy wait
+      }
+    }
+
     // JSON 파싱
     const parsed = JSON.parse(input);
     
@@ -51,6 +64,7 @@ self.onmessage = (e: MessageEvent<ParseRequest>) => {
       data: normalized,
       formatted,
       minified,
+      requestId, // Include requestId in response
     };
 
     self.postMessage(response);
@@ -58,6 +72,7 @@ self.onmessage = (e: MessageEvent<ParseRequest>) => {
     const response: ParseResponse = {
       success: false,
       error: (error as Error).message,
+      requestId, // Include requestId in error response
     };
 
     self.postMessage(response);

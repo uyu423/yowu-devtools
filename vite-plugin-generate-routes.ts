@@ -189,31 +189,177 @@ const tools: ToolInfo[] = [
     ],
   },
   {
-    id: 'jwt',
-    path: '/jwt',
-    title: 'JWT',
-    description: 'Decode and encode JSON Web Tokens',
+    id: 'jwt-decoder',
+    path: '/jwt-decoder',
+    title: 'JWT Decoder',
+    description: 'Decode JSON Web Tokens',
     seoDescription:
-      'Free online JWT decoder and encoder. Decode JSON Web Tokens to view header, payload, and signature. Encode JWT tokens with HMAC signing. Verify token signatures and check expiration. All processing happens in your browser.',
+      'Free online JWT decoder. Decode JSON Web Tokens to view header, payload, and signature. Verify token signatures and check expiration. All processing happens in your browser.',
     keywords: [
       'jwt decoder',
-      'jwt encoder',
       'jwt parser',
       'jwt token',
       'json web token',
       'jwt decode',
-      'jwt encode',
       'jwt validator',
       'jwt signature verification',
       'jwt viewer',
+      'decode jwt',
     ],
     features: [
       'Decode JWT tokens',
-      'Encode JWT tokens',
       'Signature verification',
       'Token expiration check',
-      'HMAC signing support',
       'Header and payload viewer',
+      'Token validation',
+    ],
+  },
+  {
+    id: 'jwt-encoder',
+    path: '/jwt-encoder',
+    title: 'JWT Encoder',
+    description: 'Encode JSON Web Tokens',
+    seoDescription:
+      'Free online JWT encoder. Encode JSON Web Tokens from header and payload with HMAC signing. Generate secure JWT tokens. All processing happens in your browser.',
+    keywords: [
+      'jwt encoder',
+      'jwt token',
+      'json web token',
+      'jwt encode',
+      'jwt generator',
+      'jwt signing',
+      'hmac jwt',
+      'encode jwt',
+      'create jwt',
+    ],
+    features: [
+      'Encode JWT tokens',
+      'HMAC signing support',
+      'Custom header and payload',
+      'Multiple algorithm support',
+      'Secure token generation',
+    ],
+  },
+  {
+    id: 'hash',
+    path: '/hash',
+    title: 'Hash/Checksum Generator',
+    description: 'Calculate hash values and HMAC signatures',
+    seoDescription:
+      'Free online hash and checksum generator. Calculate SHA-256, SHA-1, SHA-384, SHA-512 hashes and HMAC signatures. All processing happens in your browser - no data sent to servers.',
+    keywords: [
+      'hash generator',
+      'checksum calculator',
+      'sha256',
+      'sha1',
+      'sha384',
+      'sha512',
+      'hmac',
+      'cryptographic hash',
+      'digest calculator',
+      'hash tool',
+      'checksum tool',
+      'fingerprint generator',
+    ],
+    features: [
+      'SHA-256 hash calculation',
+      'SHA-1 hash calculation',
+      'SHA-384 hash calculation',
+      'SHA-512 hash calculation',
+      'HMAC signature support',
+      'Hex and Base64 output formats',
+      'Real-time calculation',
+    ],
+  },
+  {
+    id: 'uuid',
+    path: '/uuid',
+    title: 'UUID/ULID Generator',
+    description: 'Generate UUID v4, UUID v7, and ULID identifiers',
+    seoDescription:
+      'Free online UUID and ULID generator. Generate UUID v4 (random), UUID v7 (timestamp-based), and ULID identifiers. Batch generation up to 100 IDs. All processing happens in your browser.',
+    keywords: [
+      'uuid generator',
+      'ulid generator',
+      'uuid v4',
+      'uuid v7',
+      'ulid',
+      'unique identifier',
+      'guid generator',
+      'random id',
+      'timestamp id',
+      'uuid tool',
+      'ulid tool',
+    ],
+    features: [
+      'UUID v4 generation (random)',
+      'UUID v7 generation (timestamp-based)',
+      'ULID generation (shorter timestamp-based)',
+      'Batch generation (up to 100 IDs)',
+      'Lowercase and uppercase formats',
+      'Copy individual or all IDs',
+    ],
+  },
+  {
+    id: 'password',
+    path: '/password',
+    title: 'Password Generator',
+    description: 'Generate secure passwords with customizable options',
+    seoDescription:
+      'Free online password generator. Create strong, secure passwords with customizable length, character types, and exclusion options. Password strength indicator included. All processing happens in your browser.',
+    keywords: [
+      'password generator',
+      'secure password',
+      'random password',
+      'password creator',
+      'strong password',
+      'password maker',
+      'password tool',
+      'password strength',
+      'password checker',
+      'online password generator',
+      'password builder',
+    ],
+    features: [
+      'Customizable password length (4-128 characters)',
+      'Character type selection (uppercase, lowercase, numbers, symbols)',
+      'Exclude similar characters (i, l, 1, L, o, 0, O)',
+      'Exclude ambiguous symbols',
+      'Password strength indicator (entropy-based)',
+      'Batch generation (up to 20 passwords)',
+      'Copy individual or all passwords',
+    ],
+  },
+  {
+    id: 'url-parser',
+    path: '/url-parser',
+    title: 'URL Parser',
+    description:
+      'Parse and visualize URL components including protocol, host, path, fragment, and query parameters',
+    seoDescription:
+      'Free online URL parser. Parse and visualize URL components (protocol, host, path, fragment, query parameters) with decoding options. Client-side processing.',
+    keywords: [
+      'url parser',
+      'url analyzer',
+      'url decoder',
+      'url components',
+      'query string parser',
+      'query params',
+      'url parameters',
+      'url query parser',
+      'query string analyzer',
+      'url query string',
+      'query parameter parser',
+      'url query decoder',
+    ],
+    features: [
+      'Parse URL components (protocol, host, path, fragment)',
+      'Parse and visualize query parameters',
+      'Show decoded and raw values',
+      'Copy individual URL components',
+      'Copy individual parameters',
+      'Copy entire query string',
+      'Real-time parsing',
     ],
   },
 ];
@@ -242,7 +388,7 @@ export function generateRoutes(): Plugin {
         const structuredData = {
           '@context': 'https://schema.org',
           '@type': 'WebApplication',
-          name: `${tool.title} - tools.yowu.dev`,
+          name: `${tool.title} | Yowu's DevTools`,
           url: toolUrl,
           applicationCategory: 'DeveloperApplication',
           operatingSystem: 'Web',
@@ -260,7 +406,7 @@ export function generateRoutes(): Plugin {
         };
 
         // SEO 최적화된 title 생성 (50-60자 권장)
-        const seoTitle = `${tool.title} - Dev Tool | tools.yowu.dev`;
+        const seoTitle = `${tool.title} | Yowu's DevTools`;
 
         // Description이 160자를 초과하면 자르기 (110-160자 권장)
         const optimizedDescription =
@@ -279,13 +425,13 @@ export function generateRoutes(): Plugin {
     <meta property="og:title" content="${seoTitle}" />
     <meta property="og:description" content="${optimizedDescription}" />
     <meta property="og:image" content="https://tools.yowu.dev/opengraph.png" />
-    <meta property="og:image:alt" content="${tool.title} - Dev Tool" />
-    <meta property="og:site_name" content="tools.yowu.dev" />
+    <meta property="og:image:alt" content="${tool.title} | Yowu's DevTools" />
+    <meta property="og:site_name" content="Yowu's DevTools" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="${seoTitle}" />
     <meta name="twitter:description" content="${optimizedDescription}" />
     <meta name="twitter:image" content="https://tools.yowu.dev/opengraph.png" />
-    <meta name="twitter:image:alt" content="${tool.title} - Dev Tool" />
+    <meta name="twitter:image:alt" content="${tool.title} | Yowu's DevTools" />
     <script type="application/ld+json">${JSON.stringify(
       structuredData,
       null,

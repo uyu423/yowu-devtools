@@ -6,12 +6,14 @@
 
 ## 1. 프로젝트 현황
 
-- **상태**: Phase 5 완료 ✅ (v1.1.0 릴리스 준비 완료)
-- **현재 버전**: v1.1.0 (2024-12-14)
+- **상태**: Phase 6 완료 ✅ (v1.2.0 릴리스 완료)
+- **현재 버전**: v1.2.0 (2025-01-XX)
+- **다음 버전**: v1.3.0 (예정)
 - **주요 변경점**:
   - Phase 3: 모든 도구 기능 구현 완료 (JSON, URL, Base64, Time, YAML, Diff, Cron)
   - Phase 4: CI/CD 및 배포 설정 완료
   - Phase 5 (v1.1.0): ✅ 사이드바 고도화, Web App 지원, JWT 도구 추가, Web Worker 성능 최적화 완료
+  - Phase 6 (v1.2.0): ✅ Command Palette, 파일 워크플로우, 공유 고도화, PWA 폴리싱, 버전 체계 정리, Hash/UUID/URL Parser 도구 추가 완료
 
 ---
 
@@ -216,4 +218,154 @@ src/
   - [x] JSON: 1MB 이상 또는 10,000줄 이상 시 Worker 사용
   - [x] Diff: 10,000줄 이상 시 Worker 사용
   - [x] YAML: 큰 파일 처리 시 자동 Worker 사용
-  - [x] `shouldUseWorkerForText` 헬퍼 함수 구현
+    - [x] `shouldUseWorkerForText` 헬퍼 함수 구현
+
+### Phase 6: v1.2.0 기능 구현 (Power-user Release)
+
+#### 6.1 Command Palette 구현 ✅
+
+- [x] **Command Palette 컴포넌트 생성**:
+  - [x] `src/components/common/CommandPalette.tsx` 생성
+  - [x] `⌘K` / `Ctrl+K` 단축키 핸들러 구현
+  - [x] Fuzzy search 알고리즘 구현
+  - [x] 키보드 네비게이션 (Arrow keys, Enter, ESC)
+  - [x] 모바일 "Search" 버튼 통합
+
+- [x] **ToolDefinition 확장**:
+  - [x] `keywords` 필드 추가 (검색 키워드 배열)
+  - [x] `category` 필드 추가 (카테고리 분류)
+  - [x] 기존 도구들에 keywords/category 추가
+
+- [x] **통합**:
+  - [x] `App.tsx`에 Command Palette 통합
+  - [x] 사이드바와 동일한 데이터 소스 재사용
+  - [x] 즐겨찾기 토글 액션 추가
+
+#### 6.2 파일 워크플로우 표준화 ✅
+
+- [x] **파일 입력 컴포넌트**:
+  - [x] `src/components/common/FileInput.tsx` 생성
+  - [x] Drag & Drop 지원
+  - [x] 파일 선택 다이얼로그
+  - [x] 파일 읽기 (FileReader API)
+  - [x] 에러 처리 (파일 크기 제한, 형식 검증)
+
+- [x] **파일 다운로드 컴포넌트**:
+  - [x] `src/components/common/FileDownload.tsx` 생성
+  - [x] Blob 생성 및 다운로드
+  - [x] 파일 확장자 자동 감지 (`fileUtils.ts`)
+  - [x] 파일명 제안 기능
+
+- [x] **Worker 응답 순서 보장**:
+  - [x] `useWebWorker` 훅에 `requestId` 추가
+  - [x] Worker에서 `requestId` 포함하여 응답
+  - [x] 최신 요청만 반영하는 로직 구현
+
+- [x] **도구 통합**:
+  - [x] JSON 도구에 파일 열기/저장 추가
+  - [x] YAML 도구에 파일 열기/저장 추가
+  - [x] Diff 도구에 파일 열기/저장 추가
+
+#### 6.3 공유(Share) 고도화 ✅
+
+- [x] **공유 범위 표시**:
+  - [x] 공유 링크 생성 시 모달로 범위 표시 (`ShareModal.tsx`)
+  - [x] 포함된 필드 목록 표시
+  - [x] 제외된 필드 설명 (UI 전용 상태 등)
+
+- [x] **Web Share API 지원**:
+  - [x] `navigator.share` API 감지
+  - [x] 모바일에서 공유 시트 열기
+  - [x] 폴백: 클립보드 복사 (기존 방식)
+
+- [x] **민감정보 경고**:
+  - [x] JWT 도구에 민감정보 경고 메시지 추가
+  - [x] 공유 시 경고 모달 표시 (`ShareModal`에 `isSensitive` prop)
+  - [ ] "저장 안 함" 모드 옵션 (향후 추가 가능)
+
+- [x] **URL 스키마 버전 관리**:
+  - [x] `ShareEnvelope`에 버전 필드 명시 (`v: 1`)
+  - [x] 버전 호환성 검증 로직 추가
+  - [x] 향후 버전 업그레이드 대비
+
+#### 6.4 PWA 폴리싱 ✅
+
+- [x] **Manifest shortcuts 확장**:
+  - [x] 8개 도구 전부 shortcuts 추가
+  - [x] 각 도구별 아이콘 및 이름 설정
+  - [x] `vite.config.ts`에서 shortcuts 설정
+
+- [x] **Screenshots 추가**:
+  - [x] 데스크톱 스크린샷 2장 생성 (필드 추가 완료, 이미지 파일은 추후 추가)
+  - [x] 모바일 스크린샷 2장 생성 (필드 추가 완료, 이미지 파일은 추후 추가)
+  - [x] `public/` 디렉토리에 배치 (필드만 추가됨)
+  - [x] `manifest.json`에 screenshots 필드 추가
+
+- [ ] **업데이트 UX 정교화** (선택적):
+  - [ ] `PWAUpdatePrompt` 컴포넌트 개선
+  - [ ] "새 버전 있음" 토스트 스타일 개선
+  - [ ] 업데이트 배너 디자인 개선
+  - [ ] 업데이트 후 자동 새로고침 옵션
+
+#### 6.5 버전/릴리즈 체계 정리 ✅
+
+- [x] **빌드 타임 버전 주입**:
+  - [x] `vite.config.ts`에서 `APP_VERSION` 정의
+  - [x] `package.json`의 `version` 필드 읽기
+  - [x] 빌드 시 환경 변수로 주입
+
+- [x] **사이드바 footer에 버전 표시**:
+  - [x] `Sidebar.tsx`에 버전 표시 추가
+  - [ ] 버전 클릭 시 CHANGELOG 링크 (선택적, 향후 추가 가능)
+
+- [x] **package.json 버전 동기화**:
+  - [x] `package.json`의 `version`을 `1.2.0`으로 업데이트
+  - [x] 실제 서비스 버전과 일치시킴
+
+- [x] **RELEASE_NOTES.md 업데이트**:
+  - [x] v1.2.0 릴리즈 노트 작성
+  - [x] 각 버전별 변경사항 기록
+
+#### 6.6 신규 도구 추가 (1~2개) ✅
+
+- [x] **Hash/Checksum 도구**:
+  - [x] `src/tools/hash/index.tsx` 생성
+  - [x] WebCrypto API 사용 (SHA-256, SHA-1, SHA-384, SHA-512)
+  - [x] HMAC 옵션 지원
+  - [x] 결과를 Hex/Base64 형식으로 표시
+  - [x] "보안용이 아님" 안내 메시지
+  - [x] 도구 등록 및 SEO 정보 추가
+  - [x] UI 개선 (타이틀 간소화, 옵션 카드 레이아웃)
+
+- [x] **UUID/ULID 생성기**:
+  - [x] `src/tools/uuid/index.tsx` 생성
+  - [x] UUID v4/v7 생성
+  - [x] ULID 생성
+  - [x] 일괄 생성 기능 (최대 100개)
+  - [x] 도구 등록 및 SEO 정보 추가
+
+- [ ] **Password Generator**:
+  - [ ] `src/tools/password/index.tsx` 생성
+  - [ ] 비밀번호 길이 설정 (슬라이더, 4-128)
+  - [ ] 문자 유형 선택 (대문자, 소문자, 숫자, 특수문자)
+  - [ ] 유사 문자 제외 옵션 (i, l, 1, L, o, 0, O)
+  - [ ] 모호한 특수문자 제외 옵션
+  - [ ] 보안 강도 계산 및 표시 (엔트로피 기반)
+  - [ ] 일괄 생성 기능 (최대 20개)
+  - [ ] 복사 기능 (단일/일괄)
+  - [ ] 유효성 검사 (최소 하나의 문자 유형 선택)
+  - [ ] 도구 등록 및 SEO 정보 추가
+
+- [x] **URL Parser** (이전 Query String Parser):
+  - [x] `src/tools/query-string/index.tsx` 생성
+  - [x] URL 또는 query string 입력 받기
+  - [x] URL 컴포넌트 파싱 (protocol, host, path, fragment, query parameters)
+  - [x] Query string 파싱 로직 구현 (직접 파싱으로 배열 파라미터 지원)
+  - [x] 파라미터 구조화 표시 (테이블 형태)
+  - [x] 디코딩 옵션 (`showDecoded`, `showRaw`)
+  - [x] 개별 파라미터 및 URL 컴포넌트 복사 기능
+  - [x] 전체 query string 복사 기능
+  - [x] 에러 처리 (잘못된 URL, query string 없음)
+  - [x] 실시간 파싱 (Debounce)
+  - [x] 배열 파라미터 지원 (PHP 스타일, 인덱스 배열, 연관 배열, 중첩 배열)
+  - [x] 도구 등록 및 SEO 정보 추가 (id: url-parser, path: /url-parser)

@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { useMemo } from 'react';
 import type { ToolDefinition } from '@/tools/types';
-import { Link, RefreshCw } from 'lucide-react';
+import { Link, RefreshCw, Copy } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { EditorPanel } from '@/components/common/EditorPanel';
 import { ActionBar } from '@/components/common/ActionBar';
@@ -11,6 +11,8 @@ import { useToolState } from '@/hooks/useToolState';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useTitle } from '@/hooks/useTitle';
 import { copyToClipboard } from '@/lib/clipboard';
+import { isMobileDevice } from '@/lib/utils';
+import { ShareModal } from '@/components/common/ShareModal';
 
 interface UrlToolState {
   input: string;
@@ -28,8 +30,11 @@ const UrlTool: React.FC = () => {
   useTitle('URL Encoder');
   // URL tool state contains: input (string), mode, plusForSpace
   // All fields are necessary for sharing - input may be large but required
-  const { state, updateState, resetState, shareState } =
+  const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
     useToolState<UrlToolState>('url', DEFAULT_STATE);
+  const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
+  const shareInfo = getShareStateInfo();
+  const isMobile = isMobileDevice();
   const debouncedInput = useDebouncedValue(state.input, 200);
 
   const conversion = useMemo(() => {
@@ -70,7 +75,24 @@ const UrlTool: React.FC = () => {
         title="URL Encode/Decode"
         description="Safely transform query params or path segments."
         onReset={resetState}
-        onShare={shareState}
+        onShare={async () => {
+          if (isMobile) {
+            setIsShareModalOpen(true);
+          } else {
+            await copyShareLink();
+          }
+        }}
+      />
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        onConfirm={async () => {
+          setIsShareModalOpen(false);
+          await shareViaWebShare();
+        }}
+        includedFields={shareInfo.includedFields}
+        excludedFields={shareInfo.excludedFields}
+        toolName="URL Encoder"
       />
       <div className="flex-1 flex flex-col gap-6">
         <EditorPanel
@@ -127,26 +149,31 @@ const UrlTool: React.FC = () => {
           <ErrorBanner message="Decoding failed" details={conversion.error} />
         )}
 
-        <EditorPanel
-          title="Result"
-          value={conversion.result}
-          readOnly
-          placeholder="Result will appear here..."
-          className="h-40 lg:h-48"
-          status={conversion.error ? 'error' : 'success'}
-        />
-
-        <div className="flex justify-end">
-          <button
-            className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-            onClick={() =>
-              conversion.result &&
-              copyToClipboard(conversion.result, 'Copied result.')
-            }
-            disabled={!conversion.result}
-          >
-            Copy Result
-          </button>
+        <div className="flex flex-col">
+          <div className="flex items-center justify-between px-3 py-1.5 border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-900 shrink-0 rounded-t-md border border-b-0">
+            <span className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+              Result
+            </span>
+            <button
+              onClick={() =>
+                conversion.result &&
+                copyToClipboard(conversion.result, 'Copied result.')
+              }
+              disabled={!conversion.result}
+              className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Copy Result"
+            >
+              <Copy className="w-4 h-4" />
+            </button>
+          </div>
+          <EditorPanel
+            title=""
+            value={conversion.result}
+            readOnly
+            placeholder="Result will appear here..."
+            className="h-40 lg:h-48 rounded-t-none"
+            status={conversion.error ? 'error' : 'success'}
+          />
         </div>
       </div>
     </div>
@@ -157,6 +184,8 @@ export const urlTool: ToolDefinition<UrlToolState> = {
   id: 'url',
   title: 'URL Encoder',
   description: 'Encode/Decode URL strings',
+  keywords: ['url', 'encode', 'decode', 'percent', 'uri', 'query', 'parameter'],
+  category: 'converter',
   path: '/url',
   icon: Link,
   defaultState: DEFAULT_STATE,

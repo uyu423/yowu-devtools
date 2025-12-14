@@ -31,13 +31,40 @@ export function usePWA(): UsePWAResult {
     const updateSWFn = registerSW({
       immediate: true,
       onNeedRefresh() {
+        console.log('Service Worker update available - refresh needed');
         setNeedRefresh(true);
       },
       onOfflineReady() {
+        console.log('Service Worker offline ready');
         setOfflineReady(true);
       },
       onRegistered(registration: ServiceWorkerRegistration | undefined) {
         console.log('Service Worker registered:', registration);
+        
+        // Service Worker 업데이트 감지 (추가 보장)
+        if (registration) {
+          // 주기적으로 업데이트 확인 (1시간마다)
+          setInterval(() => {
+            registration.update().catch((error) => {
+              console.error('Failed to check for updates:', error);
+            });
+          }, 60 * 60 * 1000); // 1시간
+
+          // Service Worker 업데이트 발견 시 알림
+          registration.addEventListener('updatefound', () => {
+            console.log('Service Worker update found');
+            const newWorker = registration.installing;
+            if (newWorker) {
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  // 새 버전이 설치되었고, 현재 활성화된 Service Worker가 있으면 업데이트 필요
+                  console.log('New Service Worker installed - refresh needed');
+                  setNeedRefresh(true);
+                }
+              });
+            }
+          });
+        }
       },
       onRegisterError(error: Error) {
         console.error('Service Worker registration error:', error);

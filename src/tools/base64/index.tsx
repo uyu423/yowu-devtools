@@ -1,15 +1,18 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, { useMemo } from 'react';
+import React from 'react';
 import type { ToolDefinition } from '@/tools/types';
-import { Binary, RefreshCw } from 'lucide-react';
+import { Binary, RefreshCw, Copy } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { EditorPanel } from '@/components/common/EditorPanel';
 import { ActionBar } from '@/components/common/ActionBar';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
 import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useTitle } from '@/hooks/useTitle';
 import { copyToClipboard } from '@/lib/clipboard';
+import { isMobileDevice } from '@/lib/utils';
+import { ShareModal } from '@/components/common/ShareModal';
 
 interface Base64State {
   input: string;
@@ -27,25 +30,29 @@ const Base64Tool: React.FC = () => {
   useTitle('Base64 Converter');
   // Base64 tool state contains: input (string), mode, urlSafe
   // All fields are necessary for sharing - input may be large but required
-  const { state, updateState, resetState, shareState } =
+  const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
     useToolState<Base64State>('base64', DEFAULT_STATE);
+  const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
+  const shareInfo = getShareStateInfo();
+  const isMobile = isMobileDevice();
+  const debouncedInput = useDebouncedValue(state.input, 300);
 
-  const conversion = useMemo(() => {
-    if (!state.input) {
+  const conversion = React.useMemo(() => {
+    if (!debouncedInput) {
       return { result: '', error: null as string | null };
     }
     try {
       if (state.mode === 'encode') {
-        let encoded = encodeBase64(state.input);
+        let encoded = encodeBase64(debouncedInput);
         if (state.urlSafe) encoded = toUrlSafe(encoded);
         return { result: encoded, error: null };
       }
-      const source = state.urlSafe ? fromUrlSafe(state.input) : state.input;
+      const source = state.urlSafe ? fromUrlSafe(debouncedInput) : debouncedInput;
       return { result: decodeBase64(source), error: null };
     } catch (error) {
       return { result: '', error: (error as Error).message };
     }
-  }, [state.input, state.mode, state.urlSafe]);
+  }, [debouncedInput, state.mode, state.urlSafe]);
 
   const handleSwap = () => {
     if (!conversion.result) return;
@@ -61,7 +68,24 @@ const Base64Tool: React.FC = () => {
         title="Base64 Converter"
         description="Encode or decode UTF-8 text, including Base64URL."
         onReset={resetState}
-        onShare={shareState}
+        onShare={async () => {
+          if (isMobile) {
+            setIsShareModalOpen(true);
+          } else {
+            await copyShareLink();
+          }
+        }}
+      />
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        onConfirm={async () => {
+          setIsShareModalOpen(false);
+          await shareViaWebShare();
+        }}
+        includedFields={shareInfo.includedFields}
+        excludedFields={shareInfo.excludedFields}
+        toolName="Base64 Converter"
       />
 
       <div className="flex-1 flex flex-col gap-6">
@@ -126,26 +150,31 @@ const Base64Tool: React.FC = () => {
           />
         )}
 
-        <EditorPanel
-          title="Result"
-          value={conversion.result}
-          readOnly
-          placeholder="Result will appear here..."
-          className="h-40 lg:h-56"
-          status={conversion.error ? 'error' : 'success'}
-        />
-
-        <div className="flex justify-end">
-          <button
-            className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-            onClick={() =>
-              conversion.result &&
-              copyToClipboard(conversion.result, 'Copied result.')
-            }
-            disabled={!conversion.result}
-          >
-            Copy Result
-          </button>
+        <div className="flex flex-col">
+          <div className="flex items-center justify-between px-3 py-1.5 border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-900 shrink-0 rounded-t-md border border-b-0">
+            <span className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+              Result
+            </span>
+            <button
+              onClick={() =>
+                conversion.result &&
+                copyToClipboard(conversion.result, 'Copied result.')
+              }
+              disabled={!conversion.result}
+              className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Copy Result"
+            >
+              <Copy className="w-4 h-4" />
+            </button>
+          </div>
+          <EditorPanel
+            title=""
+            value={conversion.result}
+            readOnly
+            placeholder="Result will appear here..."
+            className="h-40 lg:h-56 rounded-t-none"
+            status={conversion.error ? 'error' : 'success'}
+          />
         </div>
       </div>
     </div>
@@ -155,10 +184,13 @@ const Base64Tool: React.FC = () => {
 function encodeBase64(value: string) {
   const encoder = new TextEncoder();
   const bytes = encoder.encode(value);
+  // Use chunking for large data to avoid "Maximum call stack size exceeded" error
+  const chunkSize = 8192;
   let binary = '';
-  bytes.forEach((byte) => {
-    binary += String.fromCharCode(byte);
-  });
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    const chunk = bytes.slice(i, i + chunkSize);
+    binary += String.fromCharCode(...chunk);
+  }
   return btoa(binary);
 }
 
@@ -183,10 +215,12 @@ function fromUrlSafe(value: string) {
 
 export const base64Tool: ToolDefinition<Base64State> = {
   id: 'base64',
-  title: 'Base64',
+  title: 'Base64 Converter',
   description: 'Base64 Encode/Decode',
   path: '/base64',
   icon: Binary,
+  keywords: ['base64', 'encode', 'decode', 'base64url', 'urlsafe'],
+  category: 'converter',
   defaultState: DEFAULT_STATE,
   Component: Base64Tool,
 };

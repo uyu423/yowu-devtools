@@ -11,6 +11,8 @@ import { useTitle } from '@/hooks/useTitle';
 import { format, formatISO } from 'date-fns';
 import { format as formatTz } from 'date-fns-tz';
 import { copyToClipboard } from '@/lib/clipboard';
+import { isMobileDevice } from '@/lib/utils';
+import { ShareModal } from '@/components/common/ShareModal';
 
 interface TimeToolState {
   epochInput: string;
@@ -65,8 +67,11 @@ const TimeTool: React.FC = () => {
   useTitle('Time Converter');
   // Time tool state contains: epochInput (string), epochUnit, isoInput (string), timezone
   // All fields are necessary for sharing - no filter needed
-  const { state, setState, resetState, shareState } =
+  const { state, setState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
     useToolState<TimeToolState>('time', DEFAULT_STATE);
+  const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
+  const shareInfo = getShareStateInfo();
+  const isMobile = isMobileDevice();
   const [epochError, setEpochError] = useState<string | null>(null);
   const [isoError, setIsoError] = useState<string | null>(null);
 
@@ -213,7 +218,13 @@ const TimeTool: React.FC = () => {
         title="Epoch / ISO Converter"
         description="Switch between epoch timestamps and ISO8601 strings."
         onReset={resetState}
-        onShare={shareState}
+        onShare={async () => {
+          if (isMobile) {
+            setIsShareModalOpen(true);
+          } else {
+            await copyShareLink();
+          }
+        }}
       />
       <div className="space-y-8 mt-4">
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm space-y-4">
@@ -536,6 +547,17 @@ const TimeTool: React.FC = () => {
           </div>
         </div>
       </div>
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        onConfirm={async () => {
+          setIsShareModalOpen(false);
+          await shareViaWebShare();
+        }}
+        includedFields={shareInfo.includedFields}
+        excludedFields={shareInfo.excludedFields}
+        toolName="Time Converter"
+      />
     </div>
   );
 };
@@ -581,6 +603,8 @@ export const timeTool: ToolDefinition<TimeToolState> = {
   description: 'Epoch <-> ISO converter',
   path: '/time',
   icon: Clock,
+  keywords: ['time', 'epoch', 'timestamp', 'iso', 'date', 'convert', 'utc', 'kst'],
+  category: 'converter',
   defaultState: DEFAULT_STATE,
   Component: TimeTool,
 };

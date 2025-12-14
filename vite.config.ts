@@ -18,7 +18,7 @@ export default defineConfig({
     react(),
     generateRoutes(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       includeAssets: [
         'favicon.svg',
         'opengraph.png',
@@ -88,6 +88,104 @@ export default defineConfig({
                 sizes: '192x192',
               },
             ],
+          },
+          {
+            name: 'Base64 Converter',
+            short_name: 'Base64',
+            description: 'Encode/Decode Base64 strings',
+            url: '/base64',
+            icons: [
+              {
+                src: '/icon-192.png',
+                sizes: '192x192',
+              },
+            ],
+          },
+          {
+            name: 'YAML Converter',
+            short_name: 'YAML',
+            description: 'Convert YAML to JSON and vice versa',
+            url: '/yaml',
+            icons: [
+              {
+                src: '/icon-192.png',
+                sizes: '192x192',
+              },
+            ],
+          },
+          {
+            name: 'Text Diff',
+            short_name: 'Diff',
+            description: 'Compare two text files',
+            url: '/diff',
+            icons: [
+              {
+                src: '/icon-192.png',
+                sizes: '192x192',
+              },
+            ],
+          },
+          {
+            name: 'Time Converter',
+            short_name: 'Time',
+            description: 'Convert between time formats',
+            url: '/time',
+            icons: [
+              {
+                src: '/icon-192.png',
+                sizes: '192x192',
+              },
+            ],
+          },
+          {
+            name: 'Cron Parser',
+            short_name: 'Cron',
+            description: 'Parse and validate cron expressions',
+            url: '/cron',
+            icons: [
+              {
+                src: '/icon-192.png',
+                sizes: '192x192',
+              },
+            ],
+          },
+          {
+            name: 'JWT Decoder',
+            short_name: 'JWT',
+            description: 'Decode and verify JWT tokens',
+            url: '/jwt',
+            icons: [
+              {
+                src: '/icon-192.png',
+                sizes: '192x192',
+              },
+            ],
+          },
+        ],
+        screenshots: [
+          {
+            src: '/screenshot-desktop-1.png',
+            sizes: '1280x720',
+            type: 'image/png',
+            label: 'JSON Viewer - Desktop',
+          },
+          {
+            src: '/screenshot-desktop-2.png',
+            sizes: '1280x720',
+            type: 'image/png',
+            label: 'Command Palette - Desktop',
+          },
+          {
+            src: '/screenshot-mobile-1.png',
+            sizes: '390x844',
+            type: 'image/png',
+            label: 'Mobile View',
+          },
+          {
+            src: '/screenshot-mobile-2.png',
+            sizes: '390x844',
+            type: 'image/png',
+            label: 'Mobile Dark Mode',
           },
         ],
       },

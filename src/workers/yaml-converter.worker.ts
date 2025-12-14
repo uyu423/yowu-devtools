@@ -7,17 +7,19 @@ interface YamlConvertRequest {
   source: string;
   direction: 'yaml2json' | 'json2yaml';
   indent: 2 | 4;
+  requestId?: number | string; // v1.2.0: Request ID for response ordering
 }
 
 interface YamlConvertResponse {
   success: boolean;
   output?: string;
   error?: string;
+  requestId?: number | string; // v1.2.0: Request ID for response ordering
 }
 
 // Worker 메시지 핸들러
 self.onmessage = (e: MessageEvent<YamlConvertRequest>) => {
-  const { source, direction, indent } = e.data;
+  const { source, direction, indent, requestId } = e.data;
 
   try {
     if (direction === 'yaml2json') {
@@ -26,6 +28,7 @@ self.onmessage = (e: MessageEvent<YamlConvertRequest>) => {
       const response: YamlConvertResponse = {
         success: true,
         output,
+        requestId, // Include requestId in response
       };
       self.postMessage(response);
     } else {
@@ -34,6 +37,7 @@ self.onmessage = (e: MessageEvent<YamlConvertRequest>) => {
       const response: YamlConvertResponse = {
         success: true,
         output,
+        requestId, // Include requestId in response
       };
       self.postMessage(response);
     }
@@ -49,6 +53,7 @@ self.onmessage = (e: MessageEvent<YamlConvertRequest>) => {
     const response: YamlConvertResponse = {
       success: false,
       error: errorMessage,
+      requestId, // Include requestId in error response
     };
 
     self.postMessage(response);

@@ -10,6 +10,8 @@ import { useTitle } from '@/hooks/useTitle';
 import { format, formatDistanceToNow } from 'date-fns';
 import CronExpressionParser, { type CronExpressionOptions } from 'cron-parser';
 import cronstrue from 'cronstrue';
+import { isMobileDevice } from '@/lib/utils';
+import { ShareModal } from '@/components/common/ShareModal';
 
 interface CronToolState {
   expression: string;
@@ -29,8 +31,11 @@ const CronTool: React.FC = () => {
   useTitle('Cron Parser');
   // Cron tool state is small (expression string, boolean flags, small numbers)
   // No filter needed - all fields are necessary and small
-  const { state, updateState, resetState, shareState } =
+  const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
     useToolState<CronToolState>('cron', DEFAULT_STATE);
+  const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
+  const shareInfo = getShareStateInfo();
+  const isMobile = isMobileDevice();
 
   const cronResult = useMemo(() => {
     if (!state.expression.trim()) {
@@ -74,7 +79,13 @@ const CronTool: React.FC = () => {
         title="Cron Parser"
         description="Explain cron expressions and preview upcoming runs."
         onReset={resetState}
-        onShare={shareState}
+        onShare={async () => {
+          if (isMobile) {
+            setIsShareModalOpen(true);
+          } else {
+            await copyShareLink();
+          }
+        }}
       />
 
       <div className="flex-1 flex flex-col gap-6">
@@ -179,6 +190,17 @@ const CronTool: React.FC = () => {
           </div>
         )}
       </div>
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        onConfirm={async () => {
+          setIsShareModalOpen(false);
+          await shareViaWebShare();
+        }}
+        includedFields={shareInfo.includedFields}
+        excludedFields={shareInfo.excludedFields}
+        toolName="Cron Parser"
+      />
     </div>
   );
 };
@@ -189,6 +211,8 @@ export const cronTool: ToolDefinition<CronToolState> = {
   description: 'Cron expression explainer',
   path: '/cron',
   icon: Timer,
+  keywords: ['cron', 'schedule', 'expression', 'parser', 'explain', 'next'],
+  category: 'parser',
   defaultState: DEFAULT_STATE,
   Component: CronTool,
 };

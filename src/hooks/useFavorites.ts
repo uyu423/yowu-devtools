@@ -18,16 +18,6 @@ function getFavorites(): string[] {
   }
 }
 
-function saveFavorites(favorites: string[]): void {
-  if (typeof window === 'undefined') return;
-  
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(favorites));
-  } catch (error) {
-    console.error('Failed to save favorites:', error);
-  }
-}
-
 export function useFavorites() {
   const [favorites, setFavorites] = useState<string[]>(() => getFavorites());
 
@@ -38,7 +28,17 @@ export function useFavorites() {
         ? prev.filter((id) => id !== toolId) // 제거
         : [...prev, toolId]; // 추가 (등록 순서 유지)
       
-      saveFavorites(updated);
+      // localStorage에 저장하고 이벤트 발생
+      // 이벤트는 다른 컴포넌트(Sidebar, CommandPalette) 동기화용
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+          window.dispatchEvent(new CustomEvent('favorites-changed', { detail: updated }));
+        } catch (error) {
+          console.error('Failed to save favorites:', error);
+        }
+      }
+      
       return updated;
     });
   }, []);
@@ -47,7 +47,14 @@ export function useFavorites() {
     setFavorites((prev) => {
       if (prev.includes(toolId)) return prev;
       const updated = [...prev, toolId];
-      saveFavorites(updated);
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+          window.dispatchEvent(new CustomEvent('favorites-changed', { detail: updated }));
+        } catch (error) {
+          console.error('Failed to save favorites:', error);
+        }
+      }
       return updated;
     });
   }, []);
@@ -55,7 +62,14 @@ export function useFavorites() {
   const removeFavorite = useCallback((toolId: string) => {
     setFavorites((prev) => {
       const updated = prev.filter((id) => id !== toolId);
-      saveFavorites(updated);
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+          window.dispatchEvent(new CustomEvent('favorites-changed', { detail: updated }));
+        } catch (error) {
+          console.error('Failed to save favorites:', error);
+        }
+      }
       return updated;
     });
   }, []);
@@ -67,19 +81,46 @@ export function useFavorites() {
 
   const clearFavorites = useCallback(() => {
     setFavorites([]);
-    saveFavorites([]);
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+        window.dispatchEvent(new CustomEvent('favorites-changed', { detail: [] }));
+      } catch (error) {
+        console.error('Failed to save favorites:', error);
+      }
+    }
   }, []);
 
-  // localStorage 변경 감지 (다른 탭에서 변경된 경우)
+  // localStorage 변경 감지 (다른 탭에서 변경된 경우 + 같은 탭에서 변경된 경우)
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === STORAGE_KEY) {
+        // localStorage에서 직접 읽어서 상태 업데이트
         setFavorites(getFavorites());
       }
     };
 
+    const handleFavoritesChanged = (e: Event) => {
+      // 커스텀 이벤트의 detail에서 직접 값을 가져와서 상태 업데이트
+      // 이렇게 하면 클로저 문제를 피하고 항상 최신 값을 가져올 수 있음
+      const customEvent = e as CustomEvent<string[]>;
+      if (customEvent.detail && Array.isArray(customEvent.detail)) {
+        setFavorites(customEvent.detail);
+      } else {
+        // detail이 없는 경우 localStorage에서 읽기
+        setFavorites(getFavorites());
+      }
+    };
+
+    // 다른 탭에서 변경된 경우
     window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    // 같은 탭에서 변경된 경우 (다른 컴포넌트에서 변경된 경우 동기화)
+    window.addEventListener('favorites-changed', handleFavoritesChanged);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('favorites-changed', handleFavoritesChanged);
+    };
   }, []);
 
   return {

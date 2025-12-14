@@ -1,11 +1,12 @@
 import { Navigate, Route, Routes, useLocation, Link } from 'react-router-dom';
 
 import { AppLayout } from '@/components/layout/AppLayout';
-import { Github } from 'lucide-react';
+import { Github, Command, Keyboard } from 'lucide-react';
 import { PWAUpdatePrompt } from '@/components/common/PWAUpdatePrompt';
+import { CommandPalette } from '@/components/common/CommandPalette';
 import { Toaster } from 'sonner';
 import { tools } from '@/tools';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { usePWA } from '@/hooks/usePWA';
 import { useRecentTools } from '@/hooks/useRecentTools';
 import { useResolvedTheme } from '@/hooks/useThemeHooks';
@@ -14,6 +15,13 @@ import { APP_VERSION } from '@/lib/constants';
 function AppContent() {
   const location = useLocation();
   const { addRecentTool } = useRecentTools();
+  
+  // 메인 페이지 타이틀 설정
+  useEffect(() => {
+    if (location.pathname === '/') {
+      document.title = "Yowu's DevTools | Developer Tools";
+    }
+  }, [location.pathname]);
 
   // 도구 페이지 진입 시 최근 사용한 도구에 추가
   useEffect(() => {
@@ -38,14 +46,12 @@ function AppContent() {
                 </span>
               </h1>
               <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-                An open toolbox for developers who would rather keep sensitive
-                snippets on their own machines. Too many "free" web converters
-                quietly ship data to unknown backends, so this project keeps
-                every transformation inside the browser, publishes every line of
-                code, and documents the UX decisions in the open. The goal is
-                simple: make the common chores (JSON inspection, cron sanity
-                checks, quick diffs, etc.) pleasant <strong>and</strong>{' '}
-                trustworthy.
+                A privacy-first toolbox for developers who want to keep their
+                data on their own machines. All processing happens in your
+                browser—no servers, no trackers, no data collection. Open source
+                and auditable, making common developer tasks (JSON formatting,
+                password generation, hash calculation, UUID creation, and more)
+                fast, secure, and trustworthy.
               </p>
 
               {/* Why it exists */}
@@ -59,10 +65,9 @@ function AppContent() {
                       •
                     </span>
                     <span>
-                      <strong>Transparent processing</strong> – no servers, no
-                      trackers, and an auditable codebase. If a tool claims to
-                      only prettify JSON, you should be able to confirm that's
-                      all it does.
+                      <strong>Privacy-first</strong> – everything runs in your
+                      browser. No data sent to servers, no tracking, no
+                      analytics. Your sensitive data stays on your machine.
                     </span>
                   </li>
                   <li className="flex items-start">
@@ -70,10 +75,10 @@ function AppContent() {
                       •
                     </span>
                     <span>
-                      <strong>Shareable but private by default</strong> –
-                      nothing leaves the tab unless you explicitly create a
-                      share link; even then the payload stays compressed inside
-                      the URL fragment.
+                      <strong>Fast and efficient</strong> – Command Palette for
+                      quick navigation, file drag & drop support, and Web
+                      Workers for handling large datasets without freezing your
+                      browser.
                     </span>
                   </li>
                   <li className="flex items-start">
@@ -81,13 +86,70 @@ function AppContent() {
                       •
                     </span>
                     <span>
-                      <strong>Composable workspace</strong> – a single layout,
-                      persistent state per tool, and theme controls so you're
-                      not juggling a dozen shady tabs during a debugging
-                      session.
+                      <strong>Installable PWA</strong> – works offline, installs
+                      as a standalone app, and automatically updates when new
+                      versions are available.
+                    </span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-blue-600 dark:text-blue-400 mr-2">
+                      •
+                    </span>
+                    <span>
+                      <strong>Open and auditable</strong> – every line of code
+                      is public. You can verify what each tool does and how it
+                      processes your data.
                     </span>
                   </li>
                 </ul>
+                <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-sm text-gray-600 dark:text-gray-400">
+                    <p>
+                      Hosted on GitHub Pages as a static site. All processing
+                      happens in your browser.
+                    </p>
+                    <a
+                      href="https://github.com/uyu423/yowu-devtools"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+                    >
+                      <Github className="w-4 h-4" />
+                      <span>View on GitHub</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Command Palette Feature */}
+            <div className="mb-12 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+              <div className="flex items-start gap-4">
+                <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                  <Command className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                    Quick Navigation
+                  </h2>
+                  <p className="text-gray-700 dark:text-gray-300 mb-4">
+                    Press <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded shadow-sm">⌘K</kbd> or <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded shadow-sm">Ctrl+K</kbd> to open the Command Palette and quickly find any tool.
+                  </p>
+                  <div className="flex flex-wrap gap-2 text-sm text-gray-600 dark:text-gray-400">
+                    <span className="flex items-center gap-1">
+                      <Keyboard className="w-4 h-4" />
+                      Search tools by name or keywords
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Keyboard className="w-4 h-4" />
+                      Navigate with arrow keys
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Keyboard className="w-4 h-4" />
+                      Access favorites and recent tools
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -118,25 +180,6 @@ function AppContent() {
                 ))}
               </div>
             </div>
-
-            {/* Footer */}
-            <footer className="mt-16 pt-8 border-t border-gray-200 dark:border-gray-700">
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-                <p className="text-center">
-                  This site is hosted on GitHub Pages as a static site, and all
-                  processing happens in the client.
-                </p>
-                <a
-                  href="https://github.com/uyu423/yowu-devtools"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
-                >
-                  <Github className="w-4 h-4" />
-                  <span>GitHub Repository</span>
-                </a>
-              </div>
-            </footer>
           </div>
         }
       />
@@ -155,6 +198,21 @@ function App() {
   // PWA 기능 (업데이트 알림, 설치 프롬프트, 오프라인 감지)
   const pwa = usePWA();
   const resolvedTheme = useResolvedTheme();
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+
+  // Command Palette keyboard shortcut (⌘K / Ctrl+K)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check for ⌘K (Mac) or Ctrl+K (Windows/Linux)
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsCommandPaletteOpen((prev) => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   return (
     <AppLayout>
@@ -171,6 +229,10 @@ function App() {
         }}
       />
       <AppContent />
+      <CommandPalette
+        isOpen={isCommandPaletteOpen}
+        onClose={() => setIsCommandPaletteOpen(false)}
+      />
       <PWAUpdatePrompt
         needRefresh={pwa.needRefresh}
         offlineReady={pwa.offlineReady}
