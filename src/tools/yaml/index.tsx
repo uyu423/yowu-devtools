@@ -9,6 +9,7 @@ import { ErrorBanner } from '@/components/common/ErrorBanner';
 import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
 import { useTitle } from '@/hooks/useTitle';
+import { useWebWorker, shouldUseWorkerForText } from '@/hooks/useWebWorker';
 import { copyToClipboard } from '@/lib/clipboard';
 import YAML from 'yaml';
 
@@ -31,9 +32,33 @@ const YamlTool: React.FC = () => {
   const { state, updateState, resetState, shareState } =
     useToolState<YamlToolState>('yaml', DEFAULT_STATE);
 
-  const conversion = useMemo(() => {
-    if (!state.source.trim())
+  // Worker 사용 여부 결정
+  const shouldUseWorker = React.useMemo(
+    () => shouldUseWorkerForText(state.source, 500_000, 10_000),
+    [state.source]
+  );
+
+  // Worker를 사용한 변환
+  const { result: workerResult, isProcessing } = useWebWorker<
+    { source: string; direction: 'yaml2json' | 'json2yaml'; indent: 2 | 4 },
+    { success: boolean; output?: string; error?: string }
+  >({
+    workerUrl: new URL('../workers/yaml-converter.worker.ts', import.meta.url),
+    shouldUseWorker: shouldUseWorker && !!state.source.trim(),
+    request: shouldUseWorker && state.source.trim()
+      ? {
+          source: state.source,
+          direction: state.direction,
+          indent: state.indent,
+        }
+      : null,
+  });
+
+  // 메인 스레드 변환 (작은 데이터용)
+  const mainThreadConversion = useMemo(() => {
+    if (!state.source.trim() || shouldUseWorker) {
       return { output: '', error: null as string | null };
+    }
     try {
       if (state.direction === 'yaml2json') {
         const parsed = YAML.parse(state.source);
@@ -58,7 +83,21 @@ const YamlTool: React.FC = () => {
       }
       return { output: '', error: err.message };
     }
-  }, [state.source, state.direction, state.indent]);
+  }, [state.source, state.direction, state.indent, shouldUseWorker]);
+
+  // 최종 변환 결과 (Worker 또는 메인 스레드)
+  const conversion = React.useMemo(() => {
+    if (shouldUseWorker) {
+      if (!workerResult) {
+        return { output: '', error: null as string | null };
+      }
+      if (workerResult.success) {
+        return { output: workerResult.output ?? '', error: null };
+      }
+      return { output: '', error: workerResult.error ?? null };
+    }
+    return mainThreadConversion;
+  }, [shouldUseWorker, workerResult, mainThreadConversion]);
 
   const handleSwap = () => {
     if (conversion.error || !conversion.output) return;
@@ -95,32 +134,40 @@ const YamlTool: React.FC = () => {
             onClick={handleSwap}
             className="p-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors"
             title="Switch Direction"
-            disabled={!!conversion.error || !conversion.output}
+            disabled={!!conversion.error || !conversion.output || isProcessing}
           >
             <ArrowRightLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
           </button>
         </div>
         <div className="flex-1 flex flex-col min-h-0">
-          <EditorPanel
-            title={
-              state.direction === 'yaml2json' ? 'JSON Output' : 'YAML Output'
-            }
-            value={conversion.output}
-            readOnly
-            mode={state.direction === 'yaml2json' ? 'json' : 'yaml'}
-            className="h-full"
-            status={
-              conversion.error
-                ? 'error'
-                : conversion.output
-                ? 'success'
-                : 'default'
-            }
-          />
+          {isProcessing && (
+            <div className="flex items-center gap-2 p-4 text-sm text-gray-600 dark:text-gray-400">
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 dark:border-gray-600 border-t-blue-600 dark:border-t-blue-400"></div>
+              Converting large file...
+            </div>
+          )}
+          {!isProcessing && (
+            <EditorPanel
+              title={
+                state.direction === 'yaml2json' ? 'JSON Output' : 'YAML Output'
+              }
+              value={conversion.output}
+              readOnly
+              mode={state.direction === 'yaml2json' ? 'json' : 'yaml'}
+              className="h-full"
+              status={
+                conversion.error
+                  ? 'error'
+                  : conversion.output
+                  ? 'success'
+                  : 'default'
+              }
+            />
+          )}
         </div>
       </div>
 
-      {conversion.error && (
+      {!isProcessing && conversion.error && (
         <ErrorBanner
           className="mt-4"
           message="Conversion failed"

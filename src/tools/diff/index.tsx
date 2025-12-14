@@ -9,6 +9,7 @@ import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useTitle } from '@/hooks/useTitle';
+import { useWebWorker, shouldUseWorkerForText } from '@/hooks/useWebWorker';
 import { copyToClipboard } from '@/lib/clipboard';
 import DiffMatchPatch from 'diff-match-patch';
 import type { Diff } from 'diff-match-patch';
@@ -40,91 +41,27 @@ const DiffTool: React.FC = () => {
 
   // Worker 사용 여부 결정
   const shouldUseWorker = React.useMemo(() => {
-    if (typeof Worker === 'undefined') {
-      return false;
-    }
-    const leftSize = new Blob([debouncedLeft]).size;
-    const rightSize = new Blob([debouncedRight]).size;
-    const leftLines = debouncedLeft.split('\n').length;
-    const rightLines = debouncedRight.split('\n').length;
-    return (
-      leftSize > 500_000 ||
-      rightSize > 500_000 ||
-      leftLines > 10_000 ||
-      rightLines > 10_000
-    );
+    const leftShouldUse = shouldUseWorkerForText(debouncedLeft, 500_000, 10_000);
+    const rightShouldUse = shouldUseWorkerForText(debouncedRight, 500_000, 10_000);
+    return leftShouldUse || rightShouldUse;
   }, [debouncedLeft, debouncedRight]);
 
-  // Worker 상태 관리
-  const [isProcessing, setIsProcessing] = React.useState(false);
-  const workerRef = React.useRef<Worker | null>(null);
-
-  // Worker를 사용한 diff 결과
-  const [workerDiffs, setWorkerDiffs] = React.useState<Diff[]>([]);
-
-  // Worker 초기화 및 메시지 처리
-  React.useEffect(() => {
-    if (!shouldUseWorker) {
-      setIsProcessing(false);
-      return;
-    }
-
-    setIsProcessing(true);
-
-    // Worker 생성
-    if (!workerRef.current) {
-      workerRef.current = new Worker(
-        new URL('../workers/diff-calculator.worker.ts', import.meta.url),
-        { type: 'module' }
-      );
-    }
-
-    const worker = workerRef.current;
-
-    // 메시지 핸들러
-    const handleMessage = (e: MessageEvent<{
-      success: boolean;
-      diffs?: Diff[];
-      error?: string;
-    }>) => {
-      if (e.data.success && e.data.diffs) {
-        setWorkerDiffs(e.data.diffs);
-      } else {
-        setWorkerDiffs([]);
-      }
-      setIsProcessing(false);
-    };
-
-    worker.addEventListener('message', handleMessage);
-
-    // Worker에 diff 계산 요청 전송
-    worker.postMessage({
-      left: debouncedLeft,
-      right: debouncedRight,
-      ignoreWhitespace: state.ignoreWhitespace,
-      ignoreCase: state.ignoreCase,
-    });
-
-    return () => {
-      worker.removeEventListener('message', handleMessage);
-    };
-  }, [
-    debouncedLeft,
-    debouncedRight,
-    state.ignoreWhitespace,
-    state.ignoreCase,
-    shouldUseWorker,
-  ]);
-
-  // Worker 정리
-  React.useEffect(() => {
-    return () => {
-      if (workerRef.current) {
-        workerRef.current.terminate();
-        workerRef.current = null;
-      }
-    };
-  }, []);
+  // Worker를 사용한 diff 계산
+  const { result: workerResult, isProcessing } = useWebWorker<
+    { left: string; right: string; ignoreWhitespace: boolean; ignoreCase: boolean },
+    { success: boolean; diffs?: Diff[]; error?: string }
+  >({
+    workerUrl: new URL('../workers/diff-calculator.worker.ts', import.meta.url),
+    shouldUseWorker: shouldUseWorker && (!!debouncedLeft || !!debouncedRight),
+    request: shouldUseWorker && (!!debouncedLeft || !!debouncedRight)
+      ? {
+          left: debouncedLeft,
+          right: debouncedRight,
+          ignoreWhitespace: state.ignoreWhitespace,
+          ignoreCase: state.ignoreCase,
+        }
+      : null,
+  });
 
   // 메인 스레드 diff 계산 (작은 데이터용)
   const mainThreadDiffs = useMemo(() => {
@@ -150,7 +87,15 @@ const DiffTool: React.FC = () => {
   ]);
 
   // 최종 diff 결과 (Worker 또는 메인 스레드)
-  const diffs = shouldUseWorker ? workerDiffs : mainThreadDiffs;
+  const diffs = React.useMemo(() => {
+    if (shouldUseWorker) {
+      if (!workerResult || !workerResult.success || !workerResult.diffs) {
+        return [];
+      }
+      return workerResult.diffs;
+    }
+    return mainThreadDiffs;
+  }, [shouldUseWorker, workerResult, mainThreadDiffs]);
 
   const stats = useMemo(() => {
     return diffs.reduce(

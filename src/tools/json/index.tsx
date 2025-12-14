@@ -11,6 +11,7 @@ import { useToolState } from '@/hooks/useToolState';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useTitle } from '@/hooks/useTitle';
 import { useTheme } from '@/hooks/useTheme';
+import { useWebWorker, shouldUseWorkerForText } from '@/hooks/useWebWorker';
 import { copyToClipboard } from '@/lib/clipboard';
 import { JsonView, defaultStyles } from 'react-json-view-lite';
 import 'react-json-view-lite/dist/index.css';
@@ -56,18 +57,10 @@ const JsonTool: React.FC = () => {
   const debouncedInput = useDebouncedValue(state.input, 300);
 
   // Worker 사용 여부 결정
-  const shouldUseWorker = React.useMemo(() => {
-    if (!debouncedInput.trim() || typeof Worker === 'undefined') {
-      return false;
-    }
-    const size = new Blob([debouncedInput]).size;
-    const lines = debouncedInput.split('\n').length;
-    return size > 1_000_000 || lines > 10_000;
-  }, [debouncedInput]);
-
-  // Worker 상태 관리
-  const [isProcessing, setIsProcessing] = React.useState(false);
-  const workerRef = React.useRef<Worker | null>(null);
+  const shouldUseWorker = React.useMemo(
+    () => shouldUseWorkerForText(debouncedInput, 1_000_000, 10_000),
+    [debouncedInput]
+  );
 
   // 다크 모드 감지 - 실제 DOM 클래스를 확인하여 정확한 상태 추적
   const [isDark, setIsDark] = React.useState(() => {
@@ -119,87 +112,49 @@ const JsonTool: React.FC = () => {
     [isDark]
   );
 
-  // Worker를 사용한 파싱 결과
-  const [workerParseResult, setWorkerParseResult] = React.useState<{
-    data: unknown | null;
-    formatted: string;
-    minified: string;
-    error: string | null;
-  }>({
-    data: null,
-    formatted: '',
-    minified: '',
-    error: null,
+  // Worker를 사용한 파싱
+  const { result: workerResult, isProcessing } = useWebWorker<
+    { input: string; indent: 2 | 4; sortKeys: boolean },
+    { success: boolean; data?: unknown; formatted?: string; minified?: string; error?: string }
+  >({
+    workerUrl: new URL('../workers/json-parser.worker.ts', import.meta.url),
+    shouldUseWorker: shouldUseWorker && !!debouncedInput.trim(),
+    request: shouldUseWorker && debouncedInput.trim()
+      ? {
+          input: debouncedInput,
+          indent: state.indent,
+          sortKeys: state.sortKeys,
+        }
+      : null,
   });
 
-  // Worker 초기화 및 메시지 처리
-  React.useEffect(() => {
-    if (!shouldUseWorker || !debouncedInput.trim()) {
-      setIsProcessing(false);
-      return;
+  // Worker 결과를 파싱 결과 형식으로 변환
+  const workerParseResult = React.useMemo(() => {
+    if (!workerResult) {
+      return {
+        data: null,
+        formatted: '',
+        minified: '',
+        error: null as string | null,
+      };
     }
 
-    setIsProcessing(true);
-
-    // Worker 생성
-    if (!workerRef.current) {
-      workerRef.current = new Worker(
-        new URL('../workers/json-parser.worker.ts', import.meta.url),
-        { type: 'module' }
-      );
+    if (workerResult.success) {
+      return {
+        data: workerResult.data ?? null,
+        formatted: workerResult.formatted ?? '',
+        minified: workerResult.minified ?? '',
+        error: null,
+      };
     }
 
-    const worker = workerRef.current;
-
-    // 메시지 핸들러
-    const handleMessage = (e: MessageEvent<{
-      success: boolean;
-      data?: unknown;
-      formatted?: string;
-      minified?: string;
-      error?: string;
-    }>) => {
-      if (e.data.success) {
-        setWorkerParseResult({
-          data: e.data.data ?? null,
-          formatted: e.data.formatted ?? '',
-          minified: e.data.minified ?? '',
-          error: null,
-        });
-      } else {
-        setWorkerParseResult({
-          data: null,
-          formatted: '',
-          minified: '',
-          error: e.data.error ?? 'Unknown error',
-        });
-      }
-      setIsProcessing(false);
+    return {
+      data: null,
+      formatted: '',
+      minified: '',
+      error: workerResult.error ?? 'Unknown error',
     };
-
-    worker.addEventListener('message', handleMessage);
-
-    // Worker에 파싱 요청 전송
-    worker.postMessage({
-      input: debouncedInput,
-      indent: state.indent,
-      sortKeys: state.sortKeys,
-    });
-
-    return () => {
-      worker.removeEventListener('message', handleMessage);
-    };
-  }, [debouncedInput, state.indent, state.sortKeys, shouldUseWorker]);
-
-  // Worker 정리
-  React.useEffect(() => {
-    return () => {
-      if (workerRef.current) {
-        workerRef.current.terminate();
-        workerRef.current = null;
-      }
-    };
-  }, []);
+  }, [workerResult]);
 
   // 메인 스레드 파싱 (작은 데이터용)
   const mainThreadParseResult = useMemo(() => {
