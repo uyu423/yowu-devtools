@@ -1,0 +1,233 @@
+export interface RegexPreset {
+  id: string;
+  name: string;
+  pattern: string;
+  description: string;
+  exampleText?: string;
+  flags?: {
+    g?: boolean;
+    i?: boolean;
+    m?: boolean;
+    s?: boolean;
+  };
+  category: 'common' | 'validation' | 'extraction' | 'formatting';
+}
+
+export const REGEX_PRESETS: RegexPreset[] = [
+  // Common patterns
+  {
+    id: 'email',
+    name: 'Email Address',
+    pattern: '\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b',
+    description: 'Matches email addresses',
+    exampleText: 'Contact us at support@example.com or sales@company.co.uk',
+    flags: { g: true },
+    category: 'validation',
+  },
+  {
+    id: 'url',
+    name: 'URL',
+    pattern: 'https?://[^\\s]+',
+    description: 'Matches HTTP/HTTPS URLs',
+    exampleText: 'Visit https://example.com and http://test.org for more info.',
+    flags: { g: true },
+    category: 'extraction',
+  },
+  {
+    id: 'phone-us',
+    name: 'US Phone Number',
+    pattern: '\\b\\d{3}[-.]?\\d{3}[-.]?\\d{4}\\b',
+    description: 'Matches US phone numbers (XXX-XXX-XXXX)',
+    exampleText: 'Call us at 555-123-4567 or 555.123.4567',
+    flags: { g: true },
+    category: 'validation',
+  },
+  {
+    id: 'date-iso',
+    name: 'ISO Date (YYYY-MM-DD)',
+    pattern: '\\d{4}-\\d{2}-\\d{2}',
+    description: 'Matches ISO date format',
+    exampleText: 'Dates: 2024-01-15, 2023-12-25, 2025-03-08',
+    flags: { g: true },
+    category: 'validation',
+  },
+  {
+    id: 'ipv4',
+    name: 'IPv4 Address',
+    pattern: '\\b(?:[0-9]{1,3}\\.){3}[0-9]{1,3}\\b',
+    description: 'Matches IPv4 addresses',
+    exampleText: 'Server IP: 192.168.1.1, Gateway: 10.0.0.1',
+    flags: { g: true },
+    category: 'validation',
+  },
+  {
+    id: 'credit-card',
+    name: 'Credit Card Number',
+    pattern: '\\b\\d{4}[\\s-]?\\d{4}[\\s-]?\\d{4}[\\s-]?\\d{4}\\b',
+    description: 'Matches credit card numbers (16 digits)',
+    exampleText: 'Card: 4532-1234-5678-9010 or 4532 1234 5678 9010',
+    flags: { g: true },
+    category: 'validation',
+  },
+  {
+    id: 'zipcode-us',
+    name: 'US Zip Code',
+    pattern: '\\b\\d{5}(?:-\\d{4})?\\b',
+    description: 'Matches US zip codes (5 or 9 digits)',
+    exampleText: 'ZIP codes: 12345, 90210-1234',
+    flags: { g: true },
+    category: 'validation',
+  },
+  {
+    id: 'time-24h',
+    name: '24-Hour Time',
+    pattern: '\\b([01]?[0-9]|2[0-3]):[0-5][0-9]\\b',
+    description: 'Matches 24-hour time format (HH:MM)',
+    exampleText: 'Times: 09:30, 14:45, 23:59',
+    flags: { g: true },
+    category: 'validation',
+  },
+  {
+    id: 'html-tag',
+    name: 'HTML Tag',
+    pattern: '<[^>]+>',
+    description: 'Matches HTML tags',
+    exampleText: '<div>Hello</div> and <span>World</span>',
+    flags: { g: true },
+    category: 'extraction',
+  },
+  {
+    id: 'numbers-only',
+    name: 'Numbers Only',
+    pattern: '^\\d+$',
+    description: 'Matches strings containing only digits',
+    exampleText: '12345',
+    flags: {},
+    category: 'validation',
+  },
+  {
+    id: 'letters-only',
+    name: 'Letters Only',
+    pattern: '^[A-Za-z]+$',
+    description: 'Matches strings containing only letters',
+    exampleText: 'HelloWorld',
+    flags: {},
+    category: 'validation',
+  },
+  {
+    id: 'whitespace',
+    name: 'Whitespace',
+    pattern: '\\s+',
+    description: 'Matches one or more whitespace characters',
+    exampleText: 'Multiple   spaces   and\ttabs',
+    flags: { g: true },
+    category: 'formatting',
+  },
+  {
+    id: 'uuid',
+    name: 'UUID',
+    pattern: '\\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\b',
+    description: 'Matches UUID format',
+    exampleText: 'ID: 550e8400-e29b-41d4-a716-446655440000',
+    flags: { g: true, i: true },
+    category: 'validation',
+  },
+  {
+    id: 'hex-color',
+    name: 'Hex Color',
+    pattern: '#[0-9a-fA-F]{6}\\b',
+    description: 'Matches hex color codes',
+    exampleText: 'Colors: #FF5733, #00FF00, #0000FF',
+    flags: { g: true },
+    category: 'validation',
+  },
+  {
+    id: 'username',
+    name: 'Username',
+    pattern: '^[a-zA-Z0-9_]{3,16}$',
+    description: 'Matches usernames (3-16 chars, alphanumeric + underscore)',
+    exampleText: 'john_doe123',
+    flags: {},
+    category: 'validation',
+  },
+  {
+    id: 'password-strong',
+    name: 'Strong Password',
+    pattern: '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$',
+    description: 'Matches strong passwords (8+ chars, upper, lower, digit, special)',
+    exampleText: 'MyP@ssw0rd',
+    flags: {},
+    category: 'validation',
+  },
+  {
+    id: 'domain',
+    name: 'Domain Name',
+    pattern: '\\b(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,}\\b',
+    description: 'Matches domain names',
+    exampleText: 'example.com, subdomain.example.co.uk',
+    flags: { g: true },
+    category: 'validation',
+  },
+  {
+    id: 'mac-address',
+    name: 'MAC Address',
+    pattern: '\\b(?:[0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}\\b',
+    description: 'Matches MAC addresses',
+    exampleText: 'MAC: 00:1B:44:11:3A:B7 or 00-1B-44-11-3A-B7',
+    flags: { g: true },
+    category: 'validation',
+  },
+  {
+    id: 'date-us',
+    name: 'US Date (MM/DD/YYYY)',
+    pattern: '\\b(0?[1-9]|1[0-2])/(0?[1-9]|[12][0-9]|3[01])/\\d{4}\\b',
+    description: 'Matches US date format',
+    exampleText: 'Dates: 01/15/2024, 12/25/2023',
+    flags: { g: true },
+    category: 'validation',
+  },
+  {
+    id: 'credit-card-visa',
+    name: 'Visa Card',
+    pattern: '\\b4[0-9]{12}(?:[0-9]{3})?\\b',
+    description: 'Matches Visa card numbers',
+    exampleText: 'Visa: 4532123456789010',
+    flags: { g: true },
+    category: 'validation',
+  },
+  {
+    id: 'social-security-us',
+    name: 'US Social Security Number',
+    pattern: '\\b\\d{3}-\\d{2}-\\d{4}\\b',
+    description: 'Matches US SSN format',
+    exampleText: 'SSN: 123-45-6789',
+    flags: { g: true },
+    category: 'validation',
+  },
+  {
+    id: 'quoted-string',
+    name: 'Quoted String',
+    pattern: '"[^"]*"',
+    description: 'Matches double-quoted strings',
+    exampleText: 'Text: "Hello World" and "Test"',
+    flags: { g: true },
+    category: 'extraction',
+  },
+  {
+    id: 'line-start',
+    name: 'Line Start',
+    pattern: '^.*',
+    description: 'Matches from start of each line',
+    exampleText: 'Line 1\nLine 2\nLine 3',
+    flags: { g: true, m: true },
+    category: 'extraction',
+  },
+];
+
+export const PRESETS_BY_CATEGORY = {
+  common: REGEX_PRESETS.filter(p => p.category === 'common'),
+  validation: REGEX_PRESETS.filter(p => p.category === 'validation'),
+  extraction: REGEX_PRESETS.filter(p => p.category === 'extraction'),
+  formatting: REGEX_PRESETS.filter(p => p.category === 'formatting'),
+};
+

@@ -35,6 +35,8 @@
 7. CRON 표현식(설명 + 다음 실행 시각)
 8. JWT Encode/Decode (v1.1.0 추가)
 9. Query String Parser (v1.2.0 추가)
+10. Hash/HMAC Generator (v1.2.0 추가, v1.2.1 고도화)
+11. Regex Tester (v1.2.1 추가)
 
 공통 기능:
 
@@ -841,31 +843,56 @@ type JwtToolState = {
 
 ---
 
-### 7.9 Hash/Checksum Generator (`toolId: hash`) (v1.2.0 추가)
+### 7.9 Hash/HMAC Generator (`toolId: hash`) (v1.2.0 추가, v1.2.1 고도화)
 
 #### 상태
 
 ```ts
 type HashToolState = {
-  input: string;
-  algorithm: 'SHA-256' | 'SHA-1' | 'MD5' | 'SHA-384' | 'SHA-512'; // 기본 SHA-256
-  hmac: boolean; // 기본 false
-  hmacKey: string; // HMAC 사용 시 키
+  mode: 'hash' | 'hmac'; // 기본 hash
+  inputType: 'text' | 'file'; // 기본 text
+  text?: string; // 텍스트 입력
+  // file은 공유/저장 대신 "마지막 파일명" 정도만 표시(실데이터 저장 금지)
+  algorithm: 'SHA-256' | 'SHA-512'; // 기본 SHA-256
+  outputEncoding: 'hex' | 'base64' | 'base64url'; // 기본 hex
+  hmacKeyText?: string; // HMAC 키 (기본 저장/공유 제외)
+  hmacKeyEncoding?: 'raw' | 'hex' | 'base64'; // 키 인코딩 형식 (기본 raw)
+  // 옵션: 랜덤 키 생성, 검증(verify) 섹션은 UI 상태로만 관리
 };
 ```
 
 #### 기능
 
-- FR-H-01: 문자열의 해시값 계산 (WebCrypto API 사용)
-- FR-H-02: HMAC 옵션 지원 (HMAC-SHA-256, HMAC-SHA-1 등)
-- FR-H-03: 여러 알고리즘 지원 (SHA-256, SHA-1, MD5, SHA-384, SHA-512)
-- FR-H-04: 결과를 Hex 또는 Base64 형식으로 표시
-- FR-H-05: **주의**: "보안용이 아님" 안내 메시지 표시
-- AC
+**Hash 모드**:
+- FR-H-01: 텍스트 입력의 해시값 계산 (WebCrypto API 사용)
+- FR-H-02: 파일 입력의 해시값 계산 (`file.arrayBuffer()` 또는 `FileReader.readAsArrayBuffer`)
+- FR-H-03: 알고리즘 지원 (SHA-256, SHA-512)
+- FR-H-04: 결과를 Hex, Base64, Base64URL 형식으로 표시
+- FR-H-05: 파일 메타 정보 표시 (name, size, lastModified)
+- FR-H-06: 처리 상태 표시 (로딩 스피너, 큰 파일 진행률)
 
-  - 입력 문자열의 해시값이 즉시 계산됨
-  - HMAC 키 입력 시 HMAC 해시 계산
-  - WebCrypto API 미지원 브라우저에서는 폴백 메시지 표시
+**HMAC 모드**:
+- FR-H-07: HMAC-SHA-256, HMAC-SHA-512 지원
+- FR-H-08: 키 인코딩 옵션 (raw-text, hex, base64)
+- FR-H-09: 랜덤 키 생성 버튼 (WebCrypto `generateKey` 또는 안전한 랜덤 바이트)
+- FR-H-10: 검증(verify) 섹션: expected MAC 입력 → 일치 여부 표시 (OK/Fail)
+- FR-H-11: 텍스트/파일 모두 HMAC 지원
+
+**보안 및 프라이버시**:
+- FR-H-12: **HMAC 키는 기본적으로 공유 링크/로컬스토리지에 저장하지 않음**
+  - 사용자가 명시적으로 "키 저장"을 켠 경우에만 저장 (강한 경고 문구)
+- FR-H-13: **주의**: "보안용이 아님" 안내 메시지 표시
+
+**에러 처리**:
+- FR-H-14: 잘못된 키 인코딩(예: hex 길이 홀수) → 사용자 친화 에러
+- FR-H-15: WebCrypto 미지원 환경 → "브라우저가 Web Crypto를 지원하지 않습니다" 안내
+- FR-H-16: 파일 읽기 실패/권한 문제 → 에러 배너
+
+- AC
+  - 텍스트 입력 SHA-256/512 결과가 WebCrypto 기반으로 안정적으로 생성됨
+  - 파일 입력 시 `arrayBuffer()`/FileReader 기반으로 해시가 생성됨
+  - HMAC은 importKey + sign 플로우로 생성됨
+  - 큰 파일 처리 시 진행률 표시 (읽기 단계까지)
 
 ---
 
@@ -1004,6 +1031,84 @@ type QueryStringToolState = {
   - 인코딩된 값과 디코딩된 값을 비교 가능
   - 각 파라미터 및 URL 컴포넌트를 개별적으로 복사 가능
   - URL 공유 기능 지원
+
+---
+
+### 7.13 Regex Tester (`toolId: regex`) (v1.2.1 추가)
+
+#### 목적
+
+정규식 패턴과 테스트 문자열을 입력하면 매치 결과를 즉시 시각화하고, 치환(replace) 결과를 미리보기로 제공하는 도구
+
+#### 상태
+
+```ts
+type RegexToolState = {
+  pattern: string; // 정규식 패턴
+  flags: {
+    g: boolean; // global
+    i: boolean; // ignore case
+    m: boolean; // multiline
+    s: boolean; // dotAll
+    u: boolean; // unicode
+    y: boolean; // sticky
+    d?: boolean; // hasIndices (브라우저 지원 시)
+    v?: boolean; // unicodeSets (브라우저 지원 시)
+  };
+  text: string; // 테스트 문자열 (멀티라인)
+  replacementEnabled: boolean; // 치환 미리보기 활성화 여부
+  replacement: string; // 치환 문자열 (멀티라인 가능)
+  replaceMode: 'first' | 'all'; // replace / replaceAll 모드
+  selectedMatchIndex?: number; // 선택된 매치 인덱스
+};
+```
+
+#### 기능 요구사항
+
+**입력**:
+- FR-R-01: Pattern 입력 (단일 라인)
+- FR-R-02: Flags 토글 (지원 범위: `g i m s u y` + 브라우저가 지원하면 `d/v`도 노출, 미지원 flag는 비활성/숨김)
+- FR-R-03: Test Text 입력 (멀티라인)
+- FR-R-04: Replace 미리보기 옵션(토글)
+  - Replacement 문자열 입력(멀티라인 가능)
+  - Replace 실행 모드: `replace`(첫 매치) / `replaceAll`(전체 매치) → 내부적으로는 `g` 플래그와 동기화
+
+**출력 - Match 리스트 패널**:
+- FR-R-05: 매치 N개 표시(인덱스/길이/매치 문자열)
+- FR-R-06: 각 매치 클릭 시 Test Text에서 해당 범위 스크롤+하이라이트
+
+**출력 - Group 패널**:
+- FR-R-07: 캡처 그룹 #1..N 값 표시(그룹 순서 규칙: 여는 괄호 기준 1부터)
+- FR-R-08: 네임드 그룹 `(?<name>...)`이 있으면 `groups.name` 형태로 표시
+
+**하이라이트(핵심)**:
+- FR-R-09: Test Text 위에 overlay 하이라이트:
+  - 전체 매치: 배경 강조
+  - **그룹별 색상**(동일 그룹은 동일 색, 매치가 달라도 그룹 #1은 같은 색)
+  - 특정 매치 선택 시 해당 매치의 그룹만 진하게 강조
+
+**치환 미리보기(Replacement Preview)**:
+- FR-R-10: Replace 결과 패널에 "치환 후 문자열" 표시
+- FR-R-11: `$1`, `$2` 같은 숫자 그룹 참조 치환 지원
+- FR-R-12: 네임드 그룹 참조 치환(예: `$<name>`) 지원
+- FR-R-13: (옵션) "원본 vs 치환 결과" Diff 뷰(기존 Text Diff 컴포넌트 재사용)
+
+**오류/예외 처리**:
+- FR-R-14: 패턴 문법 오류 시(예: 괄호 미닫힘)
+  - 결과 영역은 비우고 ErrorBanner에 예외 메시지 표시(앱 크래시 금지)
+- FR-R-15: 성능 보호
+  - 입력 변경 시 debounce(예: 150~300ms)
+  - 특정 시간(예: 300ms~1s) 이상 걸리면 "정규식이 오래 걸립니다(백트래킹 가능)" 경고 + Worker 실행 옵션(있으면)
+
+**상태/공유**:
+- FR-R-16: 공유 링크에는 pattern/text/replacement 포함(민감 정보 경고 문구 표시)
+- FR-R-17: localStorage에 상태 저장/복원
+
+- AC
+  - 패턴/텍스트 입력 시 즉시 매치 리스트가 갱신됨
+  - 캡처 그룹/네임드 그룹 값이 정확히 표시됨
+  - replacement 결과가 JS `replace()` 규칙대로 재현됨
+  - 정규식 엔진은 JavaScript RegExp(브라우저 내장) 기준으로 동작
 
 ---
 
@@ -1179,11 +1284,12 @@ export type ToolDefinition<TState> = {
 ## 13. 향후 추가하기 좋은 도구 Backlog(참고)
 
 - ~~JWT 디코더(검증 X, payload 표시)~~ ✅ v1.1.0에서 구현 완료
-- ~~Hash(SHA-256) 생성기("보안용 아님" 안내 포함)~~ ✅ v1.2.0에서 구현 예정
-- ~~UUID v4/v7 생성기~~ ✅ v1.2.0 또는 v1.3.0에서 구현 예정
+- ~~Hash(SHA-256) 생성기("보안용 아님" 안내 포함)~~ ✅ v1.2.0에서 구현 완료
+- ~~Hash/HMAC 고도화(파일 해시, base64url, 키 인코딩)~~ ✅ v1.2.1에서 구현 예정
+- ~~UUID v4/v7 생성기~~ ✅ v1.2.0에서 구현 완료
+- ~~Regex Tester~~ ✅ v1.2.1에서 구현 예정
 - QueryString ↔ JSON
 - JSONPath 테스트
-- Regex Tester
 - HTML/JSON minify
 - Case Converter
 - Color Converter (HEX, RGB, HSL)
@@ -1253,6 +1359,26 @@ export type ToolDefinition<TState> = {
   - **신규 도구 추가** ✅:
     - Hash/Checksum Generator (SHA-256/SHA-1/SHA-384/SHA-512 + HMAC 옵션) - WebCrypto API 사용 ✅
     - UUID/ULID Generator (UUID v4/v7, ULID, 일괄 생성) ✅
+
+- **v1.2.1** (2025-01-XX):
+
+  - **Hash/HMAC 도구 고도화** ✅:
+    - 파일 해시 기능 추가 (텍스트/파일 입력 모드 전환)
+    - Base64URL 인코딩 옵션 추가 (hex, base64, base64url)
+    - HMAC 키 인코딩 옵션 추가 (raw-text, hex, base64)
+    - 랜덤 키 생성 버튼 추가 (WebCrypto generateKey)
+    - HMAC 검증(verify) 섹션 추가 (expected MAC 입력 → 일치 여부 표시)
+    - 파일 메타 정보 표시 (name, size, lastModified)
+    - 처리 상태 표시 (로딩 스피너, 큰 파일 진행률)
+    - 보안 강화: HMAC 키는 기본적으로 공유 링크/로컬스토리지에 저장하지 않음
+  - **신규 도구 추가** ✅:
+    - Regex Tester: 정규식 패턴 테스트 및 치환 미리보기
+    - 매치 결과 시각화 (전체 매치, 캡처 그룹, 네임드 그룹)
+    - 그룹별 색상 하이라이트 (동일 그룹은 동일 색)
+    - 치환(replace) 미리보기 (`$1`, `$2`, `$<name>` 지원)
+    - Flags 토글 (g, i, m, s, u, y, d, v)
+    - 성능 보호 (debounce, 백트래킹 경고)
+    - JavaScript RegExp 엔진 사용 (브라우저 내장)
 
 - **v1.3** (2025-01-XX):
 

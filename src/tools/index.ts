@@ -12,6 +12,7 @@ import { hashTool } from './hash';
 import { uuidTool } from './uuid';
 import { passwordTool } from './password';
 import { queryStringTool } from './query-string';
+import { regexTool } from './regex';
 
 export const tools: ToolDefinition[] = [
   jsonTool,
@@ -27,6 +28,7 @@ export const tools: ToolDefinition[] = [
   uuidTool,
   passwordTool,
   queryStringTool,
+  regexTool,
 ];
 
 export const getToolById = (id: string) => tools.find(t => t.id === id);

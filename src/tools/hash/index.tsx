@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import React from 'react';
 import type { ToolDefinition } from '@/tools/types';
-import { Hash, Copy } from 'lucide-react';
+import { Hash, Copy, File, KeyRound, RefreshCw, CheckCircle2, XCircle } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { EditorPanel } from '@/components/common/EditorPanel';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
@@ -13,21 +13,31 @@ import { copyToClipboard } from '@/lib/clipboard';
 import { toast } from 'sonner';
 import { isMobileDevice } from '@/lib/utils';
 import { ShareModal } from '@/components/common/ShareModal';
+import { cn } from '@/lib/utils';
+import CryptoJS from 'crypto-js';
 
 interface HashToolState {
-  input: string;
-  algorithm: 'SHA-256' | 'SHA-1' | 'MD5' | 'SHA-384' | 'SHA-512';
-  hmac: boolean;
-  hmacKey: string;
-  outputFormat: 'hex' | 'base64';
+  mode: 'hash' | 'hmac'; // Hash or HMAC mode
+  inputType: 'text' | 'file'; // Text or File input
+  text?: string; // Text input
+  // file은 공유/저장 대신 "마지막 파일명" 정도만 표시(실데이터 저장 금지)
+  lastFileName?: string; // Last loaded file name (for display only)
+  algorithm: 'MD5' | 'SHA-1' | 'SHA-256' | 'SHA-512'; // Supported algorithms
+  outputEncoding: 'hex' | 'base64' | 'base64url'; // Output encoding format
+  hmacKeyText?: string; // HMAC key (default: not saved/shared)
+  hmacKeyEncoding?: 'raw' | 'hex' | 'base64'; // Key encoding format
+  saveHmacKey?: boolean; // Whether to save HMAC key in share links (default: false)
+  expectedMac?: string; // Expected MAC for verification
 }
 
 const DEFAULT_STATE: HashToolState = {
-  input: '',
-  algorithm: 'SHA-256',
-  hmac: false,
-  hmacKey: '',
-  outputFormat: 'hex',
+  mode: 'hash',
+  inputType: 'text',
+  text: '',
+  algorithm: 'MD5',
+  outputEncoding: 'hex',
+  hmacKeyEncoding: 'raw',
+  saveHmacKey: false,
 };
 
 // Convert ArrayBuffer to Hex string
@@ -45,47 +55,283 @@ const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
   return btoa(binary);
 };
 
+// Convert ArrayBuffer to Base64URL string
+const arrayBufferToBase64URL = (buffer: ArrayBuffer): string => {
+  const base64 = arrayBufferToBase64(buffer);
+  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+};
+
+// Convert hex string to ArrayBuffer
+const hexToArrayBuffer = (hex: string): ArrayBuffer => {
+  const bytes = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < hex.length; i += 2) {
+    bytes[i / 2] = parseInt(hex.substr(i, 2), 16);
+  }
+  return bytes.buffer;
+};
+
+// Convert base64 string to ArrayBuffer
+const base64ToArrayBuffer = (base64: string): ArrayBuffer => {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes.buffer;
+};
+
+
 const HashTool: React.FC = () => {
   useTitle('Hash Generator');
+  
+  // HMAC 키는 기본적으로 공유 링크에 포함하지 않음
   const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } = useToolState<HashToolState>(
     'hash',
     DEFAULT_STATE,
     {
-      shareStateFilter: ({ input, algorithm, hmac, hmacKey, outputFormat }) => ({
-        input,
-        algorithm,
-        hmac,
-        hmacKey,
-        outputFormat,
-      }),
+      shareStateFilter: ({ mode, inputType, text, lastFileName, algorithm, outputEncoding, hmacKeyText, hmacKeyEncoding, saveHmacKey }) => {
+        const filtered: Partial<HashToolState> = {
+          mode,
+          inputType,
+          algorithm,
+          outputEncoding,
+          hmacKeyEncoding,
+        };
+        
+        // Text input만 공유 (파일 내용은 공유하지 않음)
+        if (inputType === 'text' && text) {
+          filtered.text = text;
+        }
+        
+        // 파일명만 공유 (실제 파일 내용은 공유하지 않음)
+        if (inputType === 'file' && lastFileName) {
+          filtered.lastFileName = lastFileName;
+        }
+        
+        // HMAC 키는 saveHmacKey가 true일 때만 공유
+        if (saveHmacKey && hmacKeyText) {
+          filtered.hmacKeyText = hmacKeyText;
+          filtered.saveHmacKey = true;
+        }
+        
+        // Expected MAC은 공유하지 않음 (검증용)
+        
+        return filtered as HashToolState;
+      },
     }
   );
 
   const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
   const shareInfo = getShareStateInfo();
   const isMobile = React.useMemo(() => isMobileDevice(), []);
-  const debouncedInput = useDebouncedValue(state.input, 300);
-  const debouncedHmacKey = useDebouncedValue(state.hmacKey, 300);
+  const debouncedText = useDebouncedValue(state.text || '', 300);
+  const debouncedHmacKey = useDebouncedValue(state.hmacKeyText || '', 300);
 
   const [hashResult, setHashResult] = React.useState<string>('');
   const [error, setError] = React.useState<string | null>(null);
   const [isCalculating, setIsCalculating] = React.useState(false);
+  const [currentFile, setCurrentFile] = React.useState<File | null>(null);
+  const [fileMetadata, setFileMetadata] = React.useState<{ name: string; size: number; lastModified: number } | null>(null);
+  const [verificationResult, setVerificationResult] = React.useState<'match' | 'mismatch' | null>(null);
 
   // Check WebCrypto API support
   const isWebCryptoSupported = React.useMemo(() => {
     return typeof window !== 'undefined' && 'crypto' in window && 'subtle' in window.crypto;
   }, []);
 
-  // Calculate hash
-  React.useEffect(() => {
+  // Generate random HMAC key
+  const generateRandomKey = React.useCallback(async () => {
     if (!isWebCryptoSupported) {
-      setError('WebCrypto API is not supported in this browser.');
+      toast.error('WebCrypto API is not supported in this browser.');
       return;
     }
 
-    if (!debouncedInput.trim()) {
-      setHashResult('');
-      setError(null);
+    try {
+      // Generate 32 random bytes (256 bits) for HMAC key
+      const randomBytes = new Uint8Array(32);
+      crypto.getRandomValues(randomBytes);
+      
+      // Convert to hex string
+      const hexKey = arrayBufferToHex(randomBytes.buffer);
+      updateState({ hmacKeyText: hexKey, hmacKeyEncoding: 'hex' });
+      toast.success('Random key generated');
+    } catch {
+      toast.error('Failed to generate random key');
+    }
+  }, [isWebCryptoSupported, updateState]);
+
+  // Check if algorithm uses WebCrypto API (SHA-256, SHA-512) or crypto-js (MD5, SHA-1)
+  const usesWebCrypto = React.useMemo(() => {
+    return state.algorithm === 'SHA-256' || state.algorithm === 'SHA-512';
+  }, [state.algorithm]);
+
+  // Calculate hash from ArrayBuffer or WordArray
+  const calculateHashFromBuffer = React.useCallback(
+    async (data: ArrayBuffer | CryptoJS.lib.WordArray): Promise<string> => {
+      // Use crypto-js for MD5 and SHA-1
+      if (state.algorithm === 'MD5' || state.algorithm === 'SHA-1') {
+        let wordArray: CryptoJS.lib.WordArray;
+        
+        if (data instanceof ArrayBuffer) {
+          // Convert ArrayBuffer to WordArray
+          const bytes = new Uint8Array(data);
+          const words: number[] = [];
+          for (let i = 0; i < bytes.length; i += 4) {
+            words.push(
+              (bytes[i] << 24) |
+              (bytes[i + 1] << 16) |
+              (bytes[i + 2] << 8) |
+              (bytes[i + 3] || 0)
+            );
+          }
+          wordArray = CryptoJS.lib.WordArray.create(words, bytes.length);
+        } else {
+          wordArray = data;
+        }
+
+        let hash: CryptoJS.lib.WordArray;
+
+        if (state.mode === 'hmac' && debouncedHmacKey.trim()) {
+          // HMAC calculation using crypto-js
+          let key: string | CryptoJS.lib.WordArray;
+          
+          try {
+            // Decode HMAC key based on encoding
+            if (state.hmacKeyEncoding === 'hex') {
+              if (debouncedHmacKey.length % 2 !== 0) {
+                throw new Error('Invalid hex key: length must be even');
+              }
+              key = CryptoJS.enc.Hex.parse(debouncedHmacKey);
+            } else if (state.hmacKeyEncoding === 'base64') {
+              key = CryptoJS.enc.Base64.parse(debouncedHmacKey);
+            } else {
+              // raw (text)
+              key = debouncedHmacKey;
+            }
+          } catch (err) {
+            throw new Error(`Invalid key encoding: ${err instanceof Error ? err.message : 'Unknown error'}`);
+          }
+
+          // Calculate HMAC
+          if (state.algorithm === 'MD5') {
+            hash = CryptoJS.HmacMD5(wordArray, key);
+          } else {
+            // SHA-1
+            hash = CryptoJS.HmacSHA1(wordArray, key);
+          }
+        } else {
+          // Regular hash calculation
+          if (state.algorithm === 'MD5') {
+            hash = CryptoJS.MD5(wordArray);
+          } else {
+            // SHA-1
+            hash = CryptoJS.SHA1(wordArray);
+          }
+        }
+
+        // Convert to output format
+        if (state.outputEncoding === 'hex') {
+          return hash.toString(CryptoJS.enc.Hex);
+        } else if (state.outputEncoding === 'base64url') {
+          const base64 = hash.toString(CryptoJS.enc.Base64);
+          return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+        } else {
+          return hash.toString(CryptoJS.enc.Base64);
+        }
+      }
+
+      // Use WebCrypto API for SHA-256 and SHA-512
+      if (!isWebCryptoSupported) {
+        throw new Error('WebCrypto API is not supported in this browser.');
+      }
+
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => {
+          reject(new Error('Processing timeout: The operation took longer than 10 seconds and was cancelled.'));
+        }, 10_000);
+      });
+
+      let hashBuffer: ArrayBuffer;
+      const arrayBuffer = data instanceof ArrayBuffer ? data : dataToArrayBuffer(data);
+
+      if (state.mode === 'hmac' && debouncedHmacKey.trim()) {
+        // HMAC calculation
+        let keyData: ArrayBuffer;
+        
+        try {
+          // Decode HMAC key based on encoding
+          if (state.hmacKeyEncoding === 'hex') {
+            if (debouncedHmacKey.length % 2 !== 0) {
+              throw new Error('Invalid hex key: length must be even');
+            }
+            keyData = hexToArrayBuffer(debouncedHmacKey);
+          } else if (state.hmacKeyEncoding === 'base64') {
+            keyData = base64ToArrayBuffer(debouncedHmacKey);
+          } else {
+            // raw (text)
+            const encoder = new TextEncoder();
+            keyData = encoder.encode(debouncedHmacKey).buffer;
+          }
+        } catch (err) {
+          throw new Error(`Invalid key encoding: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        }
+
+        const cryptoKey = await Promise.race([
+          crypto.subtle.importKey(
+            'raw',
+            keyData,
+            { name: 'HMAC', hash: state.algorithm },
+            false,
+            ['sign']
+          ),
+          timeoutPromise,
+        ]);
+
+        hashBuffer = await Promise.race([
+          crypto.subtle.sign('HMAC', cryptoKey, arrayBuffer),
+          timeoutPromise,
+        ]);
+      } else {
+        // Regular hash calculation
+        hashBuffer = await Promise.race([
+          crypto.subtle.digest(state.algorithm, arrayBuffer),
+          timeoutPromise,
+        ]);
+      }
+
+      // Convert to output format
+      if (state.outputEncoding === 'hex') {
+        return arrayBufferToHex(hashBuffer);
+      } else if (state.outputEncoding === 'base64url') {
+        return arrayBufferToBase64URL(hashBuffer);
+      } else {
+        return arrayBufferToBase64(hashBuffer);
+      }
+    },
+    [state.mode, state.algorithm, state.outputEncoding, state.hmacKeyEncoding, debouncedHmacKey, isWebCryptoSupported]
+  );
+
+  // Helper function to convert WordArray to ArrayBuffer
+  const dataToArrayBuffer = (wordArray: CryptoJS.lib.WordArray): ArrayBuffer => {
+    const words = wordArray.words;
+    const sigBytes = wordArray.sigBytes;
+    const bytes = new Uint8Array(sigBytes);
+    
+    for (let i = 0; i < sigBytes; i++) {
+      const byte = (words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;
+      bytes[i] = byte;
+    }
+    
+    return bytes.buffer;
+  };
+
+  // Calculate hash for text input
+  React.useEffect(() => {
+    if (state.inputType !== 'text' || !debouncedText.trim()) {
+      if (state.inputType === 'text') {
+        setHashResult('');
+        setError(null);
+      }
       return;
     }
 
@@ -94,75 +340,104 @@ const HashTool: React.FC = () => {
 
     const calculateHash = async () => {
       try {
-        const encoder = new TextEncoder();
-        const data = encoder.encode(debouncedInput);
-
-        // 타임아웃 설정 (10초)
-        const timeoutPromise = new Promise<never>((_, reject) => {
-          setTimeout(() => {
-            reject(new Error('Processing timeout: The operation took longer than 10 seconds and was cancelled. The input may be too large to process.'));
-          }, 10_000);
-        });
-
-        let hashBuffer: ArrayBuffer;
-
-        if (state.hmac && debouncedHmacKey.trim()) {
-          // HMAC calculation
-          const keyData = encoder.encode(debouncedHmacKey);
-          const hashName = state.algorithm === 'MD5' ? 'SHA-256' : state.algorithm; // MD5 doesn't support HMAC, use SHA-256
-
-          const cryptoKey = await Promise.race([
-            crypto.subtle.importKey(
-              'raw',
-              keyData,
-              { name: 'HMAC', hash: hashName },
-              false,
-              ['sign']
-            ),
-            timeoutPromise,
-          ]);
-
-          hashBuffer = await Promise.race([
-            crypto.subtle.sign('HMAC', cryptoKey, data),
-            timeoutPromise,
-          ]);
+        let data: ArrayBuffer | CryptoJS.lib.WordArray;
+        
+        if (usesWebCrypto) {
+          // Use ArrayBuffer for WebCrypto API
+          const encoder = new TextEncoder();
+          data = encoder.encode(debouncedText).buffer;
         } else {
-          // Regular hash calculation
-          // Note: WebCrypto API doesn't support MD5, so we'll show an error for MD5
-          if (state.algorithm === 'MD5') {
-            setError('MD5 is not supported by WebCrypto API. Please use SHA-256, SHA-1, SHA-384, or SHA-512.');
-            setIsCalculating(false);
-            return;
-          }
-
-          hashBuffer = await Promise.race([
-            crypto.subtle.digest(state.algorithm, data),
-            timeoutPromise,
-          ]);
+          // Use WordArray for crypto-js
+          data = CryptoJS.enc.Utf8.parse(debouncedText);
         }
-
-        const result =
-          state.outputFormat === 'hex'
-            ? arrayBufferToHex(hashBuffer)
-            : arrayBufferToBase64(hashBuffer);
-
+        
+        const result = await calculateHashFromBuffer(data);
         setHashResult(result);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to calculate hash');
+        setHashResult('');
       } finally {
         setIsCalculating(false);
       }
     };
 
     calculateHash();
-  }, [
-    debouncedInput,
-    debouncedHmacKey,
-    state.algorithm,
-    state.hmac,
-    state.outputFormat,
-    isWebCryptoSupported,
-  ]);
+  }, [debouncedText, state.inputType, calculateHashFromBuffer, usesWebCrypto]);
+
+  // Calculate hash for file
+  const calculateFileHash = React.useCallback(
+    async (file: File) => {
+      setIsCalculating(true);
+      setError(null);
+      
+      try {
+        if (usesWebCrypto) {
+          // Use ArrayBuffer for WebCrypto API
+          const arrayBuffer = await file.arrayBuffer();
+          const result = await calculateHashFromBuffer(arrayBuffer);
+          setHashResult(result);
+        } else {
+          // Use WordArray for crypto-js
+          // Read file as ArrayBuffer first, then convert to WordArray
+          const arrayBuffer = await file.arrayBuffer();
+          const bytes = new Uint8Array(arrayBuffer);
+          const words: number[] = [];
+          for (let i = 0; i < bytes.length; i += 4) {
+            words.push(
+              (bytes[i] << 24) |
+              ((bytes[i + 1] || 0) << 16) |
+              ((bytes[i + 2] || 0) << 8) |
+              (bytes[i + 3] || 0)
+            );
+          }
+          const wordArray = CryptoJS.lib.WordArray.create(words, bytes.length);
+          const result = await calculateHashFromBuffer(wordArray);
+          setHashResult(result);
+        }
+      } catch (error) {
+        setError(error instanceof Error ? error.message : 'Failed to calculate file hash');
+        setHashResult('');
+      } finally {
+        setIsCalculating(false);
+      }
+    },
+    [calculateHashFromBuffer, usesWebCrypto]
+  );
+
+  // Handle file selection
+  const handleFileSelect = React.useCallback((file: File) => {
+    setCurrentFile(file);
+    setFileMetadata({
+      name: file.name,
+      size: file.size,
+      lastModified: file.lastModified,
+    });
+    updateState({ lastFileName: file.name });
+    
+    // Calculate hash immediately
+    calculateFileHash(file);
+  }, [calculateFileHash, updateState]);
+
+  // Recalculate file hash when algorithm, mode, key, or encoding changes
+  React.useEffect(() => {
+    if (state.inputType === 'file' && currentFile) {
+      calculateFileHash(currentFile);
+    }
+  }, [state.algorithm, state.mode, state.outputEncoding, debouncedHmacKey, state.hmacKeyEncoding, state.inputType, currentFile, calculateFileHash]);
+
+  // Verify MAC
+  React.useEffect(() => {
+    if (!state.expectedMac || !hashResult) {
+      setVerificationResult(null);
+      return;
+    }
+
+    // Compare expected MAC with calculated hash (case-insensitive)
+    const normalizedExpected = state.expectedMac.trim().toLowerCase();
+    const normalizedResult = hashResult.toLowerCase();
+    
+    setVerificationResult(normalizedExpected === normalizedResult ? 'match' : 'mismatch');
+  }, [state.expectedMac, hashResult]);
 
   const handleCopy = async () => {
     if (hashResult) {
@@ -171,13 +446,26 @@ const HashTool: React.FC = () => {
     }
   };
 
+  const handleReset = () => {
+    resetState();
+    setCurrentFile(null);
+    setFileMetadata(null);
+    setHashResult('');
+    setError(null);
+    setVerificationResult(null);
+  };
+
   return (
     <div className="flex flex-col h-full p-4 md:p-6 max-w-5xl mx-auto">
       <ToolHeader
         title="Hash Generator"
-        description="Calculate hash values and HMAC signatures"
-        onReset={resetState}
+        description="Calculate hash values and HMAC signatures for text or files"
+        onReset={handleReset}
         onShare={async () => {
+          if (state.inputType === 'file') {
+            toast.error('File sharing is not supported. Please switch to text mode to share your hash calculation.');
+            return;
+          }
           if (isMobile) {
             setIsShareModalOpen(true);
           } else {
@@ -188,94 +476,267 @@ const HashTool: React.FC = () => {
 
       {error && <ErrorBanner message={error} className="mb-4" />}
 
-      {/* Input */}
+      {/* Mode Selection */}
       <div className="mb-4">
-        <EditorPanel
-          value={state.input}
-          onChange={(value) => updateState({ input: value })}
-          placeholder="Enter text to hash..."
-          mode="text"
-          readOnly={false}
-        />
+        <OptionLabel tooltip="Select between regular hash calculation or HMAC (Hash-based Message Authentication Code)">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Mode
+          </label>
+        </OptionLabel>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => updateState({ mode: 'hash' })}
+            className={cn(
+              'px-4 py-2 text-sm font-medium rounded-md transition-colors',
+              state.mode === 'hash'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+            )}
+          >
+            <Hash className="w-4 h-4 inline mr-2" />
+            Hash
+          </button>
+          <button
+            type="button"
+            onClick={() => updateState({ mode: 'hmac' })}
+            className={cn(
+              'px-4 py-2 text-sm font-medium rounded-md transition-colors',
+              state.mode === 'hmac'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+            )}
+          >
+            <KeyRound className="w-4 h-4 inline mr-2" />
+            HMAC
+          </button>
+        </div>
       </div>
+
+      {/* Input Type Selection */}
+      <div className="mb-4">
+        <OptionLabel tooltip="Select input type: text string or file">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Input Type
+          </label>
+        </OptionLabel>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              updateState({ inputType: 'text' });
+              setCurrentFile(null);
+              setFileMetadata(null);
+            }}
+            className={cn(
+              'px-4 py-2 text-sm font-medium rounded-md transition-colors',
+              state.inputType === 'text'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+            )}
+          >
+            Text
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              updateState({ inputType: 'file' });
+              setHashResult('');
+            }}
+            className={cn(
+              'px-4 py-2 text-sm font-medium rounded-md transition-colors',
+              state.inputType === 'file'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+            )}
+          >
+            <File className="w-4 h-4 inline mr-2" />
+            File
+          </button>
+        </div>
+      </div>
+
+      {/* Input Section */}
+      {state.inputType === 'text' ? (
+        <div className="mb-4">
+          <EditorPanel
+            value={state.text || ''}
+            onChange={(value) => updateState({ text: value })}
+            placeholder="Enter text to hash..."
+            mode="text"
+            readOnly={false}
+          />
+        </div>
+      ) : (
+        <div className="mb-4">
+          <div
+            onDragOver={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+            onDragLeave={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              const file = e.dataTransfer.files[0];
+              if (file) {
+                handleFileSelect(file);
+              }
+            }}
+            className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center cursor-pointer hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
+          >
+            <input
+              type="file"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  handleFileSelect(file);
+                }
+              }}
+              className="hidden"
+              id="hash-file-input"
+            />
+            <label
+              htmlFor="hash-file-input"
+              className="cursor-pointer"
+            >
+              <File className="w-8 h-8 mx-auto mb-2 text-gray-400 dark:text-gray-500" />
+              <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Drop a file here or click to browse
+              </div>
+              <div className="text-xs text-gray-500 dark:text-gray-400">
+                Max 100MB
+              </div>
+            </label>
+          </div>
+          {fileMetadata && (
+            <div className="mt-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+              <div className="text-sm text-gray-700 dark:text-gray-300">
+                <div><strong>File:</strong> {fileMetadata.name}</div>
+                <div><strong>Size:</strong> {(fileMetadata.size / 1024).toFixed(2)} KB</div>
+                <div><strong>Modified:</strong> {new Date(fileMetadata.lastModified).toLocaleString()}</div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Options */}
       <div className="mb-4 space-y-4">
-        {/* Algorithm and Format */}
-        <div className="flex flex-wrap gap-4">
-          <OptionLabel tooltip="Select hash algorithm">
+        {/* Algorithm */}
+        <div>
+          <OptionLabel tooltip="Select hash algorithm. SHA-256 is recommended for most use cases, SHA-512 provides longer hash output.">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Algorithm
             </label>
-            <select
-              value={state.algorithm}
-              onChange={(e) =>
-                updateState({
-                  algorithm: e.target.value as HashToolState['algorithm'],
-                })
-              }
-              className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="SHA-256">SHA-256</option>
-              <option value="SHA-1">SHA-1</option>
-              <option value="SHA-384">SHA-384</option>
-              <option value="SHA-512">SHA-512</option>
-              <option value="MD5">MD5 (Not supported)</option>
-            </select>
           </OptionLabel>
-
-          <OptionLabel tooltip="Select output format">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Format
-            </label>
-            <select
-              value={state.outputFormat}
-              onChange={(e) =>
-                updateState({
-                  outputFormat: e.target.value as 'hex' | 'base64',
-                })
-              }
-              className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="hex">Hex</option>
-              <option value="base64">Base64</option>
-            </select>
-          </OptionLabel>
+          <select
+            value={state.algorithm}
+            onChange={(e) =>
+              updateState({
+                algorithm: e.target.value as 'MD5' | 'SHA-1' | 'SHA-256' | 'SHA-512',
+              })
+            }
+            className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="MD5">MD5</option>
+            <option value="SHA-1">SHA-1</option>
+            <option value="SHA-256">SHA-256</option>
+            <option value="SHA-512">SHA-512</option>
+          </select>
         </div>
 
-        {/* HMAC Option */}
+        {/* Output Encoding */}
         <div>
-          <OptionLabel tooltip="HMAC (Hash-based Message Authentication Code) uses a secret key to authenticate and verify the integrity of messages. Enable this to generate HMAC signatures instead of regular hashes.">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              HMAC Authentication
+          <OptionLabel tooltip="Select output encoding format. Hex is human-readable, Base64 is compact, Base64URL is URL-safe.">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Output Encoding
             </label>
           </OptionLabel>
-          <div className="flex items-center gap-2">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={state.hmac}
-                onChange={(e) => updateState({ hmac: e.target.checked })}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-              />
-              <span className="text-sm text-gray-700 dark:text-gray-300">Enable HMAC</span>
-            </label>
-          </div>
-          {state.hmac && (
-            <div className="mt-3">
+          <select
+            value={state.outputEncoding}
+            onChange={(e) =>
+              updateState({
+                outputEncoding: e.target.value as 'hex' | 'base64' | 'base64url',
+              })
+            }
+            className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="hex">Hex</option>
+            <option value="base64">Base64</option>
+            <option value="base64url">Base64URL</option>
+          </select>
+        </div>
+
+        {/* HMAC Options */}
+        {state.mode === 'hmac' && (
+          <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-md">
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <OptionLabel tooltip="HMAC key encoding format. Raw text is UTF-8 encoded, Hex and Base64 are binary formats.">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Key Encoding
+                  </label>
+                </OptionLabel>
+                <button
+                  type="button"
+                  onClick={generateRandomKey}
+                  className="flex items-center gap-1 px-2 py-1 text-xs text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+                  title="Generate random key"
+                >
+                  <RefreshCw className="w-3 h-3" />
+                  Generate Random
+                </button>
+              </div>
+              <select
+                value={state.hmacKeyEncoding || 'raw'}
+                onChange={(e) =>
+                  updateState({
+                    hmacKeyEncoding: e.target.value as 'raw' | 'hex' | 'base64',
+                  })
+                }
+                className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="raw">Raw Text (UTF-8)</option>
+                <option value="hex">Hex</option>
+                <option value="base64">Base64</option>
+              </select>
+            </div>
+            <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 HMAC Key
               </label>
               <input
                 type="text"
-                value={state.hmacKey}
-                onChange={(e) => updateState({ hmacKey: e.target.value })}
+                value={state.hmacKeyText || ''}
+                onChange={(e) => updateState({ hmacKeyText: e.target.value })}
                 placeholder="Enter HMAC key..."
                 className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
-          )}
-        </div>
+            <div>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={state.saveHmacKey || false}
+                  onChange={(e) => updateState({ saveHmacKey: e.target.checked })}
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <span className="text-sm text-gray-700 dark:text-gray-300">
+                  Save key in share links
+                </span>
+              </label>
+              {state.saveHmacKey && (
+                <p className="mt-1 text-xs text-red-600 dark:text-red-400">
+                  ⚠️ Warning: Saving HMAC keys in share links may expose sensitive information.
+                </p>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Output */}
@@ -302,13 +763,52 @@ const HashTool: React.FC = () => {
             readOnly={true}
           />
         </div>
+        
         {/* Security Note */}
         <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
           <p className="text-xs text-gray-500 dark:text-gray-400">
             <strong className="text-gray-700 dark:text-gray-300">Note:</strong> For checksum verification only. Not suitable for security purposes.
           </p>
+          {(state.algorithm === 'MD5' || state.algorithm === 'SHA-1') && (
+            <p className="mt-2 text-xs text-yellow-600 dark:text-yellow-400">
+              <strong>⚠️ Security Warning:</strong> {state.algorithm} is cryptographically broken and should not be used for security purposes. Use SHA-256 or SHA-512 for secure applications.
+            </p>
+          )}
         </div>
       </div>
+
+      {/* HMAC Verification Section */}
+      {state.mode === 'hmac' && (
+        <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-md">
+          <OptionLabel tooltip="Enter expected MAC to verify against calculated HMAC">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Verification
+            </label>
+          </OptionLabel>
+          <div className="space-y-2">
+            <input
+              type="text"
+              value={state.expectedMac || ''}
+              onChange={(e) => updateState({ expectedMac: e.target.value })}
+              placeholder="Enter expected MAC to verify..."
+              className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {verificationResult === 'match' && (
+              <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
+                <CheckCircle2 className="w-4 h-4" />
+                <span className="text-sm font-medium">Match: MAC verification successful</span>
+              </div>
+            )}
+            {verificationResult === 'mismatch' && (
+              <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
+                <XCircle className="w-4 h-4" />
+                <span className="text-sm font-medium">Mismatch: MAC verification failed</span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       <ShareModal
         isOpen={isShareModalOpen}
         onClose={() => setIsShareModalOpen(false)}
@@ -334,15 +834,14 @@ export const hashTool: ToolDefinition<HashToolState> = {
     'hash',
     'checksum',
     'sha256',
-    'sha1',
-    'md5',
+    'sha512',
     'hmac',
     'cryptographic hash',
     'digest',
     'fingerprint',
+    'file hash',
   ],
   category: 'Converters',
   defaultState: DEFAULT_STATE,
   Component: HashTool,
 };
-

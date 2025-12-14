@@ -40,4 +40,3 @@ export const ToolHeader: React.FC<ToolHeaderProps> = ({ title, description, onRe
     </div>
   );
 };
-

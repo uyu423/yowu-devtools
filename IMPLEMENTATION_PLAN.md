@@ -6,14 +6,15 @@
 
 ## 1. 프로젝트 현황
 
-- **상태**: Phase 6 완료 ✅ (v1.2.0 릴리스 완료)
-- **현재 버전**: v1.2.0 (2025-01-XX)
-- **다음 버전**: v1.3.0 (예정)
+- **상태**: Phase 7 완료 (v1.2.1 릴리즈 준비 중)
+- **현재 버전**: v1.2.1 (2025-01-XX)
+- **다음 버전**: v1.2.2 (계획 중)
 - **주요 변경점**:
   - Phase 3: 모든 도구 기능 구현 완료 (JSON, URL, Base64, Time, YAML, Diff, Cron)
   - Phase 4: CI/CD 및 배포 설정 완료
   - Phase 5 (v1.1.0): ✅ 사이드바 고도화, Web App 지원, JWT 도구 추가, Web Worker 성능 최적화 완료
   - Phase 6 (v1.2.0): ✅ Command Palette, 파일 워크플로우, 공유 고도화, PWA 폴리싱, 버전 체계 정리, Hash/UUID/URL Parser 도구 추가 완료
+  - Phase 7 (v1.2.1): ✅ Hash/HMAC 도구 고도화, Regex Tester 도구 추가 완료, Web Share API 텍스트 포맷팅 개선 완료
 
 ---
 
@@ -369,3 +370,81 @@ src/
   - [x] 실시간 파싱 (Debounce)
   - [x] 배열 파라미터 지원 (PHP 스타일, 인덱스 배열, 연관 배열, 중첩 배열)
   - [x] 도구 등록 및 SEO 정보 추가 (id: url-parser, path: /url-parser)
+
+### Phase 7: v1.2.1 기능 구현 (Enhancement & New Tool)
+
+#### 7.1 Hash/HMAC 도구 고도화 ✅ **진행 중**
+
+- [ ] **파일 해시 기능 추가**:
+  - [ ] Input Type 탭 추가 (`Text` / `File`)
+  - [ ] 파일 선택 및 Drag & Drop 지원 (`FileInput` 컴포넌트 재사용)
+  - [ ] 파일을 ArrayBuffer로 읽기 (`file.arrayBuffer()` 우선, `FileReader.readAsArrayBuffer` 대체)
+  - [ ] ArrayBuffer를 `subtle.digest`로 해시 계산
+  - [ ] 파일 메타 정보 표시 (name, size, lastModified)
+  - [ ] 처리 상태 표시 (로딩 스피너, 큰 파일 진행률)
+
+- [ ] **인코딩 옵션 확장**:
+  - [ ] Base64URL 인코딩 옵션 추가 (`hex`, `base64`, `base64url`)
+  - [ ] 출력 형식 선택 UI 개선
+
+- [ ] **HMAC 고도화**:
+  - [ ] Mode 탭 추가 (`Hash` / `HMAC`)
+  - [ ] HMAC 키 인코딩 옵션 추가 (`raw-text`, `hex`, `base64`)
+  - [ ] 랜덤 키 생성 버튼 추가 (WebCrypto `generateKey` 또는 안전한 랜덤 바이트)
+  - [ ] 검증(verify) 섹션 추가: expected MAC 입력 → 일치 여부 표시 (OK/Fail)
+  - [ ] HMAC 키 보안 정책: 기본적으로 공유 링크/로컬스토리지에 저장하지 않음
+  - [ ] "키 저장" 옵션 추가 (강한 경고 문구 포함)
+
+- [ ] **알고리즘 정리**:
+  - [ ] SHA-256, SHA-512만 지원 (MD5, SHA-1, SHA-384 제거 또는 비활성화)
+  - [ ] HMAC 모드에서 SHA-256/SHA-512 선택
+
+- [ ] **에러 처리 개선**:
+  - [ ] 잘못된 키 인코딩(예: hex 길이 홀수) → 사용자 친화 에러
+  - [ ] 파일 읽기 실패/권한 문제 → 에러 배너
+
+#### 7.2 Regex Tester 도구 추가 ✅ **진행 중**
+
+- [ ] **도구 구현**:
+  - [ ] `src/tools/regex/index.tsx` 생성
+  - [ ] Pattern 입력 필드 (단일 라인)
+  - [ ] Flags 토글 UI (`g i m s u y` + 브라우저 지원 시 `d/v`)
+  - [ ] Test Text 입력 필드 (멀티라인, CodeMirror 사용)
+  - [ ] Replace 미리보기 옵션 토글
+  - [ ] Replacement 문자열 입력 필드 (멀티라인)
+
+- [ ] **매치 결과 표시**:
+  - [ ] Match 리스트 패널: 매치 N개 표시(인덱스/길이/매치 문자열)
+  - [ ] 각 매치 클릭 시 Test Text에서 해당 범위 스크롤+하이라이트
+  - [ ] Group 패널: 캡처 그룹 #1..N 값 표시
+  - [ ] 네임드 그룹 `(?<name>...)` 표시 (`groups.name` 형태)
+
+- [ ] **하이라이트 기능**:
+  - [ ] Test Text 위에 overlay 하이라이트 구현
+  - [ ] 전체 매치: 배경 강조
+  - [ ] 그룹별 색상 (동일 그룹은 동일 색, 매치가 달라도 그룹 #1은 같은 색)
+  - [ ] 특정 매치 선택 시 해당 매치의 그룹만 진하게 강조
+
+- [ ] **치환 미리보기**:
+  - [ ] Replace 결과 패널에 "치환 후 문자열" 표시
+  - [ ] `$1`, `$2` 같은 숫자 그룹 참조 치환 지원
+  - [ ] 네임드 그룹 참조 치환(예: `$<name>`) 지원
+  - [ ] Replace 실행 모드: `replace`(첫 매치) / `replaceAll`(전체 매치)
+  - [ ] `g` 플래그와 replaceMode 동기화
+  - [ ] (옵션) "원본 vs 치환 결과" Diff 뷰 (기존 Text Diff 컴포넌트 재사용)
+
+- [ ] **오류/예외 처리**:
+  - [ ] 패턴 문법 오류 시 ErrorBanner에 예외 메시지 표시 (앱 크래시 금지)
+  - [ ] 입력 변경 시 debounce(150~300ms)
+  - [ ] 특정 시간(300ms~1s) 이상 걸리면 "정규식이 오래 걸립니다(백트래킹 가능)" 경고
+  - [ ] Worker 실행 옵션 (큰 텍스트 처리 시, 선택적)
+
+- [ ] **도구 등록**:
+  - [ ] `src/tools/index.ts`에 Regex 도구 추가
+  - [ ] `vite-plugin-generate-routes.ts`에 SEO 정보 추가
+  - [ ] 아이콘 선택 (Lucide React: Regex 또는 Search)
+
+- [ ] **상태 관리**:
+  - [ ] `useToolState`로 상태 관리
+  - [ ] URL 공유 최적화 (필터링 필요성 평가)
+  - [ ] localStorage 저장/복원
