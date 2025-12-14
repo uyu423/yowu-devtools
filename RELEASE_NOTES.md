@@ -1,6 +1,6 @@
 # Release Notes
 
-## v1.2.0 (January 2025) - Power-user Release
+## v1.2.0 (December 2024) - Power-user Release
 
 **New Features:**
 
@@ -28,7 +28,7 @@
 - ✨ **New Tools**:
   - Hash Generator: SHA-256, SHA-1, SHA-384, SHA-512, HMAC support (WebCrypto API)
   - UUID/ULID Generator: Generate UUID v4/v7 and ULID with batch generation (up to 100 IDs)
-  - Query String Parser: Parse and visualize URL query parameters with decoding options
+  - URL Parser: Parse and visualize URL components (protocol, host, path, fragment, query parameters) with decoding options and array parameter support
 
 **Improvements:**
 

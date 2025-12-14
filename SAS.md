@@ -950,11 +950,11 @@ type PasswordToolState = {
 
 ---
 
-### 7.12 Query String Parser (`toolId: query-string`) (v1.2.0 추가)
+### 7.12 URL Parser (`toolId: url-parser`) (v1.2.0 추가)
 
 #### 목적
 
-복잡한 query string이 포함된 URL을 입력받아서, 해당 URL의 구조와 파라미터를 구조 분해해서 알아보기 쉽게 사용자에게 노출해주는 도구
+URL을 입력받아서, 해당 URL의 구조(protocol, host, path, fragment)와 query parameters를 구조 분해해서 알아보기 쉽게 사용자에게 노출해주는 도구
 
 #### 상태
 
@@ -969,31 +969,40 @@ type QueryStringToolState = {
 #### 기능
 
 - FR-QS-01: URL 또는 query string 입력 받기
-- FR-QS-02: Query string 파싱 및 구조 분해
+- FR-QS-02: URL 컴포넌트 파싱
+  - Protocol (https://, http://) 파싱 및 표시
+  - Host (도메인) 파싱 및 표시
+  - Path (경로) 파싱 및 표시
+  - Fragment (# 이후) 파싱 및 표시
+  - 각 컴포넌트 개별 복사 기능
+- FR-QS-03: Query string 파싱 및 구조 분해
   - `?` 이후의 query string 추출
   - `&`로 구분된 파라미터 분리
   - `=`로 구분된 키/값 분리
-- FR-QS-03: 파라미터 구조화 표시
+  - 배열 파라미터 지원 (PHP 스타일 `arr[]`, 인덱스 배열 `arr[0]`, 연관 배열 `arr[key]`, 중첩 배열 `arr[0][key]`)
+- FR-QS-04: 파라미터 구조화 표시
   - 각 파라미터의 키(key) 표시
   - 각 파라미터의 값(value) 표시
   - 인코딩 상태 표시 (인코딩됨/디코딩됨)
   - 파라미터 개수 표시
-- FR-QS-04: 디코딩 옵션
+- FR-QS-05: 디코딩 옵션
   - `showDecoded`: 디코딩된 값 표시 (기본 true)
   - `showRaw`: 원본 인코딩된 값 표시 (기본 false)
   - 두 옵션 모두 활성화 시 비교 가능
-- FR-QS-05: 개별 파라미터 복사
+- FR-QS-06: 개별 파라미터 및 URL 컴포넌트 복사
   - 각 파라미터의 키/값 쌍 복사
+  - 각 URL 컴포넌트 (protocol, host, path, fragment) 복사
   - 전체 query string 복사
-- FR-QS-06: 에러 처리
+- FR-QS-07: 에러 처리
   - 잘못된 URL 형식 시 에러 메시지 표시
   - Query string이 없는 경우 안내 메시지 표시
-- FR-QS-07: 실시간 파싱
+- FR-QS-08: 실시간 파싱
   - 입력 변경 시 즉시 파싱 및 결과 업데이트
 - AC
   - 복잡한 query string도 정확히 파싱됨
+  - 배열 파라미터 형식 모두 지원
   - 인코딩된 값과 디코딩된 값을 비교 가능
-  - 각 파라미터를 개별적으로 복사 가능
+  - 각 파라미터 및 URL 컴포넌트를 개별적으로 복사 가능
   - URL 공유 기능 지원
 
 ---

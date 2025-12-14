@@ -13,7 +13,7 @@
   - Phase 3: 모든 도구 기능 구현 완료 (JSON, URL, Base64, Time, YAML, Diff, Cron)
   - Phase 4: CI/CD 및 배포 설정 완료
   - Phase 5 (v1.1.0): ✅ 사이드바 고도화, Web App 지원, JWT 도구 추가, Web Worker 성능 최적화 완료
-  - Phase 6 (v1.2.0): ✅ Command Palette, 파일 워크플로우, 공유 고도화, PWA 폴리싱, 버전 체계 정리, Hash/UUID 도구 추가 완료
+  - Phase 6 (v1.2.0): ✅ Command Palette, 파일 워크플로우, 공유 고도화, PWA 폴리싱, 버전 체계 정리, Hash/UUID/URL Parser 도구 추가 완료
 
 ---
 
@@ -356,14 +356,16 @@ src/
   - [ ] 유효성 검사 (최소 하나의 문자 유형 선택)
   - [ ] 도구 등록 및 SEO 정보 추가
 
-- [ ] **Query String Parser**:
-  - [ ] `src/tools/query-string/index.tsx` 생성
-  - [ ] URL 또는 query string 입력 받기
-  - [ ] Query string 파싱 로직 구현 (`URLSearchParams` 또는 직접 파싱)
-  - [ ] 파라미터 구조화 표시 (테이블 또는 카드 형태)
-  - [ ] 디코딩 옵션 (`showDecoded`, `showRaw`)
-  - [ ] 개별 파라미터 복사 기능
-  - [ ] 전체 query string 복사 기능
-  - [ ] 에러 처리 (잘못된 URL, query string 없음)
-  - [ ] 실시간 파싱 (Debounce)
-  - [ ] 도구 등록 및 SEO 정보 추가
+- [x] **URL Parser** (이전 Query String Parser):
+  - [x] `src/tools/query-string/index.tsx` 생성
+  - [x] URL 또는 query string 입력 받기
+  - [x] URL 컴포넌트 파싱 (protocol, host, path, fragment, query parameters)
+  - [x] Query string 파싱 로직 구현 (직접 파싱으로 배열 파라미터 지원)
+  - [x] 파라미터 구조화 표시 (테이블 형태)
+  - [x] 디코딩 옵션 (`showDecoded`, `showRaw`)
+  - [x] 개별 파라미터 및 URL 컴포넌트 복사 기능
+  - [x] 전체 query string 복사 기능
+  - [x] 에러 처리 (잘못된 URL, query string 없음)
+  - [x] 실시간 파싱 (Debounce)
+  - [x] 배열 파라미터 지원 (PHP 스타일, 인덱스 배열, 연관 배열, 중첩 배열)
+  - [x] 도구 등록 및 SEO 정보 추가 (id: url-parser, path: /url-parser)

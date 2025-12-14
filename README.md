@@ -24,7 +24,7 @@ An open toolbox for developers who would rather keep sensitive snippets on their
 - **Enhanced Share** (v1.2.0): Improved sharing with Web Share API support and privacy warnings.
 - **PWA Polish** (v1.2.0): Extended shortcuts for all tools and screenshots support.
 - **Version Display** (v1.2.0): App version shown in sidebar footer.
-- **New Tools** (v1.2.0): Hash Generator and UUID/ULID Generator added.
+- **New Tools** (v1.2.0): Hash Generator, UUID/ULID Generator, and URL Parser added.
 
 ## Release Notes
 
