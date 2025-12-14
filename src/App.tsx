@@ -8,6 +8,7 @@ import { tools } from '@/tools';
 import { useEffect } from 'react';
 import { usePWA } from '@/hooks/usePWA';
 import { useRecentTools } from '@/hooks/useRecentTools';
+import { useResolvedTheme } from '@/hooks/useTheme';
 
 function AppContent() {
   const location = useLocation();
@@ -149,10 +150,22 @@ function AppContent() {
 function App() {
   // PWA 기능 (업데이트 알림, 설치 프롬프트, 오프라인 감지)
   const pwa = usePWA();
+  const resolvedTheme = useResolvedTheme();
 
   return (
     <AppLayout>
-      <Toaster position="bottom-center" />
+      <Toaster 
+        position="bottom-center" 
+        theme={resolvedTheme}
+        toastOptions={{
+          classNames: {
+            toast: 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100',
+            success: 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700',
+            error: 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700',
+            info: 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700',
+          },
+        }}
+      />
       <AppContent />
       <PWAUpdatePrompt
         needRefresh={pwa.needRefresh}
