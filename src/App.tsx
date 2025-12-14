@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes, useLocation, Link } from 'react-router-dom';
 
 import { AppLayout } from '@/components/layout/AppLayout';
-import { Github } from 'lucide-react';
+import { Github, Command, Keyboard } from 'lucide-react';
 import { PWAUpdatePrompt } from '@/components/common/PWAUpdatePrompt';
 import { CommandPalette } from '@/components/common/CommandPalette';
 import { Toaster } from 'sonner';
@@ -89,6 +89,37 @@ function AppContent() {
                     </span>
                   </li>
                 </ul>
+              </div>
+            </div>
+
+            {/* Command Palette Feature */}
+            <div className="mb-12 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+              <div className="flex items-start gap-4">
+                <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                  <Command className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                    Quick Navigation
+                  </h2>
+                  <p className="text-gray-700 dark:text-gray-300 mb-4">
+                    Press <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded shadow-sm">⌘K</kbd> or <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded shadow-sm">Ctrl+K</kbd> to open the Command Palette and quickly find any tool.
+                  </p>
+                  <div className="flex flex-wrap gap-2 text-sm text-gray-600 dark:text-gray-400">
+                    <span className="flex items-center gap-1">
+                      <Keyboard className="w-4 h-4" />
+                      Search tools by name or keywords
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Keyboard className="w-4 h-4" />
+                      Navigate with arrow keys
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Keyboard className="w-4 h-4" />
+                      Access favorites and recent tools
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
 
