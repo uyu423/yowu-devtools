@@ -36,7 +36,7 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
           >
             <Menu className="w-6 h-6" />
           </button>
-          <span className="ml-2 font-semibold text-gray-900 dark:text-white">yowu-devtools</span>
+          <span className="ml-2 font-semibold text-gray-900 dark:text-white">tools.yowu.dev</span>
         </div>
 
         {/* Scrollable Area */}
