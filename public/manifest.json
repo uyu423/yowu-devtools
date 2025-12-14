@@ -1,5 +1,5 @@
 {
-  "name": "tools.yowu.dev",
+  "name": "Yowu DevTools",
   "short_name": "DevTools",
   "description": "Free online developer tools: JSON viewer, cron parser, Base64 converter, URL encoder, text diff, YAML converter, and more. All processing happens in your browser.",
   "start_url": "/",
@@ -50,4 +50,3 @@
     }
   ]
 }
-
