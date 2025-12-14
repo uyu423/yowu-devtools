@@ -247,6 +247,35 @@ const tools: ToolInfo[] = [
       'Real-time calculation',
     ],
   },
+  {
+    id: 'uuid',
+    path: '/uuid',
+    title: 'UUID/ULID Generator',
+    description: 'Generate UUID v4, UUID v7, and ULID identifiers',
+    seoDescription:
+      'Free online UUID and ULID generator. Generate UUID v4 (random), UUID v7 (timestamp-based), and ULID identifiers. Batch generation up to 100 IDs. All processing happens in your browser.',
+    keywords: [
+      'uuid generator',
+      'ulid generator',
+      'uuid v4',
+      'uuid v7',
+      'ulid',
+      'unique identifier',
+      'guid generator',
+      'random id',
+      'timestamp id',
+      'uuid tool',
+      'ulid tool',
+    ],
+    features: [
+      'UUID v4 generation (random)',
+      'UUID v7 generation (timestamp-based)',
+      'ULID generation (shorter timestamp-based)',
+      'Batch generation (up to 100 IDs)',
+      'Lowercase and uppercase formats',
+      'Copy individual or all IDs',
+    ],
+  },
 ];
 
 export function generateRoutes(): Plugin {

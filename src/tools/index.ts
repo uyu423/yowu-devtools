@@ -8,6 +8,7 @@ import { diffTool } from './diff';
 import { cronTool } from './cron';
 import { jwtTool } from './jwt';
 import { hashTool } from './hash';
+import { uuidTool } from './uuid';
 
 export const tools: ToolDefinition[] = [
   jsonTool,
@@ -19,6 +20,7 @@ export const tools: ToolDefinition[] = [
   cronTool,
   jwtTool,
   hashTool,
+  uuidTool,
 ];
 
 export const getToolById = (id: string) => tools.find(t => t.id === id);
