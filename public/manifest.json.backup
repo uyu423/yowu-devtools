@@ -1,0 +1,52 @@
+{
+  "name": "Yowu's DevTools",
+  "short_name": "DevTools",
+  "description": "Free online developer tools: JSON viewer, cron parser, Base64 converter, URL encoder, text diff, YAML converter, and more. All processing happens in your browser.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0f172a",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["developer", "utilities", "productivity"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "JSON Viewer",
+      "short_name": "JSON",
+      "description": "Pretty print and traverse JSON",
+      "url": "/json",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "URL Encoder",
+      "short_name": "URL",
+      "description": "Encode/Decode URL strings",
+      "url": "/url",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}

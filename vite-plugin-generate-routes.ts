@@ -188,6 +188,34 @@ const tools: ToolInfo[] = [
       'Syntax validation',
     ],
   },
+  {
+    id: 'jwt',
+    path: '/jwt',
+    title: 'JWT',
+    description: 'Decode and encode JSON Web Tokens',
+    seoDescription:
+      'Free online JWT decoder and encoder. Decode JSON Web Tokens to view header, payload, and signature. Encode JWT tokens with HMAC signing. Verify token signatures and check expiration. All processing happens in your browser.',
+    keywords: [
+      'jwt decoder',
+      'jwt encoder',
+      'jwt parser',
+      'jwt token',
+      'json web token',
+      'jwt decode',
+      'jwt encode',
+      'jwt validator',
+      'jwt signature verification',
+      'jwt viewer',
+    ],
+    features: [
+      'Decode JWT tokens',
+      'Encode JWT tokens',
+      'Signature verification',
+      'Token expiration check',
+      'HMAC signing support',
+      'Header and payload viewer',
+    ],
+  },
 ];
 
 export function generateRoutes(): Plugin {

@@ -35,13 +35,15 @@ src/
 ├── assets/          # 이미지, 로고 등 정적 자산
 ├── components/      # 공통 컴포넌트
 │   ├── common/     # ToolHeader, EditorPanel, ActionBar, ErrorBanner
-│   ├── layout/     # AppLayout, Sidebar
+│   ├── layout/     # AppLayout, Sidebar (v1.1.0: 즐겨찾기/최근 사용 섹션 포함)
 │   └── ui/         # Tooltip, OptionLabel 등 UI 프리미티브
 ├── hooks/          # 커스텀 훅
 │   ├── useToolState.ts    # 도구 상태 관리 (localStorage + URL 공유)
 │   ├── useTheme.ts        # 테마 관리
 │   ├── useTitle.ts        # 페이지 타이틀 관리
-│   └── useDebouncedValue.ts  # 디바운스된 값
+│   ├── useDebouncedValue.ts  # 디바운스된 값
+│   ├── useRecentTools.ts  # 최근 사용한 도구 관리 (v1.1.0)
+│   └── useFavorites.ts    # 즐겨찾기 관리 (v1.1.0)
 ├── lib/            # 유틸리티 함수
 │   ├── utils.ts    # cn (clsx + tailwind-merge)
 │   └── clipboard.ts # 클립보드 복사 헬퍼
@@ -50,7 +52,15 @@ src/
 │   ├── types.ts    # ToolDefinition 타입
 │   └── <toolId>/   # 각 도구별 디렉토리
 │       └── index.tsx  # 도구 컴포넌트 및 정의
+├── workers/        # Web Workers (v1.1.0)
+│   ├── json-parser.worker.ts
+│   ├── diff-calculator.worker.ts
+│   └── yaml-converter.worker.ts
 └── main.tsx        # 앱 진입점
+public/
+├── manifest.json   # Web App 매니페스트 (v1.1.0)
+├── icon-192.png    # 앱 아이콘 (v1.1.0)
+└── icon-512.png    # 앱 아이콘 (v1.1.0)
 ```
 
 ## 코딩 스타일 및 명명 규칙
@@ -267,7 +277,7 @@ export const tools: ToolDefinition[] = [
 - **Wide Group** (`max-w-[90rem]`): 좌우 분할 뷰 도구
   - JSON Viewer, YAML Converter, Text Diff
 - **Medium Group** (`max-w-5xl`): 상하 배치 도구
-  - URL Encoder, Base64 Converter
+  - URL Encoder, Base64 Converter, JWT Decoder (v1.1.0)
 - **Narrow Group** (`max-w-3xl`): 단순 입력 폼 도구
   - Time Converter, Cron Parser
 
@@ -391,6 +401,8 @@ npm run preview   # 빌드 결과 미리보기
 3. **의존성 추가 시 주의**: 새로운 패키지 추가 시 번들 크기와 라이선스 확인
 4. **브라우저 호환성**: 최신 브라우저 대상 (ES2020+)
 5. **접근성**: 키보드 네비게이션, 스크린 리더 고려 (향후 개선)
+6. **Web Worker 사용** (v1.1.0): 큰 데이터 처리 시 Worker 사용, 폴백 로직 필수
+7. **localStorage 키 관리**: 사이드바 기능(v1.1.0)은 `yowu-devtools:v1:app:*` 네임스페이스 사용
 
 ## 코드 리뷰 체크리스트
 
@@ -406,6 +418,9 @@ npm run preview   # 빌드 결과 미리보기
 - [ ] SEO 최적화가 완료되었는가? (신규 도구인 경우)
 - [ ] ESLint 오류가 없는가?
 - [ ] 관련 문서가 업데이트되었는가?
+- [ ] 큰 데이터 처리 시 Web Worker를 사용하는가? (v1.1.0, 필요시)
+- [ ] Worker 폴백 로직이 구현되었는가? (v1.1.0, Worker 사용 시)
+- [ ] 사이드바 기능(localStorage)이 올바른 키 네임스페이스를 사용하는가? (v1.1.0)
 
 ---
 

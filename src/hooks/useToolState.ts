@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
   compressToEncodedURIComponent,
@@ -26,6 +26,39 @@ function cloneState<T>(state: T): T {
   return JSON.parse(JSON.stringify(state)) as T;
 }
 
+function getInitialState<T>(
+  toolId: string,
+  defaultState: T,
+  search: string
+): T {
+  if (typeof window === 'undefined') {
+    return cloneState(defaultState);
+  }
+
+  const params = new URLSearchParams(search);
+  const payload = params.get('d');
+  if (payload) {
+    const decoded = decodePayload<T>(payload, toolId);
+    if (decoded) {
+      return { ...cloneState(defaultState), ...decoded };
+    }
+  }
+
+  const raw = window.localStorage.getItem(`${STORAGE_PREFIX}${toolId}`);
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw) as StoredToolState<T>;
+      if (parsed?.state) {
+        return { ...cloneState(defaultState), ...parsed.state };
+      }
+    } catch {
+      // ignore broken storage
+    }
+  }
+
+  return cloneState(defaultState);
+}
+
 export function useToolState<T extends object>(
   toolId: string,
   defaultState: T,
@@ -38,34 +71,39 @@ export function useToolState<T extends object>(
   }
 ) {
   const location = useLocation();
-  const [state, setState] = useState<T>(() => {
-    if (typeof window === 'undefined') {
-      return cloneState(defaultState);
-    }
+  const [state, setState] = useState<T>(() =>
+    getInitialState(toolId, defaultState, location.search)
+  );
 
+  // Update state when URL search params change (e.g., when navigating to shared URL)
+  // Using useEffect to sync state with URL params is necessary for shared URL restoration
+  useEffect(() => {
     const params = new URLSearchParams(location.search);
     const payload = params.get('d');
     if (payload) {
       const decoded = decodePayload<T>(payload, toolId);
       if (decoded) {
-        return { ...cloneState(defaultState), ...decoded };
+        setState({ ...cloneState(defaultState), ...decoded });
+        return;
       }
     }
-
-    const raw = window.localStorage.getItem(`${STORAGE_PREFIX}${toolId}`);
-    if (raw) {
-      try {
-        const parsed = JSON.parse(raw) as StoredToolState<T>;
-        if (parsed?.state) {
-          return { ...cloneState(defaultState), ...parsed.state };
+    // If no URL param, restore from localStorage if available
+    // Only restore from localStorage if there's no URL param to avoid overwriting shared state
+    if (!payload) {
+      const raw = window.localStorage.getItem(`${STORAGE_PREFIX}${toolId}`);
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw) as StoredToolState<T>;
+          if (parsed?.state) {
+            setState({ ...cloneState(defaultState), ...parsed.state });
+          }
+        } catch {
+          // ignore broken storage
         }
-      } catch {
-        // ignore broken storage
       }
     }
-
-    return cloneState(defaultState);
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.search, toolId]);
 
   const setAndPersist = useCallback(
     (updater: T | ((prev: T) => T)) => {
@@ -106,8 +144,9 @@ export function useToolState<T extends object>(
         state: stateToShare,
       };
       const encoded = compressToEncodedURIComponent(JSON.stringify(envelope));
-      const baseUrl = `${window.location.origin}${window.location.pathname}${window.location.search}`;
-      const shareUrl = `${baseUrl}#${location.pathname}?d=${encoded}`;
+      // Query parameter must be before hash to be readable by location.search
+      // BrowserRouter doesn't use hash routing, so we can use query parameter directly
+      const shareUrl = `${window.location.origin}${location.pathname}?d=${encoded}`;
       await navigator.clipboard?.writeText(shareUrl);
       toast.success('Share link copied.');
       return shareUrl;

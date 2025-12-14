@@ -9,6 +9,7 @@ import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useTitle } from '@/hooks/useTitle';
+import { useWebWorker, shouldUseWorkerForText } from '@/hooks/useWebWorker';
 import { copyToClipboard } from '@/lib/clipboard';
 import DiffMatchPatch from 'diff-match-patch';
 import type { Diff } from 'diff-match-patch';
@@ -38,7 +39,36 @@ const DiffTool: React.FC = () => {
   const debouncedLeft = useDebouncedValue(state.left, 250);
   const debouncedRight = useDebouncedValue(state.right, 250);
 
-  const diffs = useMemo(() => {
+  // Worker 사용 여부 결정
+  const shouldUseWorker = React.useMemo(() => {
+    const leftShouldUse = shouldUseWorkerForText(debouncedLeft, 500_000, 10_000);
+    const rightShouldUse = shouldUseWorkerForText(debouncedRight, 500_000, 10_000);
+    return leftShouldUse || rightShouldUse;
+  }, [debouncedLeft, debouncedRight]);
+
+  // Worker를 사용한 diff 계산
+  const { result: workerResult, isProcessing } = useWebWorker<
+    { left: string; right: string; ignoreWhitespace: boolean; ignoreCase: boolean },
+    { success: boolean; diffs?: Diff[]; error?: string }
+  >({
+    workerUrl: new URL('../workers/diff-calculator.worker.ts', import.meta.url),
+    shouldUseWorker: shouldUseWorker && (!!debouncedLeft || !!debouncedRight),
+    request: shouldUseWorker && (!!debouncedLeft || !!debouncedRight)
+      ? {
+          left: debouncedLeft,
+          right: debouncedRight,
+          ignoreWhitespace: state.ignoreWhitespace,
+          ignoreCase: state.ignoreCase,
+        }
+      : null,
+  });
+
+  // 메인 스레드 diff 계산 (작은 데이터용)
+  const mainThreadDiffs = useMemo(() => {
+    if (shouldUseWorker) {
+      return [];
+    }
+
     const dmp = new DiffMatchPatch();
     dmp.Diff_Timeout = 1;
     const rawDiffs = dmp.diff_main(debouncedLeft, debouncedRight);
@@ -48,7 +78,24 @@ const DiffTool: React.FC = () => {
       state.ignoreWhitespace,
       state.ignoreCase
     );
-  }, [debouncedLeft, debouncedRight, state.ignoreWhitespace, state.ignoreCase]);
+  }, [
+    debouncedLeft,
+    debouncedRight,
+    state.ignoreWhitespace,
+    state.ignoreCase,
+    shouldUseWorker,
+  ]);
+
+  // 최종 diff 결과 (Worker 또는 메인 스레드)
+  const diffs = React.useMemo(() => {
+    if (shouldUseWorker) {
+      if (!workerResult || !workerResult.success || !workerResult.diffs) {
+        return [];
+      }
+      return workerResult.diffs;
+    }
+    return mainThreadDiffs;
+  }, [shouldUseWorker, workerResult, mainThreadDiffs]);
 
   const stats = useMemo(() => {
     return diffs.reduce(
@@ -167,7 +214,15 @@ const DiffTool: React.FC = () => {
             </div>
           </div>
 
-          {!hasDiff && (
+          {isProcessing && (
+            <div className="p-4">
+              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 dark:border-gray-600 border-t-blue-600 dark:border-t-blue-400"></div>
+                Calculating diff for large text...
+              </div>
+            </div>
+          )}
+          {!isProcessing && !hasDiff && (
             <p className="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
               Both inputs are identical.
             </p>

@@ -11,6 +11,7 @@ import { useToolState } from '@/hooks/useToolState';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useTitle } from '@/hooks/useTitle';
 import { useTheme } from '@/hooks/useTheme';
+import { useWebWorker, shouldUseWorkerForText } from '@/hooks/useWebWorker';
 import { copyToClipboard } from '@/lib/clipboard';
 import { JsonView, defaultStyles } from 'react-json-view-lite';
 import 'react-json-view-lite/dist/index.css';
@@ -54,6 +55,12 @@ const JsonTool: React.FC = () => {
       }),
     });
   const debouncedInput = useDebouncedValue(state.input, 300);
+
+  // Worker 사용 여부 결정
+  const shouldUseWorker = React.useMemo(
+    () => shouldUseWorkerForText(debouncedInput, 1_000_000, 10_000),
+    [debouncedInput]
+  );
 
   // 다크 모드 감지 - 실제 DOM 클래스를 확인하여 정확한 상태 추적
   const [isDark, setIsDark] = React.useState(() => {
@@ -105,8 +112,53 @@ const JsonTool: React.FC = () => {
     [isDark]
   );
 
-  const parseResult = useMemo(() => {
-    if (!debouncedInput.trim()) {
+  // Worker를 사용한 파싱
+  const { result: workerResult, isProcessing } = useWebWorker<
+    { input: string; indent: 2 | 4; sortKeys: boolean },
+    { success: boolean; data?: unknown; formatted?: string; minified?: string; error?: string }
+  >({
+    workerUrl: new URL('../workers/json-parser.worker.ts', import.meta.url),
+    shouldUseWorker: shouldUseWorker && !!debouncedInput.trim(),
+    request: shouldUseWorker && debouncedInput.trim()
+      ? {
+          input: debouncedInput,
+          indent: state.indent,
+          sortKeys: state.sortKeys,
+        }
+      : null,
+  });
+
+  // Worker 결과를 파싱 결과 형식으로 변환
+  const workerParseResult = React.useMemo(() => {
+    if (!workerResult) {
+      return {
+        data: null,
+        formatted: '',
+        minified: '',
+        error: null as string | null,
+      };
+    }
+
+    if (workerResult.success) {
+      return {
+        data: workerResult.data ?? null,
+        formatted: workerResult.formatted ?? '',
+        minified: workerResult.minified ?? '',
+        error: null,
+      };
+    }
+
+    return {
+      data: null,
+      formatted: '',
+      minified: '',
+      error: workerResult.error ?? 'Unknown error',
+    };
+  }, [workerResult]);
+
+  // 메인 스레드 파싱 (작은 데이터용)
+  const mainThreadParseResult = useMemo(() => {
+    if (!debouncedInput.trim() || shouldUseWorker) {
       return {
         data: null,
         formatted: '',
@@ -129,7 +181,10 @@ const JsonTool: React.FC = () => {
         error: (error as Error).message,
       };
     }
-  }, [debouncedInput, state.indent, state.sortKeys]);
+  }, [debouncedInput, state.indent, state.sortKeys, shouldUseWorker]);
+
+  // 최종 파싱 결과 (Worker 또는 메인 스레드)
+  const parseResult = shouldUseWorker ? workerParseResult : mainThreadParseResult;
 
   const highlightedPretty = useMemo(() => {
     if (!parseResult.formatted) return '';
@@ -285,7 +340,15 @@ const JsonTool: React.FC = () => {
                 </p>
               </div>
             )}
-            {parseResult.error && (
+            {isProcessing && (
+              <div className="p-4">
+                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 dark:border-gray-600 border-t-blue-600 dark:border-t-blue-400"></div>
+                  Processing large JSON data...
+                </div>
+              </div>
+            )}
+            {!isProcessing && parseResult.error && (
               <div className="p-4">
                 <ErrorBanner
                   message="JSON parsing failed"
