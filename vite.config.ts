@@ -1,8 +1,8 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import path from 'path'
-import { VitePWA } from 'vite-plugin-pwa'
-import { generateRoutes } from './vite-plugin-generate-routes'
+import { VitePWA } from 'vite-plugin-pwa';
+import { defineConfig } from 'vite';
+import { generateRoutes } from './vite-plugin-generate-routes';
+import path from 'path';
+import react from '@vitejs/plugin-react';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -11,13 +11,19 @@ export default defineConfig({
     generateRoutes(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'opengraph.png'],
+      includeAssets: [
+        'favicon.svg',
+        'opengraph.png',
+        'icon-192.png',
+        'icon-512.png',
+      ],
       // manifest 파일명을 manifest.json으로 설정 (호환성)
       manifestFilename: 'manifest.json',
       manifest: {
-        name: 'Yowu DevTools',
+        name: "Yowu's DevTools",
         short_name: 'DevTools',
-        description: 'Free online developer tools: JSON viewer, cron parser, Base64 converter, URL encoder, text diff, YAML converter, and more. All processing happens in your browser.',
+        description:
+          'Free online developer tools: JSON viewer, cron parser, Base64 converter, URL encoder, text diff, YAML converter, and more. All processing happens in your browser.',
         theme_color: '#0f172a',
         background_color: '#ffffff',
         display: 'standalone',
@@ -28,13 +34,25 @@ export default defineConfig({
             src: '/icon-192.png',
             sizes: '192x192',
             type: 'image/png',
-            purpose: 'any maskable',
+            purpose: 'any',
+          },
+          {
+            src: '/icon-192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'maskable',
           },
           {
             src: '/icon-512.png',
             sizes: '512x512',
             type: 'image/png',
-            purpose: 'any maskable',
+            purpose: 'any',
+          },
+          {
+            src: '/icon-512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable',
           },
         ],
         categories: ['developer', 'utilities', 'productivity'],
@@ -108,8 +126,12 @@ export default defineConfig({
             },
           },
         ],
-        // 정적 자산은 Cache First 전략 사용
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        // 정적 자산은 Cache First 전략 사용 (아이콘 포함)
+        globPatterns: [
+          '**/*.{js,css,html,ico,png,svg,woff2}',
+          'icon-192.png',
+          'icon-512.png',
+        ],
         // 오프라인 폴백 페이지
         navigateFallback: '/404.html',
         navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/],
@@ -120,10 +142,11 @@ export default defineConfig({
         // 스킵 웨이팅: 새 Service Worker 즉시 활성화
         skipWaiting: true,
       },
-      // 개발 환경에서도 PWA 기능 테스트 가능
+      // 개발 환경에서도 PWA 기능 테스트 가능 (localhost에서 설치 프롬프트 표시)
       devOptions: {
-        enabled: false, // 개발 중에는 비활성화 (필요시 true로 변경)
+        enabled: true, // 개발 환경에서도 Service Worker 활성화 (localhost PWA 테스트용)
         type: 'module',
+        navigateFallback: 'index.html',
       },
     }),
   ],
@@ -133,4 +156,4 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
-})
+});
