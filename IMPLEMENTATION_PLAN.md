@@ -6,15 +6,15 @@
 
 ## 1. 프로젝트 현황
 
-- **상태**: Phase 7 진행 중 (v1.2.1 개발 중)
-- **현재 버전**: v1.2.0 (2025-01-XX)
-- **다음 버전**: v1.2.1 (개발 중)
+- **상태**: Phase 7 완료 (v1.2.1 릴리즈 준비 중)
+- **현재 버전**: v1.2.1 (2025-01-XX)
+- **다음 버전**: v1.2.2 (계획 중)
 - **주요 변경점**:
   - Phase 3: 모든 도구 기능 구현 완료 (JSON, URL, Base64, Time, YAML, Diff, Cron)
   - Phase 4: CI/CD 및 배포 설정 완료
   - Phase 5 (v1.1.0): ✅ 사이드바 고도화, Web App 지원, JWT 도구 추가, Web Worker 성능 최적화 완료
   - Phase 6 (v1.2.0): ✅ Command Palette, 파일 워크플로우, 공유 고도화, PWA 폴리싱, 버전 체계 정리, Hash/UUID/URL Parser 도구 추가 완료
-  - Phase 7 (v1.2.1): 🔄 Hash/HMAC 도구 고도화, Regex Tester 도구 추가 진행 중
+  - Phase 7 (v1.2.1): ✅ Hash/HMAC 도구 고도화, Regex Tester 도구 추가 완료, Web Share API 텍스트 포맷팅 개선 완료
 
 ---
 

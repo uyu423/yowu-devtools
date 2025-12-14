@@ -1,6 +1,6 @@
 # Release Notes
 
-## v1.2.1 (January 2025) - Regex & Hash Enhancement
+## v1.2.1 (December 2025) - Regex & Hash Enhancement
 
 **New Features:**
 
@@ -33,6 +33,10 @@
 - 📁 File-based workflow for hash calculation
 - 🎨 Better visual feedback for regex matches and groups
 - ⚡ Performance optimizations for regex testing
+- 📤 Improved Web Share API text formatting
+  - Professional share message format with title, privacy message, and URL
+  - Better control over share text order (title → privacy → URL)
+  - Cleaner messaging without celebratory wording
 
 **Technical:**
 
@@ -41,7 +45,7 @@
 - HMAC key security policy implementation
 - File reading via `file.arrayBuffer()` API
 
-## v1.2.0 (December 2024) - Power-user Release
+## v1.2.0 (December 2025) - Power-user Release
 
 **New Features:**
 
@@ -88,7 +92,7 @@
 - Build-time version injection via Vite environment variables
 - CHANGELOG.md for Git tag-based release notes
 
-## v1.1.1 (January 2025)
+## v1.1.1 (December 2025)
 
 **Bug Fixes:**
 
@@ -110,7 +114,7 @@
 - Enhanced Base64URL encoding/decoding for better compatibility
 - Improved error handling in JWT signature generation
 
-## v1.1.0 (December 2024)
+## v1.1.0 (December 2025)
 
 **New Features:**
 
@@ -138,4 +142,3 @@
 - Added `useWebWorker` hook for reusable Worker logic
 - Enhanced caching strategies (Network First, Cache First)
 - Improved Service Worker management with automatic updates
-
