@@ -102,6 +102,23 @@ function AppContent() {
                     </span>
                   </li>
                 </ul>
+                <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-sm text-gray-600 dark:text-gray-400">
+                    <p>
+                      Hosted on GitHub Pages as a static site. All processing
+                      happens in your browser.
+                    </p>
+                    <a
+                      href="https://github.com/uyu423/yowu-devtools"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+                    >
+                      <Github className="w-4 h-4" />
+                      <span>View on GitHub</span>
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -163,25 +180,6 @@ function AppContent() {
                 ))}
               </div>
             </div>
-
-            {/* Footer */}
-            <footer className="mt-16 pt-8 border-t border-gray-200 dark:border-gray-700">
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-                <p className="text-center">
-                  This site is hosted on GitHub Pages as a static site, and all
-                  processing happens in the client.
-                </p>
-                <a
-                  href="https://github.com/uyu423/yowu-devtools"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
-                >
-                  <Github className="w-4 h-4" />
-                  <span>GitHub Repository</span>
-                </a>
-              </div>
-            </footer>
           </div>
         }
       />
