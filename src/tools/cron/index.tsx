@@ -7,6 +7,7 @@ import { ErrorBanner } from '@/components/common/ErrorBanner';
 import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolSetup } from '@/hooks/useToolSetup';
 import { format, formatDistanceToNow } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
 import { enUS as enUSLocale, ko, ja, zhCN, es } from 'date-fns/locale';
 import CronExpressionParser, { type CronExpressionOptions } from 'cron-parser';
 import cronstrue from 'cronstrue';
@@ -541,7 +542,9 @@ const CronTool: React.FC = () => {
                   className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 flex justify-between"
                 >
                   <span className="font-mono">
-                    {format(date, 'yyyy-MM-dd HH:mm:ss')}
+                    {state.timezone === 'utc'
+                      ? formatInTimeZone(date, 'UTC', 'yyyy-MM-dd HH:mm:ss')
+                      : format(date, 'yyyy-MM-dd HH:mm:ss')}
                   </span>
                   <span className="text-gray-400 dark:text-gray-500">
                     {formatDistanceToNow(date, {
