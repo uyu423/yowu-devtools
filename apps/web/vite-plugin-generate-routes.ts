@@ -1,11 +1,26 @@
 import type { Plugin } from 'vite';
 import fs from 'fs';
 import path from 'path';
-import {
-  SUPPORTED_LOCALES,
-  DEFAULT_LOCALE,
-  type LocaleCode,
-} from './src/lib/constants';
+
+// Locale 타입 및 상수 정의 (src/lib/constants.ts와 동기화 필요)
+// Node.js 환경에서 직접 사용하기 위해 별도 정의
+type LocaleCode = 'en-US' | 'ko-KR' | 'ja-JP' | 'zh-CN' | 'es-ES';
+
+interface LocaleInfo {
+  code: LocaleCode;
+  name: string;
+  nativeName: string;
+}
+
+const SUPPORTED_LOCALES: LocaleInfo[] = [
+  { code: 'en-US', name: 'English', nativeName: 'English' },
+  { code: 'ko-KR', name: 'Korean', nativeName: '한국어' },
+  { code: 'ja-JP', name: 'Japanese', nativeName: '日本語' },
+  { code: 'zh-CN', name: 'Chinese', nativeName: '中文' },
+  { code: 'es-ES', name: 'Spanish', nativeName: 'Español' },
+];
+
+const DEFAULT_LOCALE: LocaleCode = 'en-US';
 
 // package.json에서 버전 정보 읽기
 const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf-8'));
