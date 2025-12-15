@@ -365,8 +365,10 @@ export const koKR = {
       uuidV4: 'UUID v4 (랜덤)',
       uuidV7: 'UUID v7 (Timestamp 기반)',
       ulid: 'ULID (짧은 Timestamp 기반)',
-      uuidV4Desc: '완전 랜덤 UUID. 순서가 중요하지 않은 고유 식별자에 적합합니다.',
-      uuidV7Desc: 'Timestamp 기반 UUID. 생성 시간 순으로 자연스럽게 정렬됩니다.',
+      uuidV4Desc:
+        '완전 랜덤 UUID. 순서가 중요하지 않은 고유 식별자에 적합합니다.',
+      uuidV7Desc:
+        'Timestamp 기반 UUID. 생성 시간 순으로 자연스럽게 정렬됩니다.',
       ulidDesc: '26자 식별자. 사전식 정렬 가능하며, UUID보다 짧습니다.',
       lowercase: '소문자',
       uppercase: '대문자',

@@ -25,9 +25,23 @@ function HomePage() {
             <div className="mb-12">
               <h1 className="flex flex-col md:flex-row md:items-baseline gap-2 md:gap-3 text-4xl font-bold mb-6 text-gray-900 dark:text-white">
                 <span>{t('homepage.title')}</span>
-                <span className="inline-flex items-center w-fit px-2 py-0.5 rounded-md text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border border-blue-200 dark:border-blue-800/50 leading-none">
-                  v{APP_VERSION}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center w-fit px-2 py-0.5 rounded-md text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border border-blue-200 dark:border-blue-800/50 leading-none">
+                    v{APP_VERSION}
+                  </span>
+                  <a
+                    href="https://github.com/uyu423/yowu-devtools"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex"
+                  >
+                    <img
+                      src="https://img.shields.io/github/stars/uyu423/yowu-devtools?style=flat"
+                      alt="GitHub stars"
+                      className="h-5"
+                    />
+                  </a>
+                </div>
               </h1>
               <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
                 {t('homepage.heroDescription')}
