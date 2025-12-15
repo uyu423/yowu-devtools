@@ -2,12 +2,12 @@
 
 ---
 
-# tools.yowu.dev SRS (v1.3.3)
+# tools.yowu.dev SRS (v1.3.5)
 
 ## 0. 문서 메타
 
 - 프로젝트명: **tools.yowu.dev** (구 yowu-devtools)
-- 현재 버전: **v1.3.3** (PWA Update Notification Fix & SEO Optimization)
+- 현재 버전: **v1.3.5** (Share Modal Commonization & URL Length Warning)
 - 목적: 개발자가 자주 쓰는 변환/검증/뷰어 도구를 **서버 없이** 하나의 **정적 웹앱**으로 제공
 - 배포: **GitHub Pages + Custom Domain (`tools.yowu.dev`)**
 - 변경 이력: **[RELEASE_NOTES.md](./RELEASE_NOTES.md)** 참조
@@ -417,12 +417,17 @@ const { state, shareState } = useToolState<YamlToolState>(
 );
 ```
 
-- **URL 길이 제한 고려사항**:
+- **URL 길이 제한 및 경고 (v1.3.5 강화)**:
 
   - 브라우저 URL 길이 제한: 일반적으로 2,000~8,000자
+  - GitHub Pages 권장 최대 길이: **8,000자** (`MAX_SHARE_URL_LENGTH`)
   - 메신저/이메일 공유: 일부 플랫폼은 더 짧은 제한 적용
   - **권장**: 압축 후 1,500자 이하를 목표로 필터링
   - 큰 입력값이 있는 도구(JSON, YAML, Diff 등)는 필터링으로도 URL이 길 수 있으나, 압축으로 완화
+  - **제한 초과 시 동작** (v1.3.5):
+    - ShareModal에 경고 배너 표시 (현재 URL 길이 / 최대 허용 길이)
+    - "링크 복사" 버튼 비활성화
+    - 사용자에게 데이터 줄이기 안내
 
 - **검증 방법**:
 
@@ -682,7 +687,7 @@ src/
 - YAML Converter: `.yaml`, `.yml` 파일 열기/저장
 - Text Diff: `.txt` 파일 열기/저장
 
-### 5.13 공유(Share) 고도화 (v1.2.0 추가)
+### 5.13 공유(Share) 고도화 (v1.2.0 추가, v1.3.5 강화)
 
 #### 목적
 
@@ -696,12 +701,93 @@ src/
 - **민감정보 경고**: JWT 등 민감한 도구는 기본적으로 payload 최소화
 - **URL 스키마 버전 관리**: `#v=1&tool=json&payload=...` 형식으로 호환성 유지
 - **저장 옵션**: LocalStorage 저장 데이터와 공유 데이터 분리 옵션 제공
+- **URL 길이 제한** (v1.3.5): GitHub Pages의 URI 길이 제한 고려
+  - 최대 URL 길이: 8,000자 (`MAX_SHARE_URL_LENGTH` 상수)
+  - 제한 초과 시 경고 표시 및 복사 버튼 비활성화
+  - 사용자에게 데이터 크기 줄이기 안내
 
 #### 구현 포인트
 
 - 공유 링크 생성 시 범위 표시 모달/토스트
 - Web Share API 지원 (지원 브라우저에서만)
 - 민감정보 경고 메시지 강화
+
+#### 공통 공유 모달 훅 (v1.3.5 추가)
+
+공유 기능의 일관성을 위해 `useShareModal` 훅을 제공합니다:
+
+```typescript
+// src/hooks/useShareModal.ts
+interface UseShareModalOptions {
+  toolId: string;
+  i18nKey: string;
+  isSensitive?: boolean; // JWT 등 민감한 도구 여부
+  isMobile: boolean;
+  copyShareLink: () => Promise<string | null>;
+  shareViaWebShare: () => Promise<string | null>;
+  getShareStateInfo: () => {
+    includedFields: string[];
+    excludedFields: string[];
+    urlLength: number;
+    maxUrlLength: number;
+    isUrlTooLong: boolean;
+  };
+}
+
+// 사용 예시
+const { handleShare, shareModalProps } = useShareModal({
+  toolId: 'json',
+  i18nKey: 'json',
+  isMobile: isMobileDevice(),
+  copyShareLink,
+  shareViaWebShare,
+  getShareStateInfo,
+});
+
+// ToolHeader에 연결
+<ToolHeader onShare={handleShare} />
+<ShareModal {...shareModalProps} />
+```
+
+**훅 반환값**:
+
+- `handleShare`: Share 버튼 클릭 핸들러
+- `shareModalProps`: ShareModal 컴포넌트에 전달할 props 객체
+  - `isOpen`, `onClose`, `onConfirm`
+  - `includedFields`, `excludedFields`: 공유에 포함/제외되는 필드 목록
+  - `toolName`, `isSensitive`, `isMobile`
+  - `urlLength`, `maxUrlLength`, `isUrlTooLong`: URL 길이 정보 (v1.3.5)
+
+#### URL 길이 제한 구현 (v1.3.5)
+
+**상수 정의** (`src/lib/constants.ts`):
+
+```typescript
+// GitHub Pages 및 브라우저 호환성을 고려한 최대 URL 길이
+export const MAX_SHARE_URL_LENGTH = 8000;
+```
+
+**URL 생성 및 검증** (`useToolState.ts`):
+
+```typescript
+const generateShareUrl = useCallback(() => {
+  const stateToShare = options?.shareStateFilter
+    ? options.shareStateFilter(state)
+    : state;
+  const envelope = { v: 1, tool: toolId, state: stateToShare };
+  const encoded = compressToEncodedURIComponent(JSON.stringify(envelope));
+  const shareUrl = `${window.location.origin}${location.pathname}?d=${encoded}`;
+  const isTooLong = shareUrl.length > MAX_SHARE_URL_LENGTH;
+  return { shareUrl, isTooLong };
+}, [/* deps */]);
+```
+
+**ShareModal UI**:
+
+- URL이 너무 길면 빨간색 경고 배너 표시
+- "링크 복사" / "공유 링크 생성" 버튼 비활성화
+- 현재 URL 길이와 최대 허용 길이 표시
+- 데이터를 줄이라는 안내 메시지 표시
 
 ---
 
