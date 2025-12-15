@@ -72,6 +72,21 @@ const SPEC_OPTIONS: { value: CronSpec; labelKey: string; descKey: string }[] = [
   { value: 'jenkins', labelKey: 'specJenkins', descKey: 'specJenkinsDesc' },
 ];
 
+// Helper to get current datetime string based on timezone
+const getCurrentDateTimeString = (timezone: 'local' | 'utc'): string => {
+  const now = new Date();
+  if (timezone === 'utc') {
+    return now.toISOString().slice(0, 16);
+  }
+  // Local time: format as YYYY-MM-DDTHH:mm
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
+
 const CronTool: React.FC = () => {
   const { locale } = useI18n();
   const {
@@ -358,14 +373,14 @@ const CronTool: React.FC = () => {
             <input
               type="datetime-local"
               className="rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-2 py-1 text-sm"
-              value={state.fromDateTime || new Date().toISOString().slice(0, 16)}
+              value={state.fromDateTime || getCurrentDateTimeString(state.timezone)}
               onChange={(e) => updateState({ fromDateTime: e.target.value || undefined })}
             />
             <button
               type="button"
               className="px-2 py-1 text-xs rounded bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
               onClick={() => {
-                const now = new Date().toISOString().slice(0, 16);
+                const now = getCurrentDateTimeString(state.timezone);
                 updateState({ fromDateTime: now });
               }}
             >
