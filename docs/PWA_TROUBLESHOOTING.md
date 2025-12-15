@@ -1,6 +1,6 @@
 # PWA 설치 및 업데이트 문제 해결 가이드
 
-> 최종 업데이트: v1.3.3 (2025-12)
+> 최종 업데이트: v1.3.4 (2025-12)
 
 ## 목차
 
@@ -41,6 +41,35 @@ VitePWA({
     cleanupOutdatedCaches: true,
   },
 });
+```
+
+#### 3. updateSW 함수 호출 시 인자 누락 (v1.3.4에서 수정됨)
+
+**문제**: `updateSW()` 함수를 인자 없이 호출하면 새 Service Worker가 활성화되지 않고 waiting 상태로 남아있음
+
+- `updateSW()` - reload만 수행, 새 SW는 여전히 waiting 상태
+- `updateSW(true)` - 새 SW에 skipWaiting 메시지를 보내고, 활성화 후 자동 reload
+
+**해결책** (v1.3.4에서 수정됨):
+
+```typescript
+// usePWA.ts - 기존 (버그)
+const updateServiceWorker = async () => {
+  if (updateSW) {
+    await updateSW(); // ❌ 인자 없음 - 새 SW 활성화 안됨
+    window.location.reload();
+  }
+};
+
+// usePWA.ts - 수정 후
+const updateServiceWorker = async () => {
+  if (updateSW) {
+    // ✅ true를 전달하여 새 Service Worker에 skipWaiting 메시지를 보내고 활성화
+    // updateSW(true)는 자동으로 페이지 reload를 수행함
+    await updateSW(true);
+    // Note: updateSW(true)가 reload를 처리하므로 별도의 reload 불필요
+  }
+};
 ```
 
 #### 2. Service Worker 업데이트 감지 실패

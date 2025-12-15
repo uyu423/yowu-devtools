@@ -39,7 +39,7 @@ export function usePWA(): UsePWAResult {
   const [offlineReady, setOfflineReady] = useState(false);
   const [isInstallable, setIsInstallable] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const [updateSW, setUpdateSW] = useState<(() => Promise<void>) | null>(null);
+  const [updateSW, setUpdateSW] = useState<((reloadPage?: boolean) => Promise<void>) | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const versionIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const registrationRef = useRef<ServiceWorkerRegistration | null>(null);
@@ -208,10 +208,11 @@ export function usePWA(): UsePWAResult {
 
   const updateServiceWorker = async () => {
     if (updateSW) {
-      await updateSW();
+      // true를 전달하여 새 Service Worker에 skipWaiting 메시지를 보내고 활성화
+      // updateSW(true)는 자동으로 페이지 reload를 수행함
+      await updateSW(true);
       setNeedRefresh(false);
-      // 페이지 새로고침
-      window.location.reload();
+      // Note: updateSW(true)가 reload를 처리하므로 별도의 reload 불필요
     }
   };
 
