@@ -48,7 +48,8 @@ export const esES = {
     // File operations
     fileDownloadSuccess: 'Archivo descargado correctamente',
     fileDownloadFailed: 'Error al descargar el archivo',
-    fileTooLarge: 'El archivo es demasiado grande. El tamaño máximo es {size}MB',
+    fileTooLarge:
+      'El archivo es demasiado grande. El tamaño máximo es {size}MB',
     fileLoadedSuccess: 'Archivo "{name}" cargado correctamente',
     fileReadFailed: 'Error al leer el archivo',
     loadingFile: 'Cargando archivo...',
@@ -62,18 +63,21 @@ export const esES = {
     unableToCopyShareLink: 'No se pudo copiar el enlace de compartir.',
     sharedSuccessfully: 'Compartido correctamente.',
     unableToShare: 'No se pudo compartir.',
-    sharedUrlInvalid: 'La URL compartida no es válida. Restaurando estado por defecto.',
+    sharedUrlInvalid:
+      'La URL compartida no es válida. Restaurando estado por defecto.',
     unableToCopy: 'No se pudo copiar al portapapeles.',
   },
   pwa: {
     appReadyOffline: 'La aplicación está lista para usar sin conexión',
     youAreOffline: 'Actualmente estás sin conexión',
     newVersionAvailable: 'Nueva versión disponible',
-    newVersionDescription: 'Una nueva versión de la aplicación está disponible. Actualiza ahora para obtener las últimas funciones.',
+    newVersionDescription:
+      'Una nueva versión de la aplicación está disponible. Actualiza ahora para obtener las últimas funciones.',
     updateNow: 'Actualizar ahora',
     later: 'Más tarde',
     installApp: 'Instalar aplicación',
-    installAppDescription: 'Instala esta aplicación en tu dispositivo para un acceso rápido y uso sin conexión.',
+    installAppDescription:
+      'Instala esta aplicación en tu dispositivo para un acceso rápido y uso sin conexión.',
     install: 'Instalar',
     notNow: 'Ahora no',
   },
@@ -110,20 +114,27 @@ export const esES = {
   },
   homepage: {
     title: "Yowu's DevTools",
-    heroDescription: 'Una caja de herramientas con privacidad primero para desarrolladores que quieren mantener sus datos en sus propias máquinas. Todo el procesamiento ocurre en tu navegador—sin servidores, sin rastreadores, sin recolección de datos. Código abierto y auditable, haciendo tareas comunes de desarrollo (formateo JSON, generación de contraseñas, cálculo de hash, creación de UUID y más) rápidas, seguras y confiables.',
+    heroDescription:
+      'Una caja de herramientas con privacidad primero para desarrolladores que quieren mantener sus datos en sus propias máquinas. Todo el procesamiento ocurre en tu navegador—sin servidores, sin rastreadores, sin recolección de datos. Código abierto y auditable, haciendo tareas comunes de desarrollo (formateo JSON, generación de contraseñas, cálculo de hash, creación de UUID y más) rápidas, seguras y confiables.',
     whyItExists: 'Por qué existe',
     privacyFirst: 'Privacidad primero',
-    privacyFirstDescription: 'todo se ejecuta en tu navegador. Sin envío de datos a servidores, sin rastreo, sin análisis. Tus datos sensibles permanecen en tu máquina.',
+    privacyFirstDescription:
+      'todo se ejecuta en tu navegador. Sin envío de datos a servidores, sin rastreo, sin análisis. Tus datos sensibles permanecen en tu máquina.',
     fastEfficient: 'Rápido y eficiente',
-    fastEfficientDescription: 'Command Palette para navegación rápida, soporte de arrastrar y soltar archivos, y Web Workers para manejar grandes conjuntos de datos sin congelar tu navegador.',
+    fastEfficientDescription:
+      'Command Palette para navegación rápida, soporte de arrastrar y soltar archivos, y Web Workers para manejar grandes conjuntos de datos sin congelar tu navegador.',
     installablePwa: 'PWA instalable',
-    installablePwaDescription: 'funciona sin conexión, se instala como una aplicación independiente, y se actualiza automáticamente cuando hay nuevas versiones disponibles.',
+    installablePwaDescription:
+      'funciona sin conexión, se instala como una aplicación independiente, y se actualiza automáticamente cuando hay nuevas versiones disponibles.',
     openAuditable: 'Abierto y auditable',
-    openAuditableDescription: 'cada línea de código es pública. Puedes verificar qué hace cada herramienta y cómo procesa tus datos.',
-    hostedOn: 'Alojado en GitHub Pages como un sitio estático. Todo el procesamiento ocurre en tu navegador.',
+    openAuditableDescription:
+      'cada línea de código es pública. Puedes verificar qué hace cada herramienta y cómo procesa tus datos.',
+    hostedOn:
+      'Alojado en GitHub Pages como un sitio estático. Todo el procesamiento ocurre en tu navegador.',
     viewOnGithub: 'Ver en GitHub',
     quickNavigation: 'Navegación rápida',
-    quickNavigationDescription: 'Presiona {cmdK} o {ctrlK} para abrir el Command Palette y encontrar rápidamente cualquier herramienta.',
+    quickNavigationDescription:
+      'Presiona {cmdK} o {ctrlK} para abrir el Command Palette y encontrar rápidamente cualquier herramienta.',
     searchByName: 'Buscar herramientas por nombre o palabras clave',
     navigateWithArrows: 'Navegar con las teclas de flecha',
     accessFavorites: 'Acceder a favoritos y herramientas recientes',
@@ -132,7 +143,8 @@ export const esES = {
   tool: {
     json: {
       title: 'JSON Pretty Viewer',
-      description: 'Formatea JSON instantáneamente y explora la estructura en árbol.',
+      description:
+        'Formatea JSON instantáneamente y explora la estructura en árbol.',
       inputTitle: 'Entrada JSON',
       inputPlaceholder: '{"key": "value"}',
       sortKeys: 'Ordenar Keys',
@@ -156,16 +168,20 @@ export const esES = {
       downloadPretty: 'Descargar Pretty',
       downloadMinified: 'Descargar Minified',
       indentTooltip: 'Elige cuántos espacios usar al formatear JSON.',
-      sortKeysTooltip: 'Ordena las keys del objeto alfabéticamente antes de formatear.',
-      treeDepthTooltip: 'Controla cuántos niveles se expanden automáticamente en la vista de árbol.',
+      sortKeysTooltip:
+        'Ordena las keys del objeto alfabéticamente antes de formatear.',
+      treeDepthTooltip:
+        'Controla cuántos niveles se expanden automáticamente en la vista de árbol.',
     },
     url: {
       title: 'URL Encode/Decode',
-      description: 'Transforma parámetros de consulta o segmentos de ruta de forma segura.',
+      description:
+        'Transforma parámetros de consulta o segmentos de ruta de forma segura.',
       inputPlaceholder: 'Escribe o pega contenido aquí...',
       resultPlaceholder: 'El resultado aparecerá aquí...',
       useSpacePlus: 'Usar + para espacios',
-      useSpacePlusTooltip: "Codifica espacios como '+' en lugar de '%20', como los formularios HTML.",
+      useSpacePlusTooltip:
+        "Codifica espacios como '+' en lugar de '%20', como los formularios HTML.",
       inputOutputSwap: 'Intercambiar entrada/salida',
       decodingFailed: 'Error al decodificar',
     },
@@ -178,7 +194,8 @@ export const esES = {
       base64Placeholder: 'Pega cadena Base64...',
       resultPlaceholder: 'El resultado aparecerá aquí...',
       urlSafe: 'URL Safe',
-      urlSafeTooltip: 'Usa el alfabeto Base64 seguro para URL (- y _), omitiendo el relleno.',
+      urlSafeTooltip:
+        'Usa el alfabeto Base64 seguro para URL (- y _), omitiendo el relleno.',
       inputOutputSwap: 'Intercambiar entrada/salida',
       conversionFailed: 'Error en conversión Base64',
     },
@@ -217,16 +234,23 @@ export const esES = {
       numberOutOfRange: 'El número está fuera de rango.',
       epochValueInvalid: 'El valor Epoch no es válido.',
       isoFormatInvalid: 'El formato ISO 8601 no es válido.',
-      epochTooltip: 'El timestamp Epoch es el número de segundos o milisegundos desde el 1 de enero de 1970 UTC.',
-      isoTooltip: 'ISO 8601 es un estándar internacional para la representación de fechas y horas.',
-      msTooltip: 'Interpreta el valor como milisegundos desde 1970-01-01 UTC (formato JavaScript Date).',
-      secTooltip: 'Interpreta el valor como segundos desde 1970-01-01 UTC (formato Unix timestamp).',
-      localTooltip: 'Muestra las conversiones relativas a tu zona horaria local.',
-      utcTooltip: 'Muestra las conversiones relativas a UTC (Tiempo Universal Coordinado).',
+      epochTooltip:
+        'El timestamp Epoch es el número de segundos o milisegundos desde el 1 de enero de 1970 UTC.',
+      isoTooltip:
+        'ISO 8601 es un estándar internacional para la representación de fechas y horas.',
+      msTooltip:
+        'Interpreta el valor como milisegundos desde 1970-01-01 UTC (formato JavaScript Date).',
+      secTooltip:
+        'Interpreta el valor como segundos desde 1970-01-01 UTC (formato Unix timestamp).',
+      localTooltip:
+        'Muestra las conversiones relativas a tu zona horaria local.',
+      utcTooltip:
+        'Muestra las conversiones relativas a UTC (Tiempo Universal Coordinado).',
     },
     yaml: {
       title: 'YAML ↔ JSON',
-      description: 'Convierte en ambas direcciones e inspecciona errores de análisis rápidamente.',
+      description:
+        'Convierte en ambas direcciones e inspecciona errores de análisis rápidamente.',
       yamlInput: 'Entrada YAML',
       jsonInput: 'Entrada JSON',
       yamlOutput: 'Salida YAML',
@@ -239,14 +263,16 @@ export const esES = {
     },
     diff: {
       title: 'Text Diff',
-      description: 'Detecta diferencias entre dos bloques de texto al instante.',
+      description:
+        'Detecta diferencias entre dos bloques de texto al instante.',
       original: 'Original',
       modified: 'Modificado',
       splitView: 'Vista dividida',
       unifiedView: 'Vista unificada',
       ignoreWhitespace: 'Ignorar espacios',
       ignoreCase: 'Ignorar mayúsculas',
-      ignoreWhitespaceTooltip: 'Ignora cambios que solo involucran espacios en blanco.',
+      ignoreWhitespaceTooltip:
+        'Ignora cambios que solo involucran espacios en blanco.',
       ignoreCaseTooltip: 'Compara sin distinguir mayúsculas de minúsculas.',
       downloadUnified: 'Descargar Unified',
       diffResult: 'Resultado del Diff',
@@ -258,7 +284,8 @@ export const esES = {
     },
     cron: {
       title: 'Cron Parser',
-      description: 'Explica expresiones cron y previsualiza las próximas ejecuciones.',
+      description:
+        'Explica expresiones cron y previsualiza las próximas ejecuciones.',
       cronExpression: 'Expresión Cron',
       humanReadable: 'Explicación legible',
       nextScheduledDates: 'Próximas ejecuciones programadas',
@@ -270,9 +297,12 @@ export const esES = {
       cronParsingError: 'Error de análisis Cron',
       pleaseEnterCron: 'Por favor ingresa una expresión cron.',
       expectedFields: 'Se esperaban {n} campos pero se recibieron {m}.',
-      secondsTooltip: 'Cambia al formato cron de 6 campos que incluye una columna de segundos.',
-      timezoneTooltip: 'Elige la zona horaria para calcular las próximas ejecuciones.',
-      nextRunsTooltip: 'Establece cuántas ejecuciones futuras mostrar en la tabla.',
+      secondsTooltip:
+        'Cambia al formato cron de 6 campos que incluye una columna de segundos.',
+      timezoneTooltip:
+        'Elige la zona horaria para calcular las próximas ejecuciones.',
+      nextRunsTooltip:
+        'Establece cuántas ejecuciones futuras mostrar en la tabla.',
     },
     hash: {
       title: 'Hash Generator',
@@ -296,7 +326,8 @@ export const esES = {
       expectedMacPlaceholder: 'Ingresa MAC esperado para verificar...',
       enterExpectedMacPlaceholder: 'Ingresa MAC esperado para verificar...',
       saveKeyInShareLinks: 'Guardar key en enlaces compartidos',
-      saveKeyWarning: 'Advertencia: Guardar keys HMAC en enlaces compartidos puede exponer información sensible.',
+      saveKeyWarning:
+        'Advertencia: Guardar keys HMAC en enlaces compartidos puede exponer información sensible.',
       generateRandom: 'Generar aleatoria',
       generateRandomKey: 'Generar key aleatoria',
       hashResult: 'Resultado Hash',
@@ -315,24 +346,32 @@ export const esES = {
       randomKeyGenerated: 'Key aleatoria generada',
       failedToGenerateKey: 'Error al generar key aleatoria',
       hashCopied: 'Hash copiado al portapapeles',
-      fileSharingNotSupported: 'No se admite compartir archivos. Cambia al modo de texto.',
+      fileSharingNotSupported:
+        'No se admite compartir archivos. Cambia al modo de texto.',
       enterTextPlaceholder: 'Ingresa texto para hashear...',
       resultPlaceholder: 'El resultado hash aparecerá aquí...',
       note: 'Nota',
-      securityNote: 'Solo para verificación de checksum. No apto para propósitos de seguridad.',
+      securityNote:
+        'Solo para verificación de checksum. No apto para propósitos de seguridad.',
       securityWarning: 'Advertencia de seguridad',
-      algorithmWarning: '{algorithm} está criptográficamente comprometido y no debe usarse para seguridad. Usa SHA-256 o SHA-512.',
-      hmacKeyWarning: 'Advertencia: Guardar keys HMAC en enlaces compartidos puede exponer información sensible.',
+      algorithmWarning:
+        '{algorithm} está criptográficamente comprometido y no debe usarse para seguridad. Usa SHA-256 o SHA-512.',
+      hmacKeyWarning:
+        'Advertencia: Guardar keys HMAC en enlaces compartidos puede exponer información sensible.',
       rawText: 'Texto Raw (UTF-8)',
       rawTextUtf8: 'Texto Raw (UTF-8)',
       hex: 'Hex',
       base64: 'Base64',
-      modeTooltip: 'Selecciona Hash normal o HMAC (Código de Autenticación de Mensajes basado en Hash).',
-      algorithmTooltip: 'Selecciona el algoritmo hash. Se recomienda SHA-256 para la mayoría de casos.',
-      outputEncodingTooltip: 'Selecciona el formato de salida. Hex es legible, Base64 es compacto.',
+      modeTooltip:
+        'Selecciona Hash normal o HMAC (Código de Autenticación de Mensajes basado en Hash).',
+      algorithmTooltip:
+        'Selecciona el algoritmo hash. Se recomienda SHA-256 para la mayoría de casos.',
+      outputEncodingTooltip:
+        'Selecciona el formato de salida. Hex es legible, Base64 es compacto.',
       keyEncodingTooltip: 'Formato de codificación de la key HMAC.',
       webCryptoNotSupported: 'Tu navegador no soporta Web Crypto API.',
-      processingTimeout: 'Tiempo de procesamiento agotado. El archivo puede ser muy grande.',
+      processingTimeout:
+        'Tiempo de procesamiento agotado. El archivo puede ser muy grande.',
       failedToCalculateHash: 'Error al calcular hash',
       failedToCalculateFileHash: 'Error al calcular hash del archivo',
     },
@@ -345,9 +384,12 @@ export const esES = {
       uuidV4: 'UUID v4 (aleatorio)',
       uuidV7: 'UUID v7 (basado en timestamp)',
       ulid: 'ULID (timestamp más corto)',
-      uuidV4Desc: 'UUID completamente aleatorio. Ideal para identificadores únicos sin ordenamiento.',
-      uuidV7Desc: 'UUID basado en tiempo. Se ordena naturalmente por tiempo de creación.',
-      ulidDesc: 'Identificador de 26 caracteres. Ordenable lexicográficamente, más corto que UUID.',
+      uuidV4Desc:
+        'UUID completamente aleatorio. Ideal para identificadores únicos sin ordenamiento.',
+      uuidV7Desc:
+        'UUID basado en tiempo. Se ordena naturalmente por tiempo de creación.',
+      ulidDesc:
+        'Identificador de 26 caracteres. Ordenable lexicográficamente, más corto que UUID.',
       lowercase: 'minúsculas',
       uppercase: 'MAYÚSCULAS',
       regenerate: 'Regenerar',
@@ -355,7 +397,8 @@ export const esES = {
       idCopied: 'ID copiado al portapapeles',
       allIdsCopied: 'Todos los IDs copiados al portapapeles',
       copyAll: 'Copiar todo',
-      typeTooltip: 'Selecciona el tipo de ID (UUID v4: aleatorio, UUID v7: basado en timestamp, ULID: más corto).',
+      typeTooltip:
+        'Selecciona el tipo de ID (UUID v4: aleatorio, UUID v7: basado en timestamp, ULID: más corto).',
       countTooltip: 'Número de IDs a generar (1-100).',
       formatTooltip: 'Formato de salida (minúsculas o mayúsculas).',
       countHint: 'Genera hasta 100',
@@ -385,14 +428,17 @@ export const esES = {
       passwordCopied: 'Contraseña copiada al portapapeles',
       allPasswordsCopied: 'Todas las contraseñas copiadas al portapapeles',
       atLeastOneType: 'Se debe seleccionar al menos un tipo de carácter',
-      lengthMustBeBetween: 'La longitud de la contraseña debe estar entre 4 y 128',
+      lengthMustBeBetween:
+        'La longitud de la contraseña debe estar entre 4 y 128',
       lengthTooltip: 'Longitud de la contraseña (4-128 caracteres).',
       countTooltip: 'Número de contraseñas a generar (1-20).',
     },
     urlParser: {
       title: 'URL Parser',
-      description: 'Analiza y visualiza componentes de URL incluyendo Protocol, Host, Path, Fragment y parámetros Query.',
-      inputPlaceholder: 'Ingresa URL o Query String (ej: https://example.com/search?q=laptop)...',
+      description:
+        'Analiza y visualiza componentes de URL incluyendo Protocol, Host, Path, Fragment y parámetros Query.',
+      inputPlaceholder:
+        'Ingresa URL o Query String (ej: https://example.com/search?q=laptop)...',
       urlOrQueryString: 'URL o Query String',
       urlInformation: 'Información de URL',
       parameters: 'Parámetros',
@@ -406,11 +452,13 @@ export const esES = {
       showDecodedValues: 'Mostrar valores decodificados',
       showRawValues: 'Mostrar valores raw',
       showDecodedTooltip: 'Muestra valores decodificados (legibles).',
-      showRawTooltip: 'Muestra valores raw (codificados) junto a los decodificados.',
+      showRawTooltip:
+        'Muestra valores raw (codificados) junto a los decodificados.',
       encoded: 'Codificado',
       empty: '(vacío)',
       parsingFailed: 'Error de análisis',
-      noQueryStringFound: 'No se encontró Query String. Ingresa una URL con parámetros de consulta.',
+      noQueryStringFound:
+        'No se encontró Query String. Ingresa una URL con parámetros de consulta.',
       noParametersFound: 'No se encontraron parámetros Query.',
       copiedProtocol: 'Protocol copiado.',
       copiedHost: 'Host copiado.',
@@ -421,14 +469,16 @@ export const esES = {
     },
     regex: {
       title: 'Regex Tester',
-      description: 'Prueba y visualiza expresiones regulares con resaltado de coincidencias y vista previa de reemplazo',
+      description:
+        'Prueba y visualiza expresiones regulares con resaltado de coincidencias y vista previa de reemplazo',
       pattern: 'Patrón',
       patternPlaceholder: 'Ingresa patrón de expresión regular...',
       flags: 'Flags',
       testText: 'Texto de prueba',
       testTextPlaceholder: 'Ingresa texto para probar contra el patrón...',
       replacementPreview: 'Vista previa de reemplazo',
-      replacementPlaceholder: 'Ingresa cadena de reemplazo (usa $1, $2, $<nombre> para grupos)...',
+      replacementPlaceholder:
+        'Ingresa cadena de reemplazo (usa $1, $2, $<nombre> para grupos)...',
       replacementResult: 'Resultado de reemplazo',
       matches: 'Coincidencias',
       presets: 'Presets',
@@ -444,20 +494,26 @@ export const esES = {
       lengthLabel: 'longitud: {n}',
       groups: 'Grupos',
       namedGroups: 'Grupos nombrados',
-      noMatches: 'No se encontraron coincidencias. Ingresa un patrón y texto de prueba.',
-      noMatchesFound: 'No se encontraron coincidencias. Ingresa un patrón y texto de prueba.',
+      noMatches:
+        'No se encontraron coincidencias. Ingresa un patrón y texto de prueba.',
+      noMatchesFound:
+        'No se encontraron coincidencias. Ingresa un patrón y texto de prueba.',
       appliedPreset: 'Preset aplicado: {name}',
       presetApplied: 'Preset aplicado: {name}',
       patternFeatures: 'Características del patrón',
       clickToExpand: 'Clic para expandir',
       note: 'Nota',
-      securityNote: 'Esta herramienta usa el motor JavaScript RegExp. Ten cuidado con patrones complejos.',
-      flagsTooltip: 'g=global, i=ignorar mayúsculas, m=multilínea, s=dotAll, u=unicode, y=sticky',
+      securityNote:
+        'Esta herramienta usa el motor JavaScript RegExp. Ten cuidado con patrones complejos.',
+      flagsTooltip:
+        'g=global, i=ignorar mayúsculas, m=multilínea, s=dotAll, u=unicode, y=sticky',
       // Regex spec categories
       specCharacterClasses: 'Clases de caracteres',
-      specCharacterClassesDesc: 'Conjuntos de caracteres predefinidos para coincidir con tipos específicos',
+      specCharacterClassesDesc:
+        'Conjuntos de caracteres predefinidos para coincidir con tipos específicos',
       specQuantifiers: 'Cuantificadores',
-      specQuantifiersDesc: 'Especifica cuántas veces debe coincidir un carácter, grupo o clase',
+      specQuantifiersDesc:
+        'Especifica cuántas veces debe coincidir un carácter, grupo o clase',
       specAnchors: 'Anclas',
       specAnchorsDesc: 'Afirma posiciones en la cadena sin consumir caracteres',
       specGroups: 'Grupos',
@@ -470,25 +526,37 @@ export const esES = {
       specUnicodeDesc: 'Capacidades de coincidencia específicas de Unicode',
       // Pattern descriptions - Character Classes
       patternDigitName: 'Dígito',
-      patternDigitDesc: 'Coincide con cualquier dígito (0-9). Equivalente a [0-9].',
+      patternDigitDesc:
+        'Coincide con cualquier dígito (0-9). Equivalente a [0-9].',
       patternDigitExample: '\\d+ coincide con uno o más dígitos',
       patternNonDigitName: 'No dígito',
-      patternNonDigitDesc: 'Coincide con cualquier carácter que no sea un dígito. Equivalente a [^0-9].',
-      patternNonDigitExample: '\\D+ coincide con uno o más caracteres no numéricos',
+      patternNonDigitDesc:
+        'Coincide con cualquier carácter que no sea un dígito. Equivalente a [^0-9].',
+      patternNonDigitExample:
+        '\\D+ coincide con uno o más caracteres no numéricos',
       patternWordCharName: 'Carácter de palabra',
-      patternWordCharDesc: 'Coincide con cualquier carácter de palabra (alfanumérico más guión bajo). Equivalente a [A-Za-z0-9_].',
-      patternWordCharExample: '\\w+ coincide con uno o más caracteres de palabra',
+      patternWordCharDesc:
+        'Coincide con cualquier carácter de palabra (alfanumérico más guión bajo). Equivalente a [A-Za-z0-9_].',
+      patternWordCharExample:
+        '\\w+ coincide con uno o más caracteres de palabra',
       patternNonWordCharName: 'Carácter no de palabra',
-      patternNonWordCharDesc: 'Coincide con cualquier carácter que no sea de palabra. Equivalente a [^A-Za-z0-9_].',
-      patternNonWordCharExample: '\\W+ coincide con uno o más caracteres no de palabra',
+      patternNonWordCharDesc:
+        'Coincide con cualquier carácter que no sea de palabra. Equivalente a [^A-Za-z0-9_].',
+      patternNonWordCharExample:
+        '\\W+ coincide con uno o más caracteres no de palabra',
       patternWhitespaceName: 'Espacio en blanco',
-      patternWhitespaceDesc: 'Coincide con cualquier carácter de espacio en blanco (espacio, tabulación, nueva línea, etc.).',
-      patternWhitespaceExample: '\\s+ coincide con uno o más espacios en blanco',
+      patternWhitespaceDesc:
+        'Coincide con cualquier carácter de espacio en blanco (espacio, tabulación, nueva línea, etc.).',
+      patternWhitespaceExample:
+        '\\s+ coincide con uno o más espacios en blanco',
       patternNonWhitespaceName: 'No espacio en blanco',
-      patternNonWhitespaceDesc: 'Coincide con cualquier carácter que no sea espacio en blanco.',
-      patternNonWhitespaceExample: '\\S+ coincide con uno o más caracteres no espacios en blanco',
+      patternNonWhitespaceDesc:
+        'Coincide con cualquier carácter que no sea espacio en blanco.',
+      patternNonWhitespaceExample:
+        '\\S+ coincide con uno o más caracteres no espacios en blanco',
       patternDotEscapedName: 'Punto (escapado)',
-      patternDotEscapedDesc: 'Coincide con un carácter de punto literal. El punto (.) sin escape coincide con cualquier carácter excepto nueva línea.',
+      patternDotEscapedDesc:
+        'Coincide con un carácter de punto literal. El punto (.) sin escape coincide con cualquier carácter excepto nueva línea.',
       patternDotEscapedExample: '\\. coincide con un punto literal',
       patternNewlineName: 'Nueva línea',
       patternNewlineDesc: 'Coincide con un carácter de nueva línea.',
@@ -497,131 +565,193 @@ export const esES = {
       patternTabDesc: 'Coincide con un carácter de tabulación.',
       patternTabExample: '\\t coincide con una tabulación',
       patternCarriageReturnName: 'Retorno de carro',
-      patternCarriageReturnDesc: 'Coincide con un carácter de retorno de carro.',
+      patternCarriageReturnDesc:
+        'Coincide con un carácter de retorno de carro.',
       patternCarriageReturnExample: '\\r coincide con un retorno de carro',
       // Pattern descriptions - Quantifiers
       patternZeroOrMoreName: 'Cero o más',
-      patternZeroOrMoreDesc: 'Coincide con cero o más ocurrencias del elemento anterior.',
+      patternZeroOrMoreDesc:
+        'Coincide con cero o más ocurrencias del elemento anterior.',
       patternZeroOrMoreExample: "a* coincide con cero o más caracteres 'a'",
       patternOneOrMoreName: 'Uno o más',
-      patternOneOrMoreDesc: 'Coincide con una o más ocurrencias del elemento anterior.',
+      patternOneOrMoreDesc:
+        'Coincide con una o más ocurrencias del elemento anterior.',
       patternOneOrMoreExample: "a+ coincide con uno o más caracteres 'a'",
       patternZeroOrOneName: 'Cero o uno',
-      patternZeroOrOneDesc: 'Coincide con cero o una ocurrencia del elemento anterior (lo hace opcional).',
+      patternZeroOrOneDesc:
+        'Coincide con cero o una ocurrencia del elemento anterior (lo hace opcional).',
       patternZeroOrOneExample: "a? coincide con cero o un carácter 'a'",
       patternExactlyNName: 'Exactamente N',
-      patternExactlyNDesc: 'Coincide exactamente con n ocurrencias del elemento anterior.',
-      patternExactlyNExample: "a{3} coincide exactamente con tres caracteres 'a'",
+      patternExactlyNDesc:
+        'Coincide exactamente con n ocurrencias del elemento anterior.',
+      patternExactlyNExample:
+        "a{3} coincide exactamente con tres caracteres 'a'",
       patternNOrMoreName: 'N o más',
-      patternNOrMoreDesc: 'Coincide con n o más ocurrencias del elemento anterior.',
+      patternNOrMoreDesc:
+        'Coincide con n o más ocurrencias del elemento anterior.',
       patternNOrMoreExample: "a{3,} coincide con tres o más caracteres 'a'",
       patternBetweenNMName: 'Entre N y M',
-      patternBetweenNMDesc: 'Coincide entre n y m ocurrencias del elemento anterior.',
-      patternBetweenNMExample: "a{3,5} coincide entre tres y cinco caracteres 'a'",
+      patternBetweenNMDesc:
+        'Coincide entre n y m ocurrencias del elemento anterior.',
+      patternBetweenNMExample:
+        "a{3,5} coincide entre tres y cinco caracteres 'a'",
       patternLazyZeroOrMoreName: 'Perezoso cero o más',
-      patternLazyZeroOrMoreDesc: 'Versión no codiciosa (perezosa) de *. Coincide con la menor cantidad de caracteres posible.',
-      patternLazyZeroOrMoreExample: "a*? coincide con cero o más caracteres 'a' (perezoso)",
+      patternLazyZeroOrMoreDesc:
+        'Versión no codiciosa (perezosa) de *. Coincide con la menor cantidad de caracteres posible.',
+      patternLazyZeroOrMoreExample:
+        "a*? coincide con cero o más caracteres 'a' (perezoso)",
       patternLazyOneOrMoreName: 'Perezoso uno o más',
-      patternLazyOneOrMoreDesc: 'Versión no codiciosa (perezosa) de +. Coincide con la menor cantidad de caracteres posible.',
-      patternLazyOneOrMoreExample: "a+? coincide con uno o más caracteres 'a' (perezoso)",
+      patternLazyOneOrMoreDesc:
+        'Versión no codiciosa (perezosa) de +. Coincide con la menor cantidad de caracteres posible.',
+      patternLazyOneOrMoreExample:
+        "a+? coincide con uno o más caracteres 'a' (perezoso)",
       patternLazyZeroOrOneName: 'Perezoso cero o uno',
       patternLazyZeroOrOneDesc: 'Versión no codiciosa (perezosa) de ?.',
-      patternLazyZeroOrOneExample: "a?? coincide con cero o un carácter 'a' (perezoso)",
+      patternLazyZeroOrOneExample:
+        "a?? coincide con cero o un carácter 'a' (perezoso)",
       // Pattern descriptions - Anchors
       patternStartOfStringName: 'Inicio de cadena',
-      patternStartOfStringDesc: "Coincide con el inicio de la cadena (o inicio de línea con la bandera 'm').",
-      patternStartOfStringExample: "^abc coincide con 'abc' al inicio de la cadena",
+      patternStartOfStringDesc:
+        "Coincide con el inicio de la cadena (o inicio de línea con la bandera 'm').",
+      patternStartOfStringExample:
+        "^abc coincide con 'abc' al inicio de la cadena",
       patternEndOfStringName: 'Fin de cadena',
-      patternEndOfStringDesc: "Coincide con el fin de la cadena (o fin de línea con la bandera 'm').",
-      patternEndOfStringExample: "abc$ coincide con 'abc' al final de la cadena",
+      patternEndOfStringDesc:
+        "Coincide con el fin de la cadena (o fin de línea con la bandera 'm').",
+      patternEndOfStringExample:
+        "abc$ coincide con 'abc' al final de la cadena",
       patternWordBoundaryName: 'Límite de palabra',
-      patternWordBoundaryDesc: 'Coincide con un límite de palabra (entre un carácter de palabra y uno que no lo es).',
-      patternWordBoundaryExample: "\\bword\\b coincide con 'word' como palabra completa",
+      patternWordBoundaryDesc:
+        'Coincide con un límite de palabra (entre un carácter de palabra y uno que no lo es).',
+      patternWordBoundaryExample:
+        "\\bword\\b coincide con 'word' como palabra completa",
       patternNonWordBoundaryName: 'No límite de palabra',
-      patternNonWordBoundaryDesc: 'Coincide con una posición que no es un límite de palabra.',
-      patternNonWordBoundaryExample: "\\Bword\\B coincide con 'word' fuera de los límites de palabra",
+      patternNonWordBoundaryDesc:
+        'Coincide con una posición que no es un límite de palabra.',
+      patternNonWordBoundaryExample:
+        "\\Bword\\B coincide con 'word' fuera de los límites de palabra",
       // Pattern descriptions - Groups
       patternCapturingGroupName: 'Grupo de captura',
-      patternCapturingGroupDesc: 'Agrupa y captura el texto coincidente. Se puede referenciar con $1, $2, etc.',
+      patternCapturingGroupDesc:
+        'Agrupa y captura el texto coincidente. Se puede referenciar con $1, $2, etc.',
       patternCapturingGroupExample: "(abc) captura 'abc' como grupo 1",
       patternNonCapturingGroupName: 'Grupo sin captura',
-      patternNonCapturingGroupDesc: 'Agrupa sin capturar. Útil para aplicar cuantificadores sin crear un grupo de captura.',
+      patternNonCapturingGroupDesc:
+        'Agrupa sin capturar. Útil para aplicar cuantificadores sin crear un grupo de captura.',
       patternNonCapturingGroupExample: "(?:abc) agrupa 'abc' sin capturar",
       patternNamedCapturingGroupName: 'Grupo de captura con nombre',
-      patternNamedCapturingGroupDesc: 'Crea un grupo de captura con nombre que puede referenciarse por nombre.',
-      patternNamedCapturingGroupExample: "(?<name>abc) captura 'abc' como grupo llamado 'name'",
+      patternNamedCapturingGroupDesc:
+        'Crea un grupo de captura con nombre que puede referenciarse por nombre.',
+      patternNamedCapturingGroupExample:
+        "(?<name>abc) captura 'abc' como grupo llamado 'name'",
       patternPositiveLookaheadName: 'Aserción positiva hacia adelante',
-      patternPositiveLookaheadDesc: 'Afirma que lo que sigue coincide con el patrón, pero no consume caracteres.',
-      patternPositiveLookaheadExample: "abc(?=def) coincide con 'abc' solo si está seguido por 'def'",
+      patternPositiveLookaheadDesc:
+        'Afirma que lo que sigue coincide con el patrón, pero no consume caracteres.',
+      patternPositiveLookaheadExample:
+        "abc(?=def) coincide con 'abc' solo si está seguido por 'def'",
       patternNegativeLookaheadName: 'Aserción negativa hacia adelante',
-      patternNegativeLookaheadDesc: 'Afirma que lo que sigue NO coincide con el patrón.',
-      patternNegativeLookaheadExample: "abc(?!def) coincide con 'abc' solo si NO está seguido por 'def'",
+      patternNegativeLookaheadDesc:
+        'Afirma que lo que sigue NO coincide con el patrón.',
+      patternNegativeLookaheadExample:
+        "abc(?!def) coincide con 'abc' solo si NO está seguido por 'def'",
       patternPositiveLookbehindName: 'Aserción positiva hacia atrás',
-      patternPositiveLookbehindDesc: 'Afirma que lo que precede coincide con el patrón, pero no consume caracteres.',
-      patternPositiveLookbehindExample: "(?<=abc)def coincide con 'def' solo si está precedido por 'abc'",
+      patternPositiveLookbehindDesc:
+        'Afirma que lo que precede coincide con el patrón, pero no consume caracteres.',
+      patternPositiveLookbehindExample:
+        "(?<=abc)def coincide con 'def' solo si está precedido por 'abc'",
       patternNegativeLookbehindName: 'Aserción negativa hacia atrás',
-      patternNegativeLookbehindDesc: 'Afirma que lo que precede NO coincide con el patrón.',
-      patternNegativeLookbehindExample: "(?<!abc)def coincide con 'def' solo si NO está precedido por 'abc'",
+      patternNegativeLookbehindDesc:
+        'Afirma que lo que precede NO coincide con el patrón.',
+      patternNegativeLookbehindExample:
+        "(?<!abc)def coincide con 'def' solo si NO está precedido por 'abc'",
       patternBackreferenceName: 'Referencia posterior',
-      patternBackreferenceDesc: 'Referencia un grupo capturado anteriormente por número.',
+      patternBackreferenceDesc:
+        'Referencia un grupo capturado anteriormente por número.',
       patternBackreferenceExample: "(abc)\\1 coincide con 'abcabc'",
       patternNamedBackreferenceName: 'Referencia posterior con nombre',
-      patternNamedBackreferenceDesc: 'Referencia un grupo con nombre capturado anteriormente.',
-      patternNamedBackreferenceExample: "(?<name>abc)\\k<name> coincide con 'abcabc'",
+      patternNamedBackreferenceDesc:
+        'Referencia un grupo con nombre capturado anteriormente.',
+      patternNamedBackreferenceExample:
+        "(?<name>abc)\\k<name> coincide con 'abcabc'",
       // Pattern descriptions - Character Sets
       patternCharacterClassName: 'Clase de caracteres',
-      patternCharacterClassDesc: 'Coincide con cualquier carácter del conjunto. Use ^ al inicio para negar.',
+      patternCharacterClassDesc:
+        'Coincide con cualquier carácter del conjunto. Use ^ al inicio para negar.',
       patternCharacterClassExample: "[abc] coincide con 'a', 'b' o 'c'",
       patternNegatedCharacterClassName: 'Clase de caracteres negada',
-      patternNegatedCharacterClassDesc: 'Coincide con cualquier carácter que NO esté en el conjunto.',
-      patternNegatedCharacterClassExample: "[^abc] coincide con cualquier carácter excepto 'a', 'b' o 'c'",
+      patternNegatedCharacterClassDesc:
+        'Coincide con cualquier carácter que NO esté en el conjunto.',
+      patternNegatedCharacterClassExample:
+        "[^abc] coincide con cualquier carácter excepto 'a', 'b' o 'c'",
       patternCharacterRangeName: 'Rango de caracteres',
       patternCharacterRangeDesc: 'Coincide con un rango de caracteres.',
-      patternCharacterRangeExample: '[a-z] coincide con cualquier letra minúscula',
+      patternCharacterRangeExample:
+        '[a-z] coincide con cualquier letra minúscula',
       // Pattern descriptions - Flags
       patternGlobalFlagName: 'Global',
-      patternGlobalFlagDesc: 'Encuentra todas las coincidencias en lugar de detenerse después de la primera.',
+      patternGlobalFlagDesc:
+        'Encuentra todas las coincidencias en lugar de detenerse después de la primera.',
       patternGlobalFlagExample: '/pattern/g encuentra todas las ocurrencias',
       patternCaseInsensitiveFlagName: 'Sin distinción de mayúsculas',
-      patternCaseInsensitiveFlagDesc: 'Coincidencia sin distinción de mayúsculas y minúsculas.',
-      patternCaseInsensitiveFlagExample: "/pattern/i coincide con 'Pattern', 'PATTERN', etc.",
+      patternCaseInsensitiveFlagDesc:
+        'Coincidencia sin distinción de mayúsculas y minúsculas.',
+      patternCaseInsensitiveFlagExample:
+        "/pattern/i coincide con 'Pattern', 'PATTERN', etc.",
       patternMultilineFlagName: 'Multilínea',
-      patternMultilineFlagDesc: 'Hace que ^ y $ coincidan con el inicio/fin de cada línea, no solo de la cadena.',
-      patternMultilineFlagExample: "/^pattern$/m coincide con 'pattern' al inicio de cualquier línea",
+      patternMultilineFlagDesc:
+        'Hace que ^ y $ coincidan con el inicio/fin de cada línea, no solo de la cadena.',
+      patternMultilineFlagExample:
+        "/^pattern$/m coincide con 'pattern' al inicio de cualquier línea",
       patternDotAllFlagName: 'DotAll',
-      patternDotAllFlagDesc: 'Hace que . también coincida con caracteres de nueva línea.',
-      patternDotAllFlagExample: '/pattern./s permite que . coincida con nuevas líneas',
+      patternDotAllFlagDesc:
+        'Hace que . también coincida con caracteres de nueva línea.',
+      patternDotAllFlagExample:
+        '/pattern./s permite que . coincida con nuevas líneas',
       patternUnicodeFlagName: 'Unicode',
-      patternUnicodeFlagDesc: 'Habilita la coincidencia Unicode completa. Trata el patrón como una secuencia de puntos de código Unicode.',
+      patternUnicodeFlagDesc:
+        'Habilita la coincidencia Unicode completa. Trata el patrón como una secuencia de puntos de código Unicode.',
       patternUnicodeFlagExample: '/\\u{1F600}/u coincide con emoji Unicode',
       patternStickyFlagName: 'Fijo',
-      patternStickyFlagDesc: 'Coincide solo desde el índice indicado por la propiedad lastIndex.',
+      patternStickyFlagDesc:
+        'Coincide solo desde el índice indicado por la propiedad lastIndex.',
       patternStickyFlagExample: '/pattern/y coincide solo en lastIndex',
       patternHasIndicesFlagName: 'HasIndices',
-      patternHasIndicesFlagDesc: 'Genera índices para las coincidencias de subcadenas.',
-      patternHasIndicesFlagExample: '/pattern/d incluye índices en los resultados de coincidencia',
+      patternHasIndicesFlagDesc:
+        'Genera índices para las coincidencias de subcadenas.',
+      patternHasIndicesFlagExample:
+        '/pattern/d incluye índices en los resultados de coincidencia',
       patternUnicodeSetsFlagName: 'UnicodeSets',
-      patternUnicodeSetsFlagDesc: 'Habilita el modo de conjuntos Unicode con manejo mejorado de clases de caracteres.',
-      patternUnicodeSetsFlagExample: '/[\\p{Letter}]/v coincide con propiedades de letras Unicode',
+      patternUnicodeSetsFlagDesc:
+        'Habilita el modo de conjuntos Unicode con manejo mejorado de clases de caracteres.',
+      patternUnicodeSetsFlagExample:
+        '/[\\p{Letter}]/v coincide con propiedades de letras Unicode',
       // Pattern descriptions - Unicode
       patternUnicodeEscapeName: 'Escape Unicode',
-      patternUnicodeEscapeDesc: 'Coincide con un carácter Unicode por su punto de código.',
+      patternUnicodeEscapeDesc:
+        'Coincide con un carácter Unicode por su punto de código.',
       patternUnicodeEscapeExample: "\\u0041 coincide con 'A'",
       patternUnicodeCodePointName: 'Punto de código Unicode',
-      patternUnicodeCodePointDesc: "Coincide con un carácter Unicode por su punto de código (requiere bandera 'u').",
+      patternUnicodeCodePointDesc:
+        "Coincide con un carácter Unicode por su punto de código (requiere bandera 'u').",
       patternUnicodeCodePointExample: '\\u{1F600} coincide con 😀',
       patternUnicodePropertyName: 'Propiedad Unicode',
-      patternUnicodePropertyDesc: "Coincide con caracteres con una propiedad Unicode específica (requiere bandera 'u' o 'v').",
-      patternUnicodePropertyExample: '\\p{Letter} coincide con cualquier letra Unicode',
+      patternUnicodePropertyDesc:
+        "Coincide con caracteres con una propiedad Unicode específica (requiere bandera 'u' o 'v').",
+      patternUnicodePropertyExample:
+        '\\p{Letter} coincide con cualquier letra Unicode',
       patternNegatedUnicodePropertyName: 'Propiedad Unicode negada',
-      patternNegatedUnicodePropertyDesc: 'Coincide con caracteres sin una propiedad Unicode específica.',
-      patternNegatedUnicodePropertyExample: '\\P{Letter} coincide con cualquier carácter no letra',
+      patternNegatedUnicodePropertyDesc:
+        'Coincide con caracteres sin una propiedad Unicode específica.',
+      patternNegatedUnicodePropertyExample:
+        '\\P{Letter} coincide con cualquier carácter no letra',
     },
     jwtDecoder: {
       title: 'JWT Decoder',
-      description: 'Decodifica JSON Web Tokens para ver Header, Payload y Signature.',
+      description:
+        'Decodifica JSON Web Tokens para ver Header, Payload y Signature.',
       jwtToken: 'Token JWT',
-      tokenPlaceholder: 'Pega token JWT (ej: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...)',
+      tokenPlaceholder:
+        'Pega token JWT (ej: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...)',
       validationStatus: 'Estado de validación',
       signatureVerification: 'Verificación de Signature',
       header: 'Header',
@@ -631,7 +761,8 @@ export const esES = {
       verificationKeyPlaceholder: 'Ingresa key de verificación',
       enterVerificationKey: 'Ingresa key de verificación',
       hmacKeyPlaceholder: 'Ingresa secret key HMAC (para HS256, HS384, HS512)',
-      publicKeyPlaceholder: 'Ingresa public key (formato PEM para RS256/RS384/RS512/ES256/ES384/ES512)',
+      publicKeyPlaceholder:
+        'Ingresa public key (formato PEM para RS256/RS384/RS512/ES256/ES384/ES512)',
       valid: 'Válido',
       invalid: 'Inválido',
       verified: 'Verificado',
@@ -645,13 +776,18 @@ export const esES = {
       tokenIsValid: 'El token es válido (no ha expirado)',
       issuedAt: 'Emitido: {time}',
       signatureValid: 'La firma es válida',
-      signatureVerificationFailed: 'La verificación de firma falló. El token puede haber sido manipulado o la key es incorrecta.',
+      signatureVerificationFailed:
+        'La verificación de firma falló. El token puede haber sido manipulado o la key es incorrecta.',
       enterKeyToVerify: 'Ingresa una key arriba para verificar la firma',
-      invalidJwtFormat: 'Formato JWT inválido. Se esperan 3 partes separadas por puntos (header.payload.signature).',
-      failedToDecodeHeader: 'Error al decodificar header JWT. Codificación Base64URL inválida.',
-      failedToDecodePayload: 'Error al decodificar payload JWT. Codificación Base64URL inválida.',
+      invalidJwtFormat:
+        'Formato JWT inválido. Se esperan 3 partes separadas por puntos (header.payload.signature).',
+      failedToDecodeHeader:
+        'Error al decodificar header JWT. Codificación Base64URL inválida.',
+      failedToDecodePayload:
+        'Error al decodificar payload JWT. Codificación Base64URL inválida.',
       enterJwtToDecode: 'Ingresa un token JWT para decodificarlo.',
-      signatureNote: 'Nota: No se realiza verificación de firma. Esta herramienta solo decodifica el token.',
+      signatureNote:
+        'Nota: No se realiza verificación de firma. Esta herramienta solo decodifica el token.',
       raw: 'Raw',
     },
     jwtEncoder: {
@@ -670,65 +806,80 @@ export const esES = {
       invalidJsonHeader: 'JSON inválido en header',
       invalidJsonPayload: 'JSON inválido en payload',
       secretKeyRequired: 'Se requiere secret key para firmar',
-      unsupportedAlgorithm: 'Algoritmo no soportado: {alg}. Solo se soportan HS256, HS384, HS512, none.',
+      unsupportedAlgorithm:
+        'Algoritmo no soportado: {alg}. Solo se soportan HS256, HS384, HS512, none.',
     },
   },
   meta: {
     json: {
       title: 'JSON Viewer',
-      description: 'Visor, formateador y validador JSON online gratuito. Embellece JSON con resaltado de sintaxis, vista de árbol, búsqueda y funciones de copia.',
+      description:
+        'Visor, formateador y validador JSON online gratuito. Embellece JSON con resaltado de sintaxis, vista de árbol, búsqueda y funciones de copia.',
     },
     url: {
       title: 'URL Encoder',
-      description: 'Codificador y decodificador de URL online gratuito. Codifica y decodifica cadenas URL con soporte para caracteres especiales y Unicode.',
+      description:
+        'Codificador y decodificador de URL online gratuito. Codifica y decodifica cadenas URL con soporte para caracteres especiales y Unicode.',
     },
     base64: {
       title: 'Base64 Converter',
-      description: 'Codificador y decodificador Base64 online gratuito. Convierte texto a Base64 con soporte para variante segura para URL.',
+      description:
+        'Codificador y decodificador Base64 online gratuito. Convierte texto a Base64 con soporte para variante segura para URL.',
     },
     time: {
       title: 'Time Converter',
-      description: 'Conversor de timestamp Epoch online gratuito. Convierte entre Unix timestamp y fechas ISO 8601 con soporte de zona horaria.',
+      description:
+        'Conversor de timestamp Epoch online gratuito. Convierte entre Unix timestamp y fechas ISO 8601 con soporte de zona horaria.',
     },
     yaml: {
       title: 'YAML Converter',
-      description: 'Conversor YAML-JSON online gratuito. Convierte entre formatos YAML y JSON con validación de sintaxis.',
+      description:
+        'Conversor YAML-JSON online gratuito. Convierte entre formatos YAML y JSON con validación de sintaxis.',
     },
     diff: {
       title: 'Text Diff',
-      description: 'Herramienta de diferencias de texto online gratuita. Compara dos bloques de texto y visualiza diferencias en vista dividida o unificada.',
+      description:
+        'Herramienta de diferencias de texto online gratuita. Compara dos bloques de texto y visualiza diferencias en vista dividida o unificada.',
     },
     cron: {
       title: 'Cron Parser',
-      description: 'Analizador de expresiones cron online gratuito. Explica programaciones cron y previsualiza próximos tiempos de ejecución.',
+      description:
+        'Analizador de expresiones cron online gratuito. Explica programaciones cron y previsualiza próximos tiempos de ejecución.',
     },
     hash: {
       title: 'Hash Generator',
-      description: 'Generador de hash online gratuito. Calcula hashes MD5, SHA-1, SHA-256, SHA-512 y firmas HMAC.',
+      description:
+        'Generador de hash online gratuito. Calcula hashes MD5, SHA-1, SHA-256, SHA-512 y firmas HMAC.',
     },
     uuid: {
       title: 'UUID/ULID Generator',
-      description: 'Generador de UUID y ULID online gratuito. Genera identificadores UUID v4, UUID v7 y ULID.',
+      description:
+        'Generador de UUID y ULID online gratuito. Genera identificadores UUID v4, UUID v7 y ULID.',
     },
     password: {
       title: 'Password Generator',
-      description: 'Generador de contraseñas online gratuito. Crea contraseñas seguras con opciones personalizables de longitud y caracteres.',
+      description:
+        'Generador de contraseñas online gratuito. Crea contraseñas seguras con opciones personalizables de longitud y caracteres.',
     },
     urlParser: {
       title: 'URL Parser',
-      description: 'Analizador de URL online gratuito. Analiza componentes de URL incluyendo protocol, host, path y parámetros query.',
+      description:
+        'Analizador de URL online gratuito. Analiza componentes de URL incluyendo protocol, host, path y parámetros query.',
     },
     regex: {
       title: 'Regex Tester',
-      description: 'Probador de expresiones regulares online gratuito. Prueba y visualiza regex con resaltado de coincidencias.',
+      description:
+        'Probador de expresiones regulares online gratuito. Prueba y visualiza regex con resaltado de coincidencias.',
     },
     jwtDecoder: {
       title: 'JWT Decoder',
-      description: 'Decodificador JWT online gratuito. Decodifica e inspecciona JSON Web Tokens con verificación de firma.',
+      description:
+        'Decodificador JWT online gratuito. Decodifica e inspecciona JSON Web Tokens con verificación de firma.',
     },
     jwtEncoder: {
       title: 'JWT Encoder',
-      description: 'Codificador JWT online gratuito. Crea JSON Web Tokens con header y payload personalizados.',
+      description:
+        'Codificador JWT online gratuito. Crea JSON Web Tokens con header y payload personalizados.',
     },
   },
 } as const satisfies I18nResource;

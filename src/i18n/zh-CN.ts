@@ -110,20 +110,26 @@ export const zhCN = {
   },
   homepage: {
     title: "Yowu's DevTools",
-    heroDescription: '为希望将数据保留在本地的开发者打造的隐私优先工具箱。所有处理都在浏览器中进行——无服务器、无追踪、无数据收集。开源可审计，使JSON格式化、密码生成、哈希计算、UUID创建等常见开发任务快速、安全、可信。',
+    heroDescription:
+      '为希望将数据保留在本地的开发者打造的隐私优先工具箱。所有处理都在浏览器中进行——无服务器、无追踪、无数据收集。开源可审计，使JSON格式化、密码生成、哈希计算、UUID创建等常见开发任务快速、安全、可信。',
     whyItExists: '为什么创建这个',
     privacyFirst: '隐私优先',
-    privacyFirstDescription: '所有操作都在浏览器中运行。不向服务器发送数据，无追踪，无分析。您的敏感数据留在您的设备上。',
+    privacyFirstDescription:
+      '所有操作都在浏览器中运行。不向服务器发送数据，无追踪，无分析。您的敏感数据留在您的设备上。',
     fastEfficient: '快速高效',
-    fastEfficientDescription: 'Command Palette快速导航、文件拖放支持、Web Workers处理大型数据集而不会冻结浏览器。',
+    fastEfficientDescription:
+      'Command Palette快速导航、文件拖放支持、Web Workers处理大型数据集而不会冻结浏览器。',
     installablePwa: '可安装的PWA',
-    installablePwaDescription: '离线工作，作为独立应用安装，新版本可用时自动更新。',
+    installablePwaDescription:
+      '离线工作，作为独立应用安装，新版本可用时自动更新。',
     openAuditable: '开源可审计',
-    openAuditableDescription: '每一行代码都是公开的。您可以验证每个工具做什么以及如何处理您的数据。',
+    openAuditableDescription:
+      '每一行代码都是公开的。您可以验证每个工具做什么以及如何处理您的数据。',
     hostedOn: '作为静态站点托管在GitHub Pages上。所有处理都在浏览器中进行。',
     viewOnGithub: '在GitHub上查看',
     quickNavigation: '快速导航',
-    quickNavigationDescription: '按 {cmdK} 或 {ctrlK} 打开Command Palette，快速找到任何工具。',
+    quickNavigationDescription:
+      '按 {cmdK} 或 {ctrlK} 打开Command Palette，快速找到任何工具。',
     searchByName: '按名称或关键词搜索工具',
     navigateWithArrows: '使用方向键导航',
     accessFavorites: '访问收藏夹和最近的工具',
@@ -321,7 +327,8 @@ export const zhCN = {
       note: '注意',
       securityNote: '仅用于校验和验证，不适用于安全目的。',
       securityWarning: '安全警告',
-      algorithmWarning: '{algorithm}在加密学上已被破解，不应用于安全目的。请使用SHA-256或SHA-512。',
+      algorithmWarning:
+        '{algorithm}在加密学上已被破解，不应用于安全目的。请使用SHA-256或SHA-512。',
       hmacKeyWarning: '警告：在分享链接中保存HMAC Key可能会暴露敏感信息。',
       rawText: 'Raw Text (UTF-8)',
       rawTextUtf8: 'Raw Text (UTF-8)',
@@ -355,7 +362,8 @@ export const zhCN = {
       idCopied: 'ID已复制到剪贴板',
       allIdsCopied: '所有ID已复制到剪贴板',
       copyAll: '全部复制',
-      typeTooltip: '选择ID类型（UUID v4：随机，UUID v7：基于时间戳，ULID：更短）。',
+      typeTooltip:
+        '选择ID类型（UUID v4：随机，UUID v7：基于时间戳，ULID：更短）。',
       countTooltip: '要生成的ID数量（1-100）。',
       formatTooltip: '输出格式（小写或大写）。',
       countHint: '最多生成100个',
@@ -391,8 +399,10 @@ export const zhCN = {
     },
     urlParser: {
       title: 'URL Parser',
-      description: '解析并可视化URL组件，包括Protocol、Host、Path、Fragment和Query参数。',
-      inputPlaceholder: '输入URL或Query String（例如：https://example.com/search?q=laptop）...',
+      description:
+        '解析并可视化URL组件，包括Protocol、Host、Path、Fragment和Query参数。',
+      inputPlaceholder:
+        '输入URL或Query String（例如：https://example.com/search?q=laptop）...',
       urlOrQueryString: 'URL或Query String',
       urlInformation: 'URL信息',
       parameters: '参数',
@@ -428,7 +438,8 @@ export const zhCN = {
       testText: '测试文本',
       testTextPlaceholder: '输入要匹配的文本...',
       replacementPreview: '替换预览',
-      replacementPlaceholder: '输入替换字符串（使用$1、$2、$<name>表示分组）...',
+      replacementPlaceholder:
+        '输入替换字符串（使用$1、$2、$<name>表示分组）...',
       replacementResult: '替换结果',
       matches: '匹配',
       presets: '预设',
@@ -452,7 +463,8 @@ export const zhCN = {
       clickToExpand: '点击展开',
       note: '注意',
       securityNote: '此工具使用JavaScript RegExp引擎。请注意复杂模式。',
-      flagsTooltip: 'g=全局，i=忽略大小写，m=多行，s=dotAll，u=unicode，y=sticky',
+      flagsTooltip:
+        'g=全局，i=忽略大小写，m=多行，s=dotAll，u=unicode，y=sticky',
       // Regex spec categories
       specCharacterClasses: 'Character Classes',
       specCharacterClassesDesc: '用于匹配特定类型字符的预定义字符集',
@@ -476,7 +488,8 @@ export const zhCN = {
       patternNonDigitDesc: '匹配任意非数字字符。等同于[^0-9]。',
       patternNonDigitExample: '\\D+匹配一个或多个非数字字符',
       patternWordCharName: 'Word Character',
-      patternWordCharDesc: '匹配任意单词字符（字母数字加下划线）。等同于[A-Za-z0-9_]。',
+      patternWordCharDesc:
+        '匹配任意单词字符（字母数字加下划线）。等同于[A-Za-z0-9_]。',
       patternWordCharExample: '\\w+匹配一个或多个单词字符',
       patternNonWordCharName: 'Non-word Character',
       patternNonWordCharDesc: '匹配任意非单词字符。等同于[^A-Za-z0-9_]。',
@@ -488,7 +501,8 @@ export const zhCN = {
       patternNonWhitespaceDesc: '匹配任意非空白字符。',
       patternNonWhitespaceExample: '\\S+匹配一个或多个非空白字符',
       patternDotEscapedName: 'Dot（转义）',
-      patternDotEscapedDesc: '匹配字面点字符。未转义的点(.)匹配除换行符外的任意字符。',
+      patternDotEscapedDesc:
+        '匹配字面点字符。未转义的点(.)匹配除换行符外的任意字符。',
       patternDotEscapedExample: '\\.匹配字面点',
       patternNewlineName: '换行符',
       patternNewlineDesc: '匹配换行字符。',
@@ -529,7 +543,8 @@ export const zhCN = {
       patternLazyZeroOrOneExample: "a??匹配零个或一个'a'字符（lazy）",
       // Pattern descriptions - Anchors
       patternStartOfStringName: '字符串开头',
-      patternStartOfStringDesc: "匹配字符串的开头（或在'm'标志下匹配行的开头）。",
+      patternStartOfStringDesc:
+        "匹配字符串的开头（或在'm'标志下匹配行的开头）。",
       patternStartOfStringExample: "^abc匹配字符串开头的'abc'",
       patternEndOfStringName: '字符串结尾',
       patternEndOfStringDesc: "匹配字符串的结尾（或在'm'标志下匹配行的结尾）。",
@@ -545,23 +560,27 @@ export const zhCN = {
       patternCapturingGroupDesc: '分组并捕获匹配的文本。可以用$1, $2等引用。',
       patternCapturingGroupExample: "(abc)将'abc'捕获为group 1",
       patternNonCapturingGroupName: 'Non-capturing Group',
-      patternNonCapturingGroupDesc: '不捕获地分组。在不创建捕获组的情况下应用量词时很有用。',
+      patternNonCapturingGroupDesc:
+        '不捕获地分组。在不创建捕获组的情况下应用量词时很有用。',
       patternNonCapturingGroupExample: "(?:abc)不捕获地分组'abc'",
       patternNamedCapturingGroupName: 'Named Capturing Group',
       patternNamedCapturingGroupDesc: '创建可以按名称引用的命名捕获组。',
-      patternNamedCapturingGroupExample: "(?<name>abc)将'abc'捕获为名为'name'的组",
+      patternNamedCapturingGroupExample:
+        "(?<name>abc)将'abc'捕获为名为'name'的组",
       patternPositiveLookaheadName: 'Positive Lookahead',
       patternPositiveLookaheadDesc: '断言后面的内容匹配模式，但不消耗字符。',
       patternPositiveLookaheadExample: "abc(?=def)仅当后面跟着'def'时匹配'abc'",
       patternNegativeLookaheadName: 'Negative Lookahead',
       patternNegativeLookaheadDesc: '断言后面的内容不匹配模式。',
-      patternNegativeLookaheadExample: "abc(?!def)仅当后面不跟着'def'时匹配'abc'",
+      patternNegativeLookaheadExample:
+        "abc(?!def)仅当后面不跟着'def'时匹配'abc'",
       patternPositiveLookbehindName: 'Positive Lookbehind',
       patternPositiveLookbehindDesc: '断言前面的内容匹配模式，但不消耗字符。',
       patternPositiveLookbehindExample: "(?<=abc)def仅当前面是'abc'时匹配'def'",
       patternNegativeLookbehindName: 'Negative Lookbehind',
       patternNegativeLookbehindDesc: '断言前面的内容不匹配模式。',
-      patternNegativeLookbehindExample: "(?<!abc)def仅当前面不是'abc'时匹配'def'",
+      patternNegativeLookbehindExample:
+        "(?<!abc)def仅当前面不是'abc'时匹配'def'",
       patternBackreferenceName: 'Backreference',
       patternBackreferenceDesc: '按编号引用之前捕获的组。',
       patternBackreferenceExample: "(abc)\\1匹配'abcabc'",
@@ -570,11 +589,13 @@ export const zhCN = {
       patternNamedBackreferenceExample: "(?<name>abc)\\k<name>匹配'abcabc'",
       // Pattern descriptions - Character Sets
       patternCharacterClassName: 'Character Class',
-      patternCharacterClassDesc: '匹配集合中的任意一个字符。在开头使用^进行否定。',
+      patternCharacterClassDesc:
+        '匹配集合中的任意一个字符。在开头使用^进行否定。',
       patternCharacterClassExample: "[abc]匹配'a'、'b'或'c'",
       patternNegatedCharacterClassName: 'Negated Character Class',
       patternNegatedCharacterClassDesc: '匹配不在集合中的任意字符。',
-      patternNegatedCharacterClassExample: "[^abc]匹配除'a'、'b'、'c'外的任意字符",
+      patternNegatedCharacterClassExample:
+        "[^abc]匹配除'a'、'b'、'c'外的任意字符",
       patternCharacterRangeName: 'Character Range',
       patternCharacterRangeDesc: '匹配字符范围。',
       patternCharacterRangeExample: '[a-z]匹配任意小写字母',
@@ -592,7 +613,8 @@ export const zhCN = {
       patternDotAllFlagDesc: '使.也匹配换行字符。',
       patternDotAllFlagExample: '/pattern./s允许.匹配换行符',
       patternUnicodeFlagName: 'Unicode',
-      patternUnicodeFlagDesc: '启用完整的Unicode匹配。将模式视为Unicode代码点序列。',
+      patternUnicodeFlagDesc:
+        '启用完整的Unicode匹配。将模式视为Unicode代码点序列。',
       patternUnicodeFlagExample: '/\\u{1F600}/u匹配Unicode表情符号',
       patternStickyFlagName: 'Sticky',
       patternStickyFlagDesc: '仅从lastIndex属性指示的索引处匹配。',
@@ -601,7 +623,8 @@ export const zhCN = {
       patternHasIndicesFlagDesc: '为子字符串匹配生成索引。',
       patternHasIndicesFlagExample: '/pattern/d在匹配结果中包含索引',
       patternUnicodeSetsFlagName: 'UnicodeSets',
-      patternUnicodeSetsFlagDesc: '启用具有改进的character class处理的Unicode集合模式。',
+      patternUnicodeSetsFlagDesc:
+        '启用具有改进的character class处理的Unicode集合模式。',
       patternUnicodeSetsFlagExample: '/[\\p{Letter}]/v匹配Unicode字母属性',
       // Pattern descriptions - Unicode
       patternUnicodeEscapeName: 'Unicode Escape',
@@ -611,7 +634,8 @@ export const zhCN = {
       patternUnicodeCodePointDesc: "按代码点匹配Unicode字符（需要'u'标志）。",
       patternUnicodeCodePointExample: '\\u{1F600}匹配😀',
       patternUnicodePropertyName: 'Unicode Property',
-      patternUnicodePropertyDesc: "匹配具有特定Unicode属性的字符（需要'u'或'v'标志）。",
+      patternUnicodePropertyDesc:
+        "匹配具有特定Unicode属性的字符（需要'u'或'v'标志）。",
       patternUnicodePropertyExample: '\\p{Letter}匹配任意Unicode字母',
       patternNegatedUnicodePropertyName: 'Negated Unicode Property',
       patternNegatedUnicodePropertyDesc: '匹配没有特定Unicode属性的字符。',
@@ -621,7 +645,8 @@ export const zhCN = {
       title: 'JWT Decoder',
       description: '解码JSON Web Token以查看Header、Payload和Signature。',
       jwtToken: 'JWT Token',
-      tokenPlaceholder: '粘贴JWT Token（例如：eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...）',
+      tokenPlaceholder:
+        '粘贴JWT Token（例如：eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...）',
       validationStatus: '验证状态',
       signatureVerification: 'Signature验证',
       header: 'Header',
@@ -631,7 +656,8 @@ export const zhCN = {
       verificationKeyPlaceholder: '输入验证Key',
       enterVerificationKey: '输入验证Key',
       hmacKeyPlaceholder: '输入HMAC Secret Key（用于HS256、HS384、HS512）',
-      publicKeyPlaceholder: '输入Public Key（RS256/RS384/RS512/ES256/ES384/ES512用PEM格式）',
+      publicKeyPlaceholder:
+        '输入Public Key（RS256/RS384/RS512/ES256/ES384/ES512用PEM格式）',
       valid: '有效',
       invalid: '无效',
       verified: '已验证',
@@ -645,9 +671,11 @@ export const zhCN = {
       tokenIsValid: 'Token有效（未过期）',
       issuedAt: '签发时间：{time}',
       signatureValid: 'Signature有效',
-      signatureVerificationFailed: 'Signature验证失败。Token可能被篡改或Key不正确。',
+      signatureVerificationFailed:
+        'Signature验证失败。Token可能被篡改或Key不正确。',
       enterKeyToVerify: '请在上方输入Key以验证Signature',
-      invalidJwtFormat: '无效的JWT格式。需要由点分隔的3部分（header.payload.signature）。',
+      invalidJwtFormat:
+        '无效的JWT格式。需要由点分隔的3部分（header.payload.signature）。',
       failedToDecodeHeader: 'JWT Header解码失败。无效的Base64URL编码。',
       failedToDecodePayload: 'JWT Payload解码失败。无效的Base64URL编码。',
       enterJwtToDecode: '请输入要解码的JWT Token。',
@@ -670,33 +698,40 @@ export const zhCN = {
       invalidJsonHeader: 'Header中的JSON无效',
       invalidJsonPayload: 'Payload中的JSON无效',
       secretKeyRequired: '签名需要Secret Key',
-      unsupportedAlgorithm: '不支持的算法：{alg}。仅支持HS256、HS384、HS512、none。',
+      unsupportedAlgorithm:
+        '不支持的算法：{alg}。仅支持HS256、HS384、HS512、none。',
     },
   },
   meta: {
     json: {
       title: 'JSON Viewer',
-      description: '免费在线JSON查看器、格式化工具和验证器。语法高亮、树形视图、搜索和复制功能，美化JSON。',
+      description:
+        '免费在线JSON查看器、格式化工具和验证器。语法高亮、树形视图、搜索和复制功能，美化JSON。',
     },
     url: {
       title: 'URL Encoder',
-      description: '免费在线URL编码器和解码器。支持特殊字符和Unicode，编码和解码URL字符串。',
+      description:
+        '免费在线URL编码器和解码器。支持特殊字符和Unicode，编码和解码URL字符串。',
     },
     base64: {
       title: 'Base64 Converter',
-      description: '免费在线Base64编码器和解码器。支持URL安全变体，将文本转换为Base64或还原。',
+      description:
+        '免费在线Base64编码器和解码器。支持URL安全变体，将文本转换为Base64或还原。',
     },
     time: {
       title: 'Time Converter',
-      description: '免费在线Epoch时间戳转换器。支持时区，在Unix时间戳和ISO 8601日期之间转换。',
+      description:
+        '免费在线Epoch时间戳转换器。支持时区，在Unix时间戳和ISO 8601日期之间转换。',
     },
     yaml: {
       title: 'YAML Converter',
-      description: '免费在线YAML-JSON转换器。语法验证，在YAML和JSON格式之间转换。',
+      description:
+        '免费在线YAML-JSON转换器。语法验证，在YAML和JSON格式之间转换。',
     },
     diff: {
       title: 'Text Diff',
-      description: '免费在线文本差异工具。比较两段文本，以分割或统一视图可视化差异。',
+      description:
+        '免费在线文本差异工具。比较两段文本，以分割或统一视图可视化差异。',
     },
     cron: {
       title: 'Cron Parser',
@@ -704,11 +739,13 @@ export const zhCN = {
     },
     hash: {
       title: 'Hash Generator',
-      description: '免费在线Hash生成器。计算MD5、SHA-1、SHA-256、SHA-512哈希和HMAC签名。',
+      description:
+        '免费在线Hash生成器。计算MD5、SHA-1、SHA-256、SHA-512哈希和HMAC签名。',
     },
     uuid: {
       title: 'UUID Generator',
-      description: '免费在线UUID和ULID生成器。生成UUID v4、UUID v7和ULID标识符。',
+      description:
+        '免费在线UUID和ULID生成器。生成UUID v4、UUID v7和ULID标识符。',
     },
     password: {
       title: 'Password Generator',
@@ -716,7 +753,8 @@ export const zhCN = {
     },
     urlParser: {
       title: 'URL Parser',
-      description: '免费在线URL解析器。解析URL组件，包括Protocol、Host、Path和Query参数。',
+      description:
+        '免费在线URL解析器。解析URL组件，包括Protocol、Host、Path和Query参数。',
     },
     regex: {
       title: 'Regex Tester',
@@ -728,7 +766,8 @@ export const zhCN = {
     },
     jwtEncoder: {
       title: 'JWT Encoder',
-      description: '免费在线JWT编码器。使用自定义Header和Payload创建JSON Web Token。',
+      description:
+        '免费在线JWT编码器。使用自定义Header和Payload创建JSON Web Token。',
     },
   },
 } as const satisfies I18nResource;

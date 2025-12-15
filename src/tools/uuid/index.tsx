@@ -42,25 +42,26 @@ const generateUuidV4 = (): string => {
 const generateUuidV7 = (): string => {
   const timestamp = Date.now();
   const timestampMs = BigInt(timestamp);
-  
+
   // 48-bit timestamp (milliseconds since Unix epoch)
   const timestamp48 = Number(timestampMs & BigInt(0xffffffffffff));
-  
+
   // Random values for the remaining bits
   const randomA = Math.floor(Math.random() * 0x1000); // 12 bits
   const randomB = Math.floor(Math.random() * 0x40000000); // 30 bits
   const randomC = Math.floor(Math.random() * 0x40000000); // 30 bits
-  
+
   // Construct UUID v7
   // Format: xxxxxxxx-xxxx-7xxx-xxxx-xxxxxxxxxxxx
-  const hex = (n: number, length: number) => n.toString(16).padStart(length, '0');
-  
+  const hex = (n: number, length: number) =>
+    n.toString(16).padStart(length, '0');
+
   const part1 = hex(timestamp48 >>> 16, 8);
   const part2 = hex((timestamp48 & 0xffff) | 0x7000, 4); // version 7
-  const part3 = hex((randomA | 0x8000), 4); // variant 10
+  const part3 = hex(randomA | 0x8000, 4); // variant 10
   const part4 = hex(randomB, 8);
   const part5 = hex(randomC, 12);
-  
+
   return `${part1}-${part2}-${part3}-${part4}-${part5}`;
 };
 
@@ -70,7 +71,7 @@ const CROCKFORD_BASE32 = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
 const generateUlid = (): string => {
   const timestamp = Date.now();
   const timestamp48 = BigInt(timestamp);
-  
+
   // Encode timestamp (10 characters)
   let timestampStr = '';
   let ts = timestamp48;
@@ -78,35 +79,38 @@ const generateUlid = (): string => {
     timestampStr = CROCKFORD_BASE32[Number(ts & BigInt(31))] + timestampStr;
     ts = ts >> BigInt(5);
   }
-  
+
   // Generate random part (16 characters)
   let randomStr = '';
   const randomBytes = new Uint8Array(10);
   crypto.getRandomValues(randomBytes);
-  
+
   for (let i = 0; i < 10; i++) {
     const byte = randomBytes[i];
     randomStr += CROCKFORD_BASE32[byte & 31];
     randomStr += CROCKFORD_BASE32[(byte >> 5) & 31];
   }
-  
+
   return timestampStr + randomStr;
 };
 
 const UuidTool: React.FC = () => {
   const { t } = useI18n();
   useTitle(t('tool.uuid.title'));
-  const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } = useToolState<UuidToolState>(
-    'uuid',
-    DEFAULT_STATE,
-    {
-      shareStateFilter: ({ type, count, format }) => ({
-        type,
-        count,
-        format,
-      }),
-    }
-  );
+  const {
+    state,
+    updateState,
+    resetState,
+    copyShareLink,
+    shareViaWebShare,
+    getShareStateInfo,
+  } = useToolState<UuidToolState>('uuid', DEFAULT_STATE, {
+    shareStateFilter: ({ type, count, format }) => ({
+      type,
+      count,
+      format,
+    }),
+  });
 
   const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
   const shareInfo = getShareStateInfo();
@@ -130,8 +134,10 @@ const UuidTool: React.FC = () => {
         default:
           id = generateUuidV4();
       }
-      
-      ids.push(state.format === 'uppercase' ? id.toUpperCase() : id.toLowerCase());
+
+      ids.push(
+        state.format === 'uppercase' ? id.toUpperCase() : id.toLowerCase()
+      );
     }
     setGeneratedIds(ids);
   }, [state.type, state.count, state.format]);
@@ -209,7 +215,10 @@ const UuidTool: React.FC = () => {
               max={100}
               value={state.count}
               onChange={(e) => {
-                const count = Math.max(1, Math.min(100, parseInt(e.target.value, 10) || 1));
+                const count = Math.max(
+                  1,
+                  Math.min(100, parseInt(e.target.value, 10) || 1)
+                );
                 updateState({ count });
               }}
               className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"

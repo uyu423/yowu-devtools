@@ -69,11 +69,13 @@ export const jaJP = {
     appReadyOffline: 'アプリがオフラインで使用可能になりました',
     youAreOffline: '現在オフラインです',
     newVersionAvailable: '新しいバージョンがあります',
-    newVersionDescription: '新しいバージョンのアプリが利用可能です。今すぐアップデートして最新機能をご利用ください。',
+    newVersionDescription:
+      '新しいバージョンのアプリが利用可能です。今すぐアップデートして最新機能をご利用ください。',
     updateNow: '今すぐアップデート',
     later: '後で',
     installApp: 'アプリをインストール',
-    installAppDescription: 'クイックアクセスとオフライン使用のために、このアプリをデバイスにインストールしてください。',
+    installAppDescription:
+      'クイックアクセスとオフライン使用のために、このアプリをデバイスにインストールしてください。',
     install: 'インストール',
     notNow: '後で',
   },
@@ -110,20 +112,27 @@ export const jaJP = {
   },
   homepage: {
     title: "Yowu's DevTools",
-    heroDescription: 'ローカルでデータを安全に処理したい開発者のためのプライバシー優先ツールボックスです。すべての処理はブラウザで行われ、サーバーへのデータ送信、追跡、データ収集は一切ありません。オープンソースで監査可能、JSONフォーマット、パスワード生成、ハッシュ計算、UUID作成などの一般的な開発タスクを迅速、安全、信頼性高く実行できます。',
+    heroDescription:
+      'ローカルでデータを安全に処理したい開発者のためのプライバシー優先ツールボックスです。すべての処理はブラウザで行われ、サーバーへのデータ送信、追跡、データ収集は一切ありません。オープンソースで監査可能、JSONフォーマット、パスワード生成、ハッシュ計算、UUID作成などの一般的な開発タスクを迅速、安全、信頼性高く実行できます。',
     whyItExists: 'なぜ作ったのか',
     privacyFirst: 'プライバシー優先',
-    privacyFirstDescription: 'すべてがブラウザで実行されます。サーバーへのデータ送信、追跡、分析は一切ありません。機密データはあなたのマシンに残ります。',
+    privacyFirstDescription:
+      'すべてがブラウザで実行されます。サーバーへのデータ送信、追跡、分析は一切ありません。機密データはあなたのマシンに残ります。',
     fastEfficient: '高速で効率的',
-    fastEfficientDescription: 'クイックナビゲーション用のCommand Palette、ファイルのドラッグ＆ドロップサポート、大規模データセットをブラウザがフリーズせずに処理するWeb Workers。',
+    fastEfficientDescription:
+      'クイックナビゲーション用のCommand Palette、ファイルのドラッグ＆ドロップサポート、大規模データセットをブラウザがフリーズせずに処理するWeb Workers。',
     installablePwa: 'インストール可能なPWA',
-    installablePwaDescription: 'オフラインで動作し、スタンドアロンアプリとしてインストールでき、新しいバージョンが利用可能になると自動的に更新されます。',
+    installablePwaDescription:
+      'オフラインで動作し、スタンドアロンアプリとしてインストールでき、新しいバージョンが利用可能になると自動的に更新されます。',
     openAuditable: 'オープン＆監査可能',
-    openAuditableDescription: 'すべてのコードが公開されています。各ツールが何をするか、どのようにデータを処理するかを確認できます。',
-    hostedOn: 'GitHub Pagesで静的サイトとしてホスティングされています。すべての処理はブラウザで行われます。',
+    openAuditableDescription:
+      'すべてのコードが公開されています。各ツールが何をするか、どのようにデータを処理するかを確認できます。',
+    hostedOn:
+      'GitHub Pagesで静的サイトとしてホスティングされています。すべての処理はブラウザで行われます。',
     viewOnGithub: 'GitHubで見る',
     quickNavigation: 'クイックナビゲーション',
-    quickNavigationDescription: '{cmdK}または{ctrlK}を押してCommand Paletteを開き、ツールをすばやく見つけます。',
+    quickNavigationDescription:
+      '{cmdK}または{ctrlK}を押してCommand Paletteを開き、ツールをすばやく見つけます。',
     searchByName: '名前やキーワードでツールを検索',
     navigateWithArrows: '矢印キーで移動',
     accessFavorites: 'お気に入りと最近のツールにアクセス',
@@ -156,8 +165,10 @@ export const jaJP = {
       downloadPretty: 'Prettyをダウンロード',
       downloadMinified: 'Minifiedをダウンロード',
       indentTooltip: 'JSON出力時に使用するスペース数を選択します。',
-      sortKeysTooltip: 'フォーマット前にオブジェクトのKeyをアルファベット順にソートします。',
-      treeDepthTooltip: 'ツリービューで自動的に展開されるネストレベルを制御します。',
+      sortKeysTooltip:
+        'フォーマット前にオブジェクトのKeyをアルファベット順にソートします。',
+      treeDepthTooltip:
+        'ツリービューで自動的に展開されるネストレベルを制御します。',
     },
     url: {
       title: 'URL Encode/Decode',
@@ -165,7 +176,8 @@ export const jaJP = {
       inputPlaceholder: '内容を入力または貼り付け...',
       resultPlaceholder: '結果がここに表示されます...',
       useSpacePlus: 'スペースに+を使用',
-      useSpacePlusTooltip: "HTMLフォームのようにスペースを'%20'の代わりに'+'でエンコードします。",
+      useSpacePlusTooltip:
+        "HTMLフォームのようにスペースを'%20'の代わりに'+'でエンコードします。",
       inputOutputSwap: '入力/出力を交換',
       decodingFailed: 'Decode失敗',
     },
@@ -178,7 +190,8 @@ export const jaJP = {
       base64Placeholder: 'Base64文字列を貼り付け...',
       resultPlaceholder: '結果がここに表示されます...',
       urlSafe: 'URL Safe',
-      urlSafeTooltip: 'URL安全なBase64アルファベット(-と_)を使用し、パディングを省略します。',
+      urlSafeTooltip:
+        'URL安全なBase64アルファベット(-と_)を使用し、パディングを省略します。',
       inputOutputSwap: '入力/出力を交換',
       conversionFailed: 'Base64変換失敗',
     },
@@ -217,7 +230,8 @@ export const jaJP = {
       numberOutOfRange: '数値が範囲外です。',
       epochValueInvalid: 'Epoch値が無効です。',
       isoFormatInvalid: 'ISO 8601形式が無効です。',
-      epochTooltip: 'Epoch Timestampは1970年1月1日UTC以降の秒またはミリ秒です。',
+      epochTooltip:
+        'Epoch Timestampは1970年1月1日UTC以降の秒またはミリ秒です。',
       isoTooltip: 'ISO 8601は日付と時刻表現の国際標準です。',
       msTooltip: '1970-01-01 UTC以降のミリ秒として解釈 (JavaScript Date形式)。',
       secTooltip: '1970-01-01 UTC以降の秒として解釈 (Unix timestamp形式)。',
@@ -269,7 +283,8 @@ export const jaJP = {
       items20: '20件',
       cronParsingError: 'Cronパースエラー',
       pleaseEnterCron: 'Cron式を入力してください。',
-      expectedFields: '{n}フィールドが必要ですが、{m}フィールドが入力されました。',
+      expectedFields:
+        '{n}フィールドが必要ですが、{m}フィールドが入力されました。',
       secondsTooltip: '秒カラムを含む6フィールドcron形式に切り替えます。',
       timezoneTooltip: '次の実行計算に使用するタイムゾーンを選択します。',
       nextRunsTooltip: 'プレビューする将来の実行回数を設定します。',
@@ -296,7 +311,8 @@ export const jaJP = {
       expectedMacPlaceholder: '検証する予想MACを入力...',
       enterExpectedMacPlaceholder: '検証する予想MACを入力...',
       saveKeyInShareLinks: '共有リンクにKeyを保存',
-      saveKeyWarning: '警告: 共有リンクにHMAC Keyを保存すると、機密情報が露出する可能性があります。',
+      saveKeyWarning:
+        '警告: 共有リンクにHMAC Keyを保存すると、機密情報が露出する可能性があります。',
       generateRandom: 'ランダム生成',
       generateRandomKey: 'ランダムKey生成',
       hashResult: 'Hash結果',
@@ -315,24 +331,32 @@ export const jaJP = {
       randomKeyGenerated: 'ランダムKeyが生成されました',
       failedToGenerateKey: 'ランダムKey生成失敗',
       hashCopied: 'Hashをクリップボードにコピーしました',
-      fileSharingNotSupported: 'ファイル共有はサポートされていません。テキストモードに切り替えてください。',
+      fileSharingNotSupported:
+        'ファイル共有はサポートされていません。テキストモードに切り替えてください。',
       enterTextPlaceholder: 'Hashするテキストを入力...',
       resultPlaceholder: 'Hash結果がここに表示されます...',
       note: '注',
-      securityNote: 'チェックサム検証用のみ。セキュリティ目的には適していません。',
+      securityNote:
+        'チェックサム検証用のみ。セキュリティ目的には適していません。',
       securityWarning: 'セキュリティ警告',
-      algorithmWarning: '{algorithm}は暗号学的に脆弱です。セキュリティ目的にはSHA-256またはSHA-512を使用してください。',
-      hmacKeyWarning: '警告: 共有リンクにHMAC Keyを保存すると、機密情報が露出する可能性があります。',
+      algorithmWarning:
+        '{algorithm}は暗号学的に脆弱です。セキュリティ目的にはSHA-256またはSHA-512を使用してください。',
+      hmacKeyWarning:
+        '警告: 共有リンクにHMAC Keyを保存すると、機密情報が露出する可能性があります。',
       rawText: 'Raw Text (UTF-8)',
       rawTextUtf8: 'Raw Text (UTF-8)',
       hex: 'Hex',
       base64: 'Base64',
-      modeTooltip: '通常のHashまたはHMAC (Hashベースのメッセージ認証コード) を選択します。',
-      algorithmTooltip: 'Hashアルゴリズムを選択します。ほとんどの場合、SHA-256を推奨します。',
-      outputEncodingTooltip: '出力形式を選択します。Hexは読みやすく、Base64は簡潔です。',
+      modeTooltip:
+        '通常のHashまたはHMAC (Hashベースのメッセージ認証コード) を選択します。',
+      algorithmTooltip:
+        'Hashアルゴリズムを選択します。ほとんどの場合、SHA-256を推奨します。',
+      outputEncodingTooltip:
+        '出力形式を選択します。Hexは読みやすく、Base64は簡潔です。',
       keyEncodingTooltip: 'HMAC Keyエンコーディング形式。',
       webCryptoNotSupported: 'ブラウザがWeb Crypto APIをサポートしていません。',
-      processingTimeout: '処理タイムアウト。ファイルが大きすぎる可能性があります。',
+      processingTimeout:
+        '処理タイムアウト。ファイルが大きすぎる可能性があります。',
       failedToCalculateHash: 'Hash計算失敗',
       failedToCalculateFileHash: 'ファイルHash計算失敗',
     },
@@ -345,8 +369,10 @@ export const jaJP = {
       uuidV4: 'UUID v4 (ランダム)',
       uuidV7: 'UUID v7 (Timestampベース)',
       ulid: 'ULID (短いTimestampベース)',
-      uuidV4Desc: '完全ランダムなUUID。順序が重要でないユニーク識別子に最適です。',
-      uuidV7Desc: 'Timestampベースのlーク識別子UUIDです。生成時間順に自然にソートされます。',
+      uuidV4Desc:
+        '完全ランダムなUUID。順序が重要でないユニーク識別子に最適です。',
+      uuidV7Desc:
+        'Timestampベースのlーク識別子UUIDです。生成時間順に自然にソートされます。',
       ulidDesc: '26文字の識別子。辞書順ソート可能で、UUIDより短いです。',
       lowercase: '小文字',
       uppercase: '大文字',
@@ -355,7 +381,8 @@ export const jaJP = {
       idCopied: 'IDをクリップボードにコピーしました',
       allIdsCopied: 'すべてのIDをクリップボードにコピーしました',
       copyAll: 'すべてコピー',
-      typeTooltip: 'IDタイプを選択 (UUID v4: ランダム, UUID v7: Timestampベース, ULID: 短い)。',
+      typeTooltip:
+        'IDタイプを選択 (UUID v4: ランダム, UUID v7: Timestampベース, ULID: 短い)。',
       countTooltip: '生成するIDの数 (1-100)。',
       formatTooltip: '出力形式 (小文字または大文字)。',
       countHint: '最大100個まで',
@@ -391,8 +418,10 @@ export const jaJP = {
     },
     urlParser: {
       title: 'URL Parser',
-      description: 'Protocol、Host、Path、FragmentおよびQueryパラメータを含むURLコンポーネントを分析します。',
-      inputPlaceholder: 'URLまたはQuery Stringを入力 (例: https://example.com/search?q=laptop)...',
+      description:
+        'Protocol、Host、Path、FragmentおよびQueryパラメータを含むURLコンポーネントを分析します。',
+      inputPlaceholder:
+        'URLまたはQuery Stringを入力 (例: https://example.com/search?q=laptop)...',
       urlOrQueryString: 'URLまたはQuery String',
       urlInformation: 'URL情報',
       parameters: 'パラメータ',
@@ -406,11 +435,13 @@ export const jaJP = {
       showDecodedValues: 'Decodeされた値を表示',
       showRawValues: 'Raw値を表示',
       showDecodedTooltip: 'Decodeされた (読みやすい) 値を表示します。',
-      showRawTooltip: 'Decodeされた値と一緒にRaw (エンコードされた) 値を表示します。',
+      showRawTooltip:
+        'Decodeされた値と一緒にRaw (エンコードされた) 値を表示します。',
       encoded: 'エンコード済み',
       empty: '(空)',
       parsingFailed: 'パース失敗',
-      noQueryStringFound: 'Query Stringが見つかりません。Queryパラメータを含むURLを入力してください。',
+      noQueryStringFound:
+        'Query Stringが見つかりません。Queryパラメータを含むURLを入力してください。',
       noParametersFound: 'Queryパラメータが見つかりません。',
       copiedProtocol: 'Protocolをコピーしました。',
       copiedHost: 'Hostをコピーしました。',
@@ -421,14 +452,16 @@ export const jaJP = {
     },
     regex: {
       title: 'Regex Tester',
-      description: 'マッチハイライトと置換プレビューで正規表現をテストし視覚化します',
+      description:
+        'マッチハイライトと置換プレビューで正規表現をテストし視覚化します',
       pattern: 'パターン',
       patternPlaceholder: '正規表現パターンを入力...',
       flags: 'Flags',
       testText: 'テストテキスト',
       testTextPlaceholder: 'パターンにマッチさせるテキストを入力...',
       replacementPreview: '置換プレビュー',
-      replacementPlaceholder: '置換文字列を入力 (グループは$1, $2, $<name>を使用)...',
+      replacementPlaceholder:
+        '置換文字列を入力 (グループは$1, $2, $<name>を使用)...',
       replacementResult: '置換結果',
       matches: 'マッチ',
       presets: 'プリセット',
@@ -444,20 +477,26 @@ export const jaJP = {
       lengthLabel: '長さ: {n}',
       groups: 'グループ',
       namedGroups: '名前付きグループ',
-      noMatches: 'マッチが見つかりません。パターンとテストテキストを入力してください。',
-      noMatchesFound: 'マッチが見つかりません。パターンとテストテキストを入力してください。',
+      noMatches:
+        'マッチが見つかりません。パターンとテストテキストを入力してください。',
+      noMatchesFound:
+        'マッチが見つかりません。パターンとテストテキストを入力してください。',
       appliedPreset: 'プリセットを適用: {name}',
       presetApplied: 'プリセットを適用: {name}',
       patternFeatures: 'パターン機能',
       clickToExpand: 'クリックして展開',
       note: '注',
-      securityNote: 'このツールはJavaScript RegExpエンジンを使用します。複雑なパターンに注意してください。',
-      flagsTooltip: 'g=グローバル, i=大文字小文字無視, m=複数行, s=dotAll, u=ユニコード, y=sticky',
+      securityNote:
+        'このツールはJavaScript RegExpエンジンを使用します。複雑なパターンに注意してください。',
+      flagsTooltip:
+        'g=グローバル, i=大文字小文字無視, m=複数行, s=dotAll, u=ユニコード, y=sticky',
       // Regex spec categories
       specCharacterClasses: 'Character Classes',
-      specCharacterClassesDesc: '特定の種類の文字にマッチするための定義済み文字セット',
+      specCharacterClassesDesc:
+        '特定の種類の文字にマッチするための定義済み文字セット',
       specQuantifiers: 'Quantifiers',
-      specQuantifiersDesc: '文字、グループ、または文字クラスが何回マッチするかを指定',
+      specQuantifiersDesc:
+        '文字、グループ、または文字クラスが何回マッチするかを指定',
       specAnchors: 'Anchors',
       specAnchorsDesc: '文字を消費せずに文字列内の位置を検証',
       specGroups: 'Groups',
@@ -473,22 +512,27 @@ export const jaJP = {
       patternDigitDesc: '任意の数字(0-9)にマッチします。[0-9]と同等です。',
       patternDigitExample: '\\d+は1つ以上の数字にマッチ',
       patternNonDigitName: '数字以外',
-      patternNonDigitDesc: '数字以外の任意の文字にマッチします。[^0-9]と同等です。',
+      patternNonDigitDesc:
+        '数字以外の任意の文字にマッチします。[^0-9]と同等です。',
       patternNonDigitExample: '\\D+は1つ以上の数字以外の文字にマッチ',
       patternWordCharName: 'Word Character',
-      patternWordCharDesc: '任意の単語文字（英数字とアンダースコア）にマッチします。[A-Za-z0-9_]と同等です。',
+      patternWordCharDesc:
+        '任意の単語文字（英数字とアンダースコア）にマッチします。[A-Za-z0-9_]と同等です。',
       patternWordCharExample: '\\w+は1つ以上の単語文字にマッチ',
       patternNonWordCharName: 'Non-word Character',
-      patternNonWordCharDesc: '単語文字以外の任意の文字にマッチします。[^A-Za-z0-9_]と同等です。',
+      patternNonWordCharDesc:
+        '単語文字以外の任意の文字にマッチします。[^A-Za-z0-9_]と同等です。',
       patternNonWordCharExample: '\\W+は1つ以上の非単語文字にマッチ',
       patternWhitespaceName: '空白',
-      patternWhitespaceDesc: '任意の空白文字（スペース、タブ、改行など）にマッチします。',
+      patternWhitespaceDesc:
+        '任意の空白文字（スペース、タブ、改行など）にマッチします。',
       patternWhitespaceExample: '\\s+は1つ以上の空白文字にマッチ',
       patternNonWhitespaceName: '空白以外',
       patternNonWhitespaceDesc: '空白以外の任意の文字にマッチします。',
       patternNonWhitespaceExample: '\\S+は1つ以上の非空白文字にマッチ',
       patternDotEscapedName: 'Dot（エスケープ）',
-      patternDotEscapedDesc: 'リテラルのドット文字にマッチします。エスケープなしのドット(.)は改行以外の任意の文字にマッチします。',
+      patternDotEscapedDesc:
+        'リテラルのドット文字にマッチします。エスケープなしのドット(.)は改行以外の任意の文字にマッチします。',
       patternDotEscapedExample: '\\.はリテラルのドットにマッチ',
       patternNewlineName: '改行',
       patternNewlineDesc: '改行文字にマッチします。',
@@ -507,7 +551,8 @@ export const jaJP = {
       patternOneOrMoreDesc: '前の要素が1回以上出現するものにマッチします。',
       patternOneOrMoreExample: "a+は1個以上の'a'文字にマッチ",
       patternZeroOrOneName: '0回または1回',
-      patternZeroOrOneDesc: '前の要素が0回または1回出現するものにマッチします（オプション）。',
+      patternZeroOrOneDesc:
+        '前の要素が0回または1回出現するものにマッチします（オプション）。',
       patternZeroOrOneExample: "a?は0個または1個の'a'文字にマッチ",
       patternExactlyNName: '正確にN回',
       patternExactlyNDesc: '前の要素が正確にn回出現するものにマッチします。',
@@ -519,109 +564,149 @@ export const jaJP = {
       patternBetweenNMDesc: '前の要素がn回からm回出現するものにマッチします。',
       patternBetweenNMExample: "a{3,5}は3個から5個の'a'文字にマッチ",
       patternLazyZeroOrMoreName: 'Lazy 0回以上',
-      patternLazyZeroOrMoreDesc: '*のnon-greedy（lazy）バージョン。できるだけ少ない文字にマッチします。',
+      patternLazyZeroOrMoreDesc:
+        '*のnon-greedy（lazy）バージョン。できるだけ少ない文字にマッチします。',
       patternLazyZeroOrMoreExample: "a*?は0個以上の'a'文字にマッチ（lazy）",
       patternLazyOneOrMoreName: 'Lazy 1回以上',
-      patternLazyOneOrMoreDesc: '+のnon-greedy（lazy）バージョン。できるだけ少ない文字にマッチします。',
+      patternLazyOneOrMoreDesc:
+        '+のnon-greedy（lazy）バージョン。できるだけ少ない文字にマッチします。',
       patternLazyOneOrMoreExample: "a+?は1個以上の'a'文字にマッチ（lazy）",
       patternLazyZeroOrOneName: 'Lazy 0回または1回',
       patternLazyZeroOrOneDesc: '?のnon-greedy（lazy）バージョン。',
       patternLazyZeroOrOneExample: "a??は0個または1個の'a'文字にマッチ（lazy）",
       // Pattern descriptions - Anchors
       patternStartOfStringName: '文字列の先頭',
-      patternStartOfStringDesc: "文字列の先頭にマッチします（または'm'フラグで行の先頭）。",
+      patternStartOfStringDesc:
+        "文字列の先頭にマッチします（または'm'フラグで行の先頭）。",
       patternStartOfStringExample: "^abcは文字列の先頭の'abc'にマッチ",
       patternEndOfStringName: '文字列の末尾',
-      patternEndOfStringDesc: "文字列の末尾にマッチします（または'm'フラグで行の末尾）。",
+      patternEndOfStringDesc:
+        "文字列の末尾にマッチします（または'm'フラグで行の末尾）。",
       patternEndOfStringExample: "abc$は文字列の末尾の'abc'にマッチ",
       patternWordBoundaryName: 'Word Boundary',
-      patternWordBoundaryDesc: 'Word boundary（単語文字と非単語文字の間）にマッチします。',
+      patternWordBoundaryDesc:
+        'Word boundary（単語文字と非単語文字の間）にマッチします。',
       patternWordBoundaryExample: "\\bword\\bは単語全体の'word'にマッチ",
       patternNonWordBoundaryName: 'Non-word Boundary',
       patternNonWordBoundaryDesc: 'Word boundaryではない位置にマッチします。',
-      patternNonWordBoundaryExample: "\\Bword\\Bはword boundaryではない位置の'word'にマッチ",
+      patternNonWordBoundaryExample:
+        "\\Bword\\Bはword boundaryではない位置の'word'にマッチ",
       // Pattern descriptions - Groups
       patternCapturingGroupName: 'Capturing Group',
-      patternCapturingGroupDesc: 'マッチしたテキストをグループ化してキャプチャします。$1, $2などで参照できます。',
+      patternCapturingGroupDesc:
+        'マッチしたテキストをグループ化してキャプチャします。$1, $2などで参照できます。',
       patternCapturingGroupExample: "(abc)は'abc'をgroup 1としてキャプチャ",
       patternNonCapturingGroupName: 'Non-capturing Group',
-      patternNonCapturingGroupDesc: 'キャプチャせずにグループ化します。キャプチャグループを作成せずにquantifierを適用するのに便利です。',
-      patternNonCapturingGroupExample: "(?:abc)はキャプチャせずに'abc'をグループ化",
+      patternNonCapturingGroupDesc:
+        'キャプチャせずにグループ化します。キャプチャグループを作成せずにquantifierを適用するのに便利です。',
+      patternNonCapturingGroupExample:
+        "(?:abc)はキャプチャせずに'abc'をグループ化",
       patternNamedCapturingGroupName: 'Named Capturing Group',
-      patternNamedCapturingGroupDesc: '名前で参照できる名前付きキャプチャグループを作成します。',
-      patternNamedCapturingGroupExample: "(?<name>abc)は'abc'を'name'グループとしてキャプチャ",
+      patternNamedCapturingGroupDesc:
+        '名前で参照できる名前付きキャプチャグループを作成します。',
+      patternNamedCapturingGroupExample:
+        "(?<name>abc)は'abc'を'name'グループとしてキャプチャ",
       patternPositiveLookaheadName: 'Positive Lookahead',
-      patternPositiveLookaheadDesc: '後続がパターンにマッチすることを確認しますが、文字を消費しません。',
-      patternPositiveLookaheadExample: "abc(?=def)は'def'が続く場合のみ'abc'にマッチ",
+      patternPositiveLookaheadDesc:
+        '後続がパターンにマッチすることを確認しますが、文字を消費しません。',
+      patternPositiveLookaheadExample:
+        "abc(?=def)は'def'が続く場合のみ'abc'にマッチ",
       patternNegativeLookaheadName: 'Negative Lookahead',
-      patternNegativeLookaheadDesc: '後続がパターンにマッチしないことを確認します。',
-      patternNegativeLookaheadExample: "abc(?!def)は'def'が続かない場合のみ'abc'にマッチ",
+      patternNegativeLookaheadDesc:
+        '後続がパターンにマッチしないことを確認します。',
+      patternNegativeLookaheadExample:
+        "abc(?!def)は'def'が続かない場合のみ'abc'にマッチ",
       patternPositiveLookbehindName: 'Positive Lookbehind',
-      patternPositiveLookbehindDesc: '前方がパターンにマッチすることを確認しますが、文字を消費しません。',
-      patternPositiveLookbehindExample: "(?<=abc)defは'abc'が先行する場合のみ'def'にマッチ",
+      patternPositiveLookbehindDesc:
+        '前方がパターンにマッチすることを確認しますが、文字を消費しません。',
+      patternPositiveLookbehindExample:
+        "(?<=abc)defは'abc'が先行する場合のみ'def'にマッチ",
       patternNegativeLookbehindName: 'Negative Lookbehind',
-      patternNegativeLookbehindDesc: '前方がパターンにマッチしないことを確認します。',
-      patternNegativeLookbehindExample: "(?<!abc)defは'abc'が先行しない場合のみ'def'にマッチ",
+      patternNegativeLookbehindDesc:
+        '前方がパターンにマッチしないことを確認します。',
+      patternNegativeLookbehindExample:
+        "(?<!abc)defは'abc'が先行しない場合のみ'def'にマッチ",
       patternBackreferenceName: 'Backreference',
-      patternBackreferenceDesc: '番号で以前にキャプチャしたグループを参照します。',
+      patternBackreferenceDesc:
+        '番号で以前にキャプチャしたグループを参照します。',
       patternBackreferenceExample: "(abc)\\1は'abcabc'にマッチ",
       patternNamedBackreferenceName: 'Named Backreference',
-      patternNamedBackreferenceDesc: '以前にキャプチャした名前付きグループを参照します。',
-      patternNamedBackreferenceExample: "(?<name>abc)\\k<name>は'abcabc'にマッチ",
+      patternNamedBackreferenceDesc:
+        '以前にキャプチャした名前付きグループを参照します。',
+      patternNamedBackreferenceExample:
+        "(?<name>abc)\\k<name>は'abcabc'にマッチ",
       // Pattern descriptions - Character Sets
       patternCharacterClassName: 'Character Class',
-      patternCharacterClassDesc: 'セットから任意の1文字にマッチします。先頭に^を使用すると否定になります。',
+      patternCharacterClassDesc:
+        'セットから任意の1文字にマッチします。先頭に^を使用すると否定になります。',
       patternCharacterClassExample: "[abc]は'a', 'b', または'c'にマッチ",
       patternNegatedCharacterClassName: 'Negated Character Class',
-      patternNegatedCharacterClassDesc: 'セットにない任意の文字にマッチします。',
-      patternNegatedCharacterClassExample: "[^abc]は'a', 'b', 'c'以外の任意の文字にマッチ",
+      patternNegatedCharacterClassDesc:
+        'セットにない任意の文字にマッチします。',
+      patternNegatedCharacterClassExample:
+        "[^abc]は'a', 'b', 'c'以外の任意の文字にマッチ",
       patternCharacterRangeName: 'Character Range',
       patternCharacterRangeDesc: '文字の範囲にマッチします。',
       patternCharacterRangeExample: '[a-z]は任意の小文字にマッチ',
       // Pattern descriptions - Flags
       patternGlobalFlagName: 'Global',
-      patternGlobalFlagDesc: '最初のマッチで停止せず、すべてのマッチを見つけます。',
+      patternGlobalFlagDesc:
+        '最初のマッチで停止せず、すべてのマッチを見つけます。',
       patternGlobalFlagExample: '/pattern/gはすべての出現を見つける',
       patternCaseInsensitiveFlagName: 'Case Insensitive',
       patternCaseInsensitiveFlagDesc: '大文字小文字を区別しないマッチング。',
-      patternCaseInsensitiveFlagExample: "/pattern/iは'Pattern', 'PATTERN'などにマッチ",
+      patternCaseInsensitiveFlagExample:
+        "/pattern/iは'Pattern', 'PATTERN'などにマッチ",
       patternMultilineFlagName: 'Multiline',
-      patternMultilineFlagDesc: '^と$を文字列全体ではなく各行の先頭/末尾にマッチさせます。',
-      patternMultilineFlagExample: "/^pattern$/mは任意の行の先頭で'pattern'にマッチ",
+      patternMultilineFlagDesc:
+        '^と$を文字列全体ではなく各行の先頭/末尾にマッチさせます。',
+      patternMultilineFlagExample:
+        "/^pattern$/mは任意の行の先頭で'pattern'にマッチ",
       patternDotAllFlagName: 'DotAll',
       patternDotAllFlagDesc: '.を改行文字にもマッチさせます。',
       patternDotAllFlagExample: '/pattern./sは.が改行にマッチすることを許可',
       patternUnicodeFlagName: 'Unicode',
-      patternUnicodeFlagDesc: '完全なUnicodeマッチングを有効にします。パターンをUnicodeコードポイントのシーケンスとして扱います。',
+      patternUnicodeFlagDesc:
+        '完全なUnicodeマッチングを有効にします。パターンをUnicodeコードポイントのシーケンスとして扱います。',
       patternUnicodeFlagExample: '/\\u{1F600}/uはUnicode絵文字にマッチ',
       patternStickyFlagName: 'Sticky',
-      patternStickyFlagDesc: 'lastIndexプロパティが示すインデックスからのみマッチします。',
+      patternStickyFlagDesc:
+        'lastIndexプロパティが示すインデックスからのみマッチします。',
       patternStickyFlagExample: '/pattern/yはlastIndexでのみマッチ',
       patternHasIndicesFlagName: 'HasIndices',
       patternHasIndicesFlagDesc: '部分文字列マッチのインデックスを生成します。',
-      patternHasIndicesFlagExample: '/pattern/dはマッチ結果にインデックスを含める',
+      patternHasIndicesFlagExample:
+        '/pattern/dはマッチ結果にインデックスを含める',
       patternUnicodeSetsFlagName: 'UnicodeSets',
-      patternUnicodeSetsFlagDesc: '改善されたcharacter class処理でUnicodeセットモードを有効にします。',
-      patternUnicodeSetsFlagExample: '/[\\p{Letter}]/vはUnicode文字プロパティにマッチ',
+      patternUnicodeSetsFlagDesc:
+        '改善されたcharacter class処理でUnicodeセットモードを有効にします。',
+      patternUnicodeSetsFlagExample:
+        '/[\\p{Letter}]/vはUnicode文字プロパティにマッチ',
       // Pattern descriptions - Unicode
       patternUnicodeEscapeName: 'Unicode Escape',
       patternUnicodeEscapeDesc: 'コードポイントでUnicode文字にマッチします。',
       patternUnicodeEscapeExample: "\\u0041は'A'にマッチ",
       patternUnicodeCodePointName: 'Unicode Code Point',
-      patternUnicodeCodePointDesc: "コードポイントでUnicode文字にマッチします（'u'フラグが必要）。",
+      patternUnicodeCodePointDesc:
+        "コードポイントでUnicode文字にマッチします（'u'フラグが必要）。",
       patternUnicodeCodePointExample: '\\u{1F600}は😀にマッチ',
       patternUnicodePropertyName: 'Unicode Property',
-      patternUnicodePropertyDesc: "特定のUnicodeプロパティを持つ文字にマッチします（'u'または'v'フラグが必要）。",
+      patternUnicodePropertyDesc:
+        "特定のUnicodeプロパティを持つ文字にマッチします（'u'または'v'フラグが必要）。",
       patternUnicodePropertyExample: '\\p{Letter}は任意のUnicode文字にマッチ',
       patternNegatedUnicodePropertyName: 'Negated Unicode Property',
-      patternNegatedUnicodePropertyDesc: '特定のUnicodeプロパティを持たない文字にマッチします。',
-      patternNegatedUnicodePropertyExample: '\\P{Letter}は文字以外の任意の文字にマッチ',
+      patternNegatedUnicodePropertyDesc:
+        '特定のUnicodeプロパティを持たない文字にマッチします。',
+      patternNegatedUnicodePropertyExample:
+        '\\P{Letter}は文字以外の任意の文字にマッチ',
     },
     jwtDecoder: {
       title: 'JWT Decoder',
-      description: 'JSON Web TokenをDecodeしてHeader、Payload、Signatureを確認します。',
+      description:
+        'JSON Web TokenをDecodeしてHeader、Payload、Signatureを確認します。',
       jwtToken: 'JWT Token',
-      tokenPlaceholder: 'JWT Tokenを貼り付け (例: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...)',
+      tokenPlaceholder:
+        'JWT Tokenを貼り付け (例: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...)',
       validationStatus: '検証ステータス',
       signatureVerification: 'Signature検証',
       header: 'Header',
@@ -631,7 +716,8 @@ export const jaJP = {
       verificationKeyPlaceholder: '検証Keyを入力',
       enterVerificationKey: '検証Keyを入力',
       hmacKeyPlaceholder: 'HMAC Secret Keyを入力 (HS256, HS384, HS512用)',
-      publicKeyPlaceholder: 'Public Keyを入力 (RS256/RS384/RS512/ES256/ES384/ES512用PEM形式)',
+      publicKeyPlaceholder:
+        'Public Keyを入力 (RS256/RS384/RS512/ES256/ES384/ES512用PEM形式)',
       valid: '有効',
       invalid: '無効',
       verified: '検証済み',
@@ -645,13 +731,18 @@ export const jaJP = {
       tokenIsValid: 'Tokenは有効です (期限切れではない)',
       issuedAt: '発行時刻: {time}',
       signatureValid: 'Signatureは有効です',
-      signatureVerificationFailed: 'Signature検証失敗。Tokenが改ざんされているか、Keyが間違っている可能性があります。',
+      signatureVerificationFailed:
+        'Signature検証失敗。Tokenが改ざんされているか、Keyが間違っている可能性があります。',
       enterKeyToVerify: 'Signatureを検証するには上にKeyを入力してください',
-      invalidJwtFormat: '無効なJWT形式です。ドットで区切られた3つの部分が必要です (header.payload.signature)。',
-      failedToDecodeHeader: 'JWT Header Decode失敗。無効なBase64URLエンコーディングです。',
-      failedToDecodePayload: 'JWT Payload Decode失敗。無効なBase64URLエンコーディングです。',
+      invalidJwtFormat:
+        '無効なJWT形式です。ドットで区切られた3つの部分が必要です (header.payload.signature)。',
+      failedToDecodeHeader:
+        'JWT Header Decode失敗。無効なBase64URLエンコーディングです。',
+      failedToDecodePayload:
+        'JWT Payload Decode失敗。無効なBase64URLエンコーディングです。',
       enterJwtToDecode: 'DecodeするJWT Tokenを入力してください。',
-      signatureNote: '注: Signature検証は実行されません。このツールはTokenをDecodeするだけです。',
+      signatureNote:
+        '注: Signature検証は実行されません。このツールはTokenをDecodeするだけです。',
       raw: 'Raw',
     },
     jwtEncoder: {
@@ -670,65 +761,80 @@ export const jaJP = {
       invalidJsonHeader: 'Headerに無効なJSON',
       invalidJsonPayload: 'Payloadに無効なJSON',
       secretKeyRequired: '署名にはSecret Keyが必要です',
-      unsupportedAlgorithm: 'サポートされていないアルゴリズム: {alg}。HS256、HS384、HS512、noneのみサポートされています。',
+      unsupportedAlgorithm:
+        'サポートされていないアルゴリズム: {alg}。HS256、HS384、HS512、noneのみサポートされています。',
     },
   },
   meta: {
     json: {
       title: 'JSON Viewer',
-      description: '無料オンラインJSONビューア、フォーマッタ、バリデータ。シンタックスハイライト、ツリービュー、検索、コピー機能でJSONを整形します。',
+      description:
+        '無料オンラインJSONビューア、フォーマッタ、バリデータ。シンタックスハイライト、ツリービュー、検索、コピー機能でJSONを整形します。',
     },
     url: {
       title: 'URL Encoder',
-      description: '無料オンラインURLエンコーダ・デコーダ。特殊文字やユニコードをサポートしてURL文字列をエンコード・デコードします。',
+      description:
+        '無料オンラインURLエンコーダ・デコーダ。特殊文字やユニコードをサポートしてURL文字列をエンコード・デコードします。',
     },
     base64: {
       title: 'Base64 Converter',
-      description: '無料オンラインBase64エンコーダ・デコーダ。URL安全なバリアントをサポートしてテキストをBase64に変換・復元します。',
+      description:
+        '無料オンラインBase64エンコーダ・デコーダ。URL安全なバリアントをサポートしてテキストをBase64に変換・復元します。',
     },
     time: {
       title: 'Time Converter',
-      description: '無料オンラインEpoch Timestamp変換器。タイムゾーンサポート付きでUnix TimestampとISO 8601日付を変換します。',
+      description:
+        '無料オンラインEpoch Timestamp変換器。タイムゾーンサポート付きでUnix TimestampとISO 8601日付を変換します。',
     },
     yaml: {
       title: 'YAML Converter',
-      description: '無料オンラインYAML-JSON変換器。シンタックス検証付きでYAMLとJSON形式を変換します。',
+      description:
+        '無料オンラインYAML-JSON変換器。シンタックス検証付きでYAMLとJSON形式を変換します。',
     },
     diff: {
       title: 'Text Diff',
-      description: '無料オンラインテキストDiffツール。2つのテキストブロックを比較し、分割または統合ビューで差異を視覚化します。',
+      description:
+        '無料オンラインテキストDiffツール。2つのテキストブロックを比較し、分割または統合ビューで差異を視覚化します。',
     },
     cron: {
       title: 'Cron Parser',
-      description: '無料オンラインCron式パーサ。Cronスケジュールを説明し、次の実行時間をプレビューします。',
+      description:
+        '無料オンラインCron式パーサ。Cronスケジュールを説明し、次の実行時間をプレビューします。',
     },
     hash: {
       title: 'Hash Generator',
-      description: '無料オンラインHash生成器。MD5、SHA-1、SHA-256、SHA-512 HashとHMAC署名を計算します。',
+      description:
+        '無料オンラインHash生成器。MD5、SHA-1、SHA-256、SHA-512 HashとHMAC署名を計算します。',
     },
     uuid: {
       title: 'UUID Generator',
-      description: '無料オンラインUUIDおよびULID生成器。UUID v4、UUID v7、ULID識別子を生成します。',
+      description:
+        '無料オンラインUUIDおよびULID生成器。UUID v4、UUID v7、ULID識別子を生成します。',
     },
     password: {
       title: 'Password Generator',
-      description: '無料オンラインパスワード生成器。カスタマイズ可能な長さと文字オプションで安全なパスワードを作成します。',
+      description:
+        '無料オンラインパスワード生成器。カスタマイズ可能な長さと文字オプションで安全なパスワードを作成します。',
     },
     urlParser: {
       title: 'URL Parser',
-      description: '無料オンラインURLパーサ。Protocol、Host、Path、QueryパラメータなどURLコンポーネントを分析します。',
+      description:
+        '無料オンラインURLパーサ。Protocol、Host、Path、QueryパラメータなどURLコンポーネントを分析します。',
     },
     regex: {
       title: 'Regex Tester',
-      description: '無料オンライン正規表現テスター。マッチハイライト付きで正規表現をテストし視覚化します。',
+      description:
+        '無料オンライン正規表現テスター。マッチハイライト付きで正規表現をテストし視覚化します。',
     },
     jwtDecoder: {
       title: 'JWT Decoder',
-      description: '無料オンラインJWTデコーダ。Signature検証付きでJSON Web Tokenをデコード・検査します。',
+      description:
+        '無料オンラインJWTデコーダ。Signature検証付きでJSON Web Tokenをデコード・検査します。',
     },
     jwtEncoder: {
       title: 'JWT Encoder',
-      description: '無料オンラインJWTエンコーダ。カスタムHeaderとPayloadでJSON Web Tokenを作成します。',
+      description:
+        '無料オンラインJWTエンコーダ。カスタムHeaderとPayloadでJSON Web Tokenを作成します。',
     },
   },
 } as const satisfies I18nResource;
