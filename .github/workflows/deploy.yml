@@ -46,6 +46,8 @@ jobs:
         run: pnpm run lint
 
       - name: Build project
+        env:
+          VITE_EXTENSION_ID: ${{ secrets.VITE_EXTENSION_ID }}
         run: pnpm run build:web
 
       - name: Verify build output
