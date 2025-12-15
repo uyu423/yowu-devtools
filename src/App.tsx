@@ -14,35 +14,6 @@ import { usePWA } from '@/hooks/usePWA';
 import { useRecentTools } from '@/hooks/useRecentTools';
 import { useResolvedTheme } from '@/hooks/useThemeHooks';
 
-// Pre-compute static route definitions outside of component
-// This avoids recreating these arrays on every render
-interface RouteDefinition {
-  key: string;
-  path: string;
-  element: React.ReactNode;
-}
-
-const localeHomeRoutes: RouteDefinition[] = SUPPORTED_LOCALES.map((locale) => ({
-  key: locale.code,
-  path: `/${locale.code}`,
-  element: <HomePage />,
-}));
-
-const toolRoutes: RouteDefinition[] = tools.map((tool) => ({
-  key: tool.id,
-  path: tool.path,
-  element: <tool.Component />,
-}));
-
-const localizedToolRoutes: RouteDefinition[] = SUPPORTED_LOCALES.flatMap(
-  (locale) =>
-    tools.map((tool) => ({
-      key: `${locale.code}-${tool.id}`,
-      path: `/${locale.code}${tool.path}`,
-      element: <tool.Component />,
-    }))
-);
-
 // Home page component (reusable for both / and /{locale}/)
 function HomePage() {
   const { locale, t } = useI18n();
@@ -228,19 +199,29 @@ function AppContent() {
       <Route path="/" element={<HomePage />} />
 
       {/* Locale-prefixed home page routes */}
-      {localeHomeRoutes.map((route) => (
-        <Route key={route.key} path={route.path} element={route.element} />
+      {SUPPORTED_LOCALES.map((locale) => (
+        <Route
+          key={locale.code}
+          path={`/${locale.code}`}
+          element={<HomePage />}
+        />
       ))}
 
       {/* Tool routes (without locale prefix - en-US, backward compatibility) */}
-      {toolRoutes.map((route) => (
-        <Route key={route.key} path={route.path} element={route.element} />
+      {tools.map((tool) => (
+        <Route key={tool.id} path={tool.path} element={<tool.Component />} />
       ))}
 
       {/* Locale-prefixed tool routes */}
-      {localizedToolRoutes.map((route) => (
-        <Route key={route.key} path={route.path} element={route.element} />
-      ))}
+      {SUPPORTED_LOCALES.flatMap((locale) =>
+        tools.map((tool) => (
+          <Route
+            key={`${locale.code}-${tool.id}`}
+            path={`/${locale.code}${tool.path}`}
+            element={<tool.Component />}
+          />
+        ))
+      )}
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

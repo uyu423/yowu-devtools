@@ -41,8 +41,12 @@ export function useLocalStorage<T>(
   // to avoid infinite loops when syncing
   const isLocalUpdate = useRef(false);
 
-  // Read from localStorage on mount
-  const readFromStorage = useCallback((): T => {
+  // Store initialValue in ref to maintain stable reference
+  // This prevents infinite loops when initialValue is an object/array
+  const initialValueRef = useRef(initialValue);
+
+  // Initialize state with a function to read from localStorage
+  const [storedValue, setStoredValue] = useState<T>(() => {
     if (typeof window === 'undefined') return initialValue;
 
     try {
@@ -55,35 +59,51 @@ export function useLocalStorage<T>(
       console.error(`Failed to parse localStorage key "${key}"`);
       return initialValue;
     }
-  }, [key, initialValue]);
+  });
 
-  const [storedValue, setStoredValue] = useState<T>(readFromStorage);
+  // Read from localStorage (for event handlers)
+  const readFromStorage = useCallback((): T => {
+    if (typeof window === 'undefined') return initialValueRef.current;
+
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw === null) return initialValueRef.current;
+
+      const parsed = JSON.parse(raw) as T;
+      return parsed;
+    } catch {
+      console.error(`Failed to parse localStorage key "${key}"`);
+      return initialValueRef.current;
+    }
+  }, [key]);
 
   // Write to localStorage
   const setValue = useCallback(
     (value: T | ((prev: T) => T)) => {
       try {
-        // Allow value to be a function for same API as useState
-        const valueToStore =
-          value instanceof Function ? value(storedValue) : value;
-
         // Mark as local update
         isLocalUpdate.current = true;
 
-        // Save to state
-        setStoredValue(valueToStore);
+        // Use functional update to avoid stale closure and dependency on storedValue
+        setStoredValue((prevValue) => {
+          // Allow value to be a function for same API as useState
+          const valueToStore =
+            value instanceof Function ? value(prevValue) : value;
 
-        // Save to localStorage
-        if (typeof window !== 'undefined') {
-          localStorage.setItem(key, JSON.stringify(valueToStore));
+          // Save to localStorage
+          if (typeof window !== 'undefined') {
+            localStorage.setItem(key, JSON.stringify(valueToStore));
 
-          // Dispatch custom event for same-tab synchronization
-          if (syncEventName) {
-            window.dispatchEvent(
-              new CustomEvent(syncEventName, { detail: valueToStore })
-            );
+            // Dispatch custom event for same-tab synchronization
+            if (syncEventName) {
+              window.dispatchEvent(
+                new CustomEvent(syncEventName, { detail: valueToStore })
+              );
+            }
           }
-        }
+
+          return valueToStore;
+        });
 
         // Reset flag after a small delay
         setTimeout(() => {
@@ -93,25 +113,25 @@ export function useLocalStorage<T>(
         console.error(`Failed to save to localStorage key "${key}":`, error);
       }
     },
-    [key, storedValue, syncEventName]
+    [key, syncEventName]
   );
 
   // Remove from localStorage
   const removeValue = useCallback(() => {
     try {
-      setStoredValue(initialValue);
+      setStoredValue(initialValueRef.current);
       if (typeof window !== 'undefined') {
         localStorage.removeItem(key);
         if (syncEventName) {
           window.dispatchEvent(
-            new CustomEvent(syncEventName, { detail: initialValue })
+            new CustomEvent(syncEventName, { detail: initialValueRef.current })
           );
         }
       }
     } catch (error) {
       console.error(`Failed to remove localStorage key "${key}":`, error);
     }
-  }, [key, initialValue, syncEventName]);
+  }, [key, syncEventName]);
 
   // Listen for changes from other tabs (storage event)
   // and from other components in the same tab (custom event)
