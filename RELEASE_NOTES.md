@@ -1,5 +1,57 @@
 # Release Notes
 
+## v1.3.0 (January 2025) - i18n Internationalization
+
+**New Features:**
+
+- ✨ **Multi-language Support**: Full internationalization support
+  - Supported languages: English (en-US), Korean (ko-KR), Japanese (ja-JP), Chinese (zh-CN), Spanish (es-ES)
+  - Language selection UI in header/sidebar
+  - Automatic language detection: URL → localStorage → browser language → en-US fallback
+  - Language-specific URLs: `/{locale}/{tool}` (e.g., `/ko-KR/json`)
+  - All UI strings referenced from i18n resources (no hardcoded strings)
+
+**Enhancements:**
+
+- 🌐 **i18n Infrastructure**:
+  - i18n resource files: `src/i18n/{locale}.ts`
+  - Namespace structure: `common.*`, `sidebar.*`, `tool.{slug}.*`, `meta.{slug}.*`
+  - Translation key validation (build-time and runtime)
+  - Missing key fallback to en-US
+  - Type-safe translation keys (TypeScript)
+
+- 🔗 **URL/Routing**:
+  - Language prefix in URLs: `/{locale}/{tool}`
+  - Maintain current tool when changing language
+  - Preserve URL fragments (share payload) when changing language
+  - Language-specific HTML files generated at build time (SSG)
+
+- 🏗️ **Build System**:
+  - Generate language-specific HTML files for each tool
+  - Language-specific meta tags (title, description, Open Graph, Twitter Card)
+  - Extended sitemap.xml with language-specific URLs
+  - `hreflang` tags for search engine language relationships
+
+- 💾 **Storage**:
+  - Language preference saved to localStorage (`yowu.devtools.locale`)
+  - Restore language preference on app reload
+  - Language selection persists across sessions
+
+**Improvements:**
+
+- 🌍 Better accessibility for international users
+- 🔍 Improved SEO with language-specific pages
+- 📱 Consistent UI experience across all languages
+- 🎨 Language selector UI in header/sidebar
+
+**Technical:**
+
+- i18n library integration (or custom implementation)
+- Extended `vite-plugin-generate-routes.ts` for language-specific HTML generation
+- React Context-based i18n state management
+- Translation key validation scripts
+- Build-time translation key checking
+
 ## v1.2.1 (December 2025) - Regex & Hash Enhancement
 
 **New Features:**

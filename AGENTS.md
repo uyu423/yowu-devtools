@@ -59,6 +59,8 @@ npm run build
 Use TypeScript + JSX with 2-space indentation and functional components. Components follow PascalCase (`JsonTool.tsx`), hooks kebab-case (`use-tool-state.ts`), and utility files lowercase. Favor hooks for state, `clsx`/`tailwind-merge` for conditional classes, and Tailwind utility classes for layout.
 
 ### Language Guidelines
+
+#### v1.3.0 이전 (현재)
 **All client-side text must be written in English only.** This includes:
 - User-facing UI text (buttons, labels, tooltips, error messages)
 - Footer content
@@ -68,6 +70,23 @@ Use TypeScript + JSX with 2-space indentation and functional components. Compone
 - Any text visible to end users
 
 **Rationale**: This is a global developer tool accessible to international users. English ensures consistency and broad accessibility. Code comments, documentation files (like this one), and internal developer notes may use other languages as needed, but all user-visible content must be in English.
+
+#### v1.3.0 이후 (i18n 적용)
+**All client-side text must be referenced from i18n resources only.** This includes:
+- **하드코딩된 문자열 리터럴 금지**
+- 모든 UI 텍스트는 `t('namespace.key')` 또는 `I18N.namespace.key` 형태로 참조
+- 새 UI 요소 추가 시: **모든 로케일 파일에 키를 동시에 추가**
+- 번역이 확정되지 않은 언어는 임시로 en-US 값을 복사해도 되지만, TODO 태그로 추적
+- 번역 키는 안정적인 식별자로 작성 (문장 자체를 키로 쓰지 않음)
+
+**지원 언어**: en-US(기본), ko-KR, ja-JP, zh-CN, es-ES
+
+**i18n 리소스 구조**:
+- `src/i18n/{locale}.ts` 파일에 각 언어별 번역 정의
+- 네임스페이스: `common.*`, `sidebar.*`, `tool.{slug}.*`, `meta.{slug}.*`
+- `en-US.ts`를 소스 오브 트루스로 사용
+
+자세한 내용은 `SAS.md`의 "5. i18n(국제화) 규격" 섹션을 참조하세요.
 
 ## Testing Guidelines
 There are no automated tests yet; when adding them, colocate specs inside `src/<feature>/__tests__/` and name files `*.test.ts(x)`. Prefer Vitest + React Testing Library for component coverage, and mock expensive editor/diff interactions. Always document new manual verification steps in PRs until suites exist.
@@ -669,6 +688,217 @@ if (shouldUseWorker(input)) {
 - `docs/TEST_ISSUES_v1.1.0.md`: v1.1.0 테스트 이슈
 
 **참고**: 핵심 개발 문서(`SAS.md`, `IMPLEMENTATION_PLAN.md`, `RELEASE_NOTES.md`, `TEST_CHECKLIST.md`)는 root에 두고, 나머지 기타 자질구레한 문서들(크로스 체크 결과, 트러블슈팅 가이드, 테스트 결과 등)은 `docs/` 하위에 생성하세요.
+
+## i18n(국제화) 개발 가이드 (v1.3.0)
+
+### i18n 리소스 파일 구조
+
+**디렉토리 구조**:
+```
+src/
+  i18n/
+    en-US.ts    # 소스 오브 트루스 (기본 언어)
+    ko-KR.ts    # 한국어
+    ja-JP.ts    # 일본어
+    zh-CN.ts    # 중국어
+    es-ES.ts    # 스페인어
+```
+
+**리소스 파일 예시** (`en-US.ts`):
+```typescript
+export const enUS = {
+  common: {
+    copy: 'Copy',
+    paste: 'Paste',
+    clear: 'Clear',
+    reset: 'Reset',
+    share: 'Share',
+    error: 'Error',
+    loading: 'Loading',
+  },
+  sidebar: {
+    favorites: 'Favorites',
+    recentTools: 'Recent Tools',
+    allTools: 'All Tools',
+  },
+  tool: {
+    json: {
+      title: 'JSON Viewer',
+      description: 'Pretty print and traverse JSON',
+      placeholder: 'Paste JSON here...',
+      // ...
+    },
+    // ...
+  },
+  meta: {
+    json: {
+      title: 'JSON Viewer - tools.yowu.dev',
+      description: 'Free online JSON viewer, formatter, and validator...',
+    },
+    // ...
+  },
+} as const;
+```
+
+### 번역 키 네임스페이스 규칙
+
+1. **공통 문자열**: `common.*`
+   - Copy, Paste, Clear, Reset, Share, Error, Loading 등
+   - 모든 도구에서 공통으로 사용되는 문자열
+
+2. **사이드바**: `sidebar.*`
+   - Favorites, Recent Tools, All Tools 등
+   - 사이드바 전용 문자열
+
+3. **도구별**: `tool.{slug}.*`
+   - 각 도구의 제목, 설명, placeholder, validation 메시지 등
+   - 예: `tool.json.title`, `tool.json.description`, `tool.json.placeholder`
+
+4. **SEO 메타**: `meta.{slug}.*`
+   - 각 도구의 SEO 메타 정보 (title, description)
+   - 빌드 시 사용
+
+### UI에서 i18n 사용 방법
+
+**훅 사용 예시**:
+```typescript
+import { useI18n } from '@/hooks/useI18n';
+
+const MyComponent = () => {
+  const { t } = useI18n();
+  
+  return (
+    <button>{t('common.copy')}</button>
+  );
+};
+```
+
+**또는 상수 참조 방식**:
+```typescript
+import { I18N } from '@/i18n';
+
+const MyComponent = () => {
+  const locale = useLocale(); // 현재 로케일
+  
+  return (
+    <button>{I18N[locale].common.copy}</button>
+  );
+};
+```
+
+### 새 UI 요소 추가 시 체크리스트
+
+1. **번역 키 추가**:
+   - [ ] `src/i18n/en-US.ts`에 새 키 추가 (소스 오브 트루스)
+   - [ ] `src/i18n/ko-KR.ts`에 번역 추가
+   - [ ] `src/i18n/ja-JP.ts`에 번역 추가
+   - [ ] `src/i18n/zh-CN.ts`에 번역 추가
+   - [ ] `src/i18n/es-ES.ts`에 번역 추가
+   - [ ] 번역이 확정되지 않은 언어는 임시로 en-US 값 복사 + TODO 태그
+
+2. **코드에서 사용**:
+   - [ ] 하드코딩된 문자열을 i18n 키로 교체
+   - [ ] `t('namespace.key')` 또는 `I18N[locale].namespace.key` 형태로 참조
+
+3. **검증**:
+   - [ ] 빌드 시 번역 키 누락 검증 (자동화 권장)
+   - [ ] 개발 모드에서 누락 키 경고 표시
+
+### 언어 선택 UI 구현
+
+**언어 선택 컴포넌트 예시**:
+```typescript
+import { useI18n } from '@/hooks/useI18n';
+import { SUPPORTED_LOCALES } from '@/lib/constants';
+
+const LanguageSelector = () => {
+  const { locale, setLocale } = useI18n();
+  
+  return (
+    <select value={locale} onChange={(e) => setLocale(e.target.value)}>
+      {SUPPORTED_LOCALES.map((loc) => (
+        <option key={loc.code} value={loc.code}>
+          {loc.nativeName}
+        </option>
+      ))}
+    </select>
+  );
+};
+```
+
+**언어 변경 시 라우팅**:
+- 현재 tool slug 유지
+- locale prefix만 변경 (`/{locale}/{tool}`)
+- URL fragment(공유 payload) 보존
+
+### 빌드 시 언어별 HTML 생성
+
+**vite-plugin-generate-routes.ts 확장**:
+- `SUPPORTED_LOCALES` 배열 순회
+- 각 `(locale, tool)` 조합에 대해 HTML 파일 생성
+- 각 HTML에 `<html lang="{locale}">` 설정
+- 각 HTML에 해당 로케일의 메타 태그 주입
+
+**생성되는 파일 구조**:
+```
+dist/
+  json/
+    index.html          # en-US (기본)
+  ko-KR/
+    json/
+      index.html        # ko-KR
+  ja-JP/
+    json/
+      index.html        # ja-JP
+  # ...
+```
+
+### 번역 키 검증
+
+**빌드/테스트 단계에서 검증**:
+- 모든 로케일 파일의 키 일치 여부 확인
+- 누락된 키가 있을 경우 경고 또는 빌드 실패
+- 개발 모드에서 누락 키 경고 표시
+
+**검증 스크립트 예시**:
+```typescript
+// scripts/validate-i18n.ts
+import { enUS } from '../src/i18n/en-US';
+import { koKR } from '../src/i18n/ko-KR';
+// ...
+
+function validateKeys(source: any, target: any, path: string = '') {
+  // 재귀적으로 키 일치 여부 확인
+  // 누락된 키 발견 시 에러 또는 경고
+}
+```
+
+### SEO 최적화 (언어별)
+
+**sitemap.xml 확장**:
+- 언어별 URL을 모두 포함
+- `hreflang` 태그 추가 (검색 엔진에 언어 관계 알림)
+
+**예시**:
+```xml
+<url>
+  <loc>https://tools.yowu.dev/json</loc>
+  <xhtml:link rel="alternate" hreflang="en" href="https://tools.yowu.dev/json"/>
+  <xhtml:link rel="alternate" hreflang="ko" href="https://tools.yowu.dev/ko-KR/json"/>
+  <!-- ... -->
+</url>
+```
+
+### 주의사항
+
+- **하드코딩 금지**: 모든 UI 문자열은 i18n 리소스에서 참조
+- **키 안정성**: 번역 키는 안정적인 식별자로 작성 (문장 자체를 키로 쓰지 않음)
+- **번역 품질**: en-US를 기준으로 모든 키 작성, 다른 언어는 번역 품질 확인
+- **빌드 검증**: 빌드 시 번역 키 누락 검증 필수
+- **성능**: i18n 리소스는 빌드 시 번들에 포함되므로 크기 고려
+- **타입 안전성**: TypeScript 타입 정의로 번역 키 타입 안전성 보장
+
+자세한 내용은 `SAS.md`의 "5. i18n(국제화) 규격" 섹션을 참조하세요.
 
 ### 주의사항
 

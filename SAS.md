@@ -175,6 +175,118 @@
 
 ---
 
+## 5. i18n(국제화) 규격 (v1.3.0)
+
+### 5.0 목표
+
+- 기존 영어(en-US)만 제공하던 UI를 **한국어/일본어/중국어/스페인어**까지 확대
+- 모든 사용자 노출 문자열을 **하드코딩 금지**하고 i18n 리소스에서만 참조
+- 빌드 산출물에 **언어별 경로(prefix) + 툴별 경로**를 정적으로 생성하여 GitHub Pages에서 서버 없이 동작
+
+### 5.0.1 지원 언어/로케일
+
+- 기본(디폴트): `en-US`
+- 추가: `ko-KR`, `ja-JP`, `zh-CN`, `es-ES`
+- **지원 로케일 리스트는 단일 상수(`SUPPORTED_LOCALES`)로 관리** (라우팅/드롭다운/빌드 모두 이 값을 참조)
+
+### 5.0.2 URL/라우팅 규칙
+
+#### 경로 규칙(정적 파일 산출물)
+
+- 영어(기본): `/{tool}/index.html`
+  - 예: `/json/index.html`
+- 한국어: `/{locale}/{tool}/index.html`
+  - 예: `/ko-KR/json/index.html`
+- 기타: `/{locale}/{tool}/index.html`
+
+#### 런타임 라우팅 규칙
+
+- 앱 라우트는 "(locale prefix) + (tool slug)" 구조를 지원
+- **우선순위(중요)**:
+  1. URL에 locale prefix가 있으면 그 값을 최우선 사용
+  2. 없으면 localStorage의 `yowu.devtools.locale` 사용
+  3. 없으면 `navigator.language`(가능하면 best match)
+  4. 최종 fallback은 `en-US`
+
+> 기존이 BrowserRouter 기반이므로(해시 라우팅 X) 위 구조를 **라우트 생성/프리렌더 단계**에서 함께 확장하는 전략을 사용합니다.
+
+### 5.0.3 i18n 리소스(문자열) 구조
+
+#### 디렉토리/파일
+
+- `src/i18n/`
+  - `en-US.ts` (또는 `.json`)
+  - `ko-KR.ts`
+  - `ja-JP.ts`
+  - `zh-CN.ts`
+  - `es-ES.ts`
+
+#### 키 정책
+
+- 키는 **안정적인 식별자**로 작성 (문장 자체를 키로 쓰지 않음)
+- 권장 네임스페이스 예시:
+  - `common.*` (Copy, Paste, Clear, Error 등)
+  - `sidebar.*` (Favorites, Recent 등)
+  - `tool.{slug}.*` (각 도구별 제목/설명/placeholder/validation 메시지)
+  - `meta.{slug}.title`, `meta.{slug}.description` (SEO 메타)
+
+#### 타입/정합성(강력 권장)
+
+- `en-US`를 **소스 오브 트루스**로 두고,
+- 빌드/테스트 단계에서 **다른 로케일 파일이 동일 키를 모두 보유**하는지 검증(누락/오타 방지)
+- 누락 키는 런타임에서 `en-US`로 fallback (또는 개발 환경에서 경고)
+
+### 5.0.4 프론트엔드 사용 방식(필수)
+
+- UI에서 문자열을 노출할 때:
+  - **직접 문자열 리터럴 금지**
+  - `t('common.copy')` 또는 `I18N.common.copy` 형태의 단일 진입점만 허용
+- "AI Agent 작업 규칙":
+  - 새 UI 요소 추가 시: **모든 로케일 파일에 키를 동시에 추가**하고, 기본값은 en-US 기준으로 먼저 채움
+  - 번역이 확정되지 않은 언어는 임시로 en-US 값을 복사해도 되지만(빌드 실패 방지), TODO 태그로 추적
+
+### 5.0.5 언어 선택 UI/UX
+
+- 위치: 헤더 또는 설정(테마 토글 근처 권장)
+- 동작:
+  - 선택 즉시 **현재 보고 있는 tool slug 유지한 채 locale prefix만 변경**하여 이동
+  - URL fragment(공유 payload)가 존재하면 **그대로 유지** (예: `#/...`가 아니라면 `location.hash` 보존)
+- 저장:
+  - localStorage key: `yowu.devtools.locale`
+  - 값: `en-US | ko-KR | ja-JP | zh-CN | es-ES`
+
+### 5.0.6 빌드/프리렌더(SSG) 요구사항
+
+현재도 "툴별 HTML 생성"을 하고 있으므로, 이를 아래처럼 확장:
+
+- 입력: `SUPPORTED_LOCALES × TOOL_ROUTES`
+- 출력: 각 `(locale, tool)` 조합에 대해 정적 HTML 파일 생성
+- 각 HTML에는 다음이 포함되어야 함:
+  - `<html lang="ko-KR">` 등 locale에 맞는 lang 설정
+  - 해당 locale의 meta title/description(OpenGraph/Twitter 포함) 적용(현재 SEO 구조 유지)
+  - 초기 부팅 시 사용할 기본 locale 정보를 주입(예: 전역 변수/데이터 속성 등)
+
+> 프리렌더는 "서버 없이 정적 호스팅 + 성능 이점"이 핵심이라, GitHub Pages 운영 철학과도 일치합니다.
+
+### 5.0.7 PWA/manifest 관련(선택 + 권장)
+
+- manifest에 `lang`를 명시하는 것은 표준적으로 가능
+- 다만 manifest 멤버 자체도 브라우저 호환성이 제각각일 수 있으니, v1.3.0에서는 우선:
+  - manifest는 기존처럼 유지(영문 중심)
+  - UI 언어는 앱 내부 i18n으로 처리
+  - (추가 고도화) locale별 `/ko-KR/manifest.webmanifest`를 생성해 `<link rel="manifest">`를 locale별 HTML에서 다르게 주는 방식 고려
+
+### 5.0.8 테스트/검수(Definition of Done)
+
+- [ ] 모든 툴 페이지에서 사용자 노출 문자열이 i18n을 통해서만 렌더링됨
+- [ ] locale 변경 시 동일 tool 유지 + 입력 데이터/공유 hash 유지
+- [ ] localStorage에 저장된 locale로 재진입 시 올바른 prefix로 랜딩
+- [ ] 빌드 결과물에 `/ko-KR/...`, `/ja-JP/...` 등 디렉토리 및 각 tool의 `index.html`이 생성됨
+- [ ] sitemap/robots가 **언어별 URL까지 포함**하도록 확장(현재 자동 생성 구조 유지)
+- [ ] 누락 번역 키가 있을 경우: (선택) CI에서 실패 또는 개발 모드에서 명확한 경고
+
+---
+
 ## 5. 공통 동작 규격 (모든 툴 공통)
 
 ### 5.1 툴 페이지 공통 UI 컴포넌트
@@ -265,15 +377,15 @@
 
 - **도구별 필터링 전략**:
 
-  | 도구 | 포함 필드 | 제외 필드 | 이유 |
-  |------|----------|----------|------|
-  | JSON | `input`, `indent`, `sortKeys`, `viewMode`, `expandLevel` | `search` | 검색어는 UI 전용 상태 |
-  | YAML | `source`, `direction`, `indent` | 없음 | 모든 필드가 공유에 필요 |
-  | Diff | `left`, `right`, `view`, `ignoreWhitespace`, `ignoreCase` | 없음 | 모든 필드가 공유에 필요 |
-  | Base64 | `input`, `mode`, `urlSafe` | 없음 | 모든 필드가 공유에 필요 |
-  | URL | `input`, `mode`, `plusForSpace` | 없음 | 모든 필드가 공유에 필요 |
-  | Time | `epochInput`, `epochUnit`, `isoInput`, `timezone` | 없음 | 모든 필드가 공유에 필요 (작은 데이터) |
-  | Cron | `expression`, `hasSeconds`, `timezone`, `nextCount` | 없음 | 모든 필드가 공유에 필요 (작은 데이터) |
+  | 도구   | 포함 필드                                                 | 제외 필드 | 이유                                  |
+  | ------ | --------------------------------------------------------- | --------- | ------------------------------------- |
+  | JSON   | `input`, `indent`, `sortKeys`, `viewMode`, `expandLevel`  | `search`  | 검색어는 UI 전용 상태                 |
+  | YAML   | `source`, `direction`, `indent`                           | 없음      | 모든 필드가 공유에 필요               |
+  | Diff   | `left`, `right`, `view`, `ignoreWhitespace`, `ignoreCase` | 없음      | 모든 필드가 공유에 필요               |
+  | Base64 | `input`, `mode`, `urlSafe`                                | 없음      | 모든 필드가 공유에 필요               |
+  | URL    | `input`, `mode`, `plusForSpace`                           | 없음      | 모든 필드가 공유에 필요               |
+  | Time   | `epochInput`, `epochUnit`, `isoInput`, `timezone`         | 없음      | 모든 필드가 공유에 필요 (작은 데이터) |
+  | Cron   | `expression`, `hasSeconds`, `timezone`, `nextCount`       | 없음      | 모든 필드가 공유에 필요 (작은 데이터) |
 
 - **구현 예시**:
 
@@ -315,7 +427,8 @@ const { state, shareState } = useToolState<YamlToolState>(
   - 공유 링크를 새 탭에서 열어 상태가 정확히 복원되는지 확인
   - 필터링된 필드가 제외되었는지 확인 (예: JSON의 `search` 필드)
 
-> **중요**: 
+> **중요**:
+>
 > - URL 길이 제한이 브라우저/메신저마다 다르므로, v1부터 `lz-string` 기반 "압축 공유"를 기본으로 사용
 > - 필터링은 선택적이지만, URL 길이 최적화를 위해 권장됨
 > - 신규 도구 추가 시 필터링 필요성을 평가하고, UI 전용 상태는 반드시 제외
@@ -469,7 +582,8 @@ self.addEventListener('fetch', (event) => {
 // src/main.tsx 또는 App.tsx
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
+    navigator.serviceWorker
+      .register('/sw.js')
       .then((registration) => {
         console.log('SW registered:', registration);
       })
@@ -864,6 +978,7 @@ type HashToolState = {
 #### 기능
 
 **Hash 모드**:
+
 - FR-H-01: 텍스트 입력의 해시값 계산 (WebCrypto API 사용)
 - FR-H-02: 파일 입력의 해시값 계산 (`file.arrayBuffer()` 또는 `FileReader.readAsArrayBuffer`)
 - FR-H-03: 알고리즘 지원 (SHA-256, SHA-512)
@@ -872,6 +987,7 @@ type HashToolState = {
 - FR-H-06: 처리 상태 표시 (로딩 스피너, 큰 파일 진행률)
 
 **HMAC 모드**:
+
 - FR-H-07: HMAC-SHA-256, HMAC-SHA-512 지원
 - FR-H-08: 키 인코딩 옵션 (raw-text, hex, base64)
 - FR-H-09: 랜덤 키 생성 버튼 (WebCrypto `generateKey` 또는 안전한 랜덤 바이트)
@@ -879,11 +995,13 @@ type HashToolState = {
 - FR-H-11: 텍스트/파일 모두 HMAC 지원
 
 **보안 및 프라이버시**:
+
 - FR-H-12: **HMAC 키는 기본적으로 공유 링크/로컬스토리지에 저장하지 않음**
   - 사용자가 명시적으로 "키 저장"을 켠 경우에만 저장 (강한 경고 문구)
 - FR-H-13: **주의**: "보안용이 아님" 안내 메시지 표시
 
 **에러 처리**:
+
 - FR-H-14: 잘못된 키 인코딩(예: hex 길이 홀수) → 사용자 친화 에러
 - FR-H-15: WebCrypto 미지원 환경 → "브라우저가 Web Crypto를 지원하지 않습니다" 안내
 - FR-H-16: 파일 읽기 실패/권한 문제 → 에러 배너
@@ -962,10 +1080,11 @@ type PasswordToolState = {
 
 - **엔트로피 공식**: `log2(문자 집합 크기 ^ 길이)`
 - **문자 집합 크기**: 선택된 문자 유형의 총 개수
+
   - 대문자: 26개 (A-Z)
   - 소문자: 26개 (a-z)
   - 숫자: 10개 (0-9)
-  - 특수문자: 32개 (!@#$%^&*()_+-=[]{}|;:,.<>?/~`)
+  - 특수문자: 32개 (!@#$%^&\*()\_+-=[]{}|;:,.<>?/~`)
   - 유사 문자 제외 시: 대문자에서 I, L, O 제외 (23개), 소문자에서 i, l, o 제외 (23개), 숫자에서 0, 1 제외 (8개)
   - 모호한 특수문자 제외 시: 특수문자에서 { } [ ] ( ) / \ ' " ` ~ , ; : . < > 제외 (약 16개)
 
@@ -1066,6 +1185,7 @@ type RegexToolState = {
 #### 기능 요구사항
 
 **입력**:
+
 - FR-R-01: Pattern 입력 (단일 라인)
 - FR-R-02: Flags 토글 (지원 범위: `g i m s u y` + 브라우저가 지원하면 `d/v`도 노출, 미지원 flag는 비활성/숨김)
 - FR-R-03: Test Text 입력 (멀티라인)
@@ -1074,26 +1194,31 @@ type RegexToolState = {
   - Replace 실행 모드: `replace`(첫 매치) / `replaceAll`(전체 매치) → 내부적으로는 `g` 플래그와 동기화
 
 **출력 - Match 리스트 패널**:
+
 - FR-R-05: 매치 N개 표시(인덱스/길이/매치 문자열)
 - FR-R-06: 각 매치 클릭 시 Test Text에서 해당 범위 스크롤+하이라이트
 
 **출력 - Group 패널**:
+
 - FR-R-07: 캡처 그룹 #1..N 값 표시(그룹 순서 규칙: 여는 괄호 기준 1부터)
 - FR-R-08: 네임드 그룹 `(?<name>...)`이 있으면 `groups.name` 형태로 표시
 
 **하이라이트(핵심)**:
+
 - FR-R-09: Test Text 위에 overlay 하이라이트:
   - 전체 매치: 배경 강조
   - **그룹별 색상**(동일 그룹은 동일 색, 매치가 달라도 그룹 #1은 같은 색)
   - 특정 매치 선택 시 해당 매치의 그룹만 진하게 강조
 
 **치환 미리보기(Replacement Preview)**:
+
 - FR-R-10: Replace 결과 패널에 "치환 후 문자열" 표시
 - FR-R-11: `$1`, `$2` 같은 숫자 그룹 참조 치환 지원
 - FR-R-12: 네임드 그룹 참조 치환(예: `$<name>`) 지원
 - FR-R-13: (옵션) "원본 vs 치환 결과" Diff 뷰(기존 Text Diff 컴포넌트 재사용)
 
 **오류/예외 처리**:
+
 - FR-R-14: 패턴 문법 오류 시(예: 괄호 미닫힘)
   - 결과 영역은 비우고 ErrorBanner에 예외 메시지 표시(앱 크래시 금지)
 - FR-R-15: 성능 보호
@@ -1101,6 +1226,7 @@ type RegexToolState = {
   - 특정 시간(예: 300ms~1s) 이상 걸리면 "정규식이 오래 걸립니다(백트래킹 가능)" 경고 + Worker 실행 옵션(있으면)
 
 **상태/공유**:
+
 - FR-R-16: 공유 링크에는 pattern/text/replacement 포함(민감 정보 경고 문구 표시)
 - FR-R-17: localStorage에 상태 저장/복원
 
@@ -1299,7 +1425,19 @@ export type ToolDefinition<TState> = {
 
 ## 14. 변경 이력
 
-- **v1.1.0** (2024-12-14):
+- **v1.0.0** (2024-12):
+
+  - 초기 릴리스: Phase 0~3 완료
+  - 7개 핵심 도구 구현 완료 (JSON Viewer, URL Encoder, Base64 Converter, Time Converter, YAML Converter, Text Diff, Cron Parser)
+  - 공통 기능 구현: 상태 저장/복원, URL 공유, 테마 지원, Toast 알림
+  - CI/CD 및 GitHub Pages 배포 설정 완료
+  - SEO 최적화: BrowserRouter, 도구별 HTML 파일 생성, sitemap.xml, robots.txt
+  - 다크 모드 완전 지원 (모든 컴포넌트 및 도구)
+  - 사이드바 UI 개선: 로고(yowu.dev) 추가, GitHub 링크 위치 변경, 이스터에그 뱃지 추가
+  - UX 강화: Toast 알림(`sonner`), 실시간 변환, 동적 타이틀, 그룹별 Width 전략 적용
+  - 프로젝트명 변경: `yowu-devtools` → `tools.yowu.dev`
+
+- **v1.1.0** (2024-12):
 
   - **사이드바 고도화** ✅:
     - 최근 사용한 도구 리스트 추가 (최대 3개, localStorage 기반)
@@ -1329,7 +1467,7 @@ export type ToolDefinition<TState> = {
     - `useWebWorker` 공통 훅 구현으로 코드 재사용성 향상
     - 로딩 인디케이터 추가
 
-- **v1.2.0** (2025-01-XX):
+- **v1.2.0** (2025-12):
 
   - **Command Palette** ✅:
     - `⌘K` / `Ctrl+K` 단축키로 도구 검색 및 빠른 이동
@@ -1357,10 +1495,11 @@ export type ToolDefinition<TState> = {
     - `package.json` 버전과 실제 서비스 버전 동기화
     - CHANGELOG.md 추가 (Git tag 기반 릴리즈 노트)
   - **신규 도구 추가** ✅:
-    - Hash/Checksum Generator (SHA-256/SHA-1/SHA-384/SHA-512 + HMAC 옵션) - WebCrypto API 사용 ✅
-    - UUID/ULID Generator (UUID v4/v7, ULID, 일괄 생성) ✅
+    - Hash/Checksum Generator (SHA-256/SHA-512 + HMAC 옵션) - WebCrypto API 사용
+    - UUID/ULID Generator (UUID v4/v7, ULID, 일괄 생성)
+    - URL Parser: URL 컴포넌트 및 query string 파싱 및 구조화 표시
 
-- **v1.2.1** (2025-01-XX):
+- **v1.2.1** (2025-12):
 
   - **Hash/HMAC 도구 고도화** ✅:
     - 파일 해시 기능 추가 (텍스트/파일 입력 모드 전환)
@@ -1371,6 +1510,7 @@ export type ToolDefinition<TState> = {
     - 파일 메타 정보 표시 (name, size, lastModified)
     - 처리 상태 표시 (로딩 스피너, 큰 파일 진행률)
     - 보안 강화: HMAC 키는 기본적으로 공유 링크/로컬스토리지에 저장하지 않음
+    - 알고리즘 정리: SHA-256, SHA-512만 지원 (MD5, SHA-1, SHA-384 제거)
   - **신규 도구 추가** ✅:
     - Regex Tester: 정규식 패턴 테스트 및 치환 미리보기
     - 매치 결과 시각화 (전체 매치, 캡처 그룹, 네임드 그룹)
@@ -1379,32 +1519,21 @@ export type ToolDefinition<TState> = {
     - Flags 토글 (g, i, m, s, u, y, d, v)
     - 성능 보호 (debounce, 백트래킹 경고)
     - JavaScript RegExp 엔진 사용 (브라우저 내장)
+  - **URL 공유 최적화** ✅:
+    - `shareStateFilter` 옵션 추가로 URL 길이 최적화
+    - JSON 도구: `search` 필드 제외하여 URL 길이 최적화
+    - 각 도구별 필터링 전략 문서화
 
-- **v1.3** (2025-01-XX):
+- **v1.3.0** (2025-12, 준비 중):
 
-  - URL 공유 기능 최적화: `shareStateFilter` 옵션 추가
-  - JSON 도구: `search` 필드 제외하여 URL 길이 최적화
-  - 각 도구별 필터링 전략 문서화
-  - URL 길이 제한 고려사항 및 검증 방법 추가
-
-- **v1.2** (2025-01-XX):
-
-  - HashRouter → BrowserRouter 변경으로 SEO 최적화
-  - 빌드 시 각 도구별 HTML 파일 자동 생성
-  - 각 도구 페이지에 맞춤 메타 태그 자동 생성
-  - `sitemap.xml` 및 `robots.txt` 자동 생성
-  - `404.html`을 통한 SPA 라우팅 지원
-  - 다크 모드 완전 지원 (모든 컴포넌트 및 도구)
-
-- **v1.1** (2025-12-14):
-
-  - 사이드바 UI 개선: 로고(yowu.dev) 추가, GitHub 링크 위치 변경, 이스터에그 뱃지 추가
-  - UX 강화: Toast 알림(`sonner`), 실시간 변환, 동적 타이틀, 그룹별 Width 전략 적용
-  - 프로젝트명 변경: `yowu-devtools` → `tools.yowu.dev`
-
-- **v1.0.0** (2025-01-XX):
-  - 초기 릴리스: Phase 0~3 완료
-  - 7개 핵심 도구 구현 완료 (JSON Viewer, URL Encoder, Base64 Converter, Time Converter, YAML Converter, Text Diff, Cron Parser)
-  - 공통 기능 구현: 상태 저장/복원, URL 공유, 테마 지원, Toast 알림
-  - CI/CD 및 GitHub Pages 배포 설정 완료
-  - SEO 최적화: BrowserRouter, 도구별 HTML 파일 생성, sitemap.xml, robots.txt
+  - **i18n(국제화) 지원** 🔄:
+    - 다국어 지원: en-US(기본), ko-KR, ja-JP, zh-CN, es-ES
+    - URL 구조: `/{locale}/{tool}/index.html` (예: `/ko-KR/json/index.html`)
+    - i18n 리소스 파일: `src/i18n/{locale}.ts` 구조
+    - 언어 선택 UI/UX (헤더 또는 설정 메뉴)
+    - localStorage 기반 언어 저장 (`yowu.devtools.locale`)
+    - 빌드 시 언어별 HTML 파일 자동 생성 (SSG)
+    - SEO 최적화: 언어별 메타 태그 및 sitemap.xml 확장
+    - 언어 감지 우선순위: URL → localStorage → navigator.language → en-US
+    - 모든 UI 문자열을 i18n 리소스에서 참조 (하드코딩 금지)
+    - 번역 키 누락 시 en-US로 fallback
