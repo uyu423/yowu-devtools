@@ -6,6 +6,7 @@ import { ToolHeader } from '@/components/common/ToolHeader';
 import { EditorPanel } from '@/components/common/EditorPanel';
 import { ActionBar } from '@/components/common/ActionBar';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
+import { ModeToggle } from '@/components/common/ModeToggle';
 import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useToolSetup } from '@/hooks/useToolSetup';
@@ -86,23 +87,14 @@ const Base64Tool: React.FC = () => {
         />
 
         <ActionBar className="flex-col gap-4 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center bg-gray-100 dark:bg-gray-900 p-1 rounded-lg">
-            {['encode', 'decode'].map((mode) => (
-              <button
-                key={mode}
-                className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                  state.mode === mode
-                    ? 'bg-white dark:bg-gray-800 shadow-sm text-blue-600 dark:text-blue-400'
-                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
-                }`}
-                onClick={() =>
-                  updateState({ mode: mode as Base64State['mode'] })
-                }
-              >
-                {mode === 'encode' ? t('common.encode') : t('common.decode')}
-              </button>
-            ))}
-          </div>
+          <ModeToggle
+            options={[
+              { value: 'encode' as const, label: t('common.encode') },
+              { value: 'decode' as const, label: t('common.decode') },
+            ]}
+            value={state.mode}
+            onChange={(mode) => updateState({ mode })}
+          />
 
           <label className="flex items-center space-x-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
             <input
