@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Yowu DevTools Companion",
+  "version": "1.0.0",
+  "description": "Companion extension for tools.yowu.dev - bypass CORS restrictions for API testing",
+
+  "permissions": ["storage"],
+
+  "optional_host_permissions": ["http://*/*", "https://*/*"],
+
+  "background": {
+    "service_worker": "src/service-worker.ts",
+    "type": "module"
+  },
+
+  "options_page": "src/options/options.html",
+
+  "externally_connectable": {
+    "matches": ["https://tools.yowu.dev/*", "http://localhost:5173/*"]
+  },
+
+  "icons": {
+    "16": "icons/icon-16.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  }
+}
+

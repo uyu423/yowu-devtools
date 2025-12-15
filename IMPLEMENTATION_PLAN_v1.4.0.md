@@ -67,18 +67,19 @@ yowu-devtools/
 
 ---
 
-## Phase 2: Chrome Extension 기본 구조 (3-4일)
+## Phase 2: Chrome Extension 기본 구조 ✅ (완료: 2024-12-16)
 
-### 2.1 Extension 프로젝트 설정
+### 2.1 Extension 프로젝트 설정 ✅
 
 **체크리스트**:
-- [ ] apps/extension 디렉토리 생성
-- [ ] Manifest V3 작성
-- [ ] Vite 빌드 설정
+- [x] apps/extension 디렉토리 생성
+- [x] Manifest V3 작성
+- [x] Vite 빌드 설정 (@crxjs/vite-plugin 사용)
+- [x] ESLint 설정 (eslint.config.js)
 
-### 2.2 Manifest V3 핵심 설정
+### 2.2 Manifest V3 핵심 설정 ✅
 
-**필수 필드**:
+**구현된 설정**:
 - `manifest_version`: 3
 - `permissions`: `["storage"]`
 - `optional_host_permissions`: `["http://*/*", "https://*/*"]`
@@ -86,11 +87,11 @@ yowu-devtools/
 - `background.service_worker`: Event-driven (비활성 상태 유지)
 
 **체크리스트**:
-- [ ] manifest.json 작성
-- [ ] 아이콘 파일 생성 (16, 48, 128px)
-- [ ] 고정 Extension ID 설정 (key 필드)
+- [x] manifest.json 작성
+- [x] 아이콘 파일 생성 (16, 48, 128px) - 웹앱 아이콘 재사용
+- [ ] 고정 Extension ID 설정 (key 필드) - 프로덕션 배포 시 추가 예정
 
-### 2.3 Service Worker 구현
+### 2.3 Service Worker 구현 ✅
 
 > **중요**: Service Worker는 **이벤트 기반**으로 동작하며, 평소에는 비활성 상태입니다.
 > WebApp에서 메시지가 오면 활성화되고, 작업 완료 후 다시 비활성화됩니다.
@@ -102,23 +103,25 @@ yowu-devtools/
 - 런타임 권한 관리
 
 **체크리스트**:
-- [ ] 메시지 리스너 구현
-- [ ] Origin 검증 로직
-- [ ] Request Executor 구현
-- [ ] 권한 확인/요청/회수 함수
+- [x] 메시지 리스너 구현
+- [x] Origin 검증 로직
+- [x] Request Executor 구현 (fetch 실행, timeout, body 처리)
+- [x] 권한 확인/요청/회수 함수
 
-### 2.4 Options 페이지 구현
+### 2.4 Options 페이지 구현 ✅
 
 **기능**:
 - 승인된 도메인 목록 표시
 - 개별/전체 권한 회수
 - Extension 정보 표시
+- 다크모드 지원 (prefers-color-scheme)
 
 **체크리스트**:
-- [ ] Options 페이지 UI
-- [ ] 권한 제거 기능
+- [x] Options 페이지 UI (options.html + options.ts)
+- [x] 권한 제거 기능 (개별/전체)
+- [x] 권한 변경 이벤트 리스너
 
-### 2.5 확장성 아키텍처
+### 2.5 확장성 아키텍처 ✅
 
 **핵심 설계**:
 - 모든 메시지에 `version` 필드 포함
@@ -126,10 +129,19 @@ yowu-devtools/
 - Feature Flag 시스템으로 기능 분기
 
 **체크리스트**:
-- [ ] BaseMessage 타입 정의 (version 포함)
-- [ ] Handler Registry 구현
-- [ ] Feature 상수 정의
-- [ ] Handshake 메시지 구현
+- [x] BaseMessage 타입 정의 (version 포함) - @yowu-devtools/shared
+- [x] Handler Registry 구현 (registerHandler 패턴)
+- [x] Feature 상수 정의 (SUPPORTED_FEATURES)
+- [x] Handshake 메시지 구현 (PING/PONG, HANDSHAKE/HANDSHAKE_ACK)
+
+### 2.6 공유 타입 패키지 ✅
+
+**packages/shared/src/types/api-tester.ts**:
+- RequestSpec, ResponseSpec 타입
+- WebAppMessage, ExtensionResponse 타입
+- PROTOCOL_VERSION, SUPPORTED_FEATURES 상수
+- ERROR_CODES, HTTP_METHODS 상수
+- ALLOWED_ORIGINS 목록
 
 ---
 

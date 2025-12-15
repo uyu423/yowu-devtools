@@ -1,8 +1,7 @@
 /**
  * @yowu-devtools/shared
  *
- * Shared types and utilities for yowu-devtools
+ * Shared types and utilities for yowu-devtools monorepo
  */
 
-export * from './types/index.js';
-
+export * from './types';
