@@ -21,9 +21,9 @@ interface JwtEncoderState {
 }
 
 const DEFAULT_STATE: JwtEncoderState = {
-  headerJson: JSON.stringify({ alg: 'HS256', typ: 'JWT' }, null, 2),
+  headerJson: JSON.stringify({ alg: 'none', typ: 'JWT' }, null, 2),
   payloadJson: JSON.stringify({ sub: '1234567890', name: 'John Doe' }, null, 2),
-  algorithm: 'HS256',
+  algorithm: 'none',
   secretKey: '',
 };
 
@@ -229,7 +229,7 @@ const JwtEncoderTool: React.FC = () => {
           <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
             {t('tool.jwtEncoder.algorithm')}
             <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
-              ({t('tool.jwtEncoder.updatesHeaderAlg')})
+              {t('tool.jwtEncoder.algorithmNote')}
             </span>
           </label>
           <select
