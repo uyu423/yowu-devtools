@@ -16,7 +16,7 @@ import { getToolPathFromUrl, buildLocalePath } from '@/lib/i18nUtils';
 
 // Home page component (reusable for both / and /{locale}/)
 function HomePage() {
-  const { locale } = useI18n();
+  const { locale, t } = useI18n();
   const getLocalePath = (path: string) => buildLocalePath(locale, path);
 
   return (
@@ -24,24 +24,19 @@ function HomePage() {
             {/* Hero Section */}
             <div className="mb-12">
               <h1 className="flex flex-col md:flex-row md:items-baseline gap-2 md:gap-3 text-4xl font-bold mb-6 text-gray-900 dark:text-white">
-                <span>Yowu's DevTools</span>
+                <span>{t('homepage.title')}</span>
                 <span className="inline-flex items-center w-fit px-2 py-0.5 rounded-md text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border border-blue-200 dark:border-blue-800/50 leading-none">
                   v{APP_VERSION}
                 </span>
               </h1>
               <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-                A privacy-first toolbox for developers who want to keep their
-                data on their own machines. All processing happens in your
-                browser—no servers, no trackers, no data collection. Open source
-                and auditable, making common developer tasks (JSON formatting,
-                password generation, hash calculation, UUID creation, and more)
-                fast, secure, and trustworthy.
+                {t('homepage.heroDescription')}
               </p>
 
               {/* Why it exists */}
               <div className="mt-8 space-y-4">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Why it exists
+                  {t('homepage.whyItExists')}
                 </h2>
                 <ul className="space-y-3 text-gray-700 dark:text-gray-300">
                   <li className="flex items-start">
@@ -49,9 +44,7 @@ function HomePage() {
                       •
                     </span>
                     <span>
-                      <strong>Privacy-first</strong> – everything runs in your
-                      browser. No data sent to servers, no tracking, no
-                      analytics. Your sensitive data stays on your machine.
+                      <strong>{t('homepage.privacyFirst')}</strong> – {t('homepage.privacyFirstDescription')}
                     </span>
                   </li>
                   <li className="flex items-start">
@@ -59,10 +52,7 @@ function HomePage() {
                       •
                     </span>
                     <span>
-                      <strong>Fast and efficient</strong> – Command Palette for
-                      quick navigation, file drag & drop support, and Web
-                      Workers for handling large datasets without freezing your
-                      browser.
+                      <strong>{t('homepage.fastEfficient')}</strong> – {t('homepage.fastEfficientDescription')}
                     </span>
                   </li>
                   <li className="flex items-start">
@@ -70,9 +60,7 @@ function HomePage() {
                       •
                     </span>
                     <span>
-                      <strong>Installable PWA</strong> – works offline, installs
-                      as a standalone app, and automatically updates when new
-                      versions are available.
+                      <strong>{t('homepage.installablePwa')}</strong> – {t('homepage.installablePwaDescription')}
                     </span>
                   </li>
                   <li className="flex items-start">
@@ -80,17 +68,14 @@ function HomePage() {
                       •
                     </span>
                     <span>
-                      <strong>Open and auditable</strong> – every line of code
-                      is public. You can verify what each tool does and how it
-                      processes your data.
+                      <strong>{t('homepage.openAuditable')}</strong> – {t('homepage.openAuditableDescription')}
                     </span>
                   </li>
                 </ul>
                 <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-sm text-gray-600 dark:text-gray-400">
                     <p>
-                      Hosted on GitHub Pages as a static site. All processing
-                      happens in your browser.
+                      {t('homepage.hostedOn')}
                     </p>
                     <a
                       href="https://github.com/uyu423/yowu-devtools"
@@ -99,7 +84,7 @@ function HomePage() {
                       className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
                     >
                       <Github className="w-4 h-4" />
-                      <span>View on GitHub</span>
+                      <span>{t('homepage.viewOnGithub')}</span>
                     </a>
                   </div>
                 </div>
@@ -114,23 +99,30 @@ function HomePage() {
                 </div>
                 <div className="flex-1">
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                    Quick Navigation
+                    {t('homepage.quickNavigation')}
                   </h2>
                   <p className="text-gray-700 dark:text-gray-300 mb-4">
-                    Press <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded shadow-sm">⌘K</kbd> or <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded shadow-sm">Ctrl+K</kbd> to open the Command Palette and quickly find any tool.
+                    {t('homepage.quickNavigationDescription')
+                      .split('{cmdK}')[0]}
+                    <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded shadow-sm">⌘K</kbd>
+                    {t('homepage.quickNavigationDescription')
+                      .split('{cmdK}')[1]?.split('{ctrlK}')[0] || ' / '}
+                    <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded shadow-sm">Ctrl+K</kbd>
+                    {t('homepage.quickNavigationDescription')
+                      .split('{ctrlK}')[1] || ''}
                   </p>
                   <div className="flex flex-wrap gap-2 text-sm text-gray-600 dark:text-gray-400">
                     <span className="flex items-center gap-1">
                       <Keyboard className="w-4 h-4" />
-                      Search tools by name or keywords
+                      {t('homepage.searchByName')}
                     </span>
                     <span className="flex items-center gap-1">
                       <Keyboard className="w-4 h-4" />
-                      Navigate with arrow keys
+                      {t('homepage.navigateWithArrows')}
                     </span>
                     <span className="flex items-center gap-1">
                       <Keyboard className="w-4 h-4" />
-                      Access favorites and recent tools
+                      {t('homepage.accessFavorites')}
                     </span>
                   </div>
                 </div>
@@ -140,7 +132,7 @@ function HomePage() {
             {/* Tools Grid */}
             <div className="mt-12">
               <h2 className="text-2xl font-semibold mb-6 text-gray-900 dark:text-white">
-                Available Tools
+                {t('homepage.availableTools')}
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {tools.map((tool) => (

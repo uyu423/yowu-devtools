@@ -179,14 +179,14 @@ const YamlTool: React.FC = () => {
         </div>
         <div className="flex-1 flex flex-col min-h-0">
           {isProcessing && (
-            <div className="flex items-center gap-2 p-4 text-sm text-gray-600 dark:text-gray-400">
-              <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 dark:border-gray-600 border-t-blue-600 dark:border-t-blue-400"></div>
+            <div className="flex-1 flex items-center justify-center p-4 text-sm text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800">
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 dark:border-gray-600 border-t-blue-600 dark:border-t-blue-400 mr-2"></div>
               {t('tool.yaml.convertingLargeFile')}
             </div>
           )}
           {!isProcessing && (
-            <div className="flex flex-col h-full">
-              <div className="flex items-center justify-between px-3 py-1.5 border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-900 shrink-0">
+            <div className="flex-1 flex flex-col overflow-hidden rounded-md border shadow-sm border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+              <div className="flex items-center justify-between border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-900 px-3 py-1.5 shrink-0">
                 <span className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
                   {state.direction === 'yaml2json' ? t('tool.yaml.jsonOutput') : t('tool.yaml.yamlOutput')}
                 </span>
@@ -196,7 +196,7 @@ const YamlTool: React.FC = () => {
                     copyToClipboard(conversion.output, t('tool.yaml.copiedOutput'))
                   }
                   disabled={!conversion.output || !!conversion.error}
-                  className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="p-1 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   title={t('common.copy')}
                 >
                   <Copy className="w-4 h-4" />
@@ -208,7 +208,7 @@ const YamlTool: React.FC = () => {
                   value={conversion.output}
                   readOnly
                   mode={state.direction === 'yaml2json' ? 'json' : 'yaml'}
-                  className="h-full"
+                  className="h-full border-0 shadow-none rounded-none"
                   status={
                     conversion.error
                       ? 'error'
@@ -220,6 +220,8 @@ const YamlTool: React.FC = () => {
               </div>
             </div>
           )}
+          {/* Placeholder to match left side FileInput height */}
+          <div className="mt-3 h-[42px]" />
         </div>
       </div>
 

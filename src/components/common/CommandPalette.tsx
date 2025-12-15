@@ -55,7 +55,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
   const inputRef = useRef<HTMLInputElement>(null);
   const { favorites, toggleFavorite, isFavorite } = useFavorites();
   const { recentTools } = useRecentTools();
-  const { locale } = useI18n();
+  const { locale, t } = useI18n();
   
   // Helper function to build locale-aware path
   const getLocalePath = useCallback((path: string) => buildLocalePath(locale, path), [locale]);
@@ -221,7 +221,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search tools..."
+            placeholder={t('commandPalette.searchTools')}
             className="flex-1 bg-transparent border-none outline-none text-gray-900 dark:text-white placeholder-gray-400 text-lg"
           />
           <button
@@ -236,7 +236,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
         <div className="max-h-[60vh] overflow-y-auto">
           {results.length === 0 ? (
             <div className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
-              No results found
+              {t('commandPalette.noResults')}
             </div>
           ) : (
             <div className="py-2">
@@ -266,12 +266,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
                           {tool.title}
                         </span>
                         {isRecent && (
-                          <span title="Recent">
+                          <span title={t('commandPalette.recent')}>
                             <Clock className="w-3.5 h-3.5 text-gray-400" />
                           </span>
                         )}
                         {isFav && (
-                          <span title="Favorite">
+                          <span title={t('commandPalette.favorites')}>
                             <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
                           </span>
                         )}
@@ -286,7 +286,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
                         'ml-2 p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors',
                         isFav && 'bg-yellow-50 dark:bg-yellow-900/20'
                       )}
-                      title={isFav ? 'Remove from favorites' : 'Add to favorites'}
+                      title={isFav ? t('commandPalette.removeFromFavorites') : t('commandPalette.addToFavorites')}
                     >
                       <Star
                         className={cn(
@@ -308,15 +308,15 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
             <kbd className="px-1.5 py-0.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded">
               ↑↓
             </kbd>{' '}
-            Navigate{' '}
+            {t('commandPalette.navigate')}{' '}
             <kbd className="px-1.5 py-0.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded">
               Enter
             </kbd>{' '}
-            Select{' '}
+            {t('commandPalette.select')}{' '}
             <kbd className="px-1.5 py-0.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded">
               Esc
             </kbd>{' '}
-            Close
+            {t('commandPalette.close')}
           </span>
         </div>
       </div>

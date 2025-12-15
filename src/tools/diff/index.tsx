@@ -255,6 +255,14 @@ const DiffTool: React.FC = () => {
             <span className="font-semibold text-gray-800 dark:text-white">
               {t('tool.diff.diffResult')}
             </span>
+            <div className="space-x-4 text-xs uppercase tracking-wide">
+              <span className="text-green-600 dark:text-green-400">
+                {t('tool.diff.addedChars').replace('{n}', String(stats.added))}
+              </span>
+              <span className="text-red-600 dark:text-red-400">
+                {t('tool.diff.removedChars').replace('{n}', String(stats.removed))}
+              </span>
+            </div>
             <button
               onClick={() =>
                 hasDiff &&
@@ -266,14 +274,6 @@ const DiffTool: React.FC = () => {
             >
               <Copy className="w-4 h-4" />
             </button>
-            <div className="space-x-4 text-xs uppercase tracking-wide">
-              <span className="text-green-600 dark:text-green-400">
-                {t('tool.diff.addedChars').replace('{n}', String(stats.added))}
-              </span>
-              <span className="text-red-600 dark:text-red-400">
-                {t('tool.diff.removedChars').replace('{n}', String(stats.removed))}
-              </span>
-            </div>
           </div>
 
           {isProcessing && (

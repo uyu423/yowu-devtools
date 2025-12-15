@@ -35,7 +35,7 @@ const DEFAULT_STATE: HashToolState = {
   mode: 'hash',
   inputType: 'text',
   text: '',
-  algorithm: 'MD5',
+  algorithm: 'SHA-256',
   outputEncoding: 'hex',
   hmacKeyEncoding: 'raw',
   saveHmacKey: false,

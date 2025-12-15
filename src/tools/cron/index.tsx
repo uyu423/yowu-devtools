@@ -11,6 +11,11 @@ import { useI18n } from '@/hooks/useI18nHooks';
 import { format, formatDistanceToNow } from 'date-fns';
 import CronExpressionParser, { type CronExpressionOptions } from 'cron-parser';
 import cronstrue from 'cronstrue';
+// cronstrue locales
+import 'cronstrue/locales/ko';
+import 'cronstrue/locales/ja';
+import 'cronstrue/locales/zh_CN';
+import 'cronstrue/locales/es';
 import { isMobileDevice } from '@/lib/utils';
 import { ShareModal } from '@/components/common/ShareModal';
 
@@ -28,8 +33,17 @@ const DEFAULT_STATE: CronToolState = {
   nextCount: 10,
 };
 
+// Map our locale codes to cronstrue locale codes
+const CRONSTRUE_LOCALE_MAP: Record<string, string> = {
+  'en-US': 'en',
+  'ko-KR': 'ko',
+  'ja-JP': 'ja',
+  'zh-CN': 'zh_CN',
+  'es-ES': 'es',
+};
+
 const CronTool: React.FC = () => {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   useTitle(t('tool.cron.title'));
   // Cron tool state is small (expression string, boolean flags, small numbers)
   // No filter needed - all fields are necessary and small
@@ -65,15 +79,17 @@ const CronTool: React.FC = () => {
       for (let i = 0; i < state.nextCount; i++) {
         runs.push(expression.next().toDate());
       }
+      const cronstrueLocale = CRONSTRUE_LOCALE_MAP[locale] || 'en';
       const description = cronstrue.toString(state.expression, {
         use24HourTimeFormat: true,
         throwExceptionOnParseError: true,
+        locale: cronstrueLocale,
       });
       return { description, nextRuns: runs, error: '' };
     } catch (error) {
       return { description: '', nextRuns: [], error: (error as Error).message };
     }
-  }, [state.expression, state.hasSeconds, state.nextCount, state.timezone, t]);
+  }, [state.expression, state.hasSeconds, state.nextCount, state.timezone, t, locale]);
 
   return (
     <div className="flex flex-col h-full p-4 md:p-6 max-w-3xl mx-auto">

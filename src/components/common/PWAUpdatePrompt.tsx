@@ -94,28 +94,28 @@ export const PWAUpdatePrompt: React.FC<PWAUpdatePromptProps> = ({
       )}
 
       {isInstallable && onInstall && (
-        <div className="rounded-lg border border-emerald-200 dark:border-gray-700 bg-emerald-50 dark:bg-gray-800 p-4 shadow-lg">
+        <div className="rounded-lg border border-indigo-200 dark:border-indigo-900/50 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-800 dark:to-gray-800 p-4 shadow-lg">
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0">
-              <Download className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+              <Download className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
             </div>
             <div className="flex-1">
-              <h3 className="text-sm font-semibold text-emerald-900 dark:text-white">
+              <h3 className="text-sm font-semibold text-indigo-900 dark:text-white">
                 {t('pwa.installApp')}
               </h3>
-              <p className="mt-1 text-xs text-emerald-700 dark:text-gray-300">
+              <p className="mt-1 text-xs text-indigo-700 dark:text-gray-300">
                 {t('pwa.installAppDescription')}
               </p>
               <div className="mt-3 flex gap-2">
                 <button
                   onClick={onInstall}
-                  className="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700 transition-colors"
+                  className="rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-indigo-700 transition-colors"
                 >
                   {t('pwa.install')}
                 </button>
                 <button
                   onClick={onCloseInstall}
-                  className="rounded-md border border-emerald-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-1.5 text-xs font-medium text-emerald-700 dark:text-gray-300 hover:bg-emerald-50 dark:hover:bg-gray-600 transition-colors"
+                  className="rounded-md border border-indigo-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-1.5 text-xs font-medium text-indigo-700 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-gray-600 transition-colors"
                 >
                   {t('pwa.notNow')}
                 </button>
@@ -123,7 +123,7 @@ export const PWAUpdatePrompt: React.FC<PWAUpdatePromptProps> = ({
             </div>
             <button
               onClick={onCloseInstall}
-              className="flex-shrink-0 text-emerald-400 hover:text-emerald-600 dark:text-gray-400 dark:hover:text-gray-300 transition-colors"
+              className="flex-shrink-0 text-indigo-400 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-gray-300 transition-colors"
               aria-label={t('common.close')}
             >
               <X className="h-4 w-4" />
