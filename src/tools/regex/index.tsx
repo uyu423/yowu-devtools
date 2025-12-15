@@ -7,12 +7,12 @@ import { EditorPanel } from '@/components/common/EditorPanel';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
 import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
+import { useShareModal } from '@/hooks/useShareModal';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useTitle } from '@/hooks/useTitle';
 import { useI18n } from '@/hooks/useI18nHooks';
 import { copyToClipboard } from '@/lib/clipboard';
 import { toast } from 'sonner';
-import { isMobileDevice } from '@/lib/utils';
 import { ShareModal } from '@/components/common/ShareModal';
 import { cn } from '@/lib/utils';
 import regexSpecs from './regex-specs.json';
@@ -202,9 +202,13 @@ const RegexTool: React.FC = () => {
     }),
   });
 
-  const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
-  const shareInfo = getShareStateInfo();
-  const isMobile = React.useMemo(() => isMobileDevice(), []);
+  const { handleShare, shareModalProps } = useShareModal({
+    copyShareLink,
+    shareViaWebShare,
+    getShareStateInfo,
+    toolName: t('tool.regex.title'),
+  });
+
   const debouncedPattern = useDebouncedValue(state.pattern, 200);
   const debouncedText = useDebouncedValue(state.text, 200);
 
@@ -861,10 +865,7 @@ const RegexTool: React.FC = () => {
         title={t('tool.regex.title')}
         description={t('tool.regex.description')}
         onReset={resetState}
-        onShare={() => {
-          // Both mobile and PC now show the modal first
-          setIsShareModalOpen(true);
-        }}
+        onShare={handleShare}
       />
 
       {error && <ErrorBanner message={error} className="mb-4" />}
@@ -1221,22 +1222,7 @@ const RegexTool: React.FC = () => {
         </div>
       </div>
 
-      <ShareModal
-        isOpen={isShareModalOpen}
-        onClose={() => setIsShareModalOpen(false)}
-        onConfirm={async () => {
-          setIsShareModalOpen(false);
-          if (isMobile) {
-            await shareViaWebShare();
-          } else {
-            await copyShareLink();
-          }
-        }}
-        includedFields={shareInfo.includedFields}
-        excludedFields={shareInfo.excludedFields}
-        toolName={t('tool.regex.title')}
-        isMobile={isMobile}
-      />
+      <ShareModal {...shareModalProps} />
     </div>
   );
 };

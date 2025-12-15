@@ -6,10 +6,10 @@ import { ToolHeader } from '@/components/common/ToolHeader';
 import { EditorPanel } from '@/components/common/EditorPanel';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
 import { useToolState } from '@/hooks/useToolState';
+import { useShareModal } from '@/hooks/useShareModal';
 import { useTitle } from '@/hooks/useTitle';
 import { useI18n } from '@/hooks/useI18nHooks';
 import { copyToClipboard } from '@/lib/clipboard';
-import { isMobileDevice } from '@/lib/utils';
 import { ShareModal } from '@/components/common/ShareModal';
 import { base64UrlEncode } from '@/lib/jwtUtils';
 
@@ -31,9 +31,14 @@ const JwtEncoderTool: React.FC = () => {
   const { t } = useI18n();
   const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
     useToolState<JwtEncoderState>('jwt-encoder', DEFAULT_STATE);
-  const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
-  const shareInfo = getShareStateInfo();
-  const isMobile = isMobileDevice();
+  
+  const { handleShare, shareModalProps } = useShareModal({
+    copyShareLink,
+    shareViaWebShare,
+    getShareStateInfo,
+    toolName: t('tool.jwtEncoder.title'),
+    isSensitive: true,
+  });
   
   useTitle(t('tool.jwtEncoder.title'));
 
@@ -171,10 +176,7 @@ const JwtEncoderTool: React.FC = () => {
         title={t('tool.jwtEncoder.title')}
         description={t('tool.jwtEncoder.description')}
         onReset={resetState}
-        onShare={() => {
-          // Both mobile and PC now show the modal first
-          setIsShareModalOpen(true);
-        }}
+        onShare={handleShare}
       />
 
       <div className="flex-1 flex flex-col gap-6">
@@ -287,23 +289,7 @@ const JwtEncoderTool: React.FC = () => {
           </div>
         )}
       </div>
-      <ShareModal
-        isOpen={isShareModalOpen}
-        onClose={() => setIsShareModalOpen(false)}
-        onConfirm={async () => {
-          setIsShareModalOpen(false);
-          if (isMobile) {
-            await shareViaWebShare();
-          } else {
-            await copyShareLink();
-          }
-        }}
-        includedFields={shareInfo.includedFields}
-        excludedFields={shareInfo.excludedFields}
-        toolName={t('tool.jwtEncoder.title')}
-        isSensitive={true}
-        isMobile={isMobile}
-      />
+      <ShareModal {...shareModalProps} />
     </div>
   );
 };

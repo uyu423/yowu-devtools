@@ -7,6 +7,7 @@ import {
 import { toast } from 'sonner';
 import { getToolById } from '../tools';
 import { useI18n } from './useI18nHooks';
+import { MAX_SHARE_URL_LENGTH } from '@/lib/constants';
 
 const STORAGE_PREFIX = 'yowu-devtools:v1:tool:';
 
@@ -211,12 +212,20 @@ export function useToolState<T extends object>(
       ? Object.keys(state).filter((key) => !(key in stateToShare))
       : [];
 
+    // Calculate share URL length
+    const shareUrl = generateShareUrl();
+    const urlLength = shareUrl.length;
+    const isUrlTooLong = urlLength > MAX_SHARE_URL_LENGTH;
+
     return {
       includedFields,
       excludedFields,
       stateToShare,
+      urlLength,
+      maxUrlLength: MAX_SHARE_URL_LENGTH,
+      isUrlTooLong,
     };
-  }, [state, options]);
+  }, [state, options, generateShareUrl]);
 
   const applyState = useCallback(
     (partial: Partial<T>) => {

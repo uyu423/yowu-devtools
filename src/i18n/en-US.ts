@@ -77,6 +77,9 @@ export const enUS = {
       'The share link will be copied to your clipboard. All processing happens in your browser - no data is sent to servers.',
     generateShareLink: 'Generate Share Link',
     copyLink: 'Copy Link',
+    urlTooLongTitle: 'Share Link Too Long',
+    urlTooLongDescription:
+      'The share link is too long ({length} characters, max {maxLength}). Please reduce the input data to create a shareable link.',
   },
   pwa: {
     appReadyOffline: 'App is ready to work offline',

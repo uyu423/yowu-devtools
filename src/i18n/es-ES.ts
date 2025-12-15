@@ -81,6 +81,9 @@ export const esES = {
       'El enlace de compartir se copiará a su portapapeles. Todo el procesamiento ocurre en su navegador; no se envían datos a los servidores.',
     generateShareLink: 'Generar enlace para compartir',
     copyLink: 'Copiar enlace',
+    urlTooLongTitle: 'Enlace demasiado largo',
+    urlTooLongDescription:
+      'El enlace es demasiado largo ({length} caracteres, máximo {maxLength}). Por favor, reduzca los datos de entrada para crear un enlace compartible.',
   },
   pwa: {
     appReadyOffline: 'La aplicación está lista para usar sin conexión',

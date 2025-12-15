@@ -6,11 +6,12 @@ import { ToolHeader } from '@/components/common/ToolHeader';
 import { EditorPanel } from '@/components/common/EditorPanel';
 import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
+import { useShareModal } from '@/hooks/useShareModal';
 import { useTitle } from '@/hooks/useTitle';
 import { useI18n } from '@/hooks/useI18nHooks';
 import { copyToClipboard } from '@/lib/clipboard';
 import { toast } from 'sonner';
-import { cn, isMobileDevice } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { ShareModal } from '@/components/common/ShareModal';
 
 interface PasswordToolState {
@@ -146,9 +147,13 @@ const PasswordTool: React.FC = () => {
     }
   );
 
-  const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
-  const shareInfo = getShareStateInfo();
-  const isMobile = React.useMemo(() => isMobileDevice(), []);
+  const { handleShare, shareModalProps } = useShareModal({
+    copyShareLink,
+    shareViaWebShare,
+    getShareStateInfo,
+    toolName: t('tool.password.title'),
+  });
+
   const [passwords, setPasswords] = React.useState<string[]>([]);
   const [error, setError] = React.useState<string | null>(null);
 
@@ -240,10 +245,7 @@ const PasswordTool: React.FC = () => {
         title={t('tool.password.title')}
         description={t('tool.password.description')}
         onReset={resetState}
-        onShare={() => {
-          // Both mobile and PC now show the modal first
-          setIsShareModalOpen(true);
-        }}
+        onShare={handleShare}
       />
 
       {/* Options */}
@@ -476,22 +478,7 @@ const PasswordTool: React.FC = () => {
           )}
         </div>
       </div>
-      <ShareModal
-        isOpen={isShareModalOpen}
-        onClose={() => setIsShareModalOpen(false)}
-        onConfirm={async () => {
-          setIsShareModalOpen(false);
-          if (isMobile) {
-            await shareViaWebShare();
-          } else {
-            await copyShareLink();
-          }
-        }}
-        includedFields={shareInfo.includedFields}
-        excludedFields={shareInfo.excludedFields}
-        toolName={t('tool.password.title')}
-        isMobile={isMobile}
-      />
+      <ShareModal {...shareModalProps} />
     </div>
   );
 };

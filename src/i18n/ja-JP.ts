@@ -79,6 +79,9 @@ export const jaJP = {
       '共有リンクがクリップボードにコピーされます。すべての処理はブラウザ内で行われ、サーバーにデータは送信されません。',
     generateShareLink: '共有リンクを生成',
     copyLink: 'リンクをコピー',
+    urlTooLongTitle: '共有リンクが長すぎます',
+    urlTooLongDescription:
+      '共有リンクが長すぎます（{length}文字、最大{maxLength}文字）。共有可能なリンクを作成するには、入力データを減らしてください。',
   },
   pwa: {
     appReadyOffline: 'アプリがオフラインで使用可能になりました',

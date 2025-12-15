@@ -22,3 +22,8 @@ export const SUPPORTED_LOCALES: LocaleInfo[] = [
 export const DEFAULT_LOCALE: LocaleCode = 'en-US';
 
 export const LOCALE_STORAGE_KEY = 'yowu.devtools.locale';
+
+// Maximum URL length for share links
+// GitHub Pages / CDN limit is typically around 8KB
+// Setting to 8000 characters as a safe limit
+export const MAX_SHARE_URL_LENGTH = 8000;

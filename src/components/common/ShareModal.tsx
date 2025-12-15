@@ -12,6 +12,12 @@ interface ShareModalProps {
   toolName: string;
   /** Whether the user is on a mobile device (affects button text) */
   isMobile?: boolean;
+  /** Current URL length */
+  urlLength?: number;
+  /** Maximum allowed URL length */
+  maxUrlLength?: number;
+  /** Whether the URL exceeds the maximum length */
+  isUrlTooLong?: boolean;
 }
 
 /**
@@ -26,6 +32,9 @@ export const ShareModal: React.FC<ShareModalProps> = ({
   isSensitive = false,
   toolName,
   isMobile = false,
+  urlLength,
+  maxUrlLength,
+  isUrlTooLong = false,
 }) => {
   const { t } = useI18n();
 
@@ -62,6 +71,23 @@ export const ShareModal: React.FC<ShareModalProps> = ({
 
         {/* Content */}
         <div className="px-6 py-4 space-y-4">
+          {/* URL Too Long Warning */}
+          {isUrlTooLong && (
+            <div className="flex items-start gap-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
+              <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-red-800 dark:text-red-200">
+                  {t('shareModal.urlTooLongTitle')}
+                </p>
+                <p className="text-xs text-red-700 dark:text-red-300 mt-1">
+                  {t('shareModal.urlTooLongDescription')
+                    .replace('{length}', urlLength?.toLocaleString() ?? '0')
+                    .replace('{maxLength}', maxUrlLength?.toLocaleString() ?? '8000')}
+                </p>
+              </div>
+            </div>
+          )}
+
           {isSensitive && (
             <div className="flex items-start gap-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md">
               <AlertTriangle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 shrink-0 mt-0.5" />
@@ -134,7 +160,12 @@ export const ShareModal: React.FC<ShareModalProps> = ({
           </button>
           <button
             onClick={onConfirm}
-            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 rounded-md transition-colors"
+            disabled={isUrlTooLong}
+            className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+              isUrlTooLong
+                ? 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+                : 'text-white bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600'
+            }`}
           >
             {isMobile
               ? t('shareModal.generateShareLink')

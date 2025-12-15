@@ -79,6 +79,9 @@ export const koKR = {
       '공유 링크가 클립보드에 복사됩니다. 모든 처리는 브라우저에서 이루어지며 서버로 데이터가 전송되지 않습니다.',
     generateShareLink: '공유 링크 생성',
     copyLink: '링크 복사',
+    urlTooLongTitle: '공유 링크가 너무 깁니다',
+    urlTooLongDescription:
+      '공유 링크가 너무 깁니다 ({length}자, 최대 {maxLength}자). 공유 가능한 링크를 만들려면 입력 데이터를 줄여주세요.',
   },
   pwa: {
     appReadyOffline: '앱이 오프라인에서도 사용 가능합니다',

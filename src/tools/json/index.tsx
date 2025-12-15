@@ -13,13 +13,13 @@ import { ResizablePanels } from '@/components/common/ResizablePanels';
 import { getMimeType } from '@/lib/fileUtils';
 import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
+import { useShareModal } from '@/hooks/useShareModal';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useTitle } from '@/hooks/useTitle';
 import { useResolvedTheme } from '@/hooks/useThemeHooks';
 import { useWebWorker, shouldUseWorkerForText } from '@/hooks/useWebWorker';
 import { useI18n } from '@/hooks/useI18nHooks';
 import { copyToClipboard } from '@/lib/clipboard';
-import { isMobileDevice } from '@/lib/utils';
 import { JsonView, defaultStyles } from 'react-json-view-lite';
 import 'react-json-view-lite/dist/index.css';
 
@@ -62,11 +62,15 @@ const JsonTool: React.FC = () => {
         expandLevel,
       }),
     });
+
+  const { handleShare, shareModalProps } = useShareModal({
+    copyShareLink,
+    shareViaWebShare,
+    getShareStateInfo,
+    toolName: t('tool.json.title'),
+  });
   
-  const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
   const [isRightPanelExpanded, setIsRightPanelExpanded] = React.useState(false);
-  const shareInfo = getShareStateInfo();
-  const isMobile = isMobileDevice();
   const debouncedInput = useDebouncedValue(state.input, 300);
 
   // Worker 사용 여부 결정 (디바운싱 전 state.input을 기준으로 결정하여 붙여넣기 시 즉시 Worker 모드 전환)
@@ -191,29 +195,9 @@ const JsonTool: React.FC = () => {
         title={t('tool.json.title')}
         description={t('tool.json.description')}
         onReset={resetState}
-        onShare={() => {
-          // Both mobile and PC now show the modal first
-          setIsShareModalOpen(true);
-        }}
+        onShare={handleShare}
       />
-      <ShareModal
-        isOpen={isShareModalOpen}
-        onClose={() => setIsShareModalOpen(false)}
-        onConfirm={async () => {
-          setIsShareModalOpen(false);
-          if (isMobile) {
-            // Mobile: Use Web Share API
-            await shareViaWebShare();
-          } else {
-            // PC: Copy to clipboard
-            await copyShareLink();
-          }
-        }}
-        includedFields={shareInfo.includedFields}
-        excludedFields={shareInfo.excludedFields}
-        toolName={t('tool.json.title')}
-        isMobile={isMobile}
-      />
+      <ShareModal {...shareModalProps} />
 
       <ResizablePanels
         storageKey="json-panel-width"

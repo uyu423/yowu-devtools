@@ -8,11 +8,11 @@ import { ActionBar } from '@/components/common/ActionBar';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
 import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
+import { useShareModal } from '@/hooks/useShareModal';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useTitle } from '@/hooks/useTitle';
 import { useI18n } from '@/hooks/useI18nHooks';
 import { copyToClipboard } from '@/lib/clipboard';
-import { isMobileDevice } from '@/lib/utils';
 import { ShareModal } from '@/components/common/ShareModal';
 
 interface QueryStringToolState {
@@ -53,9 +53,14 @@ const QueryStringTool: React.FC = () => {
   useTitle(t('tool.urlParser.title'));
   const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
     useToolState<QueryStringToolState>('url-parser', DEFAULT_STATE);
-  const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
-  const shareInfo = getShareStateInfo();
-  const isMobile = isMobileDevice();
+  
+  const { handleShare, shareModalProps } = useShareModal({
+    copyShareLink,
+    shareViaWebShare,
+    getShareStateInfo,
+    toolName: t('tool.urlParser.title'),
+  });
+
   const debouncedInput = useDebouncedValue(state.input, 300);
 
   const parseResult = useMemo<ParseResult>(() => {
@@ -211,27 +216,9 @@ const QueryStringTool: React.FC = () => {
         title={t('tool.urlParser.title')}
         description={t('tool.urlParser.description')}
         onReset={resetState}
-        onShare={() => {
-          // Both mobile and PC now show the modal first
-          setIsShareModalOpen(true);
-        }}
+        onShare={handleShare}
       />
-      <ShareModal
-        isOpen={isShareModalOpen}
-        onClose={() => setIsShareModalOpen(false)}
-        onConfirm={async () => {
-          setIsShareModalOpen(false);
-          if (isMobile) {
-            await shareViaWebShare();
-          } else {
-            await copyShareLink();
-          }
-        }}
-        includedFields={shareInfo.includedFields}
-        excludedFields={shareInfo.excludedFields}
-        toolName={t('tool.urlParser.title')}
-        isMobile={isMobile}
-      />
+      <ShareModal {...shareModalProps} />
 
       <div className="flex-1 flex flex-col gap-6">
         <EditorPanel

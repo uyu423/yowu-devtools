@@ -5,11 +5,11 @@ import { KeyRound, Copy } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
+import { useShareModal } from '@/hooks/useShareModal';
 import { useTitle } from '@/hooks/useTitle';
 import { useI18n } from '@/hooks/useI18nHooks';
 import { copyToClipboard } from '@/lib/clipboard';
 import { toast } from 'sonner';
-import { isMobileDevice } from '@/lib/utils';
 import { ShareModal } from '@/components/common/ShareModal';
 
 interface UuidToolState {
@@ -112,9 +112,13 @@ const UuidTool: React.FC = () => {
     }),
   });
 
-  const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
-  const shareInfo = getShareStateInfo();
-  const isMobile = React.useMemo(() => isMobileDevice(), []);
+  const { handleShare, shareModalProps } = useShareModal({
+    copyShareLink,
+    shareViaWebShare,
+    getShareStateInfo,
+    toolName: t('tool.uuid.title'),
+  });
+
   const [generatedIds, setGeneratedIds] = React.useState<string[]>([]);
 
   const generateIds = React.useCallback(() => {
@@ -163,10 +167,7 @@ const UuidTool: React.FC = () => {
         title={t('tool.uuid.title')}
         description={t('tool.uuid.description')}
         onReset={resetState}
-        onShare={() => {
-          // Both mobile and PC now show the modal first
-          setIsShareModalOpen(true);
-        }}
+        onShare={handleShare}
       />
 
       {/* Options Card */}
@@ -321,22 +322,7 @@ const UuidTool: React.FC = () => {
           )}
         </div>
       </div>
-      <ShareModal
-        isOpen={isShareModalOpen}
-        onClose={() => setIsShareModalOpen(false)}
-        onConfirm={async () => {
-          setIsShareModalOpen(false);
-          if (isMobile) {
-            await shareViaWebShare();
-          } else {
-            await copyShareLink();
-          }
-        }}
-        includedFields={shareInfo.includedFields}
-        excludedFields={shareInfo.excludedFields}
-        toolName={t('tool.uuid.title')}
-        isMobile={isMobile}
-      />
+      <ShareModal {...shareModalProps} />
     </div>
   );
 };

@@ -6,11 +6,11 @@ import { ToolHeader } from '@/components/common/ToolHeader';
 import { EditorPanel } from '@/components/common/EditorPanel';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
 import { useToolState } from '@/hooks/useToolState';
+import { useShareModal } from '@/hooks/useShareModal';
 import { useTitle } from '@/hooks/useTitle';
 import { useI18n } from '@/hooks/useI18nHooks';
 import { useResolvedTheme } from '@/hooks/useThemeHooks';
 import { copyToClipboard } from '@/lib/clipboard';
-import { isMobileDevice } from '@/lib/utils';
 import { ShareModal } from '@/components/common/ShareModal';
 import { JsonView, defaultStyles } from 'react-json-view-lite';
 import 'react-json-view-lite/dist/index.css';
@@ -53,9 +53,14 @@ const JwtDecoderTool: React.FC = () => {
   const resolvedTheme = useResolvedTheme();
   const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
     useToolState<JwtDecoderState>('jwt-decoder', DEFAULT_STATE);
-  const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
-  const shareInfo = getShareStateInfo();
-  const isMobile = isMobileDevice();
+  
+  const { handleShare, shareModalProps } = useShareModal({
+    copyShareLink,
+    shareViaWebShare,
+    getShareStateInfo,
+    toolName: t('tool.jwtDecoder.title'),
+    isSensitive: true,
+  });
   
   useTitle(t('tool.jwtDecoder.title'));
 
@@ -219,10 +224,7 @@ const JwtDecoderTool: React.FC = () => {
         title={t('tool.jwtDecoder.title')}
         description={t('tool.jwtDecoder.description')}
         onReset={resetState}
-        onShare={() => {
-          // Both mobile and PC now show the modal first
-          setIsShareModalOpen(true);
-        }}
+        onShare={handleShare}
       />
 
       <div className="flex-1 flex flex-col gap-6">
@@ -440,23 +442,7 @@ const JwtDecoderTool: React.FC = () => {
           </div>
         )}
       </div>
-      <ShareModal
-        isOpen={isShareModalOpen}
-        onClose={() => setIsShareModalOpen(false)}
-        onConfirm={async () => {
-          setIsShareModalOpen(false);
-          if (isMobile) {
-            await shareViaWebShare();
-          } else {
-            await copyShareLink();
-          }
-        }}
-        includedFields={shareInfo.includedFields}
-        excludedFields={shareInfo.excludedFields}
-        toolName={t('tool.jwtDecoder.title')}
-        isSensitive={true}
-        isMobile={isMobile}
-      />
+      <ShareModal {...shareModalProps} />
     </div>
   );
 };

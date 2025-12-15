@@ -1,8 +1,7 @@
-import { useState, useCallback, useMemo } from 'react';
 import { useToolState } from './useToolState';
 import { useI18n } from './useI18nHooks';
 import { useTitle } from './useTitle';
-import { isMobileDevice } from '@/lib/utils';
+import { useShareModal } from './useShareModal';
 
 interface UseToolSetupOptions<T extends object> {
   /**
@@ -67,55 +66,13 @@ export function useToolSetup<T extends object>(
     shareStateFilter: options?.shareStateFilter,
   });
 
-  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-  const isMobile = useMemo(() => isMobileDevice(), []);
-
-  const handleShare = useCallback(() => {
-    // Both mobile and PC now show the modal first
-    setIsShareModalOpen(true);
-  }, []);
-
-  const handleShareModalClose = useCallback(() => {
-    setIsShareModalOpen(false);
-  }, []);
-
-  const handleShareModalConfirm = useCallback(async () => {
-    setIsShareModalOpen(false);
-    if (isMobile) {
-      // Mobile: Use Web Share API
-      await shareViaWebShare();
-    } else {
-      // PC: Copy to clipboard
-      await copyShareLink();
-    }
-  }, [isMobile, shareViaWebShare, copyShareLink]);
-
-  const shareInfo = useMemo(() => getShareStateInfo(), [getShareStateInfo]);
-
-  // ShareModal props object for easy spreading
-  const shareModalProps = useMemo(
-    () => ({
-      isOpen: isShareModalOpen,
-      onClose: handleShareModalClose,
-      onConfirm: handleShareModalConfirm,
-      includedFields: shareInfo.includedFields,
-      excludedFields: shareInfo.excludedFields,
-      toolName: t(`tool.${i18nKey}.title`),
-      isSensitive: options?.isSensitive,
-      isMobile,
-    }),
-    [
-      isShareModalOpen,
-      handleShareModalClose,
-      handleShareModalConfirm,
-      shareInfo.includedFields,
-      shareInfo.excludedFields,
-      t,
-      i18nKey,
-      options?.isSensitive,
-      isMobile,
-    ]
-  );
+  const { handleShare, shareModalProps, isMobile } = useShareModal({
+    copyShareLink,
+    shareViaWebShare,
+    getShareStateInfo,
+    toolName: t(`tool.${i18nKey}.title`),
+    isSensitive: options?.isSensitive,
+  });
 
   return {
     // State management
