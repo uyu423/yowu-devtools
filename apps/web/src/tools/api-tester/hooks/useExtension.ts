@@ -54,12 +54,16 @@ declare const chrome: {
   };
 } | undefined;
 
+/** Default timeout for extension messages (ms) */
+const MESSAGE_TIMEOUT = 3000;
+
 /**
- * Send a message to the extension
+ * Send a message to the extension with timeout
  */
 const sendMessage = <T extends ExtensionResponse>(
   extensionId: string,
-  message: WebAppMessage
+  message: WebAppMessage,
+  timeout: number = MESSAGE_TIMEOUT
 ): Promise<T> => {
   return new Promise((resolve, reject) => {
     if (!extensionId) {
@@ -72,8 +76,15 @@ const sendMessage = <T extends ExtensionResponse>(
       return;
     }
 
+    // Set up timeout
+    const timeoutId = setTimeout(() => {
+      reject(new Error('Extension did not respond in time'));
+    }, timeout);
+
     try {
       chrome.runtime.sendMessage(extensionId, message, (response: unknown) => {
+        clearTimeout(timeoutId);
+        
         if (chrome?.runtime?.lastError) {
           reject(new Error(chrome.runtime.lastError.message));
           return;
@@ -85,6 +96,7 @@ const sendMessage = <T extends ExtensionResponse>(
         resolve(response as T);
       });
     } catch (err) {
+      clearTimeout(timeoutId);
       reject(err);
     }
   });
@@ -111,7 +123,7 @@ export const useExtension = (options: UseExtensionOptions = {}): UseExtensionRet
     }
 
     if (checkInProgress.current) {
-      return status === 'connected';
+      return false;
     }
 
     checkInProgress.current = true;
@@ -140,7 +152,7 @@ export const useExtension = (options: UseExtensionOptions = {}): UseExtensionRet
       checkInProgress.current = false;
       return false;
     }
-  }, [extensionId, status]);
+  }, [extensionId]);
 
   /**
    * Execute a request through the extension
@@ -256,12 +268,10 @@ export const useExtension = (options: UseExtensionOptions = {}): UseExtensionRet
       return;
     }
     
-    // Use timeout to avoid synchronous setState in effect
-    const timeoutId = setTimeout(() => {
-      checkConnection();
-    }, 0);
-    return () => clearTimeout(timeoutId);
-  }, [autoCheck, extensionId, checkConnection]);
+    // Call checkConnection directly - checkInProgress ref prevents duplicate calls in Strict Mode
+    checkConnection();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Run only on mount
 
   return {
     status,

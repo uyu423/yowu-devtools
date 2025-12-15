@@ -182,7 +182,7 @@ apps/web/src/tools/api-tester/
 - [x] 도구 디렉토리 생성
 - [x] 상태 타입 정의 (ApiTesterState, HistoryItem, ResponseData 등)
 - [x] 도구 레지스트리에 등록 (tools/index.ts)
-- [x] 라우팅 확인 (/api-tester, /ko-KR/api 등)
+- [x] 라우팅 확인 (/api-tester, /ko-KR/api-tester 등)
 
 ### 3.2 레이아웃 구조 ✅
 

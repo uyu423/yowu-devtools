@@ -351,7 +351,7 @@ export const apiTesterTool: ToolDefinition<ApiTesterState> = {
   title: 'API Tester',
   description: 'Test REST APIs with request builder and CORS bypass',
   icon: Globe,
-  path: '/api',
+  path: '/api-tester',
   i18nKey: 'apiTester',
   keywords: ['api', 'rest', 'http', 'request', 'postman', 'fetch', 'curl', 'cors'],
   category: 'tester',

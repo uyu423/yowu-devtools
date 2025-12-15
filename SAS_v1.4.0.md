@@ -33,7 +33,7 @@ yowu-devtools는 서버 없이 브라우저에서만 동작하는 개발자 도�
 
 ### 0.2 v1.4.0 목표
 
-1. **웹앱에 API Tester 도구(/api) 추가**
+1. **웹앱에 API Tester 도구(/api-tester) 추가**
 
    - Postman 유사 UI/UX
    - 다양한 HTTP 메서드, 헤더, 바디 타입 지원
@@ -167,8 +167,8 @@ yowu-devtools는 서버 없이 브라우저에서만 동작하는 개발자 도�
 | 항목      | 값                                                           |
 | --------- | ------------------------------------------------------------ |
 | Tool ID   | `api-tester`                                                 |
-| 기본 경로 | `/api`                                                       |
-| i18n 경로 | `/{locale}/api-testser` (예: `/ko-KR/api-tester`)            |
+| 기본 경로 | `/api-tester`                                                |
+| i18n 경로 | `/{locale}/api-tester` (예: `/ko-KR/api-tester`)             |
 | i18n Key  | `apiTester`                                                  |
 | 카테고리  | `tester`                                                     |
 | 키워드    | `api`, `rest`, `http`, `request`, `postman`, `fetch`, `curl` |
@@ -1919,7 +1919,7 @@ export const enUS = {
 
 ### 🚀 New Features
 
-- **API Tester Tool** (`/api`)
+- **API Tester Tool** (`/api-tester`)
 
   - Test REST APIs directly from your browser
   - Support for all HTTP methods (GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS)
