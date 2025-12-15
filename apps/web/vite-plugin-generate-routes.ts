@@ -460,6 +460,37 @@ const tools: ToolInfo[] = [
       'Unicode support',
     ],
   },
+  {
+    id: 'api-tester',
+    path: '/api-tester',
+    title: 'API Tester',
+    description: 'Build and send HTTP requests with CORS bypass via extension',
+    seoDescription:
+      'Free online API tester. Build and send HTTP requests with support for all methods, headers, body types. Bypass CORS restrictions using companion Chrome extension. View formatted responses.',
+    keywords: [
+      'api tester',
+      'http client',
+      'rest api tester',
+      'api test tool',
+      'postman alternative',
+      'http request builder',
+      'api debugger',
+      'cors bypass',
+      'api testing',
+      'rest client',
+      'http tester',
+      'api request tool',
+    ],
+    features: [
+      'All HTTP methods (GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS)',
+      'Custom headers with key-value editor',
+      'Body types: JSON, text, form-urlencoded, multipart',
+      'CORS bypass via Chrome extension',
+      'Response viewer with JSON tree, pretty print, and raw views',
+      'Request history and favorites',
+      'cURL command export',
+    ],
+  },
 ];
 
 export function generateRoutes(): Plugin {

@@ -152,149 +152,156 @@ yowu-devtools/
 
 ---
 
-## Phase 3: WebApp API Tester 도구 (5-7일)
+## Phase 3: WebApp API Tester 도구 ✅ (완료: 2024-12-17)
 
-### 3.1 도구 기본 구조
+### 3.1 도구 기본 구조 ✅
 
-**파일 구조**:
+**구현된 파일 구조**:
 ```
 apps/web/src/tools/api-tester/
 ├── index.tsx              # 도구 정의 및 메인 컴포넌트
-├── components/            # UI 컴포넌트
-├── hooks/                 # 커스텀 훅
-└── utils/                 # 유틸리티 함수
+├── types.ts               # 상태 및 데이터 타입 정의
+├── components/
+│   ├── MethodSelector.tsx # HTTP 메서드 선택
+│   ├── UrlInput.tsx       # URL 입력 (쿼리 파라미터 자동 파싱)
+│   ├── SendButton.tsx     # 요청 전송 버튼
+│   ├── KeyValueEditor.tsx # 쿼리 파라미터/헤더 편집기
+│   ├── BodyEditor.tsx     # 요청 바디 편집기 (타입별)
+│   ├── ResponseViewer.tsx # 응답 뷰어 (Tree/Pretty/Raw)
+│   ├── HistorySidebar.tsx # 히스토리 사이드바
+│   └── ExtensionStatus.tsx # 확장 프로그램 상태 표시
+├── hooks/
+│   ├── useExtension.ts    # Extension 통신 훅
+│   ├── useApiHistory.ts   # 히스토리/즐겨찾기 관리 훅
+│   └── useRequestExecutor.ts # 요청 실행 훅 (CORS 전략 포함)
+└── utils/
+    └── index.ts           # 유틸리티 함수 (URL 파싱, cURL 생성 등)
 ```
 
 **체크리스트**:
-- [ ] 도구 디렉토리 생성
-- [ ] 상태 타입 정의
-- [ ] 도구 레지스트리에 등록
-- [ ] 라우팅 확인
+- [x] 도구 디렉토리 생성
+- [x] 상태 타입 정의 (ApiTesterState, HistoryItem, ResponseData 등)
+- [x] 도구 레지스트리에 등록 (tools/index.ts)
+- [x] 라우팅 확인 (/api-tester, /ko-KR/api 등)
 
-### 3.2 레이아웃 구조
+### 3.2 레이아웃 구조 ✅
 
-**3단 레이아웃 (≥1280px)**:
-- 좌측: 기존 Sidebar (도구 목록)
-- 중앙: Request Builder + Response Viewer
-- 우측: History Sidebar
-
-**반응형**:
-- 1024-1279px: History 토글 가능
-- <1024px: History 모달/드로어
+**2단 레이아웃**:
+- 좌측: Request Builder (메서드, URL, 파라미터, 헤더, 바디)
+- 우측: Response Viewer (상태, 헤더, 바디)
 
 **체크리스트**:
-- [ ] ApiTesterLayout 컴포넌트
-- [ ] 반응형 레이아웃
-- [ ] History 사이드바 토글
+- [x] ApiTester 메인 컴포넌트 (flex 레이아웃)
+- [x] 반응형 디자인 (모바일/데스크탑)
+- [x] 좌우 패널 분할
 
-### 3.3 Request Builder UI
+### 3.3 Request Builder UI ✅
 
-**컴포넌트**:
-- MethodSelector (드롭다운)
-- UrlInput (자동 파싱)
-- SendButton (모드 선택)
-- QueryParamsEditor (key/value 테이블)
-- HeadersEditor (자동완성)
-- BodyEditor (타입별)
-- OptionsPanel
+**구현된 컴포넌트**:
+- MethodSelector (GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS)
+- UrlInput (URL 입력 및 쿼리 파라미터 자동 파싱)
+- SendButton (로딩 상태, 비활성화 상태 지원)
+- KeyValueEditor (체크박스, 키/값 입력, 추가/삭제)
+- BodyEditor (none, text, JSON, urlencoded, multipart)
 
 **체크리스트**:
-- [ ] 각 컴포넌트 구현
-- [ ] Body 타입별 에디터 (none, text, JSON, urlencoded, form-data)
+- [x] 각 컴포넌트 구현
+- [x] Body 타입별 에디터 (none, text, JSON, urlencoded, multipart)
+- [x] CodeMirror JSON 에디터 통합
+- [x] Mode 선택 (Direct/Extension)
+- [x] Copy as cURL 버튼
 
-### 3.4 Response Viewer UI
+### 3.4 Response Viewer UI ✅
 
-**컴포넌트**:
-- ResponseSummary (상태 코드, 시간, 크기)
-- ResponseBody (JSON Tree/Pretty/Raw)
-- ResponseHeaders (테이블)
-
-**체크리스트**:
-- [ ] 상태 코드 색상화
-- [ ] JSON Viewer 통합 (기존 컴포넌트 재사용)
-- [ ] Copy as cURL 기능
-
-### 3.5 History Sidebar (오른쪽)
-
-**컴포넌트**:
-- HistorySearch (fuzzy search)
-- FavoritesList
-- HistoryList
-- HistoryItem (메서드, URL, 상태, 시간)
+**구현된 기능**:
+- ResponseSummary (상태 코드, 응답 시간, 크기, Content-Type)
+- ResponseBody (Tree/Pretty/Raw 뷰 전환)
+- ResponseHeaders (테이블 형식)
 
 **체크리스트**:
-- [ ] 히스토리 목록 UI
-- [ ] 즐겨찾기 기능
+- [x] 상태 코드 색상화 (2xx: 초록, 3xx: 파랑, 4xx: 주황, 5xx: 빨강)
+- [x] JSON Tree Viewer (react-json-view-lite)
+- [x] Pretty JSON (CodeMirror)
+- [x] Raw 텍스트 뷰
+- [x] 이미지 응답 미리보기
+- [x] 바이너리 다운로드 버튼
+
+### 3.5 History Sidebar (미완성 - 추후 개선)
+
+**현재 구현 상태**:
+- 기본 History UI 구조 생성
+- useApiHistory 훅 구현
+
+**추후 개선 사항**:
+- [ ] 히스토리 목록 UI 개선
+- [ ] 즐겨찾기 기능 완성
 - [ ] Context Menu (추가, 이름 변경, 삭제)
 - [ ] Clear History
 
-### 3.6 CORS 우회 전략 구현
+### 3.6 CORS 우회 전략 구현 ✅
 
-> **중요**: Extension 사용은 최후의 수단입니다.
-> 먼저 브라우저에서 가능한 모든 방법을 시도합니다.
-
-**시도 순서**:
-1. 일반 fetch (CORS 허용 API)
-2. no-cors mode (opaque response, 제한적)
-3. CORS proxy 우회 (선택적, 공용 프록시 사용 시)
-4. Extension 모드 (마지막 수단)
+**구현된 전략**:
+1. Direct fetch (CORS 허용 API)
+2. Extension 모드 (CORS 제한 우회)
 
 **성공 방법 캐싱**:
 - localStorage에 도메인별 성공 방법 저장
-- 다음 요청 시 캐시된 방법 우선 사용
-- 캐시 만료 정책: 7일 (설정 가능)
+- 캐시 만료 정책: 7일
 - 캐시 무효화: 실패 시 자동 재시도
 
 **체크리스트**:
-- [ ] FetchStrategy 구현 (순차 시도)
-- [ ] 성공 방법 캐싱 로직
-- [ ] 캐시 만료 정책
-- [ ] 캐시 무효화 로직
+- [x] useRequestExecutor 훅 구현
+- [x] Direct/Extension 모드 전환
+- [x] 성공 방법 캐싱 로직
+- [x] 캐시 만료/무효화 로직
 
-### 3.7 Extension 통신
+### 3.7 Extension 통신 ✅
 
-**훅**:
-- `useExtension`: 연결 상태 관리, 요청 실행, 권한 관리
-
-**체크리스트**:
-- [ ] useExtension 훅 구현
-- [ ] Handshake 구현
-- [ ] 요청 실행 함수
-- [ ] 권한 확인/요청 함수
-
-### 3.8 히스토리/즐겨찾기
-
-**훅**:
-- `useApiHistory`: 히스토리 CRUD, 즐겨찾기 관리
+**useExtension 훅**:
+- 연결 상태 관리 (checking, connected, not-installed, error)
+- 요청 실행 함수 (executeRequest)
+- 권한 확인/요청/회수 함수
 
 **체크리스트**:
-- [ ] useApiHistory 훅 구현
-- [ ] 최대 30개 히스토리 관리
-- [ ] 즐겨찾기 기능
+- [x] useExtension 훅 구현
+- [x] PING/PONG 핸드셰이크
+- [x] 요청 실행 함수 (EXECUTE_REQUEST)
+- [x] 권한 확인/요청 함수 (CHECK_PERMISSION, REQUEST_PERMISSION)
+- [x] Extension 상태 배너 UI
 
----
+### 3.8 히스토리/즐겨찾기 ✅
 
-## Phase 4: i18n 및 SEO (2일)
+**useApiHistory 훅**:
+- 히스토리 CRUD
+- 즐겨찾기 관리
+- localStorage 저장
 
-### 4.1 i18n 번역 키 추가
+**체크리스트**:
+- [x] useApiHistory 훅 구현
+- [x] 최대 30개 히스토리 관리
+- [x] 즐겨찾기 토글 기능
 
-**네임스페이스**:
+### 3.9 i18n 및 SEO ✅
+
+**i18n 번역 키 추가**:
 - `tool.apiTester.*`: 도구 UI 텍스트
 - `meta.apiTester.*`: SEO 메타 태그
 
 **체크리스트**:
-- [ ] en-US.ts에 키 추가
-- [ ] ko-KR.ts에 번역 추가
-- [ ] ja-JP.ts에 번역 추가
-- [ ] zh-CN.ts에 번역 추가
-- [ ] es-ES.ts에 번역 추가
+- [x] en-US.ts에 키 추가
+- [x] ko-KR.ts에 번역 추가
+- [x] ja-JP.ts에 번역 추가
+- [x] zh-CN.ts에 번역 추가
+- [x] es-ES.ts에 번역 추가
 
-### 4.2 SEO 설정
+**SEO 설정**:
+- [x] vite-plugin-generate-routes.ts에 도구 정보 추가
+- [x] 빌드 후 메타 태그 확인
+- [x] sitemap.xml 업데이트 확인 (모든 로케일)
 
-**체크리스트**:
-- [ ] vite-plugin-generate-routes.ts에 도구 정보 추가
-- [ ] 빌드 후 메타 태그 확인
-- [ ] sitemap.xml 업데이트 확인
+---
+
+## Phase 4: 통합 테스트 및 문서화 (진행 예정)
 
 ---
 
