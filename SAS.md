@@ -2,13 +2,15 @@
 
 ---
 
-# yowu-devtools SRS (v1.2)
+# tools.yowu.dev SRS (v1.3)
 
 ## 0. 문서 메타
 
 - 프로젝트명: **tools.yowu.dev** (구 yowu-devtools)
+- 현재 버전: **v1.3.0** (i18n Internationalization)
 - 목적: 개발자가 자주 쓰는 변환/검증/뷰어 도구를 **서버 없이** 하나의 **정적 웹앱**으로 제공
 - 배포: **GitHub Pages + Custom Domain (`tools.yowu.dev`)**
+- 변경 이력: **[RELEASE_NOTES.md](./RELEASE_NOTES.md)** 참조
 - 핵심 원칙:
 
   1. **자주 쓰는 도구 몇 개를 아주 잘**
@@ -17,6 +19,7 @@
   4. **모바일 대응 + 미니멀 UI + 빠른 체감 성능**
   5. **URL 공유(입력 데이터 포함, base64 기반) + 로컬스토리지 자동 복원**
   6. **기능/UX가 바뀌면 README, AGENTS, SAS 등 모든 문서를 즉시 확인·갱신해 최신 상태를 유지**
+  7. **다국어 지원(i18n)**: 영어, 한국어, 일본어, 중국어, 스페인어
 
 ---
 
@@ -1420,120 +1423,3 @@ export type ToolDefinition<TState> = {
 - Case Converter
 - Color Converter (HEX, RGB, HSL)
 - QR Code Generator
-
----
-
-## 14. 변경 이력
-
-- **v1.0.0** (2024-12):
-
-  - 초기 릴리스: Phase 0~3 완료
-  - 7개 핵심 도구 구현 완료 (JSON Viewer, URL Encoder, Base64 Converter, Time Converter, YAML Converter, Text Diff, Cron Parser)
-  - 공통 기능 구현: 상태 저장/복원, URL 공유, 테마 지원, Toast 알림
-  - CI/CD 및 GitHub Pages 배포 설정 완료
-  - SEO 최적화: BrowserRouter, 도구별 HTML 파일 생성, sitemap.xml, robots.txt
-  - 다크 모드 완전 지원 (모든 컴포넌트 및 도구)
-  - 사이드바 UI 개선: 로고(yowu.dev) 추가, GitHub 링크 위치 변경, 이스터에그 뱃지 추가
-  - UX 강화: Toast 알림(`sonner`), 실시간 변환, 동적 타이틀, 그룹별 Width 전략 적용
-  - 프로젝트명 변경: `yowu-devtools` → `tools.yowu.dev`
-
-- **v1.1.0** (2024-12):
-
-  - **사이드바 고도화** ✅:
-    - 최근 사용한 도구 리스트 추가 (최대 3개, localStorage 기반)
-    - 즐겨찾기 리스트 및 메뉴 즐겨찾기 등록 기능 추가 (localStorage 기반)
-    - 사이드바 UI 개선: 즐겨찾기/최근 사용 섹션 분리
-    - `useRecentTools`, `useFavorites` 훅 구현 완료
-  - **Web App 지원** ✅:
-    - `vite-plugin-pwa` 도입으로 PWA 기능 완전 지원
-    - `manifest.json` 자동 생성 (Chrome 앱으로 등록 가능)
-    - 독립 창으로 실행 가능 (`standalone` 모드)
-    - 앱 아이콘 및 테마 색상 설정 완료
-    - Service Worker 기반 오프라인 캐싱 구현
-    - 자동 업데이트 알림 및 설치 프롬프트
-    - 오프라인 폴백 페이지 추가
-    - `usePWA` 훅 및 `PWAUpdatePrompt` 컴포넌트 구현
-  - **신규 도구 추가** ✅:
-    - JWT Encode/Decode 도구 추가
-    - JWT 디코딩: Header, Payload, Signature 분리 및 표시
-    - JWT 인코딩: Header/Payload JSON 입력 및 HMAC 서명 지원
-    - 서명 검증 기능 (HMAC, RSA, ECDSA)
-    - 토큰 유효성 검사 (만료 시간 확인)
-  - **성능 개선** ✅:
-    - 큰 데이터 처리 시 Web Worker 도입으로 UI 프리징 방지
-    - JSON 파싱: 1MB 이상 또는 10,000줄 이상 시 자동 Worker 사용
-    - Diff 계산: 10,000줄 이상 시 자동 Worker 사용
-    - YAML 변환: 큰 파일 처리 시 자동 Worker 사용
-    - `useWebWorker` 공통 훅 구현으로 코드 재사용성 향상
-    - 로딩 인디케이터 추가
-
-- **v1.2.0** (2025-12):
-
-  - **Command Palette** ✅:
-    - `⌘K` / `Ctrl+K` 단축키로 도구 검색 및 빠른 이동
-    - 도구 제목/키워드 기반 검색 (Fuzzy search)
-    - 즐겨찾기 토글, 최근 도구 접근 등 빠른 액션 지원
-    - 모바일에서는 상단 "Search" 버튼으로 동일 UI 제공
-    - `ToolDefinition`에 `keywords`, `category` 필드 추가 (레지스트리 기반 확장)
-  - **파일 워크플로우 표준화** ✅:
-    - Drag & Drop / 파일 선택으로 입력 채우기 (공통 컴포넌트)
-    - 출력 "다운로드" 버튼 (`.json`, `.yml`, `.txt` 등)
-    - 큰 파일 처리 시 Worker 사용, 응답 순서 보장 (`requestId` 기반)
-    - JSON/YAML/Diff 도구에 파일 열기/저장 지원
-  - **공유(Share) 고도화** ✅:
-    - 공유 링크 생성 시 어떤 데이터가 공유되는지 범위 표시
-    - Web Share API 지원 (모바일 공유 시트)
-    - 민감정보 경고 메시지 강화
-    - URL 공유 스키마 버전 관리 (`#v=1&tool=json&payload=...`)
-    - LocalStorage 저장 데이터와 공유 데이터 분리 옵션
-  - **PWA 폴리싱** ✅:
-    - `manifest.json` shortcuts: 8개 도구 전부 추가
-    - Screenshots 추가 (데스크톱/모바일 2~4장)
-    - 업데이트 감지 시 "새 버전 있음 → 새로고침" 토스트/배너 정교화
-  - **버전/릴리즈 체계 정리** ✅:
-    - 앱 내 표시 버전: `__APP_VERSION__` (빌드 타임 주입)로 사이드바 footer에 노출
-    - `package.json` 버전과 실제 서비스 버전 동기화
-    - CHANGELOG.md 추가 (Git tag 기반 릴리즈 노트)
-  - **신규 도구 추가** ✅:
-    - Hash/Checksum Generator (SHA-256/SHA-512 + HMAC 옵션) - WebCrypto API 사용
-    - UUID/ULID Generator (UUID v4/v7, ULID, 일괄 생성)
-    - URL Parser: URL 컴포넌트 및 query string 파싱 및 구조화 표시
-
-- **v1.2.1** (2025-12):
-
-  - **Hash/HMAC 도구 고도화** ✅:
-    - 파일 해시 기능 추가 (텍스트/파일 입력 모드 전환)
-    - Base64URL 인코딩 옵션 추가 (hex, base64, base64url)
-    - HMAC 키 인코딩 옵션 추가 (raw-text, hex, base64)
-    - 랜덤 키 생성 버튼 추가 (WebCrypto generateKey)
-    - HMAC 검증(verify) 섹션 추가 (expected MAC 입력 → 일치 여부 표시)
-    - 파일 메타 정보 표시 (name, size, lastModified)
-    - 처리 상태 표시 (로딩 스피너, 큰 파일 진행률)
-    - 보안 강화: HMAC 키는 기본적으로 공유 링크/로컬스토리지에 저장하지 않음
-    - 알고리즘 정리: SHA-256, SHA-512만 지원 (MD5, SHA-1, SHA-384 제거)
-  - **신규 도구 추가** ✅:
-    - Regex Tester: 정규식 패턴 테스트 및 치환 미리보기
-    - 매치 결과 시각화 (전체 매치, 캡처 그룹, 네임드 그룹)
-    - 그룹별 색상 하이라이트 (동일 그룹은 동일 색)
-    - 치환(replace) 미리보기 (`$1`, `$2`, `$<name>` 지원)
-    - Flags 토글 (g, i, m, s, u, y, d, v)
-    - 성능 보호 (debounce, 백트래킹 경고)
-    - JavaScript RegExp 엔진 사용 (브라우저 내장)
-  - **URL 공유 최적화** ✅:
-    - `shareStateFilter` 옵션 추가로 URL 길이 최적화
-    - JSON 도구: `search` 필드 제외하여 URL 길이 최적화
-    - 각 도구별 필터링 전략 문서화
-
-- **v1.3.0** (2025-12, 준비 중):
-
-  - **i18n(국제화) 지원** 🔄:
-    - 다국어 지원: en-US(기본), ko-KR, ja-JP, zh-CN, es-ES
-    - URL 구조: `/{locale}/{tool}/index.html` (예: `/ko-KR/json/index.html`)
-    - i18n 리소스 파일: `src/i18n/{locale}.ts` 구조
-    - 언어 선택 UI/UX (헤더 또는 설정 메뉴)
-    - localStorage 기반 언어 저장 (`yowu.devtools.locale`)
-    - 빌드 시 언어별 HTML 파일 자동 생성 (SSG)
-    - SEO 최적화: 언어별 메타 태그 및 sitemap.xml 확장
-    - 언어 감지 우선순위: URL → localStorage → navigator.language → en-US
-    - 모든 UI 문자열을 i18n 리소스에서 참조 (하드코딩 금지)
-    - 번역 키 누락 시 en-US로 fallback

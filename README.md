@@ -40,6 +40,7 @@ See [RELEASE_NOTES.md](./RELEASE_NOTES.md) for detailed release notes.
 ## Reporting Issues
 
 This project does not collect any logs or analytics. If you encounter a bug or error, please report it by opening a [GitHub Issue](https://github.com/uyu423/yowu-devtools/issues). Include as much detail as possible:
+
 - Steps to reproduce the issue
 - Expected behavior
 - Actual behavior
