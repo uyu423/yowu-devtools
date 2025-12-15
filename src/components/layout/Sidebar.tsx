@@ -56,7 +56,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
           <NavLink
             to={getLocalePath('/')}
             onClick={onCloseMobile}
-            className="font-bold text-lg tracking-tight hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            className="font-bold text-lg tracking-tight whitespace-nowrap hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
           >
             {t('sidebar.appName')}
           </NavLink>
