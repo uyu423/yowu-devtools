@@ -1,0 +1,182 @@
+# Chrome Extension 자동 배포 워크플로우
+#
+# 이 워크플로우는 apps/extension 또는 packages/shared 디렉토리에 변경이 있을 때
+# Chrome Web Store에 확장 프로그램을 자동으로 배포합니다.
+#
+# 필요한 GitHub Secrets:
+# - CHROME_EXTENSION_ID: Chrome Web Store의 확장 프로그램 ID (첫 업로드 후 자동 생성)
+# - CHROME_CLIENT_ID: Google Cloud Console에서 생성한 OAuth 2.0 클라이언트 ID
+# - CHROME_CLIENT_SECRET: OAuth 2.0 클라이언트 시크릿
+# - CHROME_REFRESH_TOKEN: chrome-webstore-upload-cli로 생성한 리프레시 토큰
+#
+# Secrets 설정 방법:
+# 1. Google Cloud Console (https://console.cloud.google.com)에서 프로젝트 생성
+# 2. Chrome Web Store API 활성화
+# 3. OAuth 2.0 클라이언트 ID 생성 (데스크톱 앱 유형)
+# 4. chrome-webstore-upload-cli를 사용하여 리프레시 토큰 획득:
+#    npx chrome-webstore-upload-cli init
+# 5. GitHub 저장소 Settings > Secrets and variables > Actions에 시크릿 추가
+
+name: Deploy Chrome Extension
+
+on:
+  push:
+    branches: ['main']
+    paths:
+      - 'apps/extension/**'
+      - 'packages/shared/**'
+      - 'pnpm-workspace.yaml'
+      - 'pnpm-lock.yaml'
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Publish to Chrome Web Store after upload'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: 'chrome-extension'
+  cancel-in-progress: true
+
+env:
+  EXTENSION_DIR: apps/extension
+
+jobs:
+  build:
+    name: Build Extension
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint code
+        run: pnpm run lint
+        working-directory: ${{ env.EXTENSION_DIR }}
+
+      - name: Build extension
+        run: pnpm run build
+        working-directory: ${{ env.EXTENSION_DIR }}
+
+      - name: Get version from manifest
+        id: version
+        run: |
+          VERSION=$(jq -r '.version' ${{ env.EXTENSION_DIR }}/dist/manifest.json)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "📦 Extension version: $VERSION"
+
+      - name: Verify build output
+        run: |
+          if [ ! -d "${{ env.EXTENSION_DIR }}/dist" ]; then
+            echo "❌ Error: dist directory not found"
+            exit 1
+          fi
+          if [ ! -f "${{ env.EXTENSION_DIR }}/dist/manifest.json" ]; then
+            echo "❌ Error: manifest.json not found"
+            exit 1
+          fi
+          if [ ! -f "${{ env.EXTENSION_DIR }}/dist/service-worker-loader.js" ]; then
+            echo "❌ Error: service-worker-loader.js not found"
+            exit 1
+          fi
+          echo "✅ Build output verified"
+          echo ""
+          echo "📁 Build contents:"
+          ls -la ${{ env.EXTENSION_DIR }}/dist/
+
+      - name: Create ZIP package
+        run: |
+          cd ${{ env.EXTENSION_DIR }}/dist
+          zip -r ../extension.zip ./*
+          echo "📦 Created extension.zip"
+          ls -la ../extension.zip
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: chrome-extension-${{ steps.version.outputs.version }}
+          path: ${{ env.EXTENSION_DIR }}/extension.zip
+          retention-days: 30
+
+  deploy:
+    name: Deploy to Chrome Web Store
+    needs: build
+    runs-on: ubuntu-latest
+    # 시크릿이 설정되어 있을 때만 배포 실행
+    if: ${{ vars.CHROME_EXTENSION_DEPLOY_ENABLED == 'true' }}
+    environment:
+      name: chrome-web-store
+      url: https://chrome.google.com/webstore/detail/${{ secrets.CHROME_EXTENSION_ID }}
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: chrome-extension-${{ needs.build.outputs.version }}
+
+      - name: Upload to Chrome Web Store
+        uses: mnao305/chrome-extension-upload@v5.0.0
+        with:
+          file-path: extension.zip
+          extension-id: ${{ secrets.CHROME_EXTENSION_ID }}
+          client-id: ${{ secrets.CHROME_CLIENT_ID }}
+          client-secret: ${{ secrets.CHROME_CLIENT_SECRET }}
+          refresh-token: ${{ secrets.CHROME_REFRESH_TOKEN }}
+          # 자동 게시 (수동 트리거에서 publish=true 선택 시에만)
+          publish: ${{ github.event.inputs.publish == 'true' }}
+
+      - name: Deployment summary
+        run: |
+          echo "## 🚀 Chrome Extension Deployment" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Item | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Version | ${{ needs.build.outputs.version }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Extension ID | ${{ secrets.CHROME_EXTENSION_ID }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Published | ${{ github.event.inputs.publish == 'true' && '✅ Yes' || '❌ No (Draft)' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🔗 [View in Chrome Web Store](https://chrome.google.com/webstore/detail/${{ secrets.CHROME_EXTENSION_ID }})" >> $GITHUB_STEP_SUMMARY
+
+  notify-skip:
+    name: Notify Deploy Skipped
+    needs: build
+    runs-on: ubuntu-latest
+    if: ${{ vars.CHROME_EXTENSION_DEPLOY_ENABLED != 'true' }}
+    steps:
+      - name: Notify
+        run: |
+          echo "## ⏭️ Chrome Extension Deploy Skipped" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Chrome Web Store 배포가 비활성화되어 있습니다." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 배포 활성화 방법" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "1. Repository Variables에 \`CHROME_EXTENSION_DEPLOY_ENABLED=true\` 추가" >> $GITHUB_STEP_SUMMARY
+          echo "2. Repository Secrets에 다음 값 설정:" >> $GITHUB_STEP_SUMMARY
+          echo "   - \`CHROME_EXTENSION_ID\`" >> $GITHUB_STEP_SUMMARY
+          echo "   - \`CHROME_CLIENT_ID\`" >> $GITHUB_STEP_SUMMARY
+          echo "   - \`CHROME_CLIENT_SECRET\`" >> $GITHUB_STEP_SUMMARY
+          echo "   - \`CHROME_REFRESH_TOKEN\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "빌드된 확장 프로그램은 아티팩트로 다운로드할 수 있습니다." >> $GITHUB_STEP_SUMMARY
