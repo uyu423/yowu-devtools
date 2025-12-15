@@ -8,6 +8,7 @@ import { useFavorites } from '@/hooks/useFavorites';
 import { useRecentTools } from '@/hooks/useRecentTools';
 import { useI18n } from '@/hooks/useI18nHooks';
 import { LanguageSelector } from '@/components/common/LanguageSelector';
+import { buildLocalePath } from '@/lib/i18nUtils';
 import logoImg from '@/assets/yowu-logo.jpeg';
 
 interface SidebarProps {
@@ -18,7 +19,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
   const { theme, setTheme } = useTheme();
   const { favorites, toggleFavorite, isFavorite } = useFavorites();
   const { recentTools } = useRecentTools();
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
+
+  // Helper function to build locale-aware path
+  const getLocalePath = (path: string) => buildLocalePath(locale, path);
 
   // 즐겨찾기 도구 목록
   const favoriteTools = favorites
@@ -50,7 +54,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
             <img src={logoImg} alt="yowu" className="w-full h-full object-cover" />
           </a>
           <NavLink
-            to="/"
+            to={getLocalePath('/')}
             onClick={onCloseMobile}
             className="font-bold text-lg tracking-tight hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
           >
@@ -76,7 +80,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
                 {favoriteTools.map((tool) => (
                   <NavLink
                     key={tool.id}
-                    to={tool.path}
+                    to={getLocalePath(tool.path)}
                     onClick={onCloseMobile}
                     className={({ isActive }) => cn(
                       "group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
@@ -115,7 +119,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
                 {recentToolItems.map((tool) => (
                   <NavLink
                     key={tool.id}
-                    to={tool.path}
+                    to={getLocalePath(tool.path)}
                     onClick={onCloseMobile}
                     className={({ isActive }) => cn(
                       "group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
@@ -163,7 +167,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
                 {otherTools.map(tool => (
                   <NavLink
                     key={tool.id}
-                    to={tool.path}
+                    to={getLocalePath(tool.path)}
                     onClick={onCloseMobile}
                     className={({ isActive }) => cn(
                       "group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",

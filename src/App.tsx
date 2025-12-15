@@ -10,11 +10,15 @@ import { useEffect, useState } from 'react';
 import { usePWA } from '@/hooks/usePWA';
 import { useRecentTools } from '@/hooks/useRecentTools';
 import { useResolvedTheme } from '@/hooks/useThemeHooks';
+import { useI18n } from '@/hooks/useI18nHooks';
 import { APP_VERSION, SUPPORTED_LOCALES } from '@/lib/constants';
-import { getToolPathFromUrl } from '@/lib/i18nUtils';
+import { getToolPathFromUrl, buildLocalePath } from '@/lib/i18nUtils';
 
 // Home page component (reusable for both / and /{locale}/)
 function HomePage() {
+  const { locale } = useI18n();
+  const getLocalePath = (path: string) => buildLocalePath(locale, path);
+
   return (
           <div className="p-8 max-w-4xl mx-auto">
             {/* Hero Section */}
@@ -142,7 +146,7 @@ function HomePage() {
                 {tools.map((tool) => (
                   <Link
                     key={tool.id}
-                    to={tool.path}
+                    to={getLocalePath(tool.path)}
                     className="group block p-5 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-md transition-all bg-white dark:bg-gray-800"
                   >
                     <div className="flex items-start mb-2">

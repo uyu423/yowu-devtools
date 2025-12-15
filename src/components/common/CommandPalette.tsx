@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, X, Star, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { tools } from '@/tools';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useRecentTools } from '@/hooks/useRecentTools';
+import { useI18n } from '@/hooks/useI18nHooks';
+import { buildLocalePath } from '@/lib/i18nUtils';
 
 interface CommandPaletteProps {
   isOpen: boolean;
@@ -53,6 +55,10 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
   const inputRef = useRef<HTMLInputElement>(null);
   const { favorites, toggleFavorite, isFavorite } = useFavorites();
   const { recentTools } = useRecentTools();
+  const { locale } = useI18n();
+  
+  // Helper function to build locale-aware path
+  const getLocalePath = useCallback((path: string) => buildLocalePath(locale, path), [locale]);
 
   // Search results
   const results = useMemo<SearchResult[]>(() => {
@@ -167,7 +173,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
         e.preventDefault();
         const selected = results[selectedIndex];
         if (selected) {
-          navigate(selected.tool.path);
+          navigate(getLocalePath(selected.tool.path));
           onClose();
         }
         return;
@@ -176,12 +182,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, results, selectedIndex, navigate, onClose]);
+  }, [isOpen, results, selectedIndex, navigate, onClose, getLocalePath]);
 
   if (!isOpen) return null;
 
   const handleToolClick = (tool: typeof tools[0]) => {
-    navigate(tool.path);
+    navigate(getLocalePath(tool.path));
     onClose();
   };
 
