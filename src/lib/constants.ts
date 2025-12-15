@@ -21,4 +21,3 @@ export const SUPPORTED_LOCALES: LocaleInfo[] = [
 export const DEFAULT_LOCALE: LocaleCode = 'en-US';
 
 export const LOCALE_STORAGE_KEY = 'yowu.devtools.locale';
-
