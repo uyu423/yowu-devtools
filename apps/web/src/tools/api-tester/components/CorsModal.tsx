@@ -117,7 +117,7 @@ export const CorsModal: React.FC<CorsModalProps> = ({
                   type="checkbox"
                   checked={rememberChoice}
                   onChange={(e) => setRememberChoice(e.target.checked)}
-                  className="sr-only"
+                  className="sr-only peer"
                 />
                 <div className={cn(
                   'w-4 h-4 rounded border-2 flex items-center justify-center transition-colors',
@@ -132,9 +132,9 @@ export const CorsModal: React.FC<CorsModalProps> = ({
                 <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
                   {t('tool.apiTester.corsRememberChoice')}
                 </span>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                <span className="block text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                   {t('tool.apiTester.corsRememberChoiceDesc').replace('{origin}', origin)}
-                </p>
+                </span>
               </div>
             </label>
           )}
