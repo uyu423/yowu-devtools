@@ -127,7 +127,7 @@ export function getFieldOrder(spec: CronSpec, fieldCount: number): CronFieldType
 export function parseField(
   value: string,
   type: CronFieldType,
-  spec: CronSpec,
+  _spec: CronSpec, // Reserved for future spec-specific validation
   startPos: number
 ): ParsedCronField {
   const specialTokens: { symbol: string; supportedSpecs: CronSpec[]; description: string }[] = [];
@@ -142,7 +142,7 @@ export function parseField(
   }
 
   // Generate basic description
-  let description = getFieldDescription(value, type);
+  const description = getFieldDescription(value, type);
 
   return {
     type,
