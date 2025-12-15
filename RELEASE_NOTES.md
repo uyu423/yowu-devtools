@@ -58,6 +58,20 @@
 - Web Worker로 next-run 계산 오프로드
 - i18n 번역 키 추가 (`tool.cron.spec.*`, `tool.cron.field.*`, `tool.cron.warning.*`)
 
+**Dependencies:**
+
+| 라이브러리 | 용도 | 비고 |
+|-----------|------|------|
+| `cron-parser` (기존) | 다음 실행 시간 계산 | UNIX 5/6필드 |
+| `cronstrue` (기존) | Human-readable 설명 | i18n 지원 |
+| `croner` (검토 중) | Quartz 고급 문법 | `L W # ?` 지원 |
+
+**Spec Verification:**
+
+- ✅ UNIX/Vixie DOM/DOW OR 규칙: [man7.org](https://man7.org/linux/man-pages/man5/crontab.5.html)
+- ✅ Quartz `?` 필수 규칙: [quartz-scheduler.org](https://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/crontrigger.html)
+- ✅ AWS EventBridge 제약: [docs.aws.amazon.com](https://docs.aws.amazon.com/scheduler/latest/UserGuide/schedule-types.html#cron-based)
+
 ---
 
 ## v1.3.1 (December 2025) - Code Quality & Bug Fixes

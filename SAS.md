@@ -916,7 +916,14 @@ type DiffToolState = {
 #### 상태 (v1.3.2 고도화 예정)
 
 ```ts
-type CronSpec = 'auto' | 'unix' | 'unix-seconds' | 'quartz' | 'aws' | 'k8s' | 'jenkins';
+type CronSpec =
+  | 'auto'
+  | 'unix'
+  | 'unix-seconds'
+  | 'quartz'
+  | 'aws'
+  | 'k8s'
+  | 'jenkins';
 
 type CronToolState = {
   expression: string;
@@ -945,15 +952,15 @@ type CronToolState = {
 
 현재 `Include seconds field` 체크박스 옆에 **Spec/Profile 드롭다운** 추가:
 
-| Spec | 설명 | 필드 수 | 특수 문법 |
-|------|------|---------|----------|
-| **Auto** (권장) | 입력을 보고 추정 | 5~7 | - |
-| **UNIX/Vixie** | 표준 5필드, DOM/DOW **OR 규칙** | 5 | - |
-| **UNIX + Seconds** | 초 필드 포함 변형 | 6 | - |
-| **Quartz** | 고급 연산자 지원 | 6~7 | `? L W #` |
-| **AWS EventBridge** | `cron(...)` 래퍼 | 6 | `? L W` + year 필드 |
-| **Kubernetes CronJob** | 매크로 포함 | 5 | `@hourly` 등 |
-| **Jenkins** | H 해시 토큰/별칭 | 5 | `H H(...)` |
+| Spec                   | 설명                            | 필드 수 | 특수 문법           |
+| ---------------------- | ------------------------------- | ------- | ------------------- |
+| **Auto** (권장)        | 입력을 보고 추정                | 5~7     | -                   |
+| **UNIX/Vixie**         | 표준 5필드, DOM/DOW **OR 규칙** | 5       | -                   |
+| **UNIX + Seconds**     | 초 필드 포함 변형               | 6       | -                   |
+| **Quartz**             | 고급 연산자 지원                | 6~7     | `? L W #`           |
+| **AWS EventBridge**    | `cron(...)` 래퍼                | 6       | `? L W` + year 필드 |
+| **Kubernetes CronJob** | 매크로 포함                     | 5       | `@hourly` 등        |
+| **Jenkins**            | H 해시 토큰/별칭                | 5       | `H H(...)`          |
 
 **1-2. Auto 감지 규칙 (필수)**
 
@@ -1052,6 +1059,49 @@ type CronToolState = {
 - Quartz 스펙에서 `0 0 12 ? * MON-FRI` → `?` 특수 문법 배지 표시
 - "From" 시각 변경 시 Next runs 즉시 재계산
 - 복잡한 표현식에서 UI 프리징 없이 스피너 표시
+
+#### 구현 참고: npm 라이브러리 (v1.3.2)
+
+현재 설치된 라이브러리와 추가 고려 라이브러리:
+
+| 라이브러리          | 버전   | 용도                | 지원 문법             | 설치 여부    |
+| ------------------- | ------ | ------------------- | --------------------- | ------------ |
+| **cron-parser**     | 5.4.0  | 다음 실행 시간 계산 | UNIX 5/6필드, 타임존  | ✅ 설치됨    |
+| **cronstrue**       | 3.9.0  | Human-readable 설명 | 다국어 i18n           | ✅ 설치됨    |
+| **croner**          | 9.1.0  | Quartz 고급 문법    | `L W # ?`, legacyMode | 🔶 추가 검토 |
+| **aws-cron-parser** | 1.1.12 | AWS 전용 파서       | AWS EventBridge       | 🔶 추가 검토 |
+
+**라이브러리 선택 권장사항**:
+
+1. **기본 파싱/계산**: `cron-parser` (현재 사용 중) - UNIX 5/6필드에 충분
+2. **Human-readable**: `cronstrue` (현재 사용 중) - i18n 지원
+3. **Quartz 고급 문법**: `croner` 추가 또는 자체 구현 검토
+   - `croner`는 `L`, `#`, `?` 지원하며 `{ legacyMode: false }`로 DOM/DOW AND 전환 가능
+4. **AWS 래퍼 처리**: 자체 정규식으로 `cron(...)` 추출 후 기존 파서 사용 권장
+
+#### 공식 스펙 검증 결과 (v1.3.2)
+
+각 스펙의 공식 문서와 요구사항 교차 검증 결과:
+
+| 스펙                | 검증 출처                                                                                                      | DOM/DOW 동작                         | 특수 문법           | 검증 결과 |
+| ------------------- | -------------------------------------------------------------------------------------------------------------- | ------------------------------------ | ------------------- | --------- |
+| **UNIX/Vixie**      | [man7.org/crontab.5](https://man7.org/linux/man-pages/man5/crontab.5.html)                                     | **OR** (둘 다 제한 시)               | `@hourly` 등 매크로 | ✅ 일치   |
+| **Quartz**          | [quartz-scheduler.org](https://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/crontrigger.html) | `?` 필수 (한쪽)                      | `L W #`             | ✅ 일치   |
+| **AWS EventBridge** | [docs.aws.amazon.com](https://docs.aws.amazon.com/scheduler/latest/UserGuide/schedule-types.html#cron-based)   | `?` 필수 (한쪽), `*` 동시 불가       | `L W #`, year 필드  | ✅ 일치   |
+| **croner (참고)**   | [croner.56k.guru](https://croner.56k.guru/usage/pattern/)                                                      | OR (기본), AND (`legacyMode: false`) | `L #`, 5-7필드      | ✅ 참고   |
+
+**핵심 검증 내용**:
+
+1. **UNIX DOM/DOW OR 규칙**: man7.org 공식 문서 확인
+
+   > "If both fields are restricted (i.e., do not contain the '\*' character), the command will be run when **either** field matches the current time."
+
+2. **AWS 제약사항**: AWS 공식 문서 확인
+
+   > "You can't use \* in both the Day-of-month and Day-of-week fields. If you use it in one, you must use ? in the other."
+
+3. **Quartz `?` 필수**: Quartz 공식 문서 확인
+   > "Support for specifying both a day-of-week and a day-of-month value is not complete (you must currently use the '?' character in one of these fields)."
 
 ---
 

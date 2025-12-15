@@ -704,9 +704,41 @@ src/
 
 v1.3.2는 Cron Parser의 대대적인 고도화로, 여러 cron 방언(UNIX, Quartz, AWS, K8s, Jenkins)을 지원하고 정확한 의미(semantics) 파싱을 제공합니다.
 
+#### 9.0 사용 라이브러리 및 공식 스펙 검증
+
+**현재 설치된 라이브러리**:
+
+| 라이브러리    | 버전  | 용도                | 비고                      |
+| ------------- | ----- | ------------------- | ------------------------- |
+| `cron-parser` | 5.4.0 | 다음 실행 시간 계산 | UNIX 5/6필드, 타임존 지원 |
+| `cronstrue`   | 3.9.0 | Human-readable 설명 | i18n 다국어 지원          |
+
+**추가 검토 라이브러리**:
+
+| 라이브러리        | 버전   | 용도                         | 결정              |
+| ----------------- | ------ | ---------------------------- | ----------------- |
+| `croner`          | 9.1.0  | Quartz 고급 문법 (`L W # ?`) | 🔶 필요시 추가    |
+| `aws-cron-parser` | 1.1.12 | AWS 전용 파서                | 🔶 자체 구현 권장 |
+
+**구현 전략**:
+
+1. **UNIX 파싱**: `cron-parser` 활용 (기존 유지)
+2. **Human-readable**: `cronstrue` 활용 (기존 유지)
+3. **Quartz 고급 문법**: `croner` 추가 또는 자체 정규식 구현
+4. **AWS 래퍼**: 자체 정규식으로 `cron(...)` 추출 후 기존 파서 사용
+5. **Jenkins H 토큰**: 자체 구현 (H는 해시 기반 랜덤값이므로 정확한 시뮬레이션 어려움, 경고 표시)
+
+**공식 스펙 검증 완료**:
+
+- ✅ **UNIX/Vixie**: [man7.org/crontab.5](https://man7.org/linux/man-pages/man5/crontab.5.html) - DOM/DOW OR 규칙 확인
+- ✅ **Quartz**: [quartz-scheduler.org](https://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/crontrigger.html) - `?` 필수, `L W #` 지원 확인
+- ✅ **AWS EventBridge**: [docs.aws.amazon.com](https://docs.aws.amazon.com/scheduler/latest/UserGuide/schedule-types.html#cron-based) - `cron(...)` 래퍼, DOM/DOW 제약 확인
+- ✅ **croner (참고)**: [croner.56k.guru](https://croner.56k.guru/usage/pattern/) - `legacyMode` 옵션으로 DOM/DOW AND 전환 가능
+
 #### 9.1 스펙(방언) 지원 인프라 구축
 
 - [ ] **타입 정의**:
+
   - [ ] `CronSpec` 타입 정의 (`'auto' | 'unix' | 'unix-seconds' | 'quartz' | 'aws' | 'k8s' | 'jenkins'`)
   - [ ] `CronToolState` 확장 (`spec`, `fromDateTime` 필드 추가)
   - [ ] 스펙별 특수 토큰 정의 (`? L W # H` 등)
@@ -722,6 +754,7 @@ v1.3.2는 Cron Parser의 대대적인 고도화로, 여러 cron 방언(UNIX, Qua
 #### 9.2 Auto 감지 로직 구현
 
 - [ ] **Auto 감지 규칙**:
+
   - [ ] `cron(...)` 래퍼 감지 → AWS
   - [ ] `H`, `H(...)` 감지 → Jenkins
   - [ ] `?`, `L`, `W`, `#` 감지 → Quartz/AWS
@@ -736,6 +769,7 @@ v1.3.2는 Cron Parser의 대대적인 고도화로, 여러 cron 방언(UNIX, Qua
 #### 9.3 의미(semantics) 정확화
 
 - [ ] **DOM/DOW OR 규칙 (UNIX/Vixie)**:
+
   - [ ] Human readable에 "OR" 명시
   - [ ] Next runs 계산에 OR 규칙 적용
   - [ ] "AND가 필요하면 표현식 분리" 경고
@@ -748,15 +782,18 @@ v1.3.2는 Cron Parser의 대대적인 고도화로, 여러 cron 방언(UNIX, Qua
 #### 9.4 UI/UX 고도화
 
 - [ ] **컨트롤 바 개선**:
+
   - [ ] Spec/Profile 드롭다운 추가
   - [ ] Include seconds 동적 활성화/비활성화
   - [ ] Timezone 스펙별 설명 추가
 
 - [ ] **Normalized 표시**:
+
   - [ ] 입력 아래 "Normalized" 라인
   - [ ] AWS 선택 시 "AWS format" 출력
 
 - [ ] **필드별 분해 + 하이라이트**:
+
   - [ ] 필드별 해석 카드 (Minutes/Hours/DOM/Month/DOW/Year/Seconds)
   - [ ] 입력 토큰 색상/밑줄 하이라이트
   - [ ] hover 시 서로 강조 (모바일: 탭)
@@ -771,10 +808,12 @@ v1.3.2는 Cron Parser의 대대적인 고도화로, 여러 cron 방언(UNIX, Qua
 #### 9.5 Next runs 계산 고도화
 
 - [ ] **기준 시각(From) 설정**:
+
   - [ ] "From" datetime 입력 UI
   - [ ] 기본값 Now, 사용자 지정 가능
 
 - [ ] **출력 포맷 옵션**:
+
   - [ ] Localized 표시 (i18n)
   - [ ] ISO / RFC3339 / Epoch 복사 버튼
 
@@ -786,6 +825,7 @@ v1.3.2는 Cron Parser의 대대적인 고도화로, 여러 cron 방언(UNIX, Qua
 #### 9.6 변환(Conversion) 기능 (선택)
 
 - [ ] **Convert to 드롭다운**:
+
   - [ ] UNIX(5) ↔ UNIX+Seconds(6)
   - [ ] UNIX(5) → AWS (`cron(...)` + year)
   - [ ] Jenkins `@hourly`/`H` 설명 출력
@@ -796,6 +836,7 @@ v1.3.2는 Cron Parser의 대대적인 고도화로, 여러 cron 방언(UNIX, Qua
 #### 9.7 i18n 지원
 
 - [ ] **번역 키 추가**:
+
   - [ ] `tool.cron.spec.*` - 스펙 이름/설명
   - [ ] `tool.cron.field.*` - 필드 이름 (minutes, hours, dom, month, dow, year, seconds)
   - [ ] `tool.cron.warning.*` - 경고 메시지
@@ -814,11 +855,13 @@ v1.3.2는 Cron Parser의 대대적인 고도화로, 여러 cron 방언(UNIX, Qua
 #### 9.8 테스트 및 검증
 
 - [ ] **파서 단위 테스트**:
+
   - [ ] 각 스펙별 파서 정확성 테스트
   - [ ] Auto 감지 로직 테스트
   - [ ] 래퍼 정규화 테스트
 
 - [ ] **UI 테스트**:
+
   - [ ] Spec 드롭다운 동작 확인
   - [ ] 하이라이트 동작 확인
   - [ ] From datetime 입력 동작 확인
@@ -833,6 +876,7 @@ v1.3.2는 Cron Parser의 대대적인 고도화로, 여러 cron 방언(UNIX, Qua
 #### 9.9 문서 업데이트
 
 - [ ] **개발 문서**:
+
   - [ ] `SAS.md` 7.7 섹션 업데이트 ✅ 완료
   - [ ] `IMPLEMENTATION_PLAN.md` Phase 9 추가 ✅ 완료
   - [ ] `RELEASE_NOTES.md` v1.3.2 섹션 추가
