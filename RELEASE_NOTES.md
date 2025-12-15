@@ -1,5 +1,44 @@
 # Release Notes
 
+## v1.3.1 (December 2025) - Code Quality & Bug Fixes
+
+**Bug Fixes:**
+
+- 🔧 **JWT Encoder**: Fixed HMAC algorithm (HS256/HS384/HS512) not showing results
+  - Corrected conditional logic that prevented `signToken()` from being called
+
+**Refactoring:**
+
+- 🏗️ **New Custom Hooks**:
+  - `useToolSetup`: Combines `useTitle` and `useI18n` for consistent tool setup
+  - `useLocalStorage`: Generic localStorage hook with cross-tab/component sync
+  
+- 🎨 **New Common Components**:
+  - `ModeToggle`: Reusable mode toggle button group (URL, Base64, Diff tools)
+  - `ResultPanel`: Consistent result display with copy button
+  
+- 🌐 **i18n Improvements**:
+  - ShareModal now fully internationalized
+  - Added ShareModal-related translation keys to all locales
+  
+- ⚡ **Performance Optimizations**:
+  - Static route generation in App.tsx (moved outside component)
+  - Reduced re-renders from route definitions
+  
+- 🗑️ **Code Cleanup**:
+  - Removed deprecated `shareState` function from `useToolState`
+  - Simplified `useFavorites` and `useRecentTools` with `useLocalStorage`
+  - Added `i18nKey` field to `ToolDefinition` for explicit i18n mapping
+  - Added `getToolI18nKey` helper function
+
+**Technical:**
+
+- Refactored localStorage hooks to use common `useLocalStorage` abstraction
+- Improved code organization with consistent patterns across tools
+- Better separation of concerns in tool components
+
+---
+
 ## v1.3.0 (December 2025) - i18n Internationalization
 
 **New Features:**

@@ -2,18 +2,17 @@ import { APP_VERSION, SUPPORTED_LOCALES } from '@/lib/constants';
 import { Command, Github, Keyboard } from 'lucide-react';
 import { Link, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { buildLocalePath, getToolPathFromUrl } from '@/lib/i18nUtils';
+import { getToolI18nKey, tools } from '@/tools';
 import { useEffect, useState } from 'react';
 
 import { AppLayout } from '@/components/layout/AppLayout';
 import { CommandPalette } from '@/components/common/CommandPalette';
 import { PWAUpdatePrompt } from '@/components/common/PWAUpdatePrompt';
 import { Toaster } from 'sonner';
-import { tools, getToolI18nKey } from '@/tools';
 import { useI18n } from '@/hooks/useI18nHooks';
 import { usePWA } from '@/hooks/usePWA';
 import { useRecentTools } from '@/hooks/useRecentTools';
 import { useResolvedTheme } from '@/hooks/useThemeHooks';
-
 
 // Pre-compute static route definitions outside of component
 // This avoids recreating these arrays on every render
