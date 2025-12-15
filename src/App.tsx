@@ -10,32 +10,12 @@ import { useEffect, useState } from 'react';
 import { usePWA } from '@/hooks/usePWA';
 import { useRecentTools } from '@/hooks/useRecentTools';
 import { useResolvedTheme } from '@/hooks/useThemeHooks';
-import { APP_VERSION } from '@/lib/constants';
+import { APP_VERSION, SUPPORTED_LOCALES } from '@/lib/constants';
+import { getToolPathFromUrl } from '@/lib/i18nUtils';
 
-function AppContent() {
-  const location = useLocation();
-  const { addRecentTool } = useRecentTools();
-  
-  // 메인 페이지 타이틀 설정
-  useEffect(() => {
-    if (location.pathname === '/') {
-      document.title = "Yowu's DevTools | Developer Tools";
-    }
-  }, [location.pathname]);
-
-  // 도구 페이지 진입 시 최근 사용한 도구에 추가
-  useEffect(() => {
-    const currentTool = tools.find((tool) => tool.path === location.pathname);
-    if (currentTool) {
-      addRecentTool(currentTool.id);
-    }
-  }, [location.pathname, addRecentTool]);
-
+// Home page component (reusable for both / and /{locale}/)
+function HomePage() {
   return (
-    <Routes>
-      <Route
-        path="/"
-        element={
           <div className="p-8 max-w-4xl mx-auto">
             {/* Hero Section */}
             <div className="mb-12">
@@ -181,13 +161,56 @@ function AppContent() {
               </div>
             </div>
           </div>
-        }
-      />
+  );
+}
 
-      {/* Dynamic Routes for Tools */}
+function AppContent() {
+  const location = useLocation();
+  const { addRecentTool } = useRecentTools();
+  
+  // Extract tool path (without locale prefix)
+  const toolPath = getToolPathFromUrl(location.pathname);
+  
+  // 메인 페이지 타이틀 설정
+  useEffect(() => {
+    if (toolPath === '/') {
+      document.title = "Yowu's DevTools | Developer Tools";
+    }
+  }, [toolPath]);
+
+  // 도구 페이지 진입 시 최근 사용한 도구에 추가
+  useEffect(() => {
+    const currentTool = tools.find((tool) => tool.path === toolPath);
+    if (currentTool) {
+      addRecentTool(currentTool.id);
+    }
+  }, [toolPath, addRecentTool]);
+
+  return (
+    <Routes>
+      {/* Home page routes */}
+      <Route path="/" element={<HomePage />} />
+      
+      {/* Locale-prefixed home page routes */}
+      {SUPPORTED_LOCALES.map((locale) => (
+        <Route key={locale.code} path={`/${locale.code}`} element={<HomePage />} />
+      ))}
+
+      {/* Tool routes (without locale prefix - en-US, backward compatibility) */}
       {tools.map((tool) => (
         <Route key={tool.id} path={tool.path} element={<tool.Component />} />
       ))}
+
+      {/* Locale-prefixed tool routes */}
+      {SUPPORTED_LOCALES.map((locale) =>
+        tools.map((tool) => (
+          <Route
+            key={`${locale.code}-${tool.id}`}
+            path={`/${locale.code}${tool.path}`}
+            element={<tool.Component />}
+          />
+        ))
+      )}
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

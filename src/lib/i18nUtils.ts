@@ -106,3 +106,54 @@ export function saveLocale(locale: LocaleCode): void {
   }
 }
 
+/**
+ * Extract tool path from URL (removes locale prefix if present)
+ * Examples:
+ * - /ko-KR/json -> /json
+ * - /json -> /json
+ * - /ko-KR/ -> /
+ * - / -> /
+ */
+export function getToolPathFromUrl(pathname: string): string {
+  const segments = pathname.split('/').filter(Boolean);
+  if (segments.length === 0) {
+    return '/';
+  }
+
+  const firstSegment = segments[0];
+  const isLocale = SUPPORTED_LOCALES.some((loc) => loc.code === firstSegment);
+  
+  if (isLocale) {
+    // Remove locale prefix
+    const toolSegments = segments.slice(1);
+    return toolSegments.length === 0 ? '/' : `/${toolSegments.join('/')}`;
+  }
+
+  // No locale prefix, return as is
+  return pathname;
+}
+
+/**
+ * Build URL path with locale prefix
+ * Examples:
+ * - buildLocalePath('en-US', '/json') -> '/json' (en-US is default, no prefix)
+ * - buildLocalePath('ko-KR', '/json') -> '/ko-KR/json'
+ * - buildLocalePath('ko-KR', '/') -> '/ko-KR'
+ */
+export function buildLocalePath(locale: LocaleCode, toolPath: string): string {
+  if (locale === DEFAULT_LOCALE) {
+    // Default locale (en-US) doesn't need prefix for backward compatibility
+    return toolPath;
+  }
+  
+  // Ensure toolPath starts with /
+  const normalizedPath = toolPath.startsWith('/') ? toolPath : `/${toolPath}`;
+  
+  // Handle root path
+  if (normalizedPath === '/') {
+    return `/${locale}`;
+  }
+  
+  return `/${locale}${normalizedPath}`;
+}
+

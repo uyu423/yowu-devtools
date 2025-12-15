@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { I18nContext, type I18nContextValue } from './i18nContext';
 import type { LocaleCode } from '@/lib/constants';
 import { I18N } from '@/i18n';
-import { detectLocale, saveLocale } from '@/lib/i18nUtils';
+import { detectLocale, saveLocale, getToolPathFromUrl, buildLocalePath } from '@/lib/i18nUtils';
 
 /**
  * Get nested value from object using dot notation
@@ -23,6 +23,7 @@ function getNestedValue(obj: Record<string, unknown>, path: string): string {
 
 function useProvideI18n(): I18nContextValue {
   const location = useLocation();
+  const navigate = useNavigate();
   
   // Detect locale from URL or localStorage or browser (recalculate on pathname change)
   const locale = useMemo<LocaleCode>(() => 
@@ -56,13 +57,27 @@ function useProvideI18n(): I18nContextValue {
     return value;
   }, [locale]);
 
-  // Set locale (will be saved to localStorage by useEffect above)
-  // Note: URL locale prefix update will be handled by routing logic in Phase 8.4
+  // Set locale and update URL
   const setLocale = useCallback((newLocale: LocaleCode) => {
+    if (newLocale === locale) {
+      return; // No change needed
+    }
+
+    // Get current tool path (without locale prefix)
+    const toolPath = getToolPathFromUrl(location.pathname);
+    
+    // Build new path with locale prefix
+    const newPath = buildLocalePath(newLocale, toolPath);
+    
+    // Preserve hash (share payload) if exists
+    const hash = location.hash;
+    
+    // Navigate to new locale URL
+    navigate(`${newPath}${hash}`, { replace: true });
+    
+    // Save to localStorage (will be saved by useEffect above, but save immediately for consistency)
     saveLocale(newLocale);
-    // TODO: Navigate to new locale URL (will be implemented in Phase 8.4)
-    // For now, just save to localStorage - page refresh will pick it up
-  }, []);
+  }, [locale, location.pathname, location.hash, navigate]);
 
   // Get current resources
   const resources = useMemo(() => I18N[locale], [locale]);
