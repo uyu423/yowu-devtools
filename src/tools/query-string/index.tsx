@@ -250,7 +250,7 @@ const QueryStringTool: React.FC = () => {
               onChange={(e) => updateState({ showDecoded: e.target.checked })}
             />
             <OptionLabel tooltip={t('tool.urlParser.showDecodedTooltip')}>
-              {t('tool.urlParser.showDecoded')}
+              {t('tool.urlParser.showDecodedValues')}
             </OptionLabel>
           </label>
 
@@ -262,7 +262,7 @@ const QueryStringTool: React.FC = () => {
               onChange={(e) => updateState({ showRaw: e.target.checked })}
             />
             <OptionLabel tooltip={t('tool.urlParser.showRawTooltip')}>
-              {t('tool.urlParser.showRaw')}
+              {t('tool.urlParser.showRawValues')}
             </OptionLabel>
           </label>
         </ActionBar>
