@@ -337,7 +337,7 @@ export const esES = {
       failedToCalculateFileHash: 'Error al calcular hash del archivo',
     },
     uuid: {
-      title: 'Generador de UUID/ULID',
+      title: 'Generador de UUID',
       description: 'Genera identificadores UUID v4, UUID v7 y ULID',
       type: 'Tipo',
       count: 'Cantidad',

@@ -1,7 +1,11 @@
 import type { Plugin } from 'vite';
 import fs from 'fs';
 import path from 'path';
-import { SUPPORTED_LOCALES, DEFAULT_LOCALE, type LocaleCode } from './src/lib/constants';
+import {
+  SUPPORTED_LOCALES,
+  DEFAULT_LOCALE,
+  type LocaleCode,
+} from './src/lib/constants';
 
 // 도구 정보 타입
 interface ToolInfo {
@@ -281,7 +285,7 @@ const tools: ToolInfo[] = [
   {
     id: 'uuid',
     path: '/uuid',
-    title: 'UUID/ULID Generator',
+    title: 'UUID Generator',
     description: 'Generate UUID v4, UUID v7, and ULID identifiers',
     seoDescription:
       'Free online UUID and ULID generator. Generate UUID v4 (random), UUID v7 (timestamp-based), and ULID identifiers. Batch generation up to 100 IDs. All processing happens in your browser.',

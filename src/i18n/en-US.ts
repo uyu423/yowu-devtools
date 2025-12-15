@@ -335,7 +335,7 @@ export const enUS = {
       failedToCalculateFileHash: 'Failed to calculate file hash',
     },
     uuid: {
-      title: 'UUID/ULID Generator',
+      title: 'UUID Generator',
       description: 'Generate UUID v4, UUID v7, and ULID identifiers',
       type: 'Type',
       count: 'Count',
@@ -705,7 +705,7 @@ export const enUS = {
       description: 'Free online hash generator. Calculate MD5, SHA-1, SHA-256, SHA-512 hashes and HMAC signatures.',
     },
     uuid: {
-      title: 'UUID/ULID Generator',
+      title: 'UUID Generator',
       description: 'Free online UUID and ULID generator. Generate UUID v4, UUID v7, and ULID identifiers.',
     },
     password: {

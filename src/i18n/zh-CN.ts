@@ -337,7 +337,7 @@ export const zhCN = {
       failedToCalculateFileHash: '文件Hash计算失败',
     },
     uuid: {
-      title: 'UUID/ULID Generator',
+      title: 'UUID Generator',
       description: '生成UUID v4、UUID v7和ULID标识符',
       type: '类型',
       count: '数量',
@@ -707,7 +707,7 @@ export const zhCN = {
       description: '免费在线Hash生成器。计算MD5、SHA-1、SHA-256、SHA-512哈希和HMAC签名。',
     },
     uuid: {
-      title: 'UUID/ULID Generator',
+      title: 'UUID Generator',
       description: '免费在线UUID和ULID生成器。生成UUID v4、UUID v7和ULID标识符。',
     },
     password: {

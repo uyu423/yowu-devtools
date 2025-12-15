@@ -332,7 +332,7 @@ const UuidTool: React.FC = () => {
 
 export const uuidTool: ToolDefinition<UuidToolState> = {
   id: 'uuid',
-  title: 'UUID/ULID Generator',
+  title: 'UUID Generator',
   description: 'Generate UUID v4, UUID v7, and ULID identifiers',
   path: '/uuid',
   icon: KeyRound,

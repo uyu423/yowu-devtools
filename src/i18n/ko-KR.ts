@@ -357,7 +357,7 @@ export const koKR = {
       failedToCalculateFileHash: '파일 Hash 계산 실패',
     },
     uuid: {
-      title: 'UUID/ULID Generator',
+      title: 'UUID Generator',
       description: 'UUID v4, UUID v7, ULID 식별자를 생성합니다',
       type: '유형',
       count: '개수',
@@ -800,7 +800,7 @@ export const koKR = {
         '무료 온라인 Hash 생성기. MD5, SHA-1, SHA-256, SHA-512 해시와 HMAC 서명을 계산합니다.',
     },
     uuid: {
-      title: 'UUID/ULID Generator',
+      title: 'UUID Generator',
       description:
         '무료 온라인 UUID 및 ULID 생성기. UUID v4, UUID v7, ULID 식별자를 생성합니다.',
     },

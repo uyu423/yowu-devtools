@@ -337,7 +337,7 @@ export const jaJP = {
       failedToCalculateFileHash: 'ファイルHash計算失敗',
     },
     uuid: {
-      title: 'UUID/ULID Generator',
+      title: 'UUID Generator',
       description: 'UUID v4, UUID v7, ULID識別子を生成します',
       type: 'タイプ',
       count: '数',
@@ -707,7 +707,7 @@ export const jaJP = {
       description: '無料オンラインHash生成器。MD5、SHA-1、SHA-256、SHA-512 HashとHMAC署名を計算します。',
     },
     uuid: {
-      title: 'UUID/ULID Generator',
+      title: 'UUID Generator',
       description: '無料オンラインUUIDおよびULID生成器。UUID v4、UUID v7、ULID識別子を生成します。',
     },
     password: {
