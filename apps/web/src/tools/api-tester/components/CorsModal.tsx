@@ -1,17 +1,18 @@
 /**
  * CorsModal - Modal shown when CORS error is detected
- * 
+ *
  * Features:
  * - Explains why CORS errors occur and why extension is needed
  * - Option to remember choice for the domain
  * - i18n support
  */
 
+import { AlertTriangle, Check, ExternalLink, Info, X, Zap } from 'lucide-react';
 import React, { useState } from 'react';
-import { cn } from '@/lib/utils';
-import { AlertTriangle, Zap, ExternalLink, X, Info, Check } from 'lucide-react';
-import { useI18n } from '@/hooks/useI18nHooks';
+
 import type { ExtensionStatus } from '../types';
+import { cn } from '@/lib/utils';
+import { useI18n } from '@/hooks/useI18nHooks';
 
 interface CorsModalProps {
   isOpen: boolean;
@@ -48,7 +49,9 @@ export const CorsModal: React.FC<CorsModalProps> = ({
 
   if (!isOpen) return null;
 
-  const isExtensionAvailable = extensionStatus === 'connected' || extensionStatus === 'permission-required';
+  const isExtensionAvailable =
+    extensionStatus === 'connected' ||
+    extensionStatus === 'permission-required';
   const origin = getOriginFromUrl(targetUrl);
 
   const handleRetry = () => {
@@ -119,12 +122,14 @@ export const CorsModal: React.FC<CorsModalProps> = ({
                   onChange={(e) => setRememberChoice(e.target.checked)}
                   className="sr-only peer"
                 />
-                <div className={cn(
-                  'w-4 h-4 rounded border-2 flex items-center justify-center transition-colors',
-                  rememberChoice
-                    ? 'bg-blue-600 border-blue-600'
-                    : 'border-gray-300 dark:border-gray-600 group-hover:border-blue-400'
-                )}>
+                <div
+                  className={cn(
+                    'w-4 h-4 rounded border-2 flex items-center justify-center transition-colors',
+                    rememberChoice
+                      ? 'bg-blue-600 border-blue-600'
+                      : 'border-gray-300 dark:border-gray-600 group-hover:border-blue-400'
+                  )}
+                >
                   {rememberChoice && <Check className="w-3 h-3 text-white" />}
                 </div>
               </div>
@@ -133,7 +138,10 @@ export const CorsModal: React.FC<CorsModalProps> = ({
                   {t('tool.apiTester.corsRememberChoice')}
                 </span>
                 <span className="block text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                  {t('tool.apiTester.corsRememberChoiceDesc').replace('{origin}', origin)}
+                  {t('tool.apiTester.corsRememberChoiceDesc').replace(
+                    '{origin}',
+                    origin
+                  )}
                 </span>
               </div>
             </label>
@@ -187,4 +195,3 @@ export const CorsModal: React.FC<CorsModalProps> = ({
 };
 
 export default CorsModal;
-
