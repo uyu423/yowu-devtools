@@ -1,0 +1,397 @@
+# yowu-devtools v1.4.0 구현 계획
+
+## API Tester + Companion Chrome Extension Implementation Plan
+
+---
+
+## 개요
+
+이 문서는 v1.4.0 개발을 위한 구현 계획을 정리합니다.
+요구사항 상세는 `SAS_v1.4.0.md`를 참조하세요.
+
+> **Note**: 이 문서는 AI Agent가 작업할 수 있는 대략적인 구조와 체크리스트만 포함합니다.
+> 구체적인 코드 구현은 AI Agent가 SAS 문서와 기존 코드베이스를 참고하여 작성합니다.
+
+---
+
+## Phase 1: Monorepo 구조 전환 (2-3일)
+
+### 1.1 패키지 매니저 전환 (npm → pnpm)
+
+**작업 내용**:
+1. pnpm 설치
+2. `pnpm-workspace.yaml` 생성
+3. `package-lock.json` → `pnpm-lock.yaml` 전환
+
+**체크리스트**:
+- [ ] pnpm 설치 및 설정
+- [ ] 기존 스크립트 동작 확인
+
+### 1.2 디렉토리 구조 재구성
+
+**목표 구조**:
+```
+yowu-devtools/
+├── apps/
+│   ├── web/                 # 기존 웹앱
+│   └── extension/           # Chrome Extension
+├── packages/
+│   └── shared/              # 공유 타입/유틸
+├── package.json             # Root
+├── pnpm-workspace.yaml
+└── turbo.json
+```
+
+**체크리스트**:
+- [ ] apps/web으로 기존 코드 이동
+- [ ] packages/shared 생성 (공유 타입 정의)
+- [ ] 경로 참조 수정
+- [ ] GitHub Actions 워크플로우 수정
+- [ ] 빌드 테스트 통과
+
+### 1.3 Turborepo 설정
+
+**체크리스트**:
+- [ ] turbo.json 생성
+- [ ] 루트 스크립트 설정 (dev, build, lint)
+- [ ] 빌드 캐싱 동작 확인
+
+---
+
+## Phase 2: Chrome Extension 기본 구조 (3-4일)
+
+### 2.1 Extension 프로젝트 설정
+
+**체크리스트**:
+- [ ] apps/extension 디렉토리 생성
+- [ ] Manifest V3 작성
+- [ ] Vite 빌드 설정
+
+### 2.2 Manifest V3 핵심 설정
+
+**필수 필드**:
+- `manifest_version`: 3
+- `permissions`: `["storage"]`
+- `optional_host_permissions`: `["http://*/*", "https://*/*"]`
+- `externally_connectable.matches`: `["https://tools.yowu.dev/*", "http://localhost:5173/*"]`
+- `background.service_worker`: Event-driven (비활성 상태 유지)
+
+**체크리스트**:
+- [ ] manifest.json 작성
+- [ ] 아이콘 파일 생성 (16, 48, 128px)
+- [ ] 고정 Extension ID 설정 (key 필드)
+
+### 2.3 Service Worker 구현
+
+> **중요**: Service Worker는 **이벤트 기반**으로 동작하며, 평소에는 비활성 상태입니다.
+> WebApp에서 메시지가 오면 활성화되고, 작업 완료 후 다시 비활성화됩니다.
+
+**핵심 기능**:
+- `chrome.runtime.onMessageExternal` 리스너 등록
+- Origin 검증 (허용된 도메인만)
+- 메시지 타입별 핸들러 분기
+- 런타임 권한 관리
+
+**체크리스트**:
+- [ ] 메시지 리스너 구현
+- [ ] Origin 검증 로직
+- [ ] Request Executor 구현
+- [ ] 권한 확인/요청/회수 함수
+
+### 2.4 Options 페이지 구현
+
+**기능**:
+- 승인된 도메인 목록 표시
+- 개별/전체 권한 회수
+- Extension 정보 표시
+
+**체크리스트**:
+- [ ] Options 페이지 UI
+- [ ] 권한 제거 기능
+
+### 2.5 확장성 아키텍처
+
+**핵심 설계**:
+- 모든 메시지에 `version` 필드 포함
+- Handler Registry 패턴으로 메시지 핸들러 등록
+- Feature Flag 시스템으로 기능 분기
+
+**체크리스트**:
+- [ ] BaseMessage 타입 정의 (version 포함)
+- [ ] Handler Registry 구현
+- [ ] Feature 상수 정의
+- [ ] Handshake 메시지 구현
+
+---
+
+## Phase 3: WebApp API Tester 도구 (5-7일)
+
+### 3.1 도구 기본 구조
+
+**파일 구조**:
+```
+apps/web/src/tools/api-tester/
+├── index.tsx              # 도구 정의 및 메인 컴포넌트
+├── components/            # UI 컴포넌트
+├── hooks/                 # 커스텀 훅
+└── utils/                 # 유틸리티 함수
+```
+
+**체크리스트**:
+- [ ] 도구 디렉토리 생성
+- [ ] 상태 타입 정의
+- [ ] 도구 레지스트리에 등록
+- [ ] 라우팅 확인
+
+### 3.2 레이아웃 구조
+
+**3단 레이아웃 (≥1280px)**:
+- 좌측: 기존 Sidebar (도구 목록)
+- 중앙: Request Builder + Response Viewer
+- 우측: History Sidebar
+
+**반응형**:
+- 1024-1279px: History 토글 가능
+- <1024px: History 모달/드로어
+
+**체크리스트**:
+- [ ] ApiTesterLayout 컴포넌트
+- [ ] 반응형 레이아웃
+- [ ] History 사이드바 토글
+
+### 3.3 Request Builder UI
+
+**컴포넌트**:
+- MethodSelector (드롭다운)
+- UrlInput (자동 파싱)
+- SendButton (모드 선택)
+- QueryParamsEditor (key/value 테이블)
+- HeadersEditor (자동완성)
+- BodyEditor (타입별)
+- OptionsPanel
+
+**체크리스트**:
+- [ ] 각 컴포넌트 구현
+- [ ] Body 타입별 에디터 (none, text, JSON, urlencoded, form-data)
+
+### 3.4 Response Viewer UI
+
+**컴포넌트**:
+- ResponseSummary (상태 코드, 시간, 크기)
+- ResponseBody (JSON Tree/Pretty/Raw)
+- ResponseHeaders (테이블)
+
+**체크리스트**:
+- [ ] 상태 코드 색상화
+- [ ] JSON Viewer 통합 (기존 컴포넌트 재사용)
+- [ ] Copy as cURL 기능
+
+### 3.5 History Sidebar (오른쪽)
+
+**컴포넌트**:
+- HistorySearch (fuzzy search)
+- FavoritesList
+- HistoryList
+- HistoryItem (메서드, URL, 상태, 시간)
+
+**체크리스트**:
+- [ ] 히스토리 목록 UI
+- [ ] 즐겨찾기 기능
+- [ ] Context Menu (추가, 이름 변경, 삭제)
+- [ ] Clear History
+
+### 3.6 CORS 우회 전략 구현
+
+> **중요**: Extension 사용은 최후의 수단입니다.
+> 먼저 브라우저에서 가능한 모든 방법을 시도합니다.
+
+**시도 순서**:
+1. 일반 fetch (CORS 허용 API)
+2. no-cors mode (opaque response, 제한적)
+3. CORS proxy 우회 (선택적, 공용 프록시 사용 시)
+4. Extension 모드 (마지막 수단)
+
+**성공 방법 캐싱**:
+- localStorage에 도메인별 성공 방법 저장
+- 다음 요청 시 캐시된 방법 우선 사용
+- 캐시 만료 정책: 7일 (설정 가능)
+- 캐시 무효화: 실패 시 자동 재시도
+
+**체크리스트**:
+- [ ] FetchStrategy 구현 (순차 시도)
+- [ ] 성공 방법 캐싱 로직
+- [ ] 캐시 만료 정책
+- [ ] 캐시 무효화 로직
+
+### 3.7 Extension 통신
+
+**훅**:
+- `useExtension`: 연결 상태 관리, 요청 실행, 권한 관리
+
+**체크리스트**:
+- [ ] useExtension 훅 구현
+- [ ] Handshake 구현
+- [ ] 요청 실행 함수
+- [ ] 권한 확인/요청 함수
+
+### 3.8 히스토리/즐겨찾기
+
+**훅**:
+- `useApiHistory`: 히스토리 CRUD, 즐겨찾기 관리
+
+**체크리스트**:
+- [ ] useApiHistory 훅 구현
+- [ ] 최대 30개 히스토리 관리
+- [ ] 즐겨찾기 기능
+
+---
+
+## Phase 4: i18n 및 SEO (2일)
+
+### 4.1 i18n 번역 키 추가
+
+**네임스페이스**:
+- `tool.apiTester.*`: 도구 UI 텍스트
+- `meta.apiTester.*`: SEO 메타 태그
+
+**체크리스트**:
+- [ ] en-US.ts에 키 추가
+- [ ] ko-KR.ts에 번역 추가
+- [ ] ja-JP.ts에 번역 추가
+- [ ] zh-CN.ts에 번역 추가
+- [ ] es-ES.ts에 번역 추가
+
+### 4.2 SEO 설정
+
+**체크리스트**:
+- [ ] vite-plugin-generate-routes.ts에 도구 정보 추가
+- [ ] 빌드 후 메타 태그 확인
+- [ ] sitemap.xml 업데이트 확인
+
+---
+
+## Phase 5: 테스트 및 검증 (2-3일)
+
+### 5.1 WebApp 테스트
+
+- [ ] Direct 모드 - CORS 허용 API
+- [ ] Direct 모드 - CORS 차단 API → 에러 안내
+- [ ] CORS 우회 전략 순차 시도
+- [ ] 성공 방법 캐싱 동작
+- [ ] 다양한 HTTP 메서드
+- [ ] 다양한 Body 타입
+- [ ] 히스토리/즐겨찾기
+- [ ] 공유 링크
+- [ ] 반응형 레이아웃
+- [ ] 다크모드
+
+### 5.2 Extension 테스트
+
+- [ ] Chrome 개발자 모드 로드
+- [ ] PING/PONG 통신
+- [ ] 권한 요청 흐름
+- [ ] cross-origin fetch
+- [ ] Options 페이지
+
+### 5.3 통합 테스트
+
+- [ ] WebApp ↔ Extension 통신
+- [ ] 권한 요청 → 승인 → 재시도
+- [ ] 에러 전파
+- [ ] Extension 비활성 상태 유지 확인
+
+---
+
+## Phase 6: 문서화 및 배포 준비 (2일)
+
+### 6.1 문서 업데이트
+
+- [ ] README.md 업데이트
+- [ ] RELEASE_NOTES.md 작성
+- [ ] Extension 설치 가이드
+
+### 6.2 배포 준비
+
+**WebApp**:
+- [ ] GitHub Actions 워크플로우 수정
+- [ ] 빌드 테스트
+
+**Extension**:
+- [ ] 프로덕션 빌드
+- [ ] Chrome Web Store 게시 준비 (개발자 계정, 스크린샷 등)
+
+---
+
+## 로컬 개발 환경
+
+### 개발 워크플로우
+
+```bash
+# 1. WebApp + Extension 동시 개발
+pnpm run dev
+
+# 2. Extension 빌드
+pnpm run build:extension
+
+# 3. Chrome에 Extension 로드
+# chrome://extensions/ → 개발자 모드 → 압축 해제된 확장 프로그램 로드
+# apps/extension/dist 폴더 선택
+```
+
+### 환경변수
+
+```bash
+# apps/web/.env.local
+VITE_EXTENSION_ID=<고정 Extension ID>
+```
+
+### 테스트용 API
+
+| 용도 | URL |
+|-----|-----|
+| CORS 허용 | `https://jsonplaceholder.typicode.com/posts` |
+| CORS 차단 | `https://httpbin.org/get` |
+| 에러 테스트 | `https://httpbin.org/status/500` |
+| 지연 테스트 | `https://httpbin.org/delay/3` |
+
+---
+
+## 일정 요약
+
+| Phase | 작업 | 예상 기간 |
+|-------|------|----------|
+| Phase 1 | Monorepo 구조 전환 | 2-3일 |
+| Phase 2 | Chrome Extension 기본 구조 | 3-4일 |
+| Phase 3 | WebApp API Tester 도구 | 5-7일 |
+| Phase 4 | i18n 및 SEO | 2일 |
+| Phase 5 | 테스트 및 검증 | 2-3일 |
+| Phase 6 | 문서화 및 배포 준비 | 2일 |
+| **합계** | | **16-21일** |
+
+---
+
+## 위험 요소 및 대응
+
+### 위험 1: Extension 권한 요청 UX
+
+- **문제**: `chrome.permissions.request()`는 사용자 제스처 컨텍스트에서만 동작
+- **대응**: WebApp에서 버튼 클릭 후 Extension으로 권한 요청 메시지 전달
+
+### 위험 2: Extension ID 관리
+
+- **문제**: 개발 중 Extension ID가 변경될 수 있음
+- **대응**: manifest.json에 `key` 필드로 고정 ID 사용
+
+### 위험 3: Chrome Web Store 심사
+
+- **문제**: Extension 게시 심사에 시간이 소요됨
+- **대응**: 먼저 개발자 모드로 테스트, 심사는 병렬 진행
+
+### 위험 4: Service Worker 비활성화
+
+- **문제**: Service Worker가 비활성화되면 메시지 처리 지연 발생
+- **대응**: 이벤트 리스너만 등록, 상태는 필요할 때만 로드
+
+---
+
+_구현 계획 끝_
