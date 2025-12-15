@@ -3,7 +3,6 @@ import React from 'react';
 import type { ToolDefinition } from '@/tools/types';
 import { KeyRound, Copy } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
-import { EditorPanel } from '@/components/common/EditorPanel';
 import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
 import { useTitle } from '@/hooks/useTitle';
@@ -167,13 +166,16 @@ const UuidTool: React.FC = () => {
         }}
       />
 
-      {/* Options */}
-      <div className="mb-4 space-y-3">
-        <div className="flex flex-wrap gap-4">
-          <OptionLabel tooltip={t('tool.uuid.typeTooltip')}>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t('tool.uuid.type')}
-            </label>
+      {/* Options Card */}
+      <div className="mb-6 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 shadow-sm">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {/* Type Selection */}
+          <div className="space-y-2">
+            <OptionLabel tooltip={t('tool.uuid.typeTooltip')}>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                {t('tool.uuid.type')}
+              </label>
+            </OptionLabel>
             <select
               value={state.type}
               onChange={(e) =>
@@ -181,18 +183,26 @@ const UuidTool: React.FC = () => {
                   type: e.target.value as UuidToolState['type'],
                 })
               }
-              className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="uuid-v4">{t('tool.uuid.uuidV4')}</option>
               <option value="uuid-v7">{t('tool.uuid.uuidV7')}</option>
               <option value="ulid">{t('tool.uuid.ulid')}</option>
             </select>
-          </OptionLabel>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {state.type === 'uuid-v4' && t('tool.uuid.uuidV4Desc')}
+              {state.type === 'uuid-v7' && t('tool.uuid.uuidV7Desc')}
+              {state.type === 'ulid' && t('tool.uuid.ulidDesc')}
+            </p>
+          </div>
 
-          <OptionLabel tooltip={t('tool.uuid.countTooltip')}>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t('tool.uuid.count')}
-            </label>
+          {/* Count Input */}
+          <div className="space-y-2">
+            <OptionLabel tooltip={t('tool.uuid.countTooltip')}>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                {t('tool.uuid.count')}
+              </label>
+            </OptionLabel>
             <input
               type="number"
               min={1}
@@ -202,14 +212,20 @@ const UuidTool: React.FC = () => {
                 const count = Math.max(1, Math.min(100, parseInt(e.target.value, 10) || 1));
                 updateState({ count });
               }}
-              className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 w-24"
+              className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-          </OptionLabel>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {t('tool.uuid.countHint')}
+            </p>
+          </div>
 
-          <OptionLabel tooltip={t('tool.uuid.formatTooltip')}>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t('tool.uuid.format')}
-            </label>
+          {/* Format Selection */}
+          <div className="space-y-2">
+            <OptionLabel tooltip={t('tool.uuid.formatTooltip')}>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                {t('tool.uuid.format')}
+              </label>
+            </OptionLabel>
             <select
               value={state.format}
               onChange={(e) =>
@@ -217,61 +233,78 @@ const UuidTool: React.FC = () => {
                   format: e.target.value as 'lowercase' | 'uppercase',
                 })
               }
-              className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="lowercase">{t('tool.uuid.lowercase')}</option>
               <option value="uppercase">{t('tool.uuid.uppercase')}</option>
             </select>
-          </OptionLabel>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {t('tool.uuid.formatHint')}
+            </p>
+          </div>
         </div>
 
-        <button
-          onClick={generateIds}
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors"
-        >
-          {t('tool.uuid.regenerate')}
-        </button>
+        {/* Generate Button */}
+        <div className="mt-5 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <button
+            onClick={generateIds}
+            className="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors shadow-sm"
+          >
+            {t('tool.uuid.regenerate')}
+          </button>
+        </div>
       </div>
 
       {/* Output */}
-      <div className="mb-4 flex-1 min-h-0">
-        <div className="flex items-center justify-between mb-2">
-          <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+      <div className="flex-1 min-h-0">
+        <div className="flex items-center justify-between mb-3">
+          <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
             {t('tool.uuid.generatedIds')} ({generatedIds.length})
           </label>
-          {state.count === 1 && (
-            <button
-              onClick={() => handleCopy()}
-              disabled={!outputText}
-              className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              title={t('common.copy')}
-            >
-              <Copy className="w-4 h-4" />
-            </button>
-          )}
+          <button
+            onClick={() => handleCopy()}
+            disabled={!outputText}
+            className="flex items-center gap-2 px-3 py-1.5 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed border border-blue-200 dark:border-blue-800"
+            title={t('tool.uuid.copyAll')}
+          >
+            <Copy className="w-4 h-4" />
+            <span>{t('tool.uuid.copyAll')}</span>
+          </button>
         </div>
-        <div className="h-full overflow-auto">
+        <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm overflow-hidden">
           {state.count === 1 ? (
-            <EditorPanel
-              value={outputText}
-              onChange={() => {}}
-              placeholder={t('tool.uuid.resultPlaceholder')}
-              mode="text"
-              readOnly={true}
-            />
+            <div className="p-4">
+              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-md">
+                <code className="text-sm font-mono text-gray-900 dark:text-gray-100 break-all flex-1">
+                  {generatedIds[0]}
+                </code>
+                <button
+                  onClick={() => handleCopy(generatedIds[0])}
+                  className="ml-3 p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-md transition-colors flex-shrink-0"
+                  title={t('common.copy')}
+                >
+                  <Copy className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
           ) : (
-            <div className="border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 p-4 max-h-[400px] overflow-auto">
+            <div className="max-h-[400px] overflow-auto divide-y divide-gray-200 dark:divide-gray-700">
               {generatedIds.map((id, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between py-2 border-b border-gray-200 dark:border-gray-700 last:border-b-0"
+                  className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors"
                 >
-                  <code className="text-sm font-mono text-gray-900 dark:text-gray-100 break-all">
-                    {id}
-                  </code>
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <span className="text-xs font-medium text-gray-400 dark:text-gray-500 w-6 text-right flex-shrink-0">
+                      {index + 1}
+                    </span>
+                    <code className="text-sm font-mono text-gray-900 dark:text-gray-100 break-all">
+                      {id}
+                    </code>
+                  </div>
                   <button
                     onClick={() => handleCopy(id)}
-                    className="ml-4 p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+                    className="ml-3 p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-md transition-colors flex-shrink-0"
                     title={t('common.copy')}
                   >
                     <Copy className="w-4 h-4" />

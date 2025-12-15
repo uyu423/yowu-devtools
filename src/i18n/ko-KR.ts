@@ -365,16 +365,23 @@ export const koKR = {
       uuidV4: 'UUID v4 (랜덤)',
       uuidV7: 'UUID v7 (Timestamp 기반)',
       ulid: 'ULID (짧은 Timestamp 기반)',
+      uuidV4Desc: '완전 랜덤 UUID. 순서가 중요하지 않은 고유 식별자에 적합합니다.',
+      uuidV7Desc: 'Timestamp 기반 UUID. 생성 시간 순으로 자연스럽게 정렬됩니다.',
+      ulidDesc: '26자 식별자. 사전식 정렬 가능하며, UUID보다 짧습니다.',
       lowercase: '소문자',
       uppercase: '대문자',
       regenerate: '재생성',
       generatedIds: '생성된 ID',
       idCopied: 'ID가 클립보드에 복사되었습니다',
       allIdsCopied: '모든 ID가 클립보드에 복사되었습니다',
+      copyAll: '전체 복사',
       typeTooltip:
         'ID 유형을 선택합니다 (UUID v4: 랜덤, UUID v7: Timestamp 기반, ULID: 더 짧음).',
       countTooltip: '생성할 ID 개수 (1-100).',
       formatTooltip: '출력 형식 (소문자 또는 대문자).',
+      countHint: '최대 100개까지 생성 가능',
+      formatHint: '출력 대소문자 스타일',
+      resultPlaceholder: '생성된 ID가 여기에 표시됩니다',
     },
     password: {
       title: 'Password Generator',
@@ -498,22 +505,27 @@ export const koKR = {
       patternDigitDesc: '모든 숫자(0-9)를 매칭합니다. [0-9]와 동일합니다.',
       patternDigitExample: '\\d+는 하나 이상의 숫자를 매칭',
       patternNonDigitName: '숫자가 아닌 문자',
-      patternNonDigitDesc: '숫자가 아닌 모든 문자를 매칭합니다. [^0-9]와 동일합니다.',
+      patternNonDigitDesc:
+        '숫자가 아닌 모든 문자를 매칭합니다. [^0-9]와 동일합니다.',
       patternNonDigitExample: '\\D+는 하나 이상의 숫자가 아닌 문자를 매칭',
       patternWordCharName: 'Word Character',
-      patternWordCharDesc: '모든 단어 문자(영숫자와 밑줄)를 매칭합니다. [A-Za-z0-9_]와 동일합니다.',
+      patternWordCharDesc:
+        '모든 단어 문자(영숫자와 밑줄)를 매칭합니다. [A-Za-z0-9_]와 동일합니다.',
       patternWordCharExample: '\\w+는 하나 이상의 단어 문자를 매칭',
       patternNonWordCharName: 'Non-word Character',
-      patternNonWordCharDesc: '단어 문자가 아닌 모든 문자를 매칭합니다. [^A-Za-z0-9_]와 동일합니다.',
+      patternNonWordCharDesc:
+        '단어 문자가 아닌 모든 문자를 매칭합니다. [^A-Za-z0-9_]와 동일합니다.',
       patternNonWordCharExample: '\\W+는 하나 이상의 단어가 아닌 문자를 매칭',
       patternWhitespaceName: '공백',
-      patternWhitespaceDesc: '모든 공백 문자(스페이스, 탭, 줄바꿈 등)를 매칭합니다.',
+      patternWhitespaceDesc:
+        '모든 공백 문자(스페이스, 탭, 줄바꿈 등)를 매칭합니다.',
       patternWhitespaceExample: '\\s+는 하나 이상의 공백 문자를 매칭',
       patternNonWhitespaceName: '공백이 아닌 문자',
       patternNonWhitespaceDesc: '공백이 아닌 모든 문자를 매칭합니다.',
       patternNonWhitespaceExample: '\\S+는 하나 이상의 공백이 아닌 문자를 매칭',
       patternDotEscapedName: 'Dot (이스케이프됨)',
-      patternDotEscapedDesc: '리터럴 점 문자를 매칭합니다. 이스케이프되지 않은 점(.)은 줄바꿈을 제외한 모든 문자를 매칭합니다.',
+      patternDotEscapedDesc:
+        '리터럴 점 문자를 매칭합니다. 이스케이프되지 않은 점(.)은 줄바꿈을 제외한 모든 문자를 매칭합니다.',
       patternDotEscapedExample: '\\.는 리터럴 점을 매칭',
       patternNewlineName: '줄바꿈',
       patternNewlineDesc: '줄바꿈 문자를 매칭합니다.',
@@ -532,7 +544,8 @@ export const koKR = {
       patternOneOrMoreDesc: '앞의 요소가 1번 이상 나타나는 것을 매칭합니다.',
       patternOneOrMoreExample: "a+는 1개 이상의 'a' 문자를 매칭",
       patternZeroOrOneName: '0개 또는 1개',
-      patternZeroOrOneDesc: '앞의 요소가 0번 또는 1번 나타나는 것을 매칭합니다 (선택적).',
+      patternZeroOrOneDesc:
+        '앞의 요소가 0번 또는 1번 나타나는 것을 매칭합니다 (선택적).',
       patternZeroOrOneExample: "a?는 0개 또는 1개의 'a' 문자를 매칭",
       patternExactlyNName: '정확히 N개',
       patternExactlyNDesc: '앞의 요소가 정확히 n번 나타나는 것을 매칭합니다.',
@@ -541,106 +554,141 @@ export const koKR = {
       patternNOrMoreDesc: '앞의 요소가 n번 이상 나타나는 것을 매칭합니다.',
       patternNOrMoreExample: "a{3,}는 3개 이상의 'a' 문자를 매칭",
       patternBetweenNMName: 'N개에서 M개 사이',
-      patternBetweenNMDesc: '앞의 요소가 n번에서 m번 사이로 나타나는 것을 매칭합니다.',
+      patternBetweenNMDesc:
+        '앞의 요소가 n번에서 m번 사이로 나타나는 것을 매칭합니다.',
       patternBetweenNMExample: "a{3,5}는 3개에서 5개 사이의 'a' 문자를 매칭",
       patternLazyZeroOrMoreName: 'Lazy 0개 이상',
-      patternLazyZeroOrMoreDesc: '*의 non-greedy (lazy) 버전. 가능한 적은 문자를 매칭합니다.',
+      patternLazyZeroOrMoreDesc:
+        '*의 non-greedy (lazy) 버전. 가능한 적은 문자를 매칭합니다.',
       patternLazyZeroOrMoreExample: "a*?는 0개 이상의 'a' 문자를 매칭 (lazy)",
       patternLazyOneOrMoreName: 'Lazy 1개 이상',
-      patternLazyOneOrMoreDesc: '+의 non-greedy (lazy) 버전. 가능한 적은 문자를 매칭합니다.',
+      patternLazyOneOrMoreDesc:
+        '+의 non-greedy (lazy) 버전. 가능한 적은 문자를 매칭합니다.',
       patternLazyOneOrMoreExample: "a+?는 1개 이상의 'a' 문자를 매칭 (lazy)",
       patternLazyZeroOrOneName: 'Lazy 0개 또는 1개',
       patternLazyZeroOrOneDesc: '?의 non-greedy (lazy) 버전.',
-      patternLazyZeroOrOneExample: "a??는 0개 또는 1개의 'a' 문자를 매칭 (lazy)",
+      patternLazyZeroOrOneExample:
+        "a??는 0개 또는 1개의 'a' 문자를 매칭 (lazy)",
       // Pattern descriptions - Anchors
       patternStartOfStringName: '문자열 시작',
-      patternStartOfStringDesc: "문자열의 시작을 매칭합니다 (또는 'm' 플래그와 함께 줄의 시작).",
+      patternStartOfStringDesc:
+        "문자열의 시작을 매칭합니다 (또는 'm' 플래그와 함께 줄의 시작).",
       patternStartOfStringExample: "^abc는 문자열 시작의 'abc'를 매칭",
       patternEndOfStringName: '문자열 끝',
-      patternEndOfStringDesc: "문자열의 끝을 매칭합니다 (또는 'm' 플래그와 함께 줄의 끝).",
+      patternEndOfStringDesc:
+        "문자열의 끝을 매칭합니다 (또는 'm' 플래그와 함께 줄의 끝).",
       patternEndOfStringExample: "abc$는 문자열 끝의 'abc'를 매칭",
       patternWordBoundaryName: 'Word Boundary',
-      patternWordBoundaryDesc: 'Word boundary (단어 문자와 비단어 문자 사이)를 매칭합니다.',
+      patternWordBoundaryDesc:
+        'Word boundary (단어 문자와 비단어 문자 사이)를 매칭합니다.',
       patternWordBoundaryExample: "\\bword\\b는 전체 단어 'word'를 매칭",
       patternNonWordBoundaryName: 'Non-word Boundary',
       patternNonWordBoundaryDesc: 'Word boundary가 아닌 위치를 매칭합니다.',
-      patternNonWordBoundaryExample: "\\Bword\\B는 word boundary가 아닌 위치의 'word'를 매칭",
+      patternNonWordBoundaryExample:
+        "\\Bword\\B는 word boundary가 아닌 위치의 'word'를 매칭",
       // Pattern descriptions - Groups
       patternCapturingGroupName: 'Capturing Group',
-      patternCapturingGroupDesc: '매칭된 텍스트를 그룹화하고 캡처합니다. $1, $2 등으로 참조할 수 있습니다.',
+      patternCapturingGroupDesc:
+        '매칭된 텍스트를 그룹화하고 캡처합니다. $1, $2 등으로 참조할 수 있습니다.',
       patternCapturingGroupExample: "(abc)는 'abc'를 group 1로 캡처",
       patternNonCapturingGroupName: 'Non-capturing Group',
-      patternNonCapturingGroupDesc: '캡처 없이 그룹화합니다. 캡처 그룹을 만들지 않고 quantifier를 적용할 때 유용합니다.',
+      patternNonCapturingGroupDesc:
+        '캡처 없이 그룹화합니다. 캡처 그룹을 만들지 않고 quantifier를 적용할 때 유용합니다.',
       patternNonCapturingGroupExample: "(?:abc)는 캡처 없이 'abc'를 그룹화",
       patternNamedCapturingGroupName: 'Named Capturing Group',
-      patternNamedCapturingGroupDesc: '이름으로 참조할 수 있는 명명된 캡처 그룹을 만듭니다.',
-      patternNamedCapturingGroupExample: "(?<name>abc)는 'abc'를 'name' 그룹으로 캡처",
+      patternNamedCapturingGroupDesc:
+        '이름으로 참조할 수 있는 명명된 캡처 그룹을 만듭니다.',
+      patternNamedCapturingGroupExample:
+        "(?<name>abc)는 'abc'를 'name' 그룹으로 캡처",
       patternPositiveLookaheadName: 'Positive Lookahead',
-      patternPositiveLookaheadDesc: '뒤에 오는 것이 패턴과 매칭됨을 확인하지만, 문자를 소비하지 않습니다.',
-      patternPositiveLookaheadExample: "abc(?=def)는 'def'가 뒤따르는 경우에만 'abc'를 매칭",
+      patternPositiveLookaheadDesc:
+        '뒤에 오는 것이 패턴과 매칭됨을 확인하지만, 문자를 소비하지 않습니다.',
+      patternPositiveLookaheadExample:
+        "abc(?=def)는 'def'가 뒤따르는 경우에만 'abc'를 매칭",
       patternNegativeLookaheadName: 'Negative Lookahead',
-      patternNegativeLookaheadDesc: '뒤에 오는 것이 패턴과 매칭되지 않음을 확인합니다.',
-      patternNegativeLookaheadExample: "abc(?!def)는 'def'가 뒤따르지 않는 경우에만 'abc'를 매칭",
+      patternNegativeLookaheadDesc:
+        '뒤에 오는 것이 패턴과 매칭되지 않음을 확인합니다.',
+      patternNegativeLookaheadExample:
+        "abc(?!def)는 'def'가 뒤따르지 않는 경우에만 'abc'를 매칭",
       patternPositiveLookbehindName: 'Positive Lookbehind',
-      patternPositiveLookbehindDesc: '앞에 오는 것이 패턴과 매칭됨을 확인하지만, 문자를 소비하지 않습니다.',
-      patternPositiveLookbehindExample: "(?<=abc)def는 'abc'가 앞에 있는 경우에만 'def'를 매칭",
+      patternPositiveLookbehindDesc:
+        '앞에 오는 것이 패턴과 매칭됨을 확인하지만, 문자를 소비하지 않습니다.',
+      patternPositiveLookbehindExample:
+        "(?<=abc)def는 'abc'가 앞에 있는 경우에만 'def'를 매칭",
       patternNegativeLookbehindName: 'Negative Lookbehind',
-      patternNegativeLookbehindDesc: '앞에 오는 것이 패턴과 매칭되지 않음을 확인합니다.',
-      patternNegativeLookbehindExample: "(?<!abc)def는 'abc'가 앞에 없는 경우에만 'def'를 매칭",
+      patternNegativeLookbehindDesc:
+        '앞에 오는 것이 패턴과 매칭되지 않음을 확인합니다.',
+      patternNegativeLookbehindExample:
+        "(?<!abc)def는 'abc'가 앞에 없는 경우에만 'def'를 매칭",
       patternBackreferenceName: 'Backreference',
       patternBackreferenceDesc: '번호로 이전에 캡처된 그룹을 참조합니다.',
       patternBackreferenceExample: "(abc)\\1은 'abcabc'를 매칭",
       patternNamedBackreferenceName: 'Named Backreference',
       patternNamedBackreferenceDesc: '이전에 캡처된 명명된 그룹을 참조합니다.',
-      patternNamedBackreferenceExample: "(?<name>abc)\\k<name>은 'abcabc'를 매칭",
+      patternNamedBackreferenceExample:
+        "(?<name>abc)\\k<name>은 'abcabc'를 매칭",
       // Pattern descriptions - Character Sets
       patternCharacterClassName: 'Character Class',
-      patternCharacterClassDesc: '집합에서 어떤 한 문자를 매칭합니다. 시작에 ^를 사용하면 부정합니다.',
+      patternCharacterClassDesc:
+        '집합에서 어떤 한 문자를 매칭합니다. 시작에 ^를 사용하면 부정합니다.',
       patternCharacterClassExample: "[abc]는 'a', 'b', 또는 'c'를 매칭",
       patternNegatedCharacterClassName: 'Negated Character Class',
       patternNegatedCharacterClassDesc: '집합에 없는 모든 문자를 매칭합니다.',
-      patternNegatedCharacterClassExample: "[^abc]는 'a', 'b', 'c'를 제외한 모든 문자를 매칭",
+      patternNegatedCharacterClassExample:
+        "[^abc]는 'a', 'b', 'c'를 제외한 모든 문자를 매칭",
       patternCharacterRangeName: 'Character Range',
       patternCharacterRangeDesc: '문자 범위를 매칭합니다.',
       patternCharacterRangeExample: '[a-z]는 모든 소문자를 매칭',
       // Pattern descriptions - Flags
       patternGlobalFlagName: 'Global',
-      patternGlobalFlagDesc: '첫 번째 매칭 후 중단하지 않고 모든 매칭을 찾습니다.',
+      patternGlobalFlagDesc:
+        '첫 번째 매칭 후 중단하지 않고 모든 매칭을 찾습니다.',
       patternGlobalFlagExample: '/pattern/g는 모든 발생을 찾음',
       patternCaseInsensitiveFlagName: 'Case Insensitive',
       patternCaseInsensitiveFlagDesc: '대소문자를 구분하지 않는 매칭.',
-      patternCaseInsensitiveFlagExample: "/pattern/i는 'Pattern', 'PATTERN' 등을 매칭",
+      patternCaseInsensitiveFlagExample:
+        "/pattern/i는 'Pattern', 'PATTERN' 등을 매칭",
       patternMultilineFlagName: 'Multiline',
-      patternMultilineFlagDesc: '^와 $를 문자열 전체가 아닌 각 줄의 시작/끝과 매칭하게 합니다.',
-      patternMultilineFlagExample: "/^pattern$/m은 모든 줄의 시작에서 'pattern'을 매칭",
+      patternMultilineFlagDesc:
+        '^와 $를 문자열 전체가 아닌 각 줄의 시작/끝과 매칭하게 합니다.',
+      patternMultilineFlagExample:
+        "/^pattern$/m은 모든 줄의 시작에서 'pattern'을 매칭",
       patternDotAllFlagName: 'DotAll',
       patternDotAllFlagDesc: '.이 줄바꿈 문자도 매칭하게 합니다.',
       patternDotAllFlagExample: '/pattern./s는 .이 줄바꿈을 매칭할 수 있게 함',
       patternUnicodeFlagName: 'Unicode',
-      patternUnicodeFlagDesc: '전체 Unicode 매칭을 활성화합니다. 패턴을 Unicode code point 시퀀스로 처리합니다.',
+      patternUnicodeFlagDesc:
+        '전체 Unicode 매칭을 활성화합니다. 패턴을 Unicode code point 시퀀스로 처리합니다.',
       patternUnicodeFlagExample: '/\\u{1F600}/u는 Unicode 이모지를 매칭',
       patternStickyFlagName: 'Sticky',
-      patternStickyFlagDesc: 'lastIndex 속성이 가리키는 인덱스에서만 매칭합니다.',
+      patternStickyFlagDesc:
+        'lastIndex 속성이 가리키는 인덱스에서만 매칭합니다.',
       patternStickyFlagExample: '/pattern/y는 lastIndex에서만 매칭',
       patternHasIndicesFlagName: 'HasIndices',
       patternHasIndicesFlagDesc: '부분 문자열 매칭에 대한 인덱스를 생성합니다.',
       patternHasIndicesFlagExample: '/pattern/d는 매칭 결과에 인덱스를 포함',
       patternUnicodeSetsFlagName: 'UnicodeSets',
-      patternUnicodeSetsFlagDesc: '개선된 character class 처리와 함께 Unicode set 모드를 활성화합니다.',
-      patternUnicodeSetsFlagExample: '/[\\p{Letter}]/v는 Unicode 문자 속성을 매칭',
+      patternUnicodeSetsFlagDesc:
+        '개선된 character class 처리와 함께 Unicode set 모드를 활성화합니다.',
+      patternUnicodeSetsFlagExample:
+        '/[\\p{Letter}]/v는 Unicode 문자 속성을 매칭',
       // Pattern descriptions - Unicode
       patternUnicodeEscapeName: 'Unicode Escape',
       patternUnicodeEscapeDesc: 'Code point로 Unicode 문자를 매칭합니다.',
       patternUnicodeEscapeExample: "\\u0041은 'A'를 매칭",
       patternUnicodeCodePointName: 'Unicode Code Point',
-      patternUnicodeCodePointDesc: "Code point로 Unicode 문자를 매칭합니다 ('u' 플래그 필요).",
+      patternUnicodeCodePointDesc:
+        "Code point로 Unicode 문자를 매칭합니다 ('u' 플래그 필요).",
       patternUnicodeCodePointExample: '\\u{1F600}은 😀를 매칭',
       patternUnicodePropertyName: 'Unicode Property',
-      patternUnicodePropertyDesc: "특정 Unicode 속성을 가진 문자를 매칭합니다 ('u' 또는 'v' 플래그 필요).",
+      patternUnicodePropertyDesc:
+        "특정 Unicode 속성을 가진 문자를 매칭합니다 ('u' 또는 'v' 플래그 필요).",
       patternUnicodePropertyExample: '\\p{Letter}는 모든 Unicode 문자를 매칭',
       patternNegatedUnicodePropertyName: 'Negated Unicode Property',
-      patternNegatedUnicodePropertyDesc: '특정 Unicode 속성이 없는 문자를 매칭합니다.',
-      patternNegatedUnicodePropertyExample: '\\P{Letter}는 문자가 아닌 모든 문자를 매칭',
+      patternNegatedUnicodePropertyDesc:
+        '특정 Unicode 속성이 없는 문자를 매칭합니다.',
+      patternNegatedUnicodePropertyExample:
+        '\\P{Letter}는 문자가 아닌 모든 문자를 매칭',
     },
     jwtDecoder: {
       title: 'JWT Decoder',
