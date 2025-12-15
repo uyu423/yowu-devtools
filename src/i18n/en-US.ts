@@ -63,6 +63,18 @@ export const enUS = {
     sharedUrlInvalid: 'Shared URL is invalid. Restoring default state.',
     unableToCopy: 'Unable to copy to clipboard.',
   },
+  shareModal: {
+    title: 'Share {toolName}',
+    sensitiveWarningTitle: 'Sensitive Data Warning',
+    sensitiveWarningDescription:
+      'This tool may contain sensitive information. Only share links with trusted parties. The shared data will be visible to anyone with the link.',
+    includedInShareLink: 'Included in share link:',
+    excludedUiOnly: 'Excluded (UI-only):',
+    notShared: 'not shared',
+    footerNote:
+      'The share link will be copied to your clipboard. All processing happens in your browser - no data is sent to servers.',
+    generateShareLink: 'Generate Share Link',
+  },
   pwa: {
     appReadyOffline: 'App is ready to work offline',
     youAreOffline: 'You are currently offline',
@@ -283,6 +295,7 @@ export const enUS = {
       nextRuns: 'Next runs',
       items10: '10 items',
       items20: '20 items',
+      items50: '50 items',
       cronParsingError: 'Cron parsing error',
       pleaseEnterCron: 'Enter a cron expression.',
       expectedFields: 'Expected {n} fields but received {m}.',
@@ -290,6 +303,65 @@ export const enUS = {
         'Switch to 6-field cron format with a leading seconds column.',
       timezoneTooltip: 'Choose the timezone for calculating upcoming runs.',
       nextRunsTooltip: 'Set how many future executions to preview.',
+      // v1.3.2 - Spec/Dialect support
+      spec: 'Spec',
+      specTooltip: 'Select the cron dialect/specification format.',
+      specAuto: 'Auto Detect',
+      specAutoDesc: 'Automatically detect the cron format',
+      specUnix: 'UNIX/Vixie',
+      specUnixDesc: 'Standard 5-field cron',
+      specUnixSeconds: 'UNIX + Seconds',
+      specUnixSecondsDesc: '6-field cron with seconds',
+      specQuartz: 'Quartz',
+      specQuartzDesc: 'Quartz Scheduler format (supports ? L W #)',
+      specAws: 'AWS EventBridge',
+      specAwsDesc: 'AWS cron format with cron(...) wrapper',
+      specK8s: 'Kubernetes',
+      specK8sDesc: 'K8s CronJob format (supports @hourly, @daily)',
+      specJenkins: 'Jenkins',
+      specJenkinsDesc: 'Jenkins Pipeline cron with H hash token',
+      // Normalized display
+      normalized: 'Normalized',
+      awsFormat: 'AWS format',
+      // From datetime
+      fromDateTime: 'From',
+      fromDateTimeTooltip: 'Set the base datetime for calculating next runs.',
+      now: 'Now',
+      // Field breakdown
+      fieldBreakdown: 'Field Breakdown',
+      fieldSeconds: 'Seconds',
+      fieldMinutes: 'Minutes',
+      fieldHours: 'Hours',
+      fieldDom: 'Day of Month',
+      fieldMonth: 'Month',
+      fieldDow: 'Day of Week',
+      fieldYear: 'Year',
+      // Warnings
+      warnings: 'Notes',
+      warningDomDowOr:
+        'UNIX cron: When both day-of-month and day-of-week are specified, they use OR semantics (runs if either matches).',
+      warningDomDowExclusive:
+        'Must use ? in either day-of-month or day-of-week field.',
+      warningAwsDomDow:
+        'AWS EventBridge: Cannot use * in both day-of-month and day-of-week. Use ? in one field.',
+      warningJenkinsHash:
+        'Jenkins H token: Short intervals may cause irregular execution at month boundaries.',
+      warningAwsTz:
+        'AWS EventBridge schedules use UTC by default. Specify a timezone in the schedule if needed.',
+      warningK8sTz:
+        'Kubernetes CronJob: Use .spec.timeZone field for timezone support.',
+      // Special tokens
+      specialTokens: 'Special Tokens',
+      tokenQuestion: '? - No specific value (placeholder)',
+      tokenL: 'L - Last day of month/week',
+      tokenW: 'W - Nearest weekday',
+      tokenHash: '# - Nth weekday of month (e.g., 2#1 = first Monday)',
+      tokenH: 'H - Hash-based value for load distribution',
+      // Copy formats
+      copyIso: 'Copy as ISO',
+      copyRfc3339: 'Copy as RFC3339',
+      copyEpoch: 'Copy as Epoch',
+      copiedNextRuns: 'Next runs copied.',
     },
     hash: {
       title: 'Hash Generator',

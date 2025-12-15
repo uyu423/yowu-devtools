@@ -1,4 +1,172 @@
+<!--
+RELEASE_NOTES.md must be written in English.
+-->
+
 # Release Notes
+
+## v1.3.3 (December 2025) - PWA Update Notification Fix & SEO Optimization
+
+**Bug Fixes:**
+
+- 🔧 **PWA Update Notification Not Showing**:
+  - Resolved conflict between `registerType: 'prompt'` mode and `skipWaiting`/`clientsClaim` settings
+  - Update notifications now display correctly in installed PWA after new version deployment
+  - Optimized configuration based on vite-plugin-pwa official documentation
+
+**Enhancements:**
+
+- ⚡ **Improved PWA Update Detection**:
+
+  - **Added version.json-based version check** (alongside Service Worker)
+    - Auto-generate `/version.json` file at build time
+    - Compare server version on app startup for update notification
+    - Periodic version check every 5 minutes
+  - Auto-check for updates when app receives focus (tab switch, window activation)
+  - Immediate update check when coming back online from offline
+  - Skip update check when offline (prevents unnecessary errors)
+  - Uses `onRegisteredSW` callback (v0.12.8+ recommended approach)
+
+- 🔍 **SEO: Sitemap Priority Optimization**:
+
+  - Applied priority strategy based on real developer search patterns
+  - Individual tool pages (en-US): **priority 1.0** (search engine top priority)
+  - Locale tool pages: **priority 0.9**
+  - Home pages (all locales): **priority 0.8**
+  - Developers search directly for "json formatter", "base64 decode" etc., so tool pages prioritized over homepage
+
+- 📖 **PWA Troubleshooting Documentation Overhaul**:
+  - Explained relationship between `registerType` option and `skipWaiting`/`clientsClaim`
+  - Added guide for resolving update not reflecting issues
+  - Added console log meaning explanations
+  - Added vite-plugin-pwa official documentation links
+
+**Technical:**
+
+- `vite.config.ts`: Removed `skipWaiting` and `clientsClaim` options (prompt mode compatible)
+- `vite-plugin-generate-routes.ts`:
+  - Auto-generate `version.json` at build time
+  - Defined sitemap priority constants (`TOOL_PRIORITY`, `TOOL_LOCALE_PRIORITY`, `HOME_PRIORITY`)
+- `usePWA.ts`: Version-based update check + Service Worker update check in parallel
+- `docs/PWA_TROUBLESHOOTING.md`: Complete documentation overhaul
+
+**References:**
+
+- [vite-plugin-pwa Prompt for update](https://vite-pwa-org.netlify.app/guide/prompt-for-update.html)
+- [vite-plugin-pwa Periodic SW updates](https://vite-pwa-org.netlify.app/guide/periodic-sw-updates.html)
+
+---
+
+## v1.3.2 (December 2025) - Cron Parser Advanced
+
+A major Cron Parser enhancement supporting various cron dialects with accurate semantics parsing and improved UI/UX.
+
+**New Features:**
+
+- ✨ **Multi Cron Spec Support**:
+
+  - **Auto** (recommended): Auto-detect by analyzing input
+  - **UNIX/Vixie**: Standard 5-field, DOM/DOW OR rule clarification
+  - **UNIX + Seconds**: 6-field (includes seconds)
+  - **Quartz**: 6-7 fields, `? L W #` advanced operators support
+  - **AWS EventBridge**: `cron(...)` wrapper + year field
+  - **Kubernetes CronJob**: `@hourly`, `@daily` macro support
+  - **Jenkins**: `H` hash token and alias support
+
+- ✨ **Wrapper Normalization**:
+
+  - Auto-extract from `cron(...)`, `cron('...')`, `cron("...")`
+  - Remove leading/trailing whitespace/newlines/text
+  - Display "Normalized" and "AWS format"
+
+- ✨ **Field Breakdown + Highlighting**:
+
+  - Display cards for Minutes / Hours / DOM / Month / DOW / (Year/Seconds)
+  - Color/underline highlighting for input tokens
+  - Mutual highlighting on hover (mobile: tap)
+  - Badge display for `L/W/#/?/H` special tokens
+
+- ✨ **Enhanced Next Runs Calculation**:
+  - "From" base time setting (useful for debugging)
+  - Copy buttons for ISO / RFC3339 / Epoch formats
+  - Web Worker to prevent UI freezing
+
+**Enhancements:**
+
+- 🔧 **Semantics Clarification**:
+
+  - UNIX/Vixie: Explicit DOM/DOW **OR** rule (not AND!)
+  - AWS/Quartz: DOM/DOW simultaneous specification constraint validation
+  - Differentiated error messages per spec
+
+- ⚠️ **Automatic Compatibility/Warnings**:
+
+  - UNIX/Vixie: DOM/DOW OR warning
+  - Jenkins: `H/3` short period end-of-month irregularity warning
+  - AWS: Format/limitations/TZ/DST characteristics
+  - K8s: `TZ=` not supported, `.spec.timeZone` recommended
+
+- 🔄 **Conversion Feature** (optional):
+  - UNIX(5) ↔ UNIX+Seconds(6)
+  - UNIX(5) → AWS (`cron(...)`)
+  - Clear warnings for non-convertible/non-equivalent expressions
+
+**Technical:**
+
+- Separate parser modules per spec (`src/tools/cron/parsers/`)
+- Auto-detection logic (wrapper, special tokens, field count based)
+- Offload next-run calculation to Web Worker
+- Add i18n translation keys (`tool.cron.spec.*`, `tool.cron.field.*`, `tool.cron.warning.*`)
+
+**Dependencies:**
+
+| Library                  | Purpose                    | Notes             |
+| ------------------------ | -------------------------- | ----------------- |
+| `cron-parser` (existing) | Next run time calculation  | UNIX 5/6 fields   |
+| `cronstrue` (existing)   | Human-readable description | i18n support      |
+| `croner` (under review)  | Quartz advanced syntax     | `L W # ?` support |
+
+**Spec Verification:**
+
+- ✅ UNIX/Vixie DOM/DOW OR rule: [man7.org](https://man7.org/linux/man-pages/man5/crontab.5.html)
+- ✅ Quartz `?` required rule: [quartz-scheduler.org](https://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/crontrigger.html)
+- ✅ AWS EventBridge constraints: [docs.aws.amazon.com](https://docs.aws.amazon.com/scheduler/latest/UserGuide/schedule-types.html#cron-based)
+
+---
+
+## v1.3.1 (December 2025) - Code Quality & Bug Fixes
+
+**Bug Fixes:**
+
+- 🔧 **JWT Encoder**: Fixed HMAC algorithm (HS256/HS384/HS512) not showing results
+  - Corrected conditional logic that prevented `signToken()` from being called
+
+**Refactoring:**
+
+- 🏗️ **New Custom Hooks**:
+  - `useToolSetup`: Combines `useTitle` and `useI18n` for consistent tool setup
+  - `useLocalStorage`: Generic localStorage hook with cross-tab/component sync
+- 🎨 **New Common Components**:
+  - `ModeToggle`: Reusable mode toggle button group (URL, Base64, Diff tools)
+  - `ResultPanel`: Consistent result display with copy button
+- 🌐 **i18n Improvements**:
+  - ShareModal now fully internationalized
+  - Added ShareModal-related translation keys to all locales
+- ⚡ **Performance Optimizations**:
+  - Static route generation in App.tsx (moved outside component)
+  - Reduced re-renders from route definitions
+- 🗑️ **Code Cleanup**:
+  - Removed deprecated `shareState` function from `useToolState`
+  - Simplified `useFavorites` and `useRecentTools` with `useLocalStorage`
+  - Added `i18nKey` field to `ToolDefinition` for explicit i18n mapping
+  - Added `getToolI18nKey` helper function
+
+**Technical:**
+
+- Refactored localStorage hooks to use common `useLocalStorage` abstraction
+- Improved code organization with consistent patterns across tools
+- Better separation of concerns in tool components
+
+---
 
 ## v1.3.0 (December 2025) - i18n Internationalization
 

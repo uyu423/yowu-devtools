@@ -7,15 +7,13 @@ import { EditorPanel } from '@/components/common/EditorPanel';
 import { ActionBar } from '@/components/common/ActionBar';
 import { FileInput } from '@/components/common/FileInput';
 import { FileDownload } from '@/components/common/FileDownload';
+import { ModeToggle } from '@/components/common/ModeToggle';
 import { getMimeType } from '@/lib/fileUtils';
 import { OptionLabel } from '@/components/ui/OptionLabel';
-import { useToolState } from '@/hooks/useToolState';
+import { useToolSetup } from '@/hooks/useToolSetup';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
-import { useTitle } from '@/hooks/useTitle';
-import { useI18n } from '@/hooks/useI18nHooks';
 import { useWebWorker, shouldUseWorkerForText } from '@/hooks/useWebWorker';
 import { copyToClipboard } from '@/lib/clipboard';
-import { isMobileDevice } from '@/lib/utils';
 import { ShareModal } from '@/components/common/ShareModal';
 import DiffMatchPatch from 'diff-match-patch';
 import type { Diff } from 'diff-match-patch';
@@ -37,15 +35,15 @@ const DEFAULT_STATE: DiffToolState = {
 };
 
 const DiffTool: React.FC = () => {
-  const { t } = useI18n();
-  useTitle(t('tool.diff.title'));
-  // Diff tool state contains: left (string), right (string), view, ignoreWhitespace, ignoreCase
-  // All fields are necessary for sharing - input strings may be large but required
-  const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
-    useToolState<DiffToolState>('diff', DEFAULT_STATE);
-  const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
-  const shareInfo = getShareStateInfo();
-  const isMobile = isMobileDevice();
+  const {
+    state,
+    updateState,
+    resetState,
+    t,
+    handleShare,
+    shareModalProps,
+  } = useToolSetup<DiffToolState>('diff', 'diff', DEFAULT_STATE);
+
   const debouncedLeft = useDebouncedValue(state.left, 250);
   const debouncedRight = useDebouncedValue(state.right, 250);
 
@@ -147,14 +145,9 @@ const DiffTool: React.FC = () => {
         title={t('tool.diff.title')}
         description={t('tool.diff.description')}
         onReset={() => resetState()}
-        onShare={async () => {
-          if (isMobile) {
-            setIsShareModalOpen(true);
-          } else {
-            await copyShareLink();
-          }
-        }}
+        onShare={handleShare}
       />
+      <ShareModal {...shareModalProps} />
 
       <div className="flex flex-col gap-4">
         <div className="grid gap-4 lg:grid-cols-2">
@@ -197,21 +190,15 @@ const DiffTool: React.FC = () => {
         </div>
 
         <ActionBar className="flex flex-wrap items-center justify-between rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm">
-          <div className="inline-flex items-center rounded-lg border dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-1 text-sm font-medium">
-            {(['split', 'unified'] as const).map((view) => (
-              <button
-                key={view}
-                className={`rounded-md px-3 py-1.5 ${
-                  state.view === view
-                    ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-sm'
-                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
-                }`}
-                onClick={() => updateState({ view })}
-              >
-                {view === 'split' ? t('tool.diff.splitView') : t('tool.diff.unifiedView')}
-              </button>
-            ))}
-          </div>
+          <ModeToggle
+            options={[
+              { value: 'split' as const, label: t('tool.diff.splitView') },
+              { value: 'unified' as const, label: t('tool.diff.unifiedView') },
+            ]}
+            value={state.view}
+            onChange={(view) => updateState({ view })}
+            variant="pill"
+          />
 
           <div className="flex flex-wrap items-center gap-4 text-sm text-gray-700 dark:text-gray-300">
             <label className="flex items-center gap-2 cursor-pointer">
@@ -304,17 +291,6 @@ const DiffTool: React.FC = () => {
           )}
         </div>
       </div>
-      <ShareModal
-        isOpen={isShareModalOpen}
-        onClose={() => setIsShareModalOpen(false)}
-        onConfirm={async () => {
-          setIsShareModalOpen(false);
-          await shareViaWebShare();
-        }}
-        includedFields={shareInfo.includedFields}
-        excludedFields={shareInfo.excludedFields}
-        toolName={t('tool.diff.title')}
-      />
     </div>
   );
 };

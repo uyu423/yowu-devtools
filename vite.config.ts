@@ -192,6 +192,11 @@ export default defineConfig({
       workbox: {
         // Network First 전략: 최신 버전 우선, 실패 시 캐시 사용
         runtimeCaching: [
+          // version.json은 항상 네트워크에서 가져옴 (캐시 안함)
+          {
+            urlPattern: /\/version\.json$/,
+            handler: 'NetworkOnly',
+          },
           {
             urlPattern: /^https:\/\/tools\.yowu\.dev\/.*$/i,
             handler: 'NetworkFirst',
@@ -243,10 +248,9 @@ export default defineConfig({
         navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/],
         // 클린업: 오래된 캐시 자동 삭제
         cleanupOutdatedCaches: true,
-        // 클라이언트 클레임: 즉시 제어권 획득
-        clientsClaim: true,
-        // 스킵 웨이팅: 새 Service Worker 즉시 활성화
-        skipWaiting: true,
+        // NOTE: prompt 모드에서는 skipWaiting과 clientsClaim을 설정하면 안됨
+        // 이 옵션들은 autoUpdate 모드에서만 자동으로 활성화됨
+        // prompt 모드에서 설정하면 새 SW가 즉시 활성화되어 프롬프트가 표시되지 않음
       },
       // 개발 환경에서도 PWA 기능 테스트 가능 (localhost에서 설치 프롬프트 표시)
       devOptions: {

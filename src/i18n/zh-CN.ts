@@ -65,6 +65,18 @@ export const zhCN = {
     sharedUrlInvalid: '分享URL无效。正在恢复默认状态。',
     unableToCopy: '无法复制到剪贴板。',
   },
+  shareModal: {
+    title: '分享{toolName}',
+    sensitiveWarningTitle: '敏感数据警告',
+    sensitiveWarningDescription:
+      '此工具可能包含敏感信息。请仅与可信任的人分享链接。共享的数据将对拥有链接的任何人可见。',
+    includedInShareLink: '包含在分享链接中:',
+    excludedUiOnly: '已排除（仅UI）:',
+    notShared: '未分享',
+    footerNote:
+      '分享链接将被复制到您的剪贴板。所有处理都在您的浏览器中进行，不会将数据发送到服务器。',
+    generateShareLink: '生成分享链接',
+  },
   pwa: {
     appReadyOffline: '应用已准备好离线使用',
     youAreOffline: '当前处于离线状态',
@@ -273,12 +285,70 @@ export const zhCN = {
       nextRuns: '下次执行',
       items10: '10条',
       items20: '20条',
+      items50: '50条',
       cronParsingError: 'Cron解析错误',
       pleaseEnterCron: '请输入Cron表达式。',
       expectedFields: '期望{n}个字段，但收到{m}个字段。',
       secondsTooltip: '切换到包含秒列的6字段cron格式。',
       timezoneTooltip: '选择用于计算下次执行的时区。',
       nextRunsTooltip: '设置要预览的未来执行次数。',
+      // v1.3.2 - Spec/Dialect support
+      spec: '规格',
+      specTooltip: '选择Cron方言/规格格式。',
+      specAuto: '自动检测',
+      specAutoDesc: '自动检测Cron格式',
+      specUnix: 'UNIX/Vixie',
+      specUnixDesc: '标准5字段cron',
+      specUnixSeconds: 'UNIX + 秒',
+      specUnixSecondsDesc: '包含秒的6字段cron',
+      specQuartz: 'Quartz',
+      specQuartzDesc: 'Quartz Scheduler格式（支持 ? L W #）',
+      specAws: 'AWS EventBridge',
+      specAwsDesc: '使用cron(...)包装器的AWS cron格式',
+      specK8s: 'Kubernetes',
+      specK8sDesc: 'K8s CronJob格式（支持 @hourly, @daily）',
+      specJenkins: 'Jenkins',
+      specJenkinsDesc: '使用H哈希令牌的Jenkins Pipeline cron',
+      // Normalized display
+      normalized: '已规范化',
+      awsFormat: 'AWS格式',
+      // From datetime
+      fromDateTime: '基准时间',
+      fromDateTimeTooltip: '设置用于计算下次执行的基准时间。',
+      now: '现在',
+      // Field breakdown
+      fieldBreakdown: '字段分解',
+      fieldSeconds: '秒',
+      fieldMinutes: '分',
+      fieldHours: '时',
+      fieldDom: '日（月）',
+      fieldMonth: '月',
+      fieldDow: '星期',
+      fieldYear: '年',
+      // Warnings
+      warnings: '注意事项',
+      warningDomDowOr:
+        'UNIX cron：当同时指定日（月）和星期时，使用OR语义（任一匹配则执行）。',
+      warningDomDowExclusive: '必须在日（月）或星期字段之一使用?。',
+      warningAwsDomDow:
+        'AWS EventBridge：不能在日（月）和星期中同时使用*。请在一个字段中使用?。',
+      warningJenkinsHash: 'Jenkins H令牌：短间隔可能导致月末执行不规则。',
+      warningAwsTz:
+        'AWS EventBridge调度默认使用UTC。如需要，请指定时区。',
+      warningK8sTz:
+        'Kubernetes CronJob：使用.spec.timeZone字段支持时区。',
+      // Special tokens
+      specialTokens: '特殊令牌',
+      tokenQuestion: '? - 无特定值（占位符）',
+      tokenL: 'L - 月/周的最后一天',
+      tokenW: 'W - 最近的工作日',
+      tokenHash: '# - 月的第N个星期几（例如：2#1 = 第一个星期一）',
+      tokenH: 'H - 用于负载分配的哈希值',
+      // Copy formats
+      copyIso: '复制为ISO',
+      copyRfc3339: '复制为RFC3339',
+      copyEpoch: '复制为Epoch',
+      copiedNextRuns: '下次执行时间已复制。',
     },
     hash: {
       title: 'Hash Generator',

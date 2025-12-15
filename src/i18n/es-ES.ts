@@ -67,6 +67,18 @@ export const esES = {
       'La URL compartida no es válida. Restaurando estado por defecto.',
     unableToCopy: 'No se pudo copiar al portapapeles.',
   },
+  shareModal: {
+    title: 'Compartir {toolName}',
+    sensitiveWarningTitle: 'Advertencia de datos sensibles',
+    sensitiveWarningDescription:
+      'Esta herramienta puede contener información sensible. Comparta enlaces solo con partes de confianza. Los datos compartidos serán visibles para cualquier persona con el enlace.',
+    includedInShareLink: 'Incluido en el enlace:',
+    excludedUiOnly: 'Excluido (solo UI):',
+    notShared: 'no compartido',
+    footerNote:
+      'El enlace de compartir se copiará a su portapapeles. Todo el procesamiento ocurre en su navegador; no se envían datos a los servidores.',
+    generateShareLink: 'Generar enlace para compartir',
+  },
   pwa: {
     appReadyOffline: 'La aplicación está lista para usar sin conexión',
     youAreOffline: 'Actualmente estás sin conexión',
@@ -294,6 +306,7 @@ export const esES = {
       nextRuns: 'Próximas ejecuciones',
       items10: '10 elementos',
       items20: '20 elementos',
+      items50: '50 elementos',
       cronParsingError: 'Error de análisis Cron',
       pleaseEnterCron: 'Por favor ingresa una expresión cron.',
       expectedFields: 'Se esperaban {n} campos pero se recibieron {m}.',
@@ -303,6 +316,66 @@ export const esES = {
         'Elige la zona horaria para calcular las próximas ejecuciones.',
       nextRunsTooltip:
         'Establece cuántas ejecuciones futuras mostrar en la tabla.',
+      // v1.3.2 - Spec/Dialect support
+      spec: 'Especificación',
+      specTooltip: 'Selecciona el dialecto/formato de especificación cron.',
+      specAuto: 'Detección automática',
+      specAutoDesc: 'Detectar automáticamente el formato cron',
+      specUnix: 'UNIX/Vixie',
+      specUnixDesc: 'Cron estándar de 5 campos',
+      specUnixSeconds: 'UNIX + Segundos',
+      specUnixSecondsDesc: 'Cron de 6 campos con segundos',
+      specQuartz: 'Quartz',
+      specQuartzDesc: 'Formato Quartz Scheduler (soporta ? L W #)',
+      specAws: 'AWS EventBridge',
+      specAwsDesc: 'Formato cron AWS con envoltorio cron(...)',
+      specK8s: 'Kubernetes',
+      specK8sDesc: 'Formato CronJob K8s (soporta @hourly, @daily)',
+      specJenkins: 'Jenkins',
+      specJenkinsDesc: 'Cron Jenkins Pipeline con token hash H',
+      // Normalized display
+      normalized: 'Normalizado',
+      awsFormat: 'Formato AWS',
+      // From datetime
+      fromDateTime: 'Desde',
+      fromDateTimeTooltip:
+        'Establece la fecha/hora base para calcular próximas ejecuciones.',
+      now: 'Ahora',
+      // Field breakdown
+      fieldBreakdown: 'Desglose de campos',
+      fieldSeconds: 'Segundos',
+      fieldMinutes: 'Minutos',
+      fieldHours: 'Horas',
+      fieldDom: 'Día del mes',
+      fieldMonth: 'Mes',
+      fieldDow: 'Día de la semana',
+      fieldYear: 'Año',
+      // Warnings
+      warnings: 'Notas',
+      warningDomDowOr:
+        'UNIX cron: Cuando se especifican día del mes y día de la semana, usan semántica OR (se ejecuta si cualquiera coincide).',
+      warningDomDowExclusive:
+        'Debe usar ? en el campo de día del mes o día de la semana.',
+      warningAwsDomDow:
+        'AWS EventBridge: No se puede usar * en ambos campos. Use ? en uno de ellos.',
+      warningJenkinsHash:
+        'Token H de Jenkins: Intervalos cortos pueden causar ejecuciones irregulares al final del mes.',
+      warningAwsTz:
+        'AWS EventBridge usa UTC por defecto. Especifica una zona horaria si es necesario.',
+      warningK8sTz:
+        'Kubernetes CronJob: Use el campo .spec.timeZone para soporte de zona horaria.',
+      // Special tokens
+      specialTokens: 'Tokens especiales',
+      tokenQuestion: '? - Sin valor específico (marcador de posición)',
+      tokenL: 'L - Último día del mes/semana',
+      tokenW: 'W - Día laborable más cercano',
+      tokenHash: '# - N-ésimo día de la semana del mes (ej: 2#1 = primer lunes)',
+      tokenH: 'H - Valor basado en hash para distribución de carga',
+      // Copy formats
+      copyIso: 'Copiar como ISO',
+      copyRfc3339: 'Copiar como RFC3339',
+      copyEpoch: 'Copiar como Epoch',
+      copiedNextRuns: 'Próximas ejecuciones copiadas.',
     },
     hash: {
       title: 'Hash Generator',

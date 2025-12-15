@@ -33,3 +33,20 @@ export const tools: ToolDefinition[] = [
 
 export const getToolById = (id: string) => tools.find(t => t.id === id);
 export const getToolByPath = (path: string) => tools.find(t => t.path === path);
+
+/**
+ * Get the i18n key for a tool.
+ * If i18nKey is explicitly defined, use that; otherwise convert id to camelCase.
+ * @param tool - The tool definition or tool id string
+ * @returns The i18n key (e.g., 'jwtDecoder' for tool.jwtDecoder.*)
+ */
+export const getToolI18nKey = (tool: ToolDefinition | string): string => {
+  if (typeof tool === 'string') {
+    const foundTool = getToolById(tool);
+    if (foundTool?.i18nKey) return foundTool.i18nKey;
+    // Convert kebab-case to camelCase (e.g., 'jwt-decoder' → 'jwtDecoder')
+    return tool.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+  }
+  if (tool.i18nKey) return tool.i18nKey;
+  return tool.id.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+};

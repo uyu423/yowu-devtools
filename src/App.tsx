@@ -2,21 +2,17 @@ import { APP_VERSION, SUPPORTED_LOCALES } from '@/lib/constants';
 import { Command, Github, Keyboard } from 'lucide-react';
 import { Link, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { buildLocalePath, getToolPathFromUrl } from '@/lib/i18nUtils';
+import { getToolI18nKey, tools } from '@/tools';
 import { useEffect, useState } from 'react';
 
 import { AppLayout } from '@/components/layout/AppLayout';
 import { CommandPalette } from '@/components/common/CommandPalette';
 import { PWAUpdatePrompt } from '@/components/common/PWAUpdatePrompt';
 import { Toaster } from 'sonner';
-import { tools } from '@/tools';
 import { useI18n } from '@/hooks/useI18nHooks';
 import { usePWA } from '@/hooks/usePWA';
 import { useRecentTools } from '@/hooks/useRecentTools';
 import { useResolvedTheme } from '@/hooks/useThemeHooks';
-
-// Helper to convert tool id to i18n key (url-parser → urlParser)
-const toI18nToolId = (id: string) =>
-  id.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
 
 // Home page component (reusable for both / and /{locale}/)
 function HomePage() {
@@ -165,7 +161,7 @@ function HomePage() {
                 </div>
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-400">
-                {t(`tool.${toI18nToolId(tool.id)}.description`)}
+                {t(`tool.${getToolI18nKey(tool)}.description`)}
               </div>
             </Link>
           ))}
@@ -217,7 +213,7 @@ function AppContent() {
       ))}
 
       {/* Locale-prefixed tool routes */}
-      {SUPPORTED_LOCALES.map((locale) =>
+      {SUPPORTED_LOCALES.flatMap((locale) =>
         tools.map((tool) => (
           <Route
             key={`${locale.code}-${tool.id}`}

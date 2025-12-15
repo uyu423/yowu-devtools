@@ -66,29 +66,20 @@ const JwtEncoderTool: React.FC = () => {
 
   React.useEffect(() => {
     // Header의 alg 필드를 확인하여 서명 필요 여부 결정
-    let needsSigning = true;
     try {
       const header = JSON.parse(state.headerJson);
       const alg = (header.alg as string) || state.algorithm;
-      if (alg === 'none') {
-        needsSigning = false;
-      } else if (alg.startsWith('HS') && !state.secretKey) {
+      // HMAC 알고리즘인데 secretKey가 없으면 대기
+      if (alg.startsWith('HS') && !state.secretKey) {
         setSignedToken(null);
         return;
       }
     } catch {
       // Header JSON 파싱 실패 시 기본 동작
-      if (state.algorithm === 'none' || (state.algorithm.startsWith('HS') && !state.secretKey)) {
+      if (state.algorithm.startsWith('HS') && !state.secretKey) {
         setSignedToken(null);
         return;
       }
-    }
-
-    if (!needsSigning) {
-      // 'none' 알고리즘인 경우 signToken에서 처리
-    } else {
-      setSignedToken(null);
-      return;
     }
 
     const signToken = async () => {

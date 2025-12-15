@@ -6,14 +6,12 @@ import { ToolHeader } from '@/components/common/ToolHeader';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
 import { OptionLabel } from '@/components/ui/OptionLabel';
 import { Tooltip } from '@/components/ui/Tooltip';
-import { useToolState } from '@/hooks/useToolState';
-import { useTitle } from '@/hooks/useTitle';
-import { useI18n } from '@/hooks/useI18nHooks';
+import { useToolSetup } from '@/hooks/useToolSetup';
 import { format, formatISO } from 'date-fns';
 import { format as formatTz } from 'date-fns-tz';
 import { copyToClipboard } from '@/lib/clipboard';
-import { isMobileDevice } from '@/lib/utils';
 import { ShareModal } from '@/components/common/ShareModal';
+import { useI18n } from '@/hooks/useI18nHooks';
 
 interface TimeToolState {
   epochInput: string;
@@ -68,15 +66,15 @@ const TimeFormatItem: React.FC<{
 };
 
 const TimeTool: React.FC = () => {
-  const { t } = useI18n();
-  useTitle(t('tool.time.title'));
-  // Time tool state contains: epochInput (string), epochUnit, isoInput (string), timezone
-  // All fields are necessary for sharing - no filter needed
-  const { state, setState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
-    useToolState<TimeToolState>('time', DEFAULT_STATE);
-  const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
-  const shareInfo = getShareStateInfo();
-  const isMobile = isMobileDevice();
+  const {
+    state,
+    setState,
+    resetState,
+    t,
+    handleShare,
+    shareModalProps,
+  } = useToolSetup<TimeToolState>('time', 'time', DEFAULT_STATE);
+
   const [epochError, setEpochError] = useState<string | null>(null);
   const [isoError, setIsoError] = useState<string | null>(null);
 
@@ -224,14 +222,9 @@ const TimeTool: React.FC = () => {
         title={t('tool.time.title')}
         description={t('tool.time.description')}
         onReset={resetState}
-        onShare={async () => {
-          if (isMobile) {
-            setIsShareModalOpen(true);
-          } else {
-            await copyShareLink();
-          }
-        }}
+        onShare={handleShare}
       />
+      <ShareModal {...shareModalProps} />
       <div className="space-y-8 mt-4">
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm space-y-4">
           <div className="flex justify-between items-center flex-wrap gap-3">
@@ -538,17 +531,6 @@ const TimeTool: React.FC = () => {
           </div>
         </div>
       </div>
-      <ShareModal
-        isOpen={isShareModalOpen}
-        onClose={() => setIsShareModalOpen(false)}
-        onConfirm={async () => {
-          setIsShareModalOpen(false);
-          await shareViaWebShare();
-        }}
-        includedFields={shareInfo.includedFields}
-        excludedFields={shareInfo.excludedFields}
-        toolName={t('tool.time.title')}
-      />
     </div>
   );
 };

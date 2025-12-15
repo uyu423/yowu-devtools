@@ -7,6 +7,10 @@ import {
   type LocaleCode,
 } from './src/lib/constants';
 
+// package.json에서 버전 정보 읽기
+const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf-8'));
+const appVersion = packageJson.version;
+
 // 도구 정보 타입
 interface ToolInfo {
   id: string;
@@ -17,6 +21,13 @@ interface ToolInfo {
   keywords: string[];
   features: string[];
 }
+
+// Sitemap Priority 설정
+// 개발자들은 "json formatter", "base64 decode" 등으로 직접 검색하므로
+// 개별 도구 페이지가 홈페이지보다 priority가 높아야 함
+const TOOL_PRIORITY = 1.0;           // 모든 개별 도구 (en-US)
+const TOOL_LOCALE_PRIORITY = 0.9;    // Locale 버전 도구 페이지
+const HOME_PRIORITY = 0.8;           // 메인 페이지 (홈)
 
 // 도구 정보 (SEO 최적화된 상세 정보 포함)
 const tools: ToolInfo[] = [
@@ -726,7 +737,7 @@ export function generateRoutes(): Plugin {
       const sitemapUrls: string[] = [];
       const lastmod = new Date().toISOString().split('T')[0];
 
-      // 홈 페이지 (모든 locale)
+      // 홈 페이지 (모든 locale) - priority: 0.8
       SUPPORTED_LOCALES.forEach((localeInfo) => {
         const locale = localeInfo.code;
         const homePath = locale === DEFAULT_LOCALE ? '/' : `/${locale}`;
@@ -734,13 +745,17 @@ export function generateRoutes(): Plugin {
     <loc>https://tools.yowu.dev${homePath}</loc>
     <lastmod>${lastmod}</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
+    <priority>${HOME_PRIORITY.toFixed(1)}</priority>
   </url>`);
       });
 
       // 각 도구 (모든 locale)
+      // 개발자들은 "json formatter", "base64 decode" 등으로 직접 검색하므로
+      // 개별 도구 페이지가 홈페이지보다 priority가 높음
       SUPPORTED_LOCALES.forEach((localeInfo) => {
         const locale = localeInfo.code;
+        const priority =
+          locale === DEFAULT_LOCALE ? TOOL_PRIORITY : TOOL_LOCALE_PRIORITY;
         tools.forEach((tool) => {
           const toolPath =
             locale === DEFAULT_LOCALE ? tool.path : `/${locale}${tool.path}`;
@@ -748,7 +763,7 @@ export function generateRoutes(): Plugin {
     <loc>https://tools.yowu.dev${toolPath}</loc>
     <lastmod>${lastmod}</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>${priority.toFixed(1)}</priority>
   </url>`);
         });
       });
@@ -779,6 +794,18 @@ Sitemap: https://tools.yowu.dev/sitemap.xml`;
       const cname = 'tools.yowu.dev';
       fs.writeFileSync(path.join(distDir, 'CNAME'), cname, 'utf-8');
       console.log(`✅ Generated: CNAME (${cname})`);
+
+      // version.json 생성 (PWA 업데이트 감지용)
+      const versionInfo = {
+        version: appVersion,
+        buildTime: new Date().toISOString(),
+      };
+      fs.writeFileSync(
+        path.join(distDir, 'version.json'),
+        JSON.stringify(versionInfo, null, 2),
+        'utf-8'
+      );
+      console.log(`✅ Generated: version.json (v${appVersion})`);
 
       console.log(
         '\n🎉 All route HTML files and SEO files generated successfully!'

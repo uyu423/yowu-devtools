@@ -2,12 +2,12 @@
 
 ---
 
-# tools.yowu.dev SRS (v1.3)
+# tools.yowu.dev SRS (v1.3.3)
 
 ## 0. 문서 메타
 
 - 프로젝트명: **tools.yowu.dev** (구 yowu-devtools)
-- 현재 버전: **v1.3.0** (i18n Internationalization)
+- 현재 버전: **v1.3.3** (PWA Update Notification Fix & SEO Optimization)
 - 목적: 개발자가 자주 쓰는 변환/검증/뷰어 도구를 **서버 없이** 하나의 **정적 웹앱**으로 제공
 - 배포: **GitHub Pages + Custom Domain (`tools.yowu.dev`)**
 - 변경 이력: **[RELEASE_NOTES.md](./RELEASE_NOTES.md)** 참조
@@ -912,26 +912,195 @@ type DiffToolState = {
 
 ### 7.7 CRON 표현식 (`toolId: cron`)
 
-#### 상태
+#### 상태 (v1.3.2 고도화 예정)
 
 ```ts
+type CronSpec =
+  | 'auto'
+  | 'unix'
+  | 'unix-seconds'
+  | 'quartz'
+  | 'aws'
+  | 'k8s'
+  | 'jenkins';
+
 type CronToolState = {
   expression: string;
-  hasSeconds: boolean; // 기본 false(5필드), true면 6필드
-  timezone: 'local' | 'utc';
-  nextCount: 10 | 20; // 기본 10
+  spec: CronSpec; // 기본 'auto' (v1.3.2)
+  hasSeconds: boolean; // 기본 false(5필드), true면 6필드 - spec과 연동
+  timezone: string; // 'local' | 'utc' | IANA TZ (예: 'Asia/Seoul')
+  nextCount: 10 | 20 | 50; // 기본 10
+  fromDateTime?: string; // 기준 시각 (기본 now) - v1.3.2
 };
 ```
 
-#### 기능
+#### 기능 (기본)
 
 - FR-C-01: 유효성 검증(필드 수/범위)
-- FR-C-02: 사람 읽는 설명 제공(가능하면 한글)
+- FR-C-02: 사람 읽는 설명 제공(i18n, cronstrue 연동)
 - FR-C-03: 다음 실행 시각 N개 출력
 - FR-C-04: 잘못된 cron이면 에러 배너 + 예시 제공
 - AC
-
   - `*/5 * * * *` 같은 표현에서 다음 실행이 실제로 리스트업 됨
+
+#### v1.3.2 고도화 요구사항
+
+##### 1) 지원 스펙(방언) 정의 + UI에서 선택/자동감지
+
+**1-1. Spec/Profile 드롭다운 추가 (기본: Auto)**
+
+현재 `Include seconds field` 체크박스 옆에 **Spec/Profile 드롭다운** 추가:
+
+| Spec                   | 설명                            | 필드 수 | 특수 문법           |
+| ---------------------- | ------------------------------- | ------- | ------------------- |
+| **Auto** (권장)        | 입력을 보고 추정                | 5~7     | -                   |
+| **UNIX/Vixie**         | 표준 5필드, DOM/DOW **OR 규칙** | 5       | -                   |
+| **UNIX + Seconds**     | 초 필드 포함 변형               | 6       | -                   |
+| **Quartz**             | 고급 연산자 지원                | 6~7     | `? L W #`           |
+| **AWS EventBridge**    | `cron(...)` 래퍼                | 6       | `? L W` + year 필드 |
+| **Kubernetes CronJob** | 매크로 포함                     | 5       | `@hourly` 등        |
+| **Jenkins**            | H 해시 토큰/별칭                | 5       | `H H(...)`          |
+
+**1-2. Auto 감지 규칙 (필수)**
+
+- FR-C-05: `cron(`으로 시작 → **AWS 래퍼**로 판정
+- FR-C-06: `H`, `H(...)` 포함 → **Jenkins** 후보
+- FR-C-07: `?` 또는 `L/W/#` 포함 → **Quartz/AWS** 후보 (필드 수/래퍼로 최종 결정)
+- FR-C-08: 필드 수(5/6/7)로 1차 분기
+- FR-C-09: `@hourly`, `@daily` 등 매크로 → **Kubernetes** 후보
+
+##### 2) 입력 포맷 "래퍼" 정규화
+
+**2-1. 래퍼는 모두 "껍데기"로 취급하고 내부 필드만 파싱**
+
+다음은 **동일 케이스로 묶어서** 처리:
+
+- FR-C-10: `cron( … )` → 내부만 추출해서 파싱
+- FR-C-11: `cron('…')`, `cron("…")` (Jenkins Pipeline) → 따옴표/괄호 제거 후 파싱
+- FR-C-12: 여백/개행/앞뒤 텍스트가 있어도 **가장 안쪽 표현식만 안전 추출**
+
+**2-2. Normalized 표시 추가 (권장)**
+
+- FR-C-13: 입력 바로 아래에 "Normalized" 라인 표시
+  - 예: **Normalized:** `3-59/7 6-22/2 1,15,28-31 */2 1-5`
+- FR-C-14: AWS 선택 시 **AWS format** 도 출력
+  - 예: **AWS format:** `cron(3-59/7 6-22/2 1,15,28-31 */2 1-5 *)`
+
+##### 3) 의미(semantics) 정확화
+
+**3-1. UNIX/Vixie의 DOM/DOW는 "AND가 아니라 OR"**
+
+- FR-C-15: 스펙이 UNIX/Vixie일 때 Human readable에 `day-of-month OR day-of-week` 명시
+- FR-C-16: Next runs도 OR 규칙으로 계산
+- FR-C-17: "AND가 필요하면 표현식을 2개로 분리해야 함" 경고 제공
+
+**3-2. AWS/Quartz 계열은 DOM/DOW 동시 지정 제약 검증**
+
+- FR-C-18: AWS는 `*`를 동시에 못 쓰고, 한쪽은 `?` 필요
+- FR-C-19: 스펙별 제약을 Validation 규칙으로 분리
+- FR-C-20: 에러 메시지도 스펙에 맞게 다르게 표시
+
+##### 4) UI/UX 고도화
+
+**4-1. 컨트롤 바 개선**
+
+- FR-C-21: **Spec/Profile 드롭다운** 추가
+- FR-C-22: `Include seconds`는 Spec가 "UNIX+Seconds/Quartz"가 아닐 때 비활성/대체
+- FR-C-23: Timezone 스펙별 의미 안내:
+  - AWS: UTC 또는 지정 TZ로 스케줄 평가 (+ DST 동작)
+  - K8s: `.spec.timeZone` 사용 가능, 미지정 시 컨트롤 플레인 로컬 TZ
+  - Jenkins/UNIX: 서버 로컬 기준
+
+**4-2. Human readable를 "필드별 분해 + 하이라이트"로 확장**
+
+- FR-C-24: 문장 1줄 + **필드별 해석 카드**
+  - Minutes / Hours / DOM / Month / DOW / (Year/Seconds)
+- FR-C-25: 입력 문자열에서 해당 토큰을 **색/밑줄로 하이라이트** (hover 시 서로 강조)
+- FR-C-26: `L/W/#/?/H` 같은 특수 토큰은 "이 스펙에서만" 배지로 표시
+
+**4-3. "호환성/주의사항" 영역 추가**
+
+- FR-C-27: 스펙별 흔한 경고 자동 안내:
+  - UNIX/Vixie: DOM/DOW OR 경고
+  - Jenkins: `H/3` 같은 짧은 주기 DOM 월말 불규칙 경고
+  - AWS: `cron(...)` 포맷 + 필드/와일드카드 제한 + TZ/DST 특성
+  - K8s: `TZ=` 미지원, `.spec.timeZone` 권장
+
+##### 5) Next runs 계산/표시 고도화
+
+**5-1. "기준 시각(From)" 설정**
+
+- FR-C-28: 기본 Now, 옵션으로 사용자가 기준 datetime 입력 가능
+
+**5-2. 출력 포맷 옵션**
+
+- FR-C-29: Localized 표시 (i18n과 연동)
+- FR-C-30: 복사 버튼: ISO / RFC3339 / Epoch 포맷 선택
+
+**5-3. 성능 요구사항**
+
+- FR-C-31: next-run 계산을 **Web Worker로 오프로드** (복잡한 표현식 UI 프리징 방지)
+- FR-C-32: 계산 중에는 skeleton + cancel 버튼
+
+##### 6) 변환(Conversion) 기능 (선택)
+
+- FR-C-33: "Convert to" 드롭다운:
+  - UNIX(5) ↔ UNIX+Seconds(6)
+  - UNIX(5) → AWS (`cron(...)` + year `*`)
+  - Jenkins: `@hourly`/`H` 포함 표현 설명/출력
+- FR-C-34: **변환 불가/비등가**는 명확히 경고
+  - 예: UNIX의 DOM/DOW OR를 Quartz/AWS식으로 100% 동일 변환 불가
+
+#### AC (v1.3.2)
+
+- 입력 `cron(0 12 * * ? *)` → 자동으로 AWS로 감지, Normalized 표시
+- UNIX 스펙에서 `0 12 1,15 * 1-5` → "1일, 15일 **또는** 월~금 12:00에 실행" (OR 명시)
+- Quartz 스펙에서 `0 0 12 ? * MON-FRI` → `?` 특수 문법 배지 표시
+- "From" 시각 변경 시 Next runs 즉시 재계산
+- 복잡한 표현식에서 UI 프리징 없이 스피너 표시
+
+#### 구현 참고: npm 라이브러리 (v1.3.2)
+
+현재 설치된 라이브러리와 추가 고려 라이브러리:
+
+| 라이브러리          | 버전   | 용도                | 지원 문법             | 설치 여부    |
+| ------------------- | ------ | ------------------- | --------------------- | ------------ |
+| **cron-parser**     | 5.4.0  | 다음 실행 시간 계산 | UNIX 5/6필드, 타임존  | ✅ 설치됨    |
+| **cronstrue**       | 3.9.0  | Human-readable 설명 | 다국어 i18n           | ✅ 설치됨    |
+| **croner**          | 9.1.0  | Quartz 고급 문법    | `L W # ?`, legacyMode | 🔶 추가 검토 |
+| **aws-cron-parser** | 1.1.12 | AWS 전용 파서       | AWS EventBridge       | 🔶 추가 검토 |
+
+**라이브러리 선택 권장사항**:
+
+1. **기본 파싱/계산**: `cron-parser` (현재 사용 중) - UNIX 5/6필드에 충분
+2. **Human-readable**: `cronstrue` (현재 사용 중) - i18n 지원
+3. **Quartz 고급 문법**: `croner` 추가 또는 자체 구현 검토
+   - `croner`는 `L`, `#`, `?` 지원하며 `{ legacyMode: false }`로 DOM/DOW AND 전환 가능
+4. **AWS 래퍼 처리**: 자체 정규식으로 `cron(...)` 추출 후 기존 파서 사용 권장
+
+#### 공식 스펙 검증 결과 (v1.3.2)
+
+각 스펙의 공식 문서와 요구사항 교차 검증 결과:
+
+| 스펙                | 검증 출처                                                                                                      | DOM/DOW 동작                         | 특수 문법           | 검증 결과 |
+| ------------------- | -------------------------------------------------------------------------------------------------------------- | ------------------------------------ | ------------------- | --------- |
+| **UNIX/Vixie**      | [man7.org/crontab.5](https://man7.org/linux/man-pages/man5/crontab.5.html)                                     | **OR** (둘 다 제한 시)               | `@hourly` 등 매크로 | ✅ 일치   |
+| **Quartz**          | [quartz-scheduler.org](https://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/crontrigger.html) | `?` 필수 (한쪽)                      | `L W #`             | ✅ 일치   |
+| **AWS EventBridge** | [docs.aws.amazon.com](https://docs.aws.amazon.com/scheduler/latest/UserGuide/schedule-types.html#cron-based)   | `?` 필수 (한쪽), `*` 동시 불가       | `L W #`, year 필드  | ✅ 일치   |
+| **croner (참고)**   | [croner.56k.guru](https://croner.56k.guru/usage/pattern/)                                                      | OR (기본), AND (`legacyMode: false`) | `L #`, 5-7필드      | ✅ 참고   |
+
+**핵심 검증 내용**:
+
+1. **UNIX DOM/DOW OR 규칙**: man7.org 공식 문서 확인
+
+   > "If both fields are restricted (i.e., do not contain the '\*' character), the command will be run when **either** field matches the current time."
+
+2. **AWS 제약사항**: AWS 공식 문서 확인
+
+   > "You can't use \* in both the Day-of-month and Day-of-week fields. If you use it in one, you must use ? in the other."
+
+3. **Quartz `?` 필수**: Quartz 공식 문서 확인
+   > "Support for specifying both a day-of-week and a day-of-month value is not complete (you must currently use the '?' character in one of these fields)."
 
 ---
 
@@ -1337,6 +1506,34 @@ export type ToolDefinition<TState> = {
   - `sitemap.xml`: 모든 페이지를 검색 엔진에 알림
   - `robots.txt`: 검색 엔진 크롤링 허용 및 sitemap 위치 지정
 - Vite 플러그인: `vite-plugin-generate-routes.ts`가 빌드 후 자동으로 라우트 HTML 생성
+
+#### Sitemap Priority 전략 (v1.3.3)
+
+개발자들의 실제 검색 패턴을 기반으로 sitemap.xml의 priority를 최적화합니다.
+
+**전략 근거**:
+
+- 개발자들은 "json formatter", "base64 decode", "url encode online" 등으로 직접 검색
+- "yowu devtools"를 검색하는 사용자는 극소수
+- 따라서 개별 도구 페이지가 홈페이지보다 검색 엔진에서 우선순위가 높아야 함
+
+**Priority 설정**:
+
+| 페이지 유형             | Priority | 예시                           |
+| ----------------------- | -------- | ------------------------------ |
+| 개별 도구 (en-US)       | **1.0**  | `/json`, `/base64`, `/url`     |
+| Locale 도구 페이지      | **0.9**  | `/ko-KR/json`, `/ja-JP/base64` |
+| 홈 페이지 (모든 locale) | **0.8**  | `/`, `/ko-KR`, `/ja-JP`        |
+
+**구현 위치**: `vite-plugin-generate-routes.ts`의 상수 정의
+
+```typescript
+const TOOL_PRIORITY = 1.0; // 모든 개별 도구 (en-US)
+const TOOL_LOCALE_PRIORITY = 0.9; // Locale 버전 도구 페이지
+const HOME_PRIORITY = 0.8; // 메인 페이지 (홈)
+```
+
+**참고**: Google은 priority를 무시한다고 공식 발표했으나, Bing/Yandex 등 다른 검색 엔진은 여전히 참고할 수 있으며, 크롤 버짓 힌트 제공 및 사이트 구조 문서화 목적으로 유용합니다.
 
 #### 신규 도구 추가 시 SEO 최적화 필수 사항
 

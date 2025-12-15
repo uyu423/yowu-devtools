@@ -1,18 +1,16 @@
 /* eslint-disable react-refresh/only-export-components */
 import React from 'react';
 import type { ToolDefinition } from '@/tools/types';
-import { Binary, RefreshCw, Copy } from 'lucide-react';
+import { Binary, RefreshCw } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { EditorPanel } from '@/components/common/EditorPanel';
 import { ActionBar } from '@/components/common/ActionBar';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
+import { ModeToggle } from '@/components/common/ModeToggle';
+import { ResultPanel } from '@/components/common/ResultPanel';
 import { OptionLabel } from '@/components/ui/OptionLabel';
-import { useToolState } from '@/hooks/useToolState';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
-import { useTitle } from '@/hooks/useTitle';
-import { useI18n } from '@/hooks/useI18nHooks';
-import { copyToClipboard } from '@/lib/clipboard';
-import { isMobileDevice } from '@/lib/utils';
+import { useToolSetup } from '@/hooks/useToolSetup';
 import { ShareModal } from '@/components/common/ShareModal';
 
 interface Base64State {
@@ -28,15 +26,15 @@ const DEFAULT_STATE: Base64State = {
 };
 
 const Base64Tool: React.FC = () => {
-  const { t } = useI18n();
-  useTitle(t('tool.base64.title'));
-  // Base64 tool state contains: input (string), mode, urlSafe
-  // All fields are necessary for sharing - input may be large but required
-  const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
-    useToolState<Base64State>('base64', DEFAULT_STATE);
-  const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
-  const shareInfo = getShareStateInfo();
-  const isMobile = isMobileDevice();
+  const {
+    state,
+    updateState,
+    resetState,
+    t,
+    handleShare,
+    shareModalProps,
+  } = useToolSetup<Base64State>('base64', 'base64', DEFAULT_STATE);
+
   const debouncedInput = useDebouncedValue(state.input, 300);
 
   const conversion = React.useMemo(() => {
@@ -70,25 +68,9 @@ const Base64Tool: React.FC = () => {
         title={t('tool.base64.title')}
         description={t('tool.base64.description')}
         onReset={resetState}
-        onShare={async () => {
-          if (isMobile) {
-            setIsShareModalOpen(true);
-          } else {
-            await copyShareLink();
-          }
-        }}
+        onShare={handleShare}
       />
-      <ShareModal
-        isOpen={isShareModalOpen}
-        onClose={() => setIsShareModalOpen(false)}
-        onConfirm={async () => {
-          setIsShareModalOpen(false);
-          await shareViaWebShare();
-        }}
-        includedFields={shareInfo.includedFields}
-        excludedFields={shareInfo.excludedFields}
-        toolName={t('tool.base64.title')}
-      />
+      <ShareModal {...shareModalProps} />
 
       <div className="flex-1 flex flex-col gap-6">
         <EditorPanel
@@ -105,23 +87,14 @@ const Base64Tool: React.FC = () => {
         />
 
         <ActionBar className="flex-col gap-4 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center bg-gray-100 dark:bg-gray-900 p-1 rounded-lg">
-            {['encode', 'decode'].map((mode) => (
-              <button
-                key={mode}
-                className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                  state.mode === mode
-                    ? 'bg-white dark:bg-gray-800 shadow-sm text-blue-600 dark:text-blue-400'
-                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
-                }`}
-                onClick={() =>
-                  updateState({ mode: mode as Base64State['mode'] })
-                }
-              >
-                {mode === 'encode' ? t('common.encode') : t('common.decode')}
-              </button>
-            ))}
-          </div>
+          <ModeToggle
+            options={[
+              { value: 'encode' as const, label: t('common.encode') },
+              { value: 'decode' as const, label: t('common.decode') },
+            ]}
+            value={state.mode}
+            onChange={(mode) => updateState({ mode })}
+          />
 
           <label className="flex items-center space-x-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
             <input
@@ -152,32 +125,15 @@ const Base64Tool: React.FC = () => {
           />
         )}
 
-        <div className="flex flex-col">
-          <div className="flex items-center justify-between px-3 py-1.5 border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-900 shrink-0 rounded-t-md border border-b-0">
-            <span className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-              {t('common.result')}
-            </span>
-            <button
-              onClick={() =>
-                conversion.result &&
-                copyToClipboard(conversion.result, t('common.copiedResult'))
-              }
-              disabled={!conversion.result}
-              className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              title={t('common.copy')}
-            >
-              <Copy className="w-4 h-4" />
-            </button>
-          </div>
-          <EditorPanel
-            title=""
-            value={conversion.result}
-            readOnly
-            placeholder={t('tool.base64.resultPlaceholder')}
-            className="h-40 lg:h-56 rounded-t-none"
-            status={conversion.error ? 'error' : 'success'}
-          />
-        </div>
+        <ResultPanel
+          title={t('common.result')}
+          value={conversion.result}
+          copyMessage={t('common.copiedResult')}
+          copyTooltip={t('common.copy')}
+          placeholder={t('tool.base64.resultPlaceholder')}
+          status={conversion.error ? 'error' : 'success'}
+          className="h-40 lg:h-56"
+        />
       </div>
     </div>
   );
