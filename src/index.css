@@ -16,10 +16,6 @@
     sans-serif;
 }
 
-html {
-  font-size: 90%; /* Base font size reduced to 90% (14.4px from default 16px) */
-}
-
 .child-fields-container {
   margin: 0;
   padding-left: 1rem;
