@@ -351,6 +351,9 @@ const CronTool: React.FC = () => {
           <div className="mt-3 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
             <OptionLabel tooltip={t('tool.cron.fromDateTimeTooltip')}>
               {t('tool.cron.fromDateTime')}
+              <span className="ml-1 text-xs text-gray-400 dark:text-gray-500">
+                ({state.timezone === 'utc' ? 'UTC' : t('tool.time.local')})
+              </span>
             </OptionLabel>
             <input
               type="datetime-local"
