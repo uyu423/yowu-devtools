@@ -1,16 +1,16 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { useMemo } from 'react';
 import type { ToolDefinition } from '@/tools/types';
-import { Link, RefreshCw, Copy } from 'lucide-react';
+import { Link, RefreshCw } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { EditorPanel } from '@/components/common/EditorPanel';
 import { ActionBar } from '@/components/common/ActionBar';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
 import { ModeToggle } from '@/components/common/ModeToggle';
+import { ResultPanel } from '@/components/common/ResultPanel';
 import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useToolSetup } from '@/hooks/useToolSetup';
-import { copyToClipboard } from '@/lib/clipboard';
 import { ShareModal } from '@/components/common/ShareModal';
 
 interface UrlToolState {
@@ -125,32 +125,15 @@ const UrlTool: React.FC = () => {
           <ErrorBanner message={t('tool.url.decodingFailed')} details={conversion.error} />
         )}
 
-        <div className="flex flex-col">
-          <div className="flex items-center justify-between px-3 py-1.5 border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-900 shrink-0 rounded-t-md border border-b-0">
-            <span className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-              {t('common.result')}
-            </span>
-            <button
-              onClick={() =>
-                conversion.result &&
-                copyToClipboard(conversion.result, t('common.copiedResult'))
-              }
-              disabled={!conversion.result}
-              className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              title={t('common.copy')}
-            >
-              <Copy className="w-4 h-4" />
-            </button>
-          </div>
-          <EditorPanel
-            title=""
-            value={conversion.result}
-            readOnly
-            placeholder={t('tool.url.resultPlaceholder')}
-            className="h-40 lg:h-48 rounded-t-none"
-            status={conversion.error ? 'error' : 'success'}
-          />
-        </div>
+        <ResultPanel
+          title={t('common.result')}
+          value={conversion.result}
+          copyMessage={t('common.copiedResult')}
+          copyTooltip={t('common.copy')}
+          placeholder={t('tool.url.resultPlaceholder')}
+          status={conversion.error ? 'error' : 'success'}
+          className="h-40 lg:h-48"
+        />
       </div>
     </div>
   );
