@@ -291,12 +291,72 @@ export const koKR = {
       nextRuns: '다음 실행',
       items10: '10개',
       items20: '20개',
+      items50: '50개',
       cronParsingError: 'Cron 파싱 오류',
       pleaseEnterCron: 'Cron 표현식을 입력해 주세요.',
       expectedFields: '{n}개의 필드가 필요하지만 {m}개가 입력되었습니다.',
       secondsTooltip: '초 컬럼을 포함하는 6필드 cron 형식으로 전환합니다.',
       timezoneTooltip: '다음 실행 계산에 사용할 타임존을 선택합니다.',
       nextRunsTooltip: '미리 볼 향후 실행 횟수를 설정합니다.',
+      // v1.3.2 - Spec/Dialect support
+      spec: '스펙',
+      specTooltip: 'Cron 방언/스펙 형식을 선택합니다.',
+      specAuto: '자동 감지',
+      specAutoDesc: 'Cron 형식을 자동으로 감지합니다',
+      specUnix: 'UNIX/Vixie',
+      specUnixDesc: '표준 5필드 cron',
+      specUnixSeconds: 'UNIX + 초',
+      specUnixSecondsDesc: '초를 포함하는 6필드 cron',
+      specQuartz: 'Quartz',
+      specQuartzDesc: 'Quartz Scheduler 형식 (? L W # 지원)',
+      specAws: 'AWS EventBridge',
+      specAwsDesc: 'cron(...) 래퍼를 사용하는 AWS cron 형식',
+      specK8s: 'Kubernetes',
+      specK8sDesc: 'K8s CronJob 형식 (@hourly, @daily 지원)',
+      specJenkins: 'Jenkins',
+      specJenkinsDesc: 'H 해시 토큰을 사용하는 Jenkins Pipeline cron',
+      // Normalized display
+      normalized: '정규화됨',
+      awsFormat: 'AWS 형식',
+      // From datetime
+      fromDateTime: '기준 시각',
+      fromDateTimeTooltip: '다음 실행 계산의 기준이 되는 시각을 설정합니다.',
+      now: '현재',
+      // Field breakdown
+      fieldBreakdown: '필드 분해',
+      fieldSeconds: '초',
+      fieldMinutes: '분',
+      fieldHours: '시',
+      fieldDom: '일(월 기준)',
+      fieldMonth: '월',
+      fieldDow: '요일',
+      fieldYear: '연도',
+      // Warnings
+      warnings: '참고사항',
+      warningDomDowOr:
+        'UNIX cron: 일(월 기준)과 요일이 모두 지정된 경우 OR 의미로 동작합니다 (둘 중 하나라도 일치하면 실행).',
+      warningDomDowExclusive:
+        '일(월 기준) 또는 요일 필드 중 하나에 ?를 사용해야 합니다.',
+      warningAwsDomDow:
+        'AWS EventBridge: 일(월 기준)과 요일에 동시에 *를 사용할 수 없습니다. 한쪽에 ?를 사용하세요.',
+      warningJenkinsHash:
+        'Jenkins H 토큰: 짧은 간격은 월말에 불규칙한 실행을 유발할 수 있습니다.',
+      warningAwsTz:
+        'AWS EventBridge 스케줄은 기본적으로 UTC를 사용합니다. 필요한 경우 타임존을 지정하세요.',
+      warningK8sTz:
+        'Kubernetes CronJob: 타임존 지원을 위해 .spec.timeZone 필드를 사용하세요.',
+      // Special tokens
+      specialTokens: '특수 토큰',
+      tokenQuestion: '? - 특정 값 없음 (placeholder)',
+      tokenL: 'L - 월/주의 마지막 날',
+      tokenW: 'W - 가장 가까운 평일',
+      tokenHash: '# - 월의 N번째 요일 (예: 2#1 = 첫째 월요일)',
+      tokenH: 'H - 부하 분산을 위한 해시 기반 값',
+      // Copy formats
+      copyIso: 'ISO로 복사',
+      copyRfc3339: 'RFC3339로 복사',
+      copyEpoch: 'Epoch로 복사',
+      copiedNextRuns: '다음 실행 시간이 복사되었습니다.',
     },
     hash: {
       title: 'Hash Generator',

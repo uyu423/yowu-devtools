@@ -293,6 +293,7 @@ export const jaJP = {
       nextRuns: '次の実行',
       items10: '10件',
       items20: '20件',
+      items50: '50件',
       cronParsingError: 'Cronパースエラー',
       pleaseEnterCron: 'Cron式を入力してください。',
       expectedFields:
@@ -300,6 +301,65 @@ export const jaJP = {
       secondsTooltip: '秒カラムを含む6フィールドcron形式に切り替えます。',
       timezoneTooltip: '次の実行計算に使用するタイムゾーンを選択します。',
       nextRunsTooltip: 'プレビューする将来の実行回数を設定します。',
+      // v1.3.2 - Spec/Dialect support
+      spec: 'スペック',
+      specTooltip: 'Cronの方言/仕様形式を選択します。',
+      specAuto: '自動検出',
+      specAutoDesc: 'Cron形式を自動検出します',
+      specUnix: 'UNIX/Vixie',
+      specUnixDesc: '標準5フィールドcron',
+      specUnixSeconds: 'UNIX + 秒',
+      specUnixSecondsDesc: '秒を含む6フィールドcron',
+      specQuartz: 'Quartz',
+      specQuartzDesc: 'Quartz Scheduler形式（? L W # サポート）',
+      specAws: 'AWS EventBridge',
+      specAwsDesc: 'cron(...)ラッパーを使用するAWS cron形式',
+      specK8s: 'Kubernetes',
+      specK8sDesc: 'K8s CronJob形式（@hourly, @dailyサポート）',
+      specJenkins: 'Jenkins',
+      specJenkinsDesc: 'Hハッシュトークンを使用するJenkins Pipeline cron',
+      // Normalized display
+      normalized: '正規化済み',
+      awsFormat: 'AWS形式',
+      // From datetime
+      fromDateTime: '基準時刻',
+      fromDateTimeTooltip: '次の実行計算の基準となる時刻を設定します。',
+      now: '現在',
+      // Field breakdown
+      fieldBreakdown: 'フィールド分解',
+      fieldSeconds: '秒',
+      fieldMinutes: '分',
+      fieldHours: '時',
+      fieldDom: '日（月基準）',
+      fieldMonth: '月',
+      fieldDow: '曜日',
+      fieldYear: '年',
+      // Warnings
+      warnings: '注意事項',
+      warningDomDowOr:
+        'UNIX cron: 日（月基準）と曜日の両方が指定された場合、OR動作します（どちらか一致すれば実行）。',
+      warningDomDowExclusive:
+        '日（月基準）または曜日フィールドのどちらかに?を使用する必要があります。',
+      warningAwsDomDow:
+        'AWS EventBridge: 日（月基準）と曜日に同時に*を使用できません。片方に?を使用してください。',
+      warningJenkinsHash:
+        'Jenkins Hトークン: 短い間隔は月末に不規則な実行を引き起こす可能性があります。',
+      warningAwsTz:
+        'AWS EventBridgeスケジュールはデフォルトでUTCを使用します。必要に応じてタイムゾーンを指定してください。',
+      warningK8sTz:
+        'Kubernetes CronJob: タイムゾーンサポートには.spec.timeZoneフィールドを使用してください。',
+      // Special tokens
+      specialTokens: '特殊トークン',
+      tokenQuestion: '? - 特定の値なし（プレースホルダー）',
+      tokenL: 'L - 月/週の最終日',
+      tokenW: 'W - 最も近い平日',
+      tokenHash: '# - 月のN番目の曜日（例: 2#1 = 第1月曜日）',
+      tokenH: 'H - 負荷分散のためのハッシュベースの値',
+      // Copy formats
+      copyIso: 'ISOでコピー',
+      copyRfc3339: 'RFC3339でコピー',
+      copyEpoch: 'Epochでコピー',
+      copiedNextRuns: '次の実行時間がコピーされました。',
     },
     hash: {
       title: 'Hash Generator',
