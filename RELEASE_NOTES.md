@@ -4,6 +4,45 @@ RELEASE_NOTES.md must be written in English.
 
 # Release Notes
 
+## v1.3.4 (December 2025) - JSON Viewer & Share UX Improvements
+
+**New Features:**
+
+- ✨ **JSON Viewer Fullscreen Mode**:
+  - Added fullscreen toggle button next to the copy button
+  - Right panel expands to full width for better viewing of large JSON
+  - Press ESC or click toggle again to exit fullscreen
+
+- ✨ **Improved Search UX in JSON Viewer**:
+  - Search input now only appears in Pretty mode (where highlighting works)
+  - Cleaner UI when using Tree or Minify modes
+
+**Enhancements:**
+
+- 🔧 **Share Modal on Web**:
+  - Web browser now shows confirmation modal before copying share link (same as mobile)
+  - Modal displays what data will be included in the shared URL
+  - Different button text: "Copy Link" (web) vs "Generate Share Link" (mobile)
+
+- 🎨 **Sidebar Design Improvements**:
+  - "More coming soon" badge is now center-aligned
+  - Added "Suggest a feature" link below the badge
+  - Links to [GitHub Issues](https://github.com/uyu423/yowu-devtools/issues) for feature requests
+
+- ⚡ **ResizablePanels Optimization**:
+  - Added `expandRightPanel` prop for fullscreen support
+  - Reduced resizer padding by 50% for better space efficiency
+
+**Technical:**
+
+- `ResizablePanels.tsx`: New component for flexible panel layouts with expand support
+- `ShareModal.tsx`: Added `isMobile` prop for button text differentiation
+- `useToolSetup.ts`: Updated share logic to show modal on both web and mobile
+- `Sidebar.tsx`: Added external link to GitHub Issues
+- i18n: Added translations for `fullscreen`, `exitFullscreen`, `copyLink`, `suggestFeature`
+
+---
+
 ## v1.3.3 (December 2025) - PWA Update Notification Fix & SEO Optimization
 
 **Bug Fixes:**
