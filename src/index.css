@@ -2,8 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* NanumSquareNeo Variable Font */
+@font-face {
+  font-family: 'NanumSquareNeo';
+  src: url('/fonts/NanumSquareNeo-Variable.woff2') format('woff2-variations');
+  font-weight: 300 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'NanumSquareNeo', Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
 
 .child-fields-container {
