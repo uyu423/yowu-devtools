@@ -1,5 +1,6 @@
 import React from 'react';
 import { Share2, RotateCcw } from 'lucide-react';
+import { useI18n } from '@/hooks/useI18nHooks';
 
 interface ToolHeaderProps {
   title: string;
@@ -9,6 +10,8 @@ interface ToolHeaderProps {
 }
 
 export const ToolHeader: React.FC<ToolHeaderProps> = ({ title, description, onReset, onShare }) => {
+  const { t } = useI18n();
+  
   return (
     <div className="mb-6 pb-4 border-b dark:border-gray-800">
       <div className="flex justify-between items-start">
@@ -21,7 +24,7 @@ export const ToolHeader: React.FC<ToolHeaderProps> = ({ title, description, onRe
             <button 
               onClick={onShare}
               className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-md transition-colors"
-              title="Share State"
+              title={t('common.shareState')}
             >
               <Share2 className="w-5 h-5" />
             </button>
@@ -30,7 +33,7 @@ export const ToolHeader: React.FC<ToolHeaderProps> = ({ title, description, onRe
             <button 
               onClick={onReset}
               className="p-2 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-colors"
-              title="Reset Tool"
+              title={t('common.resetTool')}
             >
               <RotateCcw className="w-5 h-5" />
             </button>

@@ -6,6 +6,7 @@ import { X, Moon, Sun, Laptop, Sparkles, Star, Clock } from 'lucide-react';
 import { useTheme } from '@/hooks/useThemeHooks';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useRecentTools } from '@/hooks/useRecentTools';
+import { useI18n } from '@/hooks/useI18nHooks';
 import logoImg from '@/assets/yowu-logo.jpeg';
 
 interface SidebarProps {
@@ -16,6 +17,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
   const { theme, setTheme } = useTheme();
   const { favorites, toggleFavorite, isFavorite } = useFavorites();
   const { recentTools } = useRecentTools();
+  const { t } = useI18n();
 
   // 즐겨찾기 도구 목록
   const favoriteTools = favorites
@@ -42,7 +44,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
             target="_blank" 
             rel="noopener noreferrer"
             className="block w-8 h-8 rounded-full overflow-hidden hover:opacity-80 transition-opacity border border-gray-200 dark:border-gray-700"
-            title="Go to yowu.dev"
+            title={t('sidebar.goToYowuDev')}
           >
             <img src={logoImg} alt="yowu" className="w-full h-full object-cover" />
           </a>
@@ -51,7 +53,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
             onClick={onCloseMobile}
             className="font-bold text-lg tracking-tight hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
           >
-            Yowu's DevTools
+            {t('sidebar.appName')}
           </NavLink>
         </div>
         <button onClick={onCloseMobile} className="lg:hidden p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded">
@@ -67,7 +69,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
             <div>
               <div className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
                 <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                Favorites
+                {t('sidebar.favorites')}
               </div>
               <div className="space-y-1 mt-1">
                 {favoriteTools.map((tool) => (
@@ -91,7 +93,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
                         toggleFavorite(tool.id);
                       }}
                       className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-opacity"
-                      title="Remove from favorites"
+                      title={t('sidebar.removeFromFavorites')}
                     >
                       <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
                     </button>
@@ -106,7 +108,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
             <div>
               <div className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
                 <Clock className="w-3 h-3" />
-                Recent
+                {t('sidebar.recentTools')}
               </div>
               <div className="space-y-1 mt-1">
                 {recentToolItems.map((tool) => (
@@ -133,7 +135,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
                         "opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-opacity",
                         isFavorite(tool.id) && "opacity-100"
                       )}
-                      title={isFavorite(tool.id) ? "Remove from favorites" : "Add to favorites"}
+                      title={isFavorite(tool.id) ? t('sidebar.removeFromFavorites') : t('sidebar.addToFavorites')}
                     >
                       <Star className={cn(
                         "w-3.5 h-3.5",
@@ -149,12 +151,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
           {/* 전체 도구 리스트 */}
           {tools.length === 0 ? (
             <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
-              No tools loaded
+              {t('sidebar.noToolsLoaded')}
             </div>
           ) : (
             <div>
               <div className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                All Tools
+                {t('sidebar.allTools')}
               </div>
               <div className="space-y-1 mt-1">
                 {otherTools.map(tool => (
@@ -181,7 +183,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
                         "opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-opacity",
                         isFavorite(tool.id) && "opacity-100"
                       )}
-                      title={isFavorite(tool.id) ? "Remove from favorites" : "Add to favorites"}
+                      title={isFavorite(tool.id) ? t('sidebar.removeFromFavorites') : t('sidebar.addToFavorites')}
                     >
                       <Star className={cn(
                         "w-3.5 h-3.5",
@@ -197,9 +199,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
 
         {/* Easter Egg Badge */}
         <div className="mt-6 px-4">
-           <div className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-medium bg-gradient-to-r from-purple-100 to-blue-100 text-purple-700 dark:from-purple-900/30 dark:to-blue-900/30 dark:text-purple-300 border border-purple-200 dark:border-purple-800/50 cursor-help group transition-all hover:scale-105" title="More tools are being baked...">
+           <div className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-medium bg-gradient-to-r from-purple-100 to-blue-100 text-purple-700 dark:from-purple-900/30 dark:to-blue-900/30 dark:text-purple-300 border border-purple-200 dark:border-purple-800/50 cursor-help group transition-all hover:scale-105" title={t('sidebar.moreComingSoon')}>
              <Sparkles className="w-3 h-3 mr-1.5 animate-pulse" />
-             <span>More coming soon...</span>
+             <span>{t('sidebar.moreComingSoon')}</span>
            </div>
         </div>
       </div>
@@ -215,7 +217,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
                  ? "bg-white text-gray-900 shadow-sm dark:bg-gray-700 dark:text-white" 
                  : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
              )}
-             title="Light Mode"
+             title={t('sidebar.lightMode')}
            >
              <Sun className="w-3.5 h-3.5" />
            </button>
@@ -227,7 +229,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
                  ? "bg-white text-gray-900 shadow-sm dark:bg-gray-700 dark:text-white" 
                  : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
              )}
-             title="System Mode"
+             title={t('sidebar.systemMode')}
            >
              <Laptop className="w-3.5 h-3.5" />
            </button>
@@ -239,7 +241,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
                  ? "bg-white text-gray-900 shadow-sm dark:bg-gray-700 dark:text-white" 
                  : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
              )}
-             title="Dark Mode"
+             title={t('sidebar.darkMode')}
            >
              <Moon className="w-3.5 h-3.5" />
            </button>
