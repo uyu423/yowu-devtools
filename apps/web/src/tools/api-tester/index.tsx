@@ -5,7 +5,7 @@
  * A powerful API testing tool with CORS bypass support via Chrome Extension.
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Globe, Check, Terminal, PanelRightClose, PanelRightOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ToolDefinition } from '@/tools/types';
@@ -18,7 +18,7 @@ import { useI18n } from '@/hooks/useI18nHooks';
 import { copyToClipboard } from '@/lib/clipboard';
 
 import type { ApiTesterState, HttpMethod, HistoryItem } from './types';
-import { COMMON_HEADERS, COMMON_CONTENT_TYPES } from './types';
+import { COMMON_HEADERS, COMMON_CONTENT_TYPES, BODY_SUPPORTED_METHODS } from './types';
 import { createKeyValueItem, toCurlCommand, parseUrlParams } from './utils';
 import {
   MethodSelector,
@@ -29,8 +29,8 @@ import {
   ResponseViewer,
   HistorySidebar,
   ExtensionStatus,
-  ExtensionModeSelector,
-  CorsErrorBanner,
+  CollapsibleSection,
+  CorsModal,
 } from './components';
 import { useRequestExecutor, useApiHistory } from './hooks';
 
@@ -92,8 +92,36 @@ const ApiTesterTool: React.FC = () => {
     useApiHistory();
 
   // UI state
-  const [showHistory, setShowHistory] = useState(false);
+  const [showHistory, setShowHistory] = useState(true); // Default expanded
   const [curlCopied, setCurlCopied] = useState(false);
+  const [queryExpanded, setQueryExpanded] = useState(true);
+  const [headersExpanded, setHeadersExpanded] = useState(false);
+  const [corsModalOpen, setCorsModalOpen] = useState(false);
+  const [pendingCorsRetry, setPendingCorsRetry] = useState(false);
+
+  // Check if response has CORS error (only for direct/cors mode requests)
+  const hasCorsError = response?.error?.code === 'CORS_ERROR' && response?.method === 'cors';
+
+  // Show CORS modal when CORS error detected
+  // Using a ref-based approach to avoid setState in effect
+  const prevHasCorsError = React.useRef(false);
+  useEffect(() => {
+    console.log('[API Tester] CORS modal check:', {
+      hasCorsError,
+      prevHasCorsError: prevHasCorsError.current,
+      responseMethod: response?.method,
+      pendingCorsRetry,
+    });
+    
+    // Only show modal when CORS error transitions from false to true
+    if (hasCorsError && !prevHasCorsError.current && !pendingCorsRetry) {
+      console.log('[API Tester] Opening CORS modal');
+      // Use timeout to avoid setState directly in effect
+      const timeoutId = setTimeout(() => setCorsModalOpen(true), 0);
+      return () => clearTimeout(timeoutId);
+    }
+    prevHasCorsError.current = hasCorsError;
+  }, [hasCorsError, response?.method, pendingCorsRetry]);
 
   // Handle URL change with query param parsing
   const handleUrlChange = useCallback(
@@ -113,35 +141,46 @@ const ApiTesterTool: React.FC = () => {
     (method: HttpMethod) => {
       updateState({ method });
       // Reset body for methods that don't support it
-      if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+      if (!BODY_SUPPORTED_METHODS.includes(method)) {
         updateState({ body: { kind: 'none' } });
       }
     },
     [updateState]
   );
 
-  // Handle send request
-  const handleSend = useCallback(async () => {
-    if (!state.url.trim()) return;
-
-    const result = await executeRequest(state);
+  // Execute request with auto mode selection
+  const executeWithAutoMode = useCallback(async (requestState: ApiTesterState, forceExtension: boolean = false) => {
+    const mode = forceExtension ? 'extension' : 'direct';
+    console.log('[API Tester] Executing request with mode:', mode, 'url:', requestState.url);
+    
+    const result = await executeRequest({ ...requestState, selectedMode: mode });
+    console.log('[API Tester] Request result:', result);
 
     // Add to history
-    addHistory(state, {
+    addHistory(requestState, {
       status: result.status,
       statusText: result.statusText,
       timingMs: result.timingMs,
     });
-  }, [state, executeRequest, addHistory]);
 
-  // Handle retry with extension
+    return result;
+  }, [executeRequest, addHistory]);
+
+  // Handle send request
+  const handleSend = useCallback(async () => {
+    if (!state.url.trim()) return;
+    setPendingCorsRetry(false);
+    await executeWithAutoMode(state, false);
+  }, [state, executeWithAutoMode]);
+
+  // Handle retry with extension (from modal)
   const handleRetryWithExtension = useCallback(async () => {
-    updateState({ selectedMode: 'extension' });
-    // Wait for state update then execute
-    setTimeout(() => {
-      executeRequest({ ...state, selectedMode: 'extension' });
-    }, 0);
-  }, [state, updateState, executeRequest]);
+    console.log('[API Tester] Retrying with extension...');
+    setCorsModalOpen(false);
+    setPendingCorsRetry(true);
+    clearResponse();
+    await executeWithAutoMode(state, true);
+  }, [state, executeWithAutoMode, clearResponse]);
 
   // Handle history item select
   const handleHistorySelect = useCallback(
@@ -167,8 +206,10 @@ const ApiTesterTool: React.FC = () => {
     setTimeout(() => setCurlCopied(false), 2000);
   }, [state]);
 
-  // Check if response has CORS error
-  const hasCorsError = response?.error?.code === 'CORS_ERROR';
+  // Count active query params and headers
+  const activeQueryCount = state.queryParams.filter((p) => p.key && p.enabled).length;
+  const activeHeaderCount = state.headers.filter((h) => h.key && h.enabled).length;
+  const supportsBody = BODY_SUPPORTED_METHODS.includes(state.method);
 
   return (
     <div className="flex flex-col h-full">
@@ -181,7 +222,7 @@ const ApiTesterTool: React.FC = () => {
             onReset={resetState}
             onShare={handleShare}
           />
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
             <ExtensionStatus status={extensionStatus} onRetry={checkExtension} />
             <button
               onClick={() => setShowHistory(!showHistory)}
@@ -220,14 +261,8 @@ const ApiTesterTool: React.FC = () => {
               />
             </div>
 
-            {/* Mode selector and tools */}
-            <div className="flex items-center justify-between mt-3">
-              <ExtensionModeSelector
-                mode={state.selectedMode}
-                onChange={(mode) => updateState({ selectedMode: mode })}
-                extensionStatus={extensionStatus}
-                disabled={isLoading}
-              />
+            {/* Copy as cURL */}
+            <div className="flex items-center justify-end mt-2">
               <button
                 onClick={handleCopyCurl}
                 className={cn(
@@ -253,33 +288,16 @@ const ApiTesterTool: React.FC = () => {
 
           {/* Request/Response split */}
           <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
-            {/* Request builder */}
+            {/* Request builder - vertical sections */}
             <div className="flex-1 flex flex-col overflow-hidden border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-gray-700">
-              {/* Tabs */}
-              <div className="flex-shrink-0 flex items-center gap-1 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
-                {(['params', 'headers', 'body'] as const).map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => updateState({ activeTab: tab })}
-                    className={cn(
-                      'px-3 py-1.5 text-sm rounded-md transition-colors capitalize',
-                      state.activeTab === tab
-                        ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
-                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
-                    )}
-                  >
-                    {tab === 'params'
-                      ? `Query (${state.queryParams.filter((p) => p.key).length})`
-                      : tab === 'headers'
-                      ? `Headers (${state.headers.filter((h) => h.key).length})`
-                      : 'Body'}
-                  </button>
-                ))}
-              </div>
-
-              {/* Tab content */}
-              <div className="flex-1 overflow-auto p-4">
-                {state.activeTab === 'params' && (
+              <div className="flex-1 overflow-auto">
+                {/* Query Parameters Section */}
+                <CollapsibleSection
+                  title="Query Parameters"
+                  count={activeQueryCount}
+                  isOpen={queryExpanded}
+                  onToggle={() => setQueryExpanded(!queryExpanded)}
+                >
                   <KeyValueEditor
                     items={state.queryParams}
                     onChange={(queryParams) => updateState({ queryParams })}
@@ -287,9 +305,15 @@ const ApiTesterTool: React.FC = () => {
                     valuePlaceholder="Value"
                     disabled={isLoading}
                   />
-                )}
+                </CollapsibleSection>
 
-                {state.activeTab === 'headers' && (
+                {/* Headers Section */}
+                <CollapsibleSection
+                  title="Headers"
+                  count={activeHeaderCount}
+                  isOpen={headersExpanded}
+                  onToggle={() => setHeadersExpanded(!headersExpanded)}
+                >
                   <KeyValueEditor
                     items={state.headers}
                     onChange={(headers) => updateState({ headers })}
@@ -299,30 +323,27 @@ const ApiTesterTool: React.FC = () => {
                     valueAutocomplete={COMMON_CONTENT_TYPES}
                     disabled={isLoading}
                   />
-                )}
+                </CollapsibleSection>
 
-                {state.activeTab === 'body' && (
-                  <BodyEditor
-                    body={state.body}
-                    onChange={(body) => updateState({ body })}
-                    disabled={isLoading || !['POST', 'PUT', 'PATCH', 'DELETE'].includes(state.method)}
-                  />
+                {/* Body Section - only for methods that support it */}
+                {supportsBody && (
+                  <div className="border-b border-gray-200 dark:border-gray-700 p-4">
+                    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                      Request Body
+                    </h3>
+                    <BodyEditor
+                      body={state.body}
+                      onChange={(body) => updateState({ body })}
+                      disabled={isLoading}
+                    />
+                  </div>
                 )}
               </div>
             </div>
 
             {/* Response viewer */}
             <div className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-gray-900">
-              {hasCorsError && state.selectedMode === 'direct' ? (
-                <div className="p-4">
-                  <CorsErrorBanner
-                    onRetryWithExtension={handleRetryWithExtension}
-                    extensionStatus={extensionStatus}
-                  />
-                </div>
-              ) : (
-                <ResponseViewer response={response} isLoading={isLoading} />
-              )}
+              <ResponseViewer response={response} isLoading={isLoading} />
             </div>
           </div>
         </div>
@@ -340,6 +361,14 @@ const ApiTesterTool: React.FC = () => {
           onClose={() => setShowHistory(false)}
         />
       </div>
+
+      {/* CORS Error Modal */}
+      <CorsModal
+        isOpen={corsModalOpen}
+        onClose={() => setCorsModalOpen(false)}
+        onRetryWithExtension={handleRetryWithExtension}
+        extensionStatus={extensionStatus}
+      />
 
       <ShareModal {...shareModalProps} />
     </div>
@@ -360,4 +389,3 @@ export const apiTesterTool: ToolDefinition<ApiTesterState> = {
 };
 
 export default apiTesterTool;
-

@@ -226,17 +226,20 @@ apps/web/src/tools/api-tester/
 - [x] 이미지 응답 미리보기
 - [x] 바이너리 다운로드 버튼
 
-### 3.5 History Sidebar (미완성 - 추후 개선)
+### 3.5 History Sidebar ✅
 
-**현재 구현 상태**:
-- 기본 History UI 구조 생성
-- useApiHistory 훅 구현
+**구현된 기능**:
+- 히스토리 목록 UI
+- 즐겨찾기 기능 (별 아이콘)
+- Context Menu (이름 변경, 삭제)
+- Clear History
 
-**추후 개선 사항**:
-- [ ] 히스토리 목록 UI 개선
-- [ ] 즐겨찾기 기능 완성
-- [ ] Context Menu (추가, 이름 변경, 삭제)
-- [ ] Clear History
+**체크리스트**:
+- [x] 히스토리 목록 UI 구현
+- [x] 즐겨찾기 기능 구현
+- [x] Context Menu 구현
+- [x] Clear History 구현
+- [x] 검색 기능 구현
 
 ### 3.6 CORS 우회 전략 구현 ✅
 
@@ -301,7 +304,70 @@ apps/web/src/tools/api-tester/
 
 ---
 
-## Phase 4: 통합 테스트 및 문서화 (진행 예정)
+## Phase 4: UI 고도화 ✅ (완료: 2024-12-16)
+
+### 4.1 요청 빌더 UI 개선 ✅
+
+**변경 사항**:
+- 탭 기반 UI → 수직 섹션 기반 UI 전환
+- Query Parameters: 항상 표시, 기본 펼침, 접기 지원
+- Headers: Query 아래 위치, 기본 접힘, 펼치기 지원
+- Body: POST/PUT/PATCH/DELETE 메서드일 때만 표시
+
+**체크리스트**:
+- [x] CollapsibleSection 컴포넌트 구현
+- [x] 탭 UI 제거, 수직 섹션 레이아웃 적용
+- [x] 섹션별 접기/펼치기 상태 관리
+
+### 4.2 Chrome Extension 배지 개선 ✅
+
+**변경 사항**:
+- 컴팩트 배지 디자인: "Chrome Extension {상태 인디케이터}"
+- 상태별 색상 인디케이터 (⚪/🔴/🟡/🟢)
+- 마우스 오버 툴팁으로 상세 상태 표시
+- Mode 선택 UI 제거 (자동 모드 선택으로 대체)
+
+**체크리스트**:
+- [x] ExtensionStatus 컴포넌트 리팩토링
+- [x] Tooltip 통합
+- [x] ExtensionModeSelector 컴포넌트 제거
+
+### 4.3 자동 Mode 선택 + CORS 모달 ✅
+
+**변경 사항**:
+- Direct 모드 자동 시도 → CORS 에러 감지 → 모달 표시
+- Extension 설치 시: "Extension으로 재시도" 모달
+- Extension 미설치 시: "Extension 설치 필요" 모달
+
+**체크리스트**:
+- [x] CorsModal 컴포넌트 구현
+- [x] CORS 에러 감지 시 모달 자동 표시
+- [x] Extension 상태에 따른 모달 내용 분기
+
+### 4.4 Response Viewer 개선 ✅
+
+**변경 사항**:
+- 4xx/5xx HTTP 에러도 Response로 표시 (Body, Headers 탭 사용 가능)
+- 네트워크/CORS 에러만 별도 에러 UI 표시
+- max-width 최적화 (Pretty Viewer 전체 활용)
+- Tree/Pretty 뷰에서 복사 시 Pretty 포맷 데이터 복사
+- Tree 뷰에서 http/https URL 자동 링크 변환
+
+**체크리스트**:
+- [x] 4xx/5xx 응답 정상 표시 로직
+- [x] max-width CSS 최적화
+- [x] handleCopy 함수 개선 (Pretty 데이터 복사)
+- [x] JsonWithLinks 컴포넌트 구현 (URL 링크화)
+
+### 4.5 History Sidebar 개선 ✅
+
+**변경 사항**:
+- 기본 상태: 펼쳐진 상태 (isOpen = true)
+- 너비 확장: 288px → 384px (30% 증가)
+
+**체크리스트**:
+- [x] 기본 상태 펼침으로 변경
+- [x] 너비 384px로 확장
 
 ---
 

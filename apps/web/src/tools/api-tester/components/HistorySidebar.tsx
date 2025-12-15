@@ -248,7 +248,7 @@ export const HistorySidebar: React.FC<HistorySidebarProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="flex flex-col h-full w-72 border-l border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+    <div className="flex flex-col h-full w-96 border-l border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
         <h3 className="font-semibold text-gray-900 dark:text-gray-100">History</h3>

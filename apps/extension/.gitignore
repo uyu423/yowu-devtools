@@ -1,0 +1,19 @@
+# Build output
+dist/
+*.zip
+
+# Node modules
+node_modules/
+
+# TypeScript
+*.tsbuildinfo
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

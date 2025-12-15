@@ -203,6 +203,7 @@ export const useRequestExecutor = (): UseRequestExecutorReturn => {
               id: requestId,
               ok: false,
               timingMs,
+              method: 'cors',
               error: {
                 code: 'TIMEOUT',
                 message: `Request timeout after ${state.timeoutMs}ms`,
@@ -216,6 +217,7 @@ export const useRequestExecutor = (): UseRequestExecutorReturn => {
               id: requestId,
               ok: false,
               timingMs,
+              method: 'cors',
               error: {
                 code: 'CORS_ERROR',
                 message:
@@ -228,6 +230,7 @@ export const useRequestExecutor = (): UseRequestExecutorReturn => {
             id: requestId,
             ok: false,
             timingMs,
+            method: 'cors',
             error: {
               code: 'NETWORK_ERROR',
               message: err.message,
@@ -239,6 +242,7 @@ export const useRequestExecutor = (): UseRequestExecutorReturn => {
           id: requestId,
           ok: false,
           timingMs,
+          method: 'cors',
           error: {
             code: 'UNKNOWN_ERROR',
             message: 'An unknown error occurred',
@@ -254,6 +258,7 @@ export const useRequestExecutor = (): UseRequestExecutorReturn => {
    */
   const executeExtensionFetch = useCallback(
     async (state: ApiTesterState): Promise<ResponseData> => {
+      console.log('[executeExtensionFetch] Starting extension fetch...');
       const requestId = generateId();
       const startTime = performance.now();
 
@@ -261,19 +266,26 @@ export const useRequestExecutor = (): UseRequestExecutorReturn => {
         // Get target origin
         const url = new URL(buildUrlWithParams(getBaseUrl(state.url), state.queryParams));
         const targetOrigin = url.origin;
+        console.log('[executeExtensionFetch] Target origin:', targetOrigin);
 
         // Check permission
+        console.log('[executeExtensionFetch] Checking permission...');
         const hasPermission = await checkPermission(targetOrigin);
+        console.log('[executeExtensionFetch] Has permission:', hasPermission);
 
         if (!hasPermission) {
           // Request permission
+          console.log('[executeExtensionFetch] Requesting permission...');
           const granted = await requestPermission(targetOrigin);
+          console.log('[executeExtensionFetch] Permission granted:', granted);
 
           if (!granted) {
+            console.log('[executeExtensionFetch] Permission denied, returning error');
             return {
               id: requestId,
               ok: false,
               timingMs: Math.round(performance.now() - startTime),
+              method: 'extension',
               error: {
                 code: 'PERMISSION_DENIED',
                 message: `Permission denied for ${targetOrigin}. Please grant permission and try again.`,
@@ -283,18 +295,25 @@ export const useRequestExecutor = (): UseRequestExecutorReturn => {
         }
 
         // Execute request
+        console.log('[executeExtensionFetch] Building request spec...');
         const spec = buildRequestSpec(state);
+        console.log('[executeExtensionFetch] Request spec:', spec);
+        
+        console.log('[executeExtensionFetch] Executing via extension...');
         const result = await executeViaExtension(spec);
+        console.log('[executeExtensionFetch] Extension result:', result);
 
         return {
           ...result,
           method: 'extension',
         };
       } catch (err) {
+        console.error('[executeExtensionFetch] Error:', err);
         return {
           id: requestId,
           ok: false,
           timingMs: Math.round(performance.now() - startTime),
+          method: 'extension',
           error: {
             code: 'EXTENSION_ERROR',
             message: err instanceof Error ? err.message : 'Extension request failed',
@@ -310,6 +329,7 @@ export const useRequestExecutor = (): UseRequestExecutorReturn => {
    */
   const executeRequest = useCallback(
     async (state: ApiTesterState): Promise<ResponseData> => {
+      console.log('[useRequestExecutor] executeRequest called with mode:', state.selectedMode);
       setIsLoading(true);
       setResponse(null);
 
@@ -317,13 +337,19 @@ export const useRequestExecutor = (): UseRequestExecutorReturn => {
         let result: ResponseData;
 
         if (state.selectedMode === 'extension') {
+          console.log('[useRequestExecutor] Using extension mode');
           result = await executeExtensionFetch(state);
         } else {
+          console.log('[useRequestExecutor] Using direct mode');
           result = await executeDirectFetch(state);
         }
 
+        console.log('[useRequestExecutor] Result:', result);
         setResponse(result);
         return result;
+      } catch (err) {
+        console.error('[useRequestExecutor] Error:', err);
+        throw err;
       } finally {
         setIsLoading(false);
         abortControllerRef.current = null;

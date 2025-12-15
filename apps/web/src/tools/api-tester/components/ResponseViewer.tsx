@@ -2,18 +2,16 @@
  * ResponseViewer - Display API response with status, headers, and body
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { cn } from '@/lib/utils';
-import { Copy, Download, Check, Clock, Database, FileType } from 'lucide-react';
+import { Copy, Download, Check, Clock, Database, FileType, ExternalLink } from 'lucide-react';
 import type { ResponseData } from '../types';
 import { getStatusColor, formatBytes } from '../types';
 import { parseResponseBody } from '../utils';
 import { copyToClipboard } from '@/lib/clipboard';
-import { JsonView, defaultStyles } from 'react-json-view-lite';
 import { useResolvedTheme } from '@/hooks/useThemeHooks';
 import CodeMirror from '@uiw/react-codemirror';
 import { oneDark } from '@codemirror/theme-one-dark';
-import 'react-json-view-lite/dist/index.css';
 
 interface ResponseViewerProps {
   response: ResponseData | null;
@@ -23,6 +21,82 @@ interface ResponseViewerProps {
 type ViewMode = 'tree' | 'pretty' | 'raw';
 type TabType = 'body' | 'headers';
 
+/**
+ * Recursively render JSON with clickable links for URLs
+ */
+const JsonWithLinks: React.FC<{ data: unknown; depth?: number }> = ({ data, depth = 0 }) => {
+  if (data === null) return <span className="text-gray-500">null</span>;
+  if (data === undefined) return <span className="text-gray-500">undefined</span>;
+
+  if (typeof data === 'string') {
+    // Check if it's a URL
+    if (/^https?:\/\//i.test(data)) {
+      return (
+        <a
+          href={data}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1"
+          onClick={(e) => e.stopPropagation()}
+        >
+          "{data}"
+          <ExternalLink className="w-3 h-3" />
+        </a>
+      );
+    }
+    return <span className="text-emerald-600 dark:text-emerald-400">"{data}"</span>;
+  }
+
+  if (typeof data === 'number') {
+    return <span className="text-purple-600 dark:text-purple-400">{data}</span>;
+  }
+
+  if (typeof data === 'boolean') {
+    return <span className="text-orange-600 dark:text-orange-400">{data.toString()}</span>;
+  }
+
+  if (Array.isArray(data)) {
+    if (data.length === 0) return <span>[]</span>;
+    return (
+      <span>
+        {'['}
+        <div className="pl-4">
+          {data.map((item, index) => (
+            <div key={index}>
+              <JsonWithLinks data={item} depth={depth + 1} />
+              {index < data.length - 1 && ','}
+            </div>
+          ))}
+        </div>
+        {']'}
+      </span>
+    );
+  }
+
+  if (typeof data === 'object') {
+    const entries = Object.entries(data);
+    if (entries.length === 0) return <span>{'{}'}</span>;
+    return (
+      <span>
+        {'{'}
+        <div className="pl-4">
+          {entries.map(([key, value], index) => (
+            <div key={key}>
+              <span className="text-gray-700 dark:text-gray-300">"{key}"</span>
+              <span className="text-gray-500">: </span>
+              <JsonWithLinks data={value} depth={depth + 1} />
+              {index < entries.length - 1 && ','}
+            </div>
+          ))}
+        </div>
+        {'}'}
+      </span>
+    );
+  }
+
+  return <span>{String(data)}</span>;
+};
+
 export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoading }) => {
   const [activeTab, setActiveTab] = useState<TabType>('body');
   const [viewMode, setViewMode] = useState<ViewMode>('tree');
@@ -30,18 +104,39 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
   const resolvedTheme = useResolvedTheme();
   const isDark = resolvedTheme === 'dark';
 
-  const jsonViewStyles = useMemo(
-    () => ({
-      ...defaultStyles,
-      container: `${defaultStyles.container} text-sm font-mono ${
-        isDark ? 'text-gray-100' : 'text-gray-900'
-      }`,
-    }),
-    [isDark]
-  );
+  // Parse response body
+  const parsedBody = useMemo(() => {
+    if (!response?.body) return null;
+    const contentType = response.headers?.['content-type'];
+    return parseResponseBody(response.body, contentType);
+  }, [response]);
 
-  const handleCopy = async (text: string) => {
-    await copyToClipboard(text);
+  // Get pretty formatted data for copy
+  const getPrettyData = useCallback(() => {
+    if (!parsedBody) return '';
+    if (parsedBody.type === 'json') {
+      return JSON.stringify(parsedBody.data, null, 2);
+    }
+    if (parsedBody.type === 'text') {
+      return parsedBody.data as string;
+    }
+    return response?.body?.data || '';
+  }, [parsedBody, response]);
+
+  const handleCopy = async () => {
+    let textToCopy = '';
+    
+    if (activeTab === 'body') {
+      // Always copy pretty formatted data for body
+      textToCopy = getPrettyData();
+    } else if (activeTab === 'headers') {
+      const headersText = Object.entries(response?.headers || {})
+        .map(([k, v]) => `${k}: ${v}`)
+        .join('\n');
+      textToCopy = headersText;
+    }
+    
+    await copyToClipboard(textToCopy);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -55,13 +150,6 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
     a.click();
     URL.revokeObjectURL(url);
   };
-
-  // Parse response body
-  const parsedBody = useMemo(() => {
-    if (!response?.body) return null;
-    const contentType = response.headers?.['content-type'];
-    return parseResponseBody(response.body, contentType);
-  }, [response]);
 
   // Calculate body size
   const bodySize = useMemo(() => {
@@ -91,8 +179,8 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
     );
   }
 
-  // Error response
-  if (response.error) {
+  // Network/CORS error (not HTTP error)
+  if (response.error && !response.status) {
     return (
       <div className="p-4 space-y-4">
         <div className="flex items-center gap-4 text-red-600 dark:text-red-400">
@@ -115,6 +203,7 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
     );
   }
 
+  // HTTP response (including 4xx, 5xx errors)
   return (
     <div className="flex flex-col h-full">
       {/* Status bar */}
@@ -205,16 +294,7 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
 
         {/* Copy button */}
         <button
-          onClick={() => {
-            if (activeTab === 'body' && response.body?.kind === 'text') {
-              handleCopy(response.body.data);
-            } else if (activeTab === 'headers') {
-              const headersText = Object.entries(response.headers || {})
-                .map(([k, v]) => `${k}: ${v}`)
-                .join('\n');
-              handleCopy(headersText);
-            }
-          }}
+          onClick={handleCopy}
           className={cn(
             'ml-2 p-1.5 rounded text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200',
             'hover:bg-gray-100 dark:hover:bg-gray-800',
@@ -232,22 +312,26 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
             {parsedBody?.type === 'json' && (
               <>
                 {viewMode === 'tree' && (
-                  <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 overflow-auto">
-                    <JsonView data={parsedBody.data as object | unknown[]} style={jsonViewStyles} />
+                  <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 overflow-auto font-mono text-sm">
+                    <JsonWithLinks data={parsedBody.data} />
                   </div>
                 )}
                 {viewMode === 'pretty' && (
-                  <CodeMirror
-                    value={JSON.stringify(parsedBody.data, null, 2)}
-                    height="400px"
-                    extensions={[]}
-                    theme={isDark ? oneDark : undefined}
-                    editable={false}
-                    basicSetup={{ lineNumbers: true, foldGutter: true }}
-                  />
+                  <div className="w-full overflow-hidden">
+                    <CodeMirror
+                      value={JSON.stringify(parsedBody.data, null, 2)}
+                      height="auto"
+                      maxHeight="600px"
+                      extensions={[]}
+                      theme={isDark ? oneDark : undefined}
+                      editable={false}
+                      basicSetup={{ lineNumbers: true, foldGutter: true }}
+                      className="w-full [&_.cm-editor]:!max-w-full [&_.cm-scroller]:!overflow-x-auto"
+                    />
+                  </div>
                 )}
                 {viewMode === 'raw' && (
-                  <pre className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg text-sm font-mono text-gray-800 dark:text-gray-200 overflow-auto whitespace-pre-wrap">
+                  <pre className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg text-sm font-mono text-gray-800 dark:text-gray-200 overflow-auto whitespace-pre-wrap break-all">
                     {response.body?.data}
                   </pre>
                 )}
@@ -255,7 +339,7 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
             )}
 
             {parsedBody?.type === 'text' && (
-              <pre className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg text-sm font-mono text-gray-800 dark:text-gray-200 overflow-auto whitespace-pre-wrap">
+              <pre className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg text-sm font-mono text-gray-800 dark:text-gray-200 overflow-auto whitespace-pre-wrap break-all">
                 {parsedBody.data as string}
               </pre>
             )}
@@ -318,4 +402,3 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
 };
 
 export default ResponseViewer;
-

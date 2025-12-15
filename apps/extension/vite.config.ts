@@ -19,4 +19,3 @@ export default defineConfig({
     // CRXJS handles rollup input automatically from manifest
   },
 });
-

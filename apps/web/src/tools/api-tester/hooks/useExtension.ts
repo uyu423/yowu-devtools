@@ -56,6 +56,46 @@ declare const chrome: {
 
 /** Default timeout for extension messages (ms) */
 const MESSAGE_TIMEOUT = 3000;
+/** Timeout for API requests through extension (ms) */
+const REQUEST_TIMEOUT = 60000; // 60 seconds for actual API calls
+
+/** localStorage key for granted origins cache */
+const GRANTED_ORIGINS_CACHE_KEY = 'yowu-devtools:v1:api-tester:grantedOrigins';
+
+/**
+ * Get cached granted origins from localStorage
+ */
+const getCachedGrantedOrigins = (): Set<string> => {
+  try {
+    const cached = localStorage.getItem(GRANTED_ORIGINS_CACHE_KEY);
+    if (cached) {
+      return new Set(JSON.parse(cached));
+    }
+  } catch {
+    // Ignore parse errors
+  }
+  return new Set();
+};
+
+/**
+ * Add origin to cached granted origins
+ */
+const addCachedGrantedOrigin = (origin: string): void => {
+  try {
+    const cached = getCachedGrantedOrigins();
+    cached.add(origin);
+    localStorage.setItem(GRANTED_ORIGINS_CACHE_KEY, JSON.stringify([...cached]));
+  } catch {
+    // Ignore storage errors
+  }
+};
+
+/**
+ * Check if origin is in cached granted origins
+ */
+const isCachedGrantedOrigin = (origin: string): boolean => {
+  return getCachedGrantedOrigins().has(origin);
+};
 
 /**
  * Send a message to the extension with timeout
@@ -116,19 +156,24 @@ export const useExtension = (options: UseExtensionOptions = {}): UseExtensionRet
    * Check if extension is connected
    */
   const checkConnection = useCallback(async (): Promise<boolean> => {
+    console.log('[useExtension] checkConnection called, extensionId:', extensionId);
+    
     if (!extensionId) {
+      console.log('[useExtension] No extension ID configured');
       setStatus('not-installed');
       setError('Extension ID not configured. Set VITE_EXTENSION_ID in your environment.');
       return false;
     }
 
     if (checkInProgress.current) {
+      console.log('[useExtension] Check already in progress, skipping');
       return false;
     }
 
     checkInProgress.current = true;
     setStatus('checking');
     setError(null);
+    console.log('[useExtension] Sending PING to extension...');
 
     try {
       const response = await sendMessage<ExtensionResponse>(extensionId, {
@@ -136,17 +181,22 @@ export const useExtension = (options: UseExtensionOptions = {}): UseExtensionRet
         version: '1.0.0',
       });
 
+      console.log('[useExtension] PING response:', response);
+
       if (response.type === 'PONG') {
+        console.log('[useExtension] Extension connected!');
         setStatus('connected');
         checkInProgress.current = false;
         return true;
       }
 
+      console.log('[useExtension] Unexpected response type:', response.type);
       setStatus('not-installed');
       checkInProgress.current = false;
       return false;
     } catch (err) {
       // Extension not installed or not responding
+      console.error('[useExtension] PING failed:', err);
       setStatus('not-installed');
       setError(err instanceof Error ? err.message : 'Failed to connect to extension');
       checkInProgress.current = false;
@@ -163,13 +213,23 @@ export const useExtension = (options: UseExtensionOptions = {}): UseExtensionRet
         throw new Error('Extension ID not configured');
       }
 
-      const response = await sendMessage<ExtensionResponse>(extensionId, {
-        type: 'EXECUTE_REQUEST',
-        version: '1.0.0',
-        payload: spec,
-      });
+      console.log('[useExtension] Executing request via extension:', spec.url);
+
+      // Use longer timeout for actual API requests
+      const response = await sendMessage<ExtensionResponse>(
+        extensionId,
+        {
+          type: 'EXECUTE_REQUEST',
+          version: '1.0.0',
+          payload: spec,
+        },
+        REQUEST_TIMEOUT
+      );
+
+      console.log('[useExtension] Got response:', response.type);
 
       if (response.type === 'ERROR') {
+        console.error('[useExtension] Extension error:', response.error);
         throw new Error(response.error.message);
       }
 
@@ -184,24 +244,49 @@ export const useExtension = (options: UseExtensionOptions = {}): UseExtensionRet
 
   /**
    * Check if extension has permission for origin
+   * First checks localStorage cache, then verifies with extension if not cached
    */
   const checkPermission = useCallback(
     async (origin: string): Promise<boolean> => {
-      if (!extensionId) return false;
+      console.log('[useExtension] checkPermission called for:', origin);
+      
+      // First, check localStorage cache
+      if (isCachedGrantedOrigin(origin)) {
+        console.log('[useExtension] checkPermission: Found in cache, skipping extension check');
+        return true;
+      }
+      
+      if (!extensionId) {
+        console.log('[useExtension] checkPermission: No extension ID');
+        return false;
+      }
 
       try {
+        console.log('[useExtension] checkPermission: Sending CHECK_PERMISSION message...');
         const response = await sendMessage<ExtensionResponse>(extensionId, {
           type: 'CHECK_PERMISSION',
           version: '1.0.0',
           payload: { origin },
         });
+        console.log('[useExtension] checkPermission response:', response);
 
         if (response.type === 'PERMISSION_STATUS') {
-          return response.payload.granted;
+          const granted = response.payload.granted;
+          console.log('[useExtension] checkPermission: granted =', granted);
+          
+          // Cache the granted permission
+          if (granted) {
+            addCachedGrantedOrigin(origin);
+            console.log('[useExtension] checkPermission: Added to cache');
+          }
+          
+          return granted;
         }
 
+        console.log('[useExtension] checkPermission: Unexpected response type');
         return false;
-      } catch {
+      } catch (err) {
+        console.error('[useExtension] checkPermission error:', err);
         return false;
       }
     },
@@ -210,29 +295,48 @@ export const useExtension = (options: UseExtensionOptions = {}): UseExtensionRet
 
   /**
    * Request permission for origin
+   * On success, caches the granted origin in localStorage
    */
   const requestPermission = useCallback(
     async (origin: string): Promise<boolean> => {
-      if (!extensionId) return false;
+      console.log('[useExtension] requestPermission called for:', origin);
+      if (!extensionId) {
+        console.log('[useExtension] requestPermission: No extension ID');
+        return false;
+      }
 
       try {
+        console.log('[useExtension] requestPermission: Sending REQUEST_PERMISSION message...');
         const response = await sendMessage<ExtensionResponse>(extensionId, {
           type: 'REQUEST_PERMISSION',
           version: '1.0.0',
           payload: { origin },
         });
+        console.log('[useExtension] requestPermission response:', response);
 
         if (response.type === 'PERMISSION_STATUS') {
-          return response.payload.granted;
+          const granted = response.payload.granted;
+          console.log('[useExtension] requestPermission: granted =', granted);
+          
+          // Cache the granted permission
+          if (granted) {
+            addCachedGrantedOrigin(origin);
+            console.log('[useExtension] requestPermission: Added to cache');
+          }
+          
+          return granted;
         }
 
         if (response.type === 'ERROR') {
+          console.error('[useExtension] requestPermission: Error from extension:', response.error);
           setError(response.error.message);
           return false;
         }
 
+        console.log('[useExtension] requestPermission: Unexpected response type');
         return false;
       } catch (err) {
+        console.error('[useExtension] requestPermission error:', err);
         setError(err instanceof Error ? err.message : 'Permission request failed');
         return false;
       }

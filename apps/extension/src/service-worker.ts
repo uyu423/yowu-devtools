@@ -98,6 +98,71 @@ async function getGrantedOrigins(): Promise<string[]> {
 }
 
 // =============================================================================
+// Cookie Management
+// =============================================================================
+
+/**
+ * Get cookies for a URL and format them as a Cookie header value
+ */
+async function getCookiesForUrl(url: string): Promise<string | null> {
+  try {
+    const cookies = await chrome.cookies.getAll({ url });
+    if (cookies.length === 0) return null;
+    
+    return cookies.map(cookie => `${cookie.name}=${cookie.value}`).join('; ');
+  } catch (error) {
+    console.warn('[Extension] Failed to get cookies:', error);
+    return null;
+  }
+}
+
+/**
+ * Add a dynamic rule to set Cookie header for a specific request
+ */
+async function addCookieRule(ruleId: number, urlFilter: string, cookieValue: string): Promise<void> {
+  try {
+    await chrome.declarativeNetRequest.updateSessionRules({
+      addRules: [{
+        id: ruleId,
+        priority: 2,
+        action: {
+          type: chrome.declarativeNetRequest.RuleActionType.MODIFY_HEADERS,
+          requestHeaders: [
+            { header: 'cookie', operation: chrome.declarativeNetRequest.HeaderOperation.SET, value: cookieValue }
+          ]
+        },
+        condition: {
+          urlFilter: urlFilter,
+          resourceTypes: [
+            chrome.declarativeNetRequest.ResourceType.XMLHTTPREQUEST,
+            chrome.declarativeNetRequest.ResourceType.OTHER
+          ]
+        }
+      }],
+      removeRuleIds: [ruleId]
+    });
+  } catch (error) {
+    console.warn('[Extension] Failed to add cookie rule:', error);
+  }
+}
+
+/**
+ * Remove a dynamic cookie rule
+ */
+async function removeCookieRule(ruleId: number): Promise<void> {
+  try {
+    await chrome.declarativeNetRequest.updateSessionRules({
+      removeRuleIds: [ruleId]
+    });
+  } catch (error) {
+    console.warn('[Extension] Failed to remove cookie rule:', error);
+  }
+}
+
+// Counter for generating unique rule IDs
+let cookieRuleIdCounter = 1000;
+
+// =============================================================================
 // Request Executor
 // =============================================================================
 
@@ -209,6 +274,15 @@ async function executeRequest(spec: RequestSpec): Promise<ResponseSpec> {
     };
   }
 
+  // Get cookies for the target URL and add dynamic rule
+  const cookieRuleId = cookieRuleIdCounter++;
+  const cookieValue = await getCookiesForUrl(spec.url);
+  
+  if (cookieValue) {
+    console.log('[Extension] Adding cookies for:', targetOrigin);
+    await addCookieRule(cookieRuleId, spec.url, cookieValue);
+  }
+
   // Create AbortController for timeout
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), spec.options.timeoutMs);
@@ -224,6 +298,11 @@ async function executeRequest(spec: RequestSpec): Promise<ResponseSpec> {
     });
 
     clearTimeout(timeoutId);
+    
+    // Clean up cookie rule
+    if (cookieValue) {
+      await removeCookieRule(cookieRuleId);
+    }
 
     const timingMs = Math.round(performance.now() - startTime);
 
@@ -262,6 +341,11 @@ async function executeRequest(spec: RequestSpec): Promise<ResponseSpec> {
     };
   } catch (error) {
     clearTimeout(timeoutId);
+    
+    // Clean up cookie rule
+    if (cookieValue) {
+      await removeCookieRule(cookieRuleId);
+    }
 
     const timingMs = Math.round(performance.now() - startTime);
 
@@ -449,6 +533,15 @@ chrome.runtime.onMessageExternal.addListener(
     return true;
   }
 );
+
+// =============================================================================
+// Action Button Handler
+// =============================================================================
+
+// Open options page when toolbar icon is clicked
+chrome.action.onClicked.addListener(() => {
+  chrome.runtime.openOptionsPage();
+});
 
 // =============================================================================
 // Service Worker Lifecycle

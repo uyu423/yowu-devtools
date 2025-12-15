@@ -2,9 +2,9 @@
   "manifest_version": 3,
   "name": "Yowu DevTools Companion",
   "short_name": "DevTools",
-  "version": "1.0.0",
+  "version": "1.0.1",
 
-  "description": "Companion extension for tools.yowu.dev - enables CORS-free API testing. Only activates when explicitly invoked from the API Tester tool. No background activity, no data collection.",
+  "description": "Companion extension for tools.yowu.dev",
 
   "homepage_url": "https://tools.yowu.dev",
 
@@ -23,9 +23,19 @@
     "default_title": "Yowu DevTools Companion - Click for settings"
   },
 
-  "permissions": ["storage"],
+  "permissions": ["storage", "declarativeNetRequest", "cookies"],
 
   "optional_host_permissions": ["http://*/*", "https://*/*"],
+
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "ruleset_remove_origin",
+        "enabled": true,
+        "path": "rules/remove-origin.json"
+      }
+    ]
+  },
 
   "background": {
     "service_worker": "src/service-worker.ts",

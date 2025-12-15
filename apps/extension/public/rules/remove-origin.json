@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1,
+    "priority": 1,
+    "action": {
+      "type": "modifyHeaders",
+      "requestHeaders": [
+        { "header": "origin", "operation": "remove" },
+        { "header": "sec-fetch-site", "operation": "set", "value": "none" },
+        { "header": "sec-fetch-mode", "operation": "set", "value": "cors" }
+      ]
+    },
+    "condition": {
+      "resourceTypes": ["xmlhttprequest", "other"]
+    }
+  }
+]
+
