@@ -91,6 +91,13 @@ yowu-devtools/
 - [x] 아이콘 파일 생성 (16, 48, 128px) - 웹앱 아이콘 재사용
 - [ ] 고정 Extension ID 설정 (key 필드) - 프로덕션 배포 시 추가 예정
 
+### 2.7 테스트 완료 ✅
+
+- [x] Extension 빌드 성공 (`pnpm run build`)
+- [x] Chrome에 Extension 로드 성공
+- [x] PING/PONG 통신 테스트 성공
+- [x] Options 페이지 정상 동작 확인
+
 ### 2.3 Service Worker 구현 ✅
 
 > **중요**: Service Worker는 **이벤트 기반**으로 동작하며, 평소에는 비활성 상태입니다.
