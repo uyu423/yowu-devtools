@@ -369,6 +369,72 @@ const RegexTool: React.FC = () => {
     return { name: category?.name || categoryKey, description: category?.description || '' };
   }, [t]);
 
+  // Pattern name to i18n key mapping
+  const getPatternI18n = React.useCallback((patternName: string, fallback: { name: string; description: string; example: string }): { name: string; description: string; example: string } => {
+    const patternMap: Record<string, { nameKey: string; descKey: string; exampleKey: string }> = {
+      // Character Classes
+      'Digit': { nameKey: 'tool.regex.patternDigitName', descKey: 'tool.regex.patternDigitDesc', exampleKey: 'tool.regex.patternDigitExample' },
+      'Non-digit': { nameKey: 'tool.regex.patternNonDigitName', descKey: 'tool.regex.patternNonDigitDesc', exampleKey: 'tool.regex.patternNonDigitExample' },
+      'Word Character': { nameKey: 'tool.regex.patternWordCharName', descKey: 'tool.regex.patternWordCharDesc', exampleKey: 'tool.regex.patternWordCharExample' },
+      'Non-word Character': { nameKey: 'tool.regex.patternNonWordCharName', descKey: 'tool.regex.patternNonWordCharDesc', exampleKey: 'tool.regex.patternNonWordCharExample' },
+      'Whitespace': { nameKey: 'tool.regex.patternWhitespaceName', descKey: 'tool.regex.patternWhitespaceDesc', exampleKey: 'tool.regex.patternWhitespaceExample' },
+      'Non-whitespace': { nameKey: 'tool.regex.patternNonWhitespaceName', descKey: 'tool.regex.patternNonWhitespaceDesc', exampleKey: 'tool.regex.patternNonWhitespaceExample' },
+      'Dot (Escaped)': { nameKey: 'tool.regex.patternDotEscapedName', descKey: 'tool.regex.patternDotEscapedDesc', exampleKey: 'tool.regex.patternDotEscapedExample' },
+      'Newline': { nameKey: 'tool.regex.patternNewlineName', descKey: 'tool.regex.patternNewlineDesc', exampleKey: 'tool.regex.patternNewlineExample' },
+      'Tab': { nameKey: 'tool.regex.patternTabName', descKey: 'tool.regex.patternTabDesc', exampleKey: 'tool.regex.patternTabExample' },
+      'Carriage Return': { nameKey: 'tool.regex.patternCarriageReturnName', descKey: 'tool.regex.patternCarriageReturnDesc', exampleKey: 'tool.regex.patternCarriageReturnExample' },
+      // Quantifiers
+      'Zero or More': { nameKey: 'tool.regex.patternZeroOrMoreName', descKey: 'tool.regex.patternZeroOrMoreDesc', exampleKey: 'tool.regex.patternZeroOrMoreExample' },
+      'One or More': { nameKey: 'tool.regex.patternOneOrMoreName', descKey: 'tool.regex.patternOneOrMoreDesc', exampleKey: 'tool.regex.patternOneOrMoreExample' },
+      'Zero or One': { nameKey: 'tool.regex.patternZeroOrOneName', descKey: 'tool.regex.patternZeroOrOneDesc', exampleKey: 'tool.regex.patternZeroOrOneExample' },
+      'Exactly N': { nameKey: 'tool.regex.patternExactlyNName', descKey: 'tool.regex.patternExactlyNDesc', exampleKey: 'tool.regex.patternExactlyNExample' },
+      'N or More': { nameKey: 'tool.regex.patternNOrMoreName', descKey: 'tool.regex.patternNOrMoreDesc', exampleKey: 'tool.regex.patternNOrMoreExample' },
+      'Between N and M': { nameKey: 'tool.regex.patternBetweenNMName', descKey: 'tool.regex.patternBetweenNMDesc', exampleKey: 'tool.regex.patternBetweenNMExample' },
+      'Lazy Zero or More': { nameKey: 'tool.regex.patternLazyZeroOrMoreName', descKey: 'tool.regex.patternLazyZeroOrMoreDesc', exampleKey: 'tool.regex.patternLazyZeroOrMoreExample' },
+      'Lazy One or More': { nameKey: 'tool.regex.patternLazyOneOrMoreName', descKey: 'tool.regex.patternLazyOneOrMoreDesc', exampleKey: 'tool.regex.patternLazyOneOrMoreExample' },
+      'Lazy Zero or One': { nameKey: 'tool.regex.patternLazyZeroOrOneName', descKey: 'tool.regex.patternLazyZeroOrOneDesc', exampleKey: 'tool.regex.patternLazyZeroOrOneExample' },
+      // Anchors
+      'Start of String': { nameKey: 'tool.regex.patternStartOfStringName', descKey: 'tool.regex.patternStartOfStringDesc', exampleKey: 'tool.regex.patternStartOfStringExample' },
+      'End of String': { nameKey: 'tool.regex.patternEndOfStringName', descKey: 'tool.regex.patternEndOfStringDesc', exampleKey: 'tool.regex.patternEndOfStringExample' },
+      'Word Boundary': { nameKey: 'tool.regex.patternWordBoundaryName', descKey: 'tool.regex.patternWordBoundaryDesc', exampleKey: 'tool.regex.patternWordBoundaryExample' },
+      'Non-word Boundary': { nameKey: 'tool.regex.patternNonWordBoundaryName', descKey: 'tool.regex.patternNonWordBoundaryDesc', exampleKey: 'tool.regex.patternNonWordBoundaryExample' },
+      // Groups
+      'Capturing Group': { nameKey: 'tool.regex.patternCapturingGroupName', descKey: 'tool.regex.patternCapturingGroupDesc', exampleKey: 'tool.regex.patternCapturingGroupExample' },
+      'Non-capturing Group': { nameKey: 'tool.regex.patternNonCapturingGroupName', descKey: 'tool.regex.patternNonCapturingGroupDesc', exampleKey: 'tool.regex.patternNonCapturingGroupExample' },
+      'Named Capturing Group': { nameKey: 'tool.regex.patternNamedCapturingGroupName', descKey: 'tool.regex.patternNamedCapturingGroupDesc', exampleKey: 'tool.regex.patternNamedCapturingGroupExample' },
+      'Positive Lookahead': { nameKey: 'tool.regex.patternPositiveLookaheadName', descKey: 'tool.regex.patternPositiveLookaheadDesc', exampleKey: 'tool.regex.patternPositiveLookaheadExample' },
+      'Negative Lookahead': { nameKey: 'tool.regex.patternNegativeLookaheadName', descKey: 'tool.regex.patternNegativeLookaheadDesc', exampleKey: 'tool.regex.patternNegativeLookaheadExample' },
+      'Positive Lookbehind': { nameKey: 'tool.regex.patternPositiveLookbehindName', descKey: 'tool.regex.patternPositiveLookbehindDesc', exampleKey: 'tool.regex.patternPositiveLookbehindExample' },
+      'Negative Lookbehind': { nameKey: 'tool.regex.patternNegativeLookbehindName', descKey: 'tool.regex.patternNegativeLookbehindDesc', exampleKey: 'tool.regex.patternNegativeLookbehindExample' },
+      'Backreference': { nameKey: 'tool.regex.patternBackreferenceName', descKey: 'tool.regex.patternBackreferenceDesc', exampleKey: 'tool.regex.patternBackreferenceExample' },
+      'Named Backreference': { nameKey: 'tool.regex.patternNamedBackreferenceName', descKey: 'tool.regex.patternNamedBackreferenceDesc', exampleKey: 'tool.regex.patternNamedBackreferenceExample' },
+      // Character Sets
+      'Character Class': { nameKey: 'tool.regex.patternCharacterClassName', descKey: 'tool.regex.patternCharacterClassDesc', exampleKey: 'tool.regex.patternCharacterClassExample' },
+      'Negated Character Class': { nameKey: 'tool.regex.patternNegatedCharacterClassName', descKey: 'tool.regex.patternNegatedCharacterClassDesc', exampleKey: 'tool.regex.patternNegatedCharacterClassExample' },
+      'Character Range': { nameKey: 'tool.regex.patternCharacterRangeName', descKey: 'tool.regex.patternCharacterRangeDesc', exampleKey: 'tool.regex.patternCharacterRangeExample' },
+      // Flags
+      'Global': { nameKey: 'tool.regex.patternGlobalFlagName', descKey: 'tool.regex.patternGlobalFlagDesc', exampleKey: 'tool.regex.patternGlobalFlagExample' },
+      'Case Insensitive': { nameKey: 'tool.regex.patternCaseInsensitiveFlagName', descKey: 'tool.regex.patternCaseInsensitiveFlagDesc', exampleKey: 'tool.regex.patternCaseInsensitiveFlagExample' },
+      'Multiline': { nameKey: 'tool.regex.patternMultilineFlagName', descKey: 'tool.regex.patternMultilineFlagDesc', exampleKey: 'tool.regex.patternMultilineFlagExample' },
+      'DotAll': { nameKey: 'tool.regex.patternDotAllFlagName', descKey: 'tool.regex.patternDotAllFlagDesc', exampleKey: 'tool.regex.patternDotAllFlagExample' },
+      'Unicode': { nameKey: 'tool.regex.patternUnicodeFlagName', descKey: 'tool.regex.patternUnicodeFlagDesc', exampleKey: 'tool.regex.patternUnicodeFlagExample' },
+      'Sticky': { nameKey: 'tool.regex.patternStickyFlagName', descKey: 'tool.regex.patternStickyFlagDesc', exampleKey: 'tool.regex.patternStickyFlagExample' },
+      'HasIndices': { nameKey: 'tool.regex.patternHasIndicesFlagName', descKey: 'tool.regex.patternHasIndicesFlagDesc', exampleKey: 'tool.regex.patternHasIndicesFlagExample' },
+      'UnicodeSets': { nameKey: 'tool.regex.patternUnicodeSetsFlagName', descKey: 'tool.regex.patternUnicodeSetsFlagDesc', exampleKey: 'tool.regex.patternUnicodeSetsFlagExample' },
+      // Unicode
+      'Unicode Escape': { nameKey: 'tool.regex.patternUnicodeEscapeName', descKey: 'tool.regex.patternUnicodeEscapeDesc', exampleKey: 'tool.regex.patternUnicodeEscapeExample' },
+      'Unicode Code Point': { nameKey: 'tool.regex.patternUnicodeCodePointName', descKey: 'tool.regex.patternUnicodeCodePointDesc', exampleKey: 'tool.regex.patternUnicodeCodePointExample' },
+      'Unicode Property': { nameKey: 'tool.regex.patternUnicodePropertyName', descKey: 'tool.regex.patternUnicodePropertyDesc', exampleKey: 'tool.regex.patternUnicodePropertyExample' },
+      'Negated Unicode Property': { nameKey: 'tool.regex.patternNegatedUnicodePropertyName', descKey: 'tool.regex.patternNegatedUnicodePropertyDesc', exampleKey: 'tool.regex.patternNegatedUnicodePropertyExample' },
+    };
+    const keys = patternMap[patternName];
+    if (keys) {
+      return { name: t(keys.nameKey), description: t(keys.descKey), example: t(keys.exampleKey) };
+    }
+    // Fallback to original pattern info from JSON
+    return fallback;
+  }, [t]);
+
   // Analyze pattern to detect used features
   const detectedFeatures = React.useMemo(() => {
     if (!debouncedPattern.trim()) {
@@ -404,15 +470,16 @@ const RegexTool: React.FC = () => {
             );
             if (!alreadyAdded) {
               const categoryI18n = getCategoryI18n(categoryKey);
+              const patternI18n = getPatternI18n(patternSpec.name, {
+                name: patternSpec.name,
+                description: patternSpec.description,
+                example: patternSpec.example,
+              });
               features.push({
                 category: categoryKey,
                 categoryName: categoryI18n.name,
                 categoryDescription: categoryI18n.description,
-                feature: {
-                  name: patternSpec.name,
-                  description: patternSpec.description,
-                  example: patternSpec.example,
-                },
+                feature: patternI18n,
               });
             }
           }
@@ -434,15 +501,16 @@ const RegexTool: React.FC = () => {
           );
           if (!alreadyAdded) {
             const categoryI18n = getCategoryI18n('flags');
+            const patternI18n = getPatternI18n(flagSpec.name, {
+              name: flagSpec.name,
+              description: flagSpec.description,
+              example: flagSpec.example,
+            });
             features.push({
               category: 'flags',
               categoryName: categoryI18n.name,
               categoryDescription: categoryI18n.description,
-              feature: {
-                name: flagSpec.name,
-                description: flagSpec.description,
-                example: flagSpec.example,
-              },
+              feature: patternI18n,
             });
           }
         }
@@ -450,7 +518,7 @@ const RegexTool: React.FC = () => {
     });
 
     return features;
-  }, [debouncedPattern, state.flags, getCategoryI18n]);
+  }, [debouncedPattern, state.flags, getCategoryI18n, getPatternI18n]);
 
   // Build highlights array for CodeMirror decoration
   const highlights = React.useMemo(() => {
