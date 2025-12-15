@@ -10,6 +10,7 @@ import { getStatusColor, formatBytes } from '../types';
 import { parseResponseBody } from '../utils';
 import { copyToClipboard } from '@/lib/clipboard';
 import { useResolvedTheme } from '@/hooks/useThemeHooks';
+import { useI18n } from '@/hooks/useI18nHooks';
 import CodeMirror from '@uiw/react-codemirror';
 import { oneDark } from '@codemirror/theme-one-dark';
 
@@ -97,12 +98,53 @@ const JsonWithLinks: React.FC<{ data: unknown; depth?: number }> = ({ data, dept
   return <span>{String(data)}</span>;
 };
 
+// Map error codes to i18n keys
+const ERROR_MESSAGE_KEYS: Record<string, string> = {
+  TIMEOUT: 'errorTimeout',
+  CORS_ERROR: 'errorCors',
+  NETWORK_ERROR: 'errorNetwork',
+  UNKNOWN_ERROR: 'errorUnknown',
+  PERMISSION_DENIED: 'errorPermissionDenied',
+  EXTENSION_ERROR: 'errorExtension',
+};
+
 export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoading }) => {
+  const { t } = useI18n();
   const [activeTab, setActiveTab] = useState<TabType>('body');
   const [viewMode, setViewMode] = useState<ViewMode>('tree');
   const [copied, setCopied] = useState(false);
   const resolvedTheme = useResolvedTheme();
   const isDark = resolvedTheme === 'dark';
+
+  // Get translated error message based on error code
+  const getErrorMessage = useCallback(
+    (error: { code: string; message: string }) => {
+      const key = ERROR_MESSAGE_KEYS[error.code];
+      if (!key) return error.message;
+
+      // Extract parameters from original message for interpolation
+      let translatedMessage = t(`tool.apiTester.${key}`);
+
+      // Handle timeout message with ms parameter
+      if (error.code === 'TIMEOUT') {
+        const msMatch = error.message.match(/(\d+)ms/);
+        if (msMatch) {
+          translatedMessage = translatedMessage.replace('{ms}', msMatch[1]);
+        }
+      }
+
+      // Handle permission denied with origin parameter
+      if (error.code === 'PERMISSION_DENIED') {
+        const originMatch = error.message.match(/for ([^\s.]+)/);
+        if (originMatch) {
+          translatedMessage = translatedMessage.replace('{origin}', originMatch[1]);
+        }
+      }
+
+      return translatedMessage;
+    },
+    [t]
+  );
 
   // Parse response body
   const parsedBody = useMemo(() => {
@@ -165,7 +207,7 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
       <div className="flex items-center justify-center h-64 text-gray-500 dark:text-gray-400">
         <div className="flex items-center gap-2">
           <div className="animate-spin rounded-full h-5 w-5 border-2 border-gray-300 dark:border-gray-600 border-t-blue-600" />
-          <span>Sending request...</span>
+          <span>{t('tool.apiTester.sendingRequest')}</span>
         </div>
       </div>
     );
@@ -174,7 +216,7 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
   if (!response) {
     return (
       <div className="flex items-center justify-center h-64 text-gray-400 dark:text-gray-500">
-        <span>Send a request to see the response</span>
+        <span>{t('tool.apiTester.sendRequestToSee')}</span>
       </div>
     );
   }
@@ -184,7 +226,7 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
     return (
       <div className="p-4 space-y-4">
         <div className="flex items-center gap-4 text-red-600 dark:text-red-400">
-          <span className="font-semibold">Error</span>
+          <span className="font-semibold">{t('common.error')}</span>
           {response.timingMs !== undefined && (
             <span className="text-sm text-gray-500 dark:text-gray-400">
               {response.timingMs}ms
@@ -196,7 +238,7 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
             {response.error.code}
           </div>
           <div className="mt-2 text-sm text-red-600 dark:text-red-400">
-            {response.error.message}
+            {getErrorMessage(response.error)}
           </div>
         </div>
       </div>
@@ -242,7 +284,7 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
         {/* Method badge */}
         {response.method && (
           <div className="ml-auto text-xs px-2 py-0.5 rounded bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
-            via {response.method}
+            {t('tool.apiTester.viaMethod').replace('{method}', response.method)}
           </div>
         )}
       </div>
@@ -258,7 +300,7 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
               : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
           )}
         >
-          Body
+          {t('tool.apiTester.responseBody')}
         </button>
         <button
           onClick={() => setActiveTab('headers')}
@@ -269,7 +311,7 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
               : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
           )}
         >
-          Headers ({Object.keys(response.headers || {}).length})
+          {t('tool.apiTester.responseHeaders')} ({Object.keys(response.headers || {}).length})
         </button>
 
         {/* View mode (only for body tab with JSON) */}
@@ -286,7 +328,7 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
                     : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
                 )}
               >
-                {mode.charAt(0).toUpperCase() + mode.slice(1)}
+                {t(`tool.apiTester.view${mode.charAt(0).toUpperCase() + mode.slice(1)}`)}
               </button>
             ))}
           </div>
@@ -357,7 +399,7 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
             {parsedBody?.type === 'binary' && (
               <div className="flex flex-col items-center gap-4 p-8">
                 <div className="text-gray-500 dark:text-gray-400">
-                  Binary response ({formatBytes(bodySize)})
+                  {t('tool.apiTester.binaryResponse')} ({formatBytes(bodySize)})
                 </div>
                 <button
                   onClick={() => {
@@ -371,7 +413,7 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
                   className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
                 >
                   <Download className="w-4 h-4" />
-                  Download
+                  {t('tool.apiTester.downloadBinary')}
                 </button>
               </div>
             )}

@@ -81,7 +81,7 @@ export const ExtensionStatus: React.FC<ExtensionStatusProps> = ({
   };
 
   return (
-    <Tooltip content={tooltip}>
+    <Tooltip content={tooltip} position="bottom" align="left">
       <button
         onClick={handleClick}
         className={cn(

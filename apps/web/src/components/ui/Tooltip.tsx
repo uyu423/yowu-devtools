@@ -5,16 +5,30 @@ interface TooltipProps {
   content: string;
   children: React.ReactNode;
   className?: string;
+  /** Preferred position - 'auto' will calculate, 'top'/'bottom' will force that direction */
+  position?: 'auto' | 'top' | 'bottom';
+  /** Horizontal alignment - 'center' (default), 'left', or 'right' */
+  align?: 'center' | 'left' | 'right';
 }
 
-export const Tooltip: React.FC<TooltipProps> = ({ content, children, className }) => {
+export const Tooltip: React.FC<TooltipProps> = ({ 
+  content, 
+  children, 
+  className,
+  position: preferredPosition = 'auto',
+  align = 'center',
+}) => {
   const [isVisible, setIsVisible] = useState(false);
-  const [position, setPosition] = useState<'top' | 'bottom'>('top');
+  const [calculatedPosition, setCalculatedPosition] = useState<'top' | 'bottom'>('top');
   const tooltipRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Determine final position
+  const finalPosition = preferredPosition === 'auto' ? calculatedPosition : preferredPosition;
+
   useLayoutEffect(() => {
     if (!isVisible || !tooltipRef.current || !containerRef.current) return;
+    if (preferredPosition !== 'auto') return; // Skip calculation if position is forced
 
     // tooltip이 렌더링된 후 위치 계산
     const updatePosition = () => {
@@ -35,9 +49,9 @@ export const Tooltip: React.FC<TooltipProps> = ({ content, children, className }
 
       // 위쪽 공간이 부족하고 아래쪽 공간이 충분하면 아래쪽에 표시
       if (spaceAbove < tooltipHeight + margin && spaceBelow > tooltipHeight + margin) {
-        setPosition('bottom');
+        setCalculatedPosition('bottom');
       } else {
-        setPosition('top');
+        setCalculatedPosition('top');
       }
     };
 
@@ -46,7 +60,30 @@ export const Tooltip: React.FC<TooltipProps> = ({ content, children, className }
     
     // requestAnimationFrame으로 한 프레임 후 다시 확인 (렌더링 완료 후)
     requestAnimationFrame(updatePosition);
-  }, [isVisible]);
+  }, [isVisible, preferredPosition]);
+
+  // Get alignment classes
+  const getAlignmentClasses = () => {
+    switch (align) {
+      case 'left':
+        return 'left-0';
+      case 'right':
+        return 'right-0';
+      default:
+        return 'left-1/2 transform -translate-x-1/2';
+    }
+  };
+
+  const getArrowAlignmentClasses = () => {
+    switch (align) {
+      case 'left':
+        return 'left-4';
+      case 'right':
+        return 'right-4';
+      default:
+        return 'left-1/2 transform -translate-x-1/2';
+    }
+  };
 
   return (
     <div 
@@ -60,18 +97,20 @@ export const Tooltip: React.FC<TooltipProps> = ({ content, children, className }
         <div
           ref={tooltipRef}
           className={cn(
-            "absolute z-50 px-4 py-2.5 text-sm text-white bg-gray-900 dark:bg-gray-700 rounded-md shadow-lg whitespace-normal pointer-events-none left-1/2 transform -translate-x-1/2 max-w-lg",
-            position === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'
+            "absolute z-50 px-4 py-2.5 text-sm text-white bg-gray-900 dark:bg-gray-700 rounded-md shadow-lg whitespace-normal pointer-events-none max-w-lg",
+            getAlignmentClasses(),
+            finalPosition === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'
           )}
         >
           {content}
           <div className={cn(
-            "absolute left-1/2 transform -translate-x-1/2",
-            position === 'top' ? 'top-full -mt-1' : 'bottom-full -mb-1'
+            "absolute",
+            getArrowAlignmentClasses(),
+            finalPosition === 'top' ? 'top-full -mt-1' : 'bottom-full -mb-1'
           )}>
             <div className={cn(
               "border-4 border-transparent",
-              position === 'top' 
+              finalPosition === 'top' 
                 ? 'border-t-gray-900 dark:border-t-gray-700' 
                 : 'border-b-gray-900 dark:border-b-gray-700'
             )} />
