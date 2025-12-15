@@ -42,6 +42,8 @@ export const esES = {
     spaces4: '4 espacios',
     copiedResult: 'Resultado copiado.',
     copiedToClipboard: 'Copiado al portapapeles',
+    fullscreen: 'Pantalla completa',
+    exitFullscreen: 'Salir de pantalla completa',
     processingLargeData: 'Procesando datos grandes...',
     noDataFound: 'No se encontraron datos',
     invalidInput: 'Entrada no válida',

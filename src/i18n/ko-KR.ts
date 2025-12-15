@@ -42,6 +42,8 @@ export const koKR = {
     spaces4: '4칸',
     copiedResult: '결과가 복사되었습니다.',
     copiedToClipboard: '클립보드에 복사되었습니다',
+    fullscreen: '전체 화면',
+    exitFullscreen: '전체 화면 종료',
     processingLargeData: '대용량 데이터 처리 중...',
     noDataFound: '데이터를 찾을 수 없습니다',
     invalidInput: '잘못된 입력입니다',

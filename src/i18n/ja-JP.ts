@@ -42,6 +42,8 @@ export const jaJP = {
     spaces4: '4スペース',
     copiedResult: '結果をコピーしました。',
     copiedToClipboard: 'クリップボードにコピーしました',
+    fullscreen: 'フルスクリーン',
+    exitFullscreen: 'フルスクリーン解除',
     processingLargeData: '大きなデータを処理中...',
     noDataFound: 'データが見つかりません',
     invalidInput: '無効な入力',

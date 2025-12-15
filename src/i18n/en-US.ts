@@ -40,6 +40,8 @@ export const enUS = {
     spaces4: '4 spaces',
     copiedResult: 'Result copied.',
     copiedToClipboard: 'Copied to clipboard',
+    fullscreen: 'Fullscreen',
+    exitFullscreen: 'Exit Fullscreen',
     processingLargeData: 'Processing large data...',
     noDataFound: 'No data found',
     invalidInput: 'Invalid input',

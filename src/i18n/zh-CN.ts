@@ -42,6 +42,8 @@ export const zhCN = {
     spaces4: '4个空格',
     copiedResult: '结果已复制。',
     copiedToClipboard: '已复制到剪贴板',
+    fullscreen: '全屏',
+    exitFullscreen: '退出全屏',
     processingLargeData: '正在处理大量数据...',
     noDataFound: '未找到数据',
     invalidInput: '无效输入',

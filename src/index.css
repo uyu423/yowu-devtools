@@ -160,6 +160,25 @@ input[type='radio']:checked::after {
   color: rgb(243 244 246) !important; /* gray-100 */
 }
 
+/* JSON Tree View - 긴 값 줄바꿈 처리 */
+.json-tree-view {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+/* JSON Tree View의 문자열 값 줄바꿈 */
+.json-tree-view span {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+/* JSON 문자열 값 클래스에 직접 적용 */
+.json-string-value {
+  word-break: break-all;
+  overflow-wrap: anywhere;
+  display: inline;
+}
+
 /* Sonner Toast 다크 모드 스타일 커스터마이징 */
 .dark [data-sonner-toast] {
   background-color: rgb(31 41 55) !important; /* gray-800 */
