@@ -9,6 +9,7 @@ import { useToolState } from '@/hooks/useToolState';
 import { useTitle } from '@/hooks/useTitle';
 import { useI18n } from '@/hooks/useI18nHooks';
 import { format, formatDistanceToNow } from 'date-fns';
+import { enUS as enUSLocale, ko, ja, zhCN, es } from 'date-fns/locale';
 import CronExpressionParser, { type CronExpressionOptions } from 'cron-parser';
 import cronstrue from 'cronstrue';
 // cronstrue locales
@@ -42,13 +43,28 @@ const CRONSTRUE_LOCALE_MAP: Record<string, string> = {
   'es-ES': 'es',
 };
 
+// Map our locale codes to date-fns locale objects
+const DATE_FNS_LOCALE_MAP: Record<string, typeof enUSLocale> = {
+  'en-US': enUSLocale,
+  'ko-KR': ko,
+  'ja-JP': ja,
+  'zh-CN': zhCN,
+  'es-ES': es,
+};
+
 const CronTool: React.FC = () => {
   const { t, locale } = useI18n();
   useTitle(t('tool.cron.title'));
   // Cron tool state is small (expression string, boolean flags, small numbers)
   // No filter needed - all fields are necessary and small
-  const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
-    useToolState<CronToolState>('cron', DEFAULT_STATE);
+  const {
+    state,
+    updateState,
+    resetState,
+    copyShareLink,
+    shareViaWebShare,
+    getShareStateInfo,
+  } = useToolState<CronToolState>('cron', DEFAULT_STATE);
   const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
   const shareInfo = getShareStateInfo();
   const isMobile = isMobileDevice();
@@ -67,7 +83,9 @@ const CronTool: React.FC = () => {
       const expected = state.hasSeconds ? 6 : 5;
       if (parts.length !== expected) {
         throw new Error(
-          t('tool.cron.expectedFields').replace('{n}', String(expected)).replace('{m}', String(parts.length))
+          t('tool.cron.expectedFields')
+            .replace('{n}', String(expected))
+            .replace('{m}', String(parts.length))
         );
       }
       const options: CronExpressionOptions = {
@@ -89,7 +107,14 @@ const CronTool: React.FC = () => {
     } catch (error) {
       return { description: '', nextRuns: [], error: (error as Error).message };
     }
-  }, [state.expression, state.hasSeconds, state.nextCount, state.timezone, t, locale]);
+  }, [
+    state.expression,
+    state.hasSeconds,
+    state.nextCount,
+    state.timezone,
+    t,
+    locale,
+  ]);
 
   return (
     <div className="flex flex-col h-full p-4 md:p-6 max-w-3xl mx-auto">
@@ -187,7 +212,9 @@ const CronTool: React.FC = () => {
             <div className="bg-gray-50 dark:bg-gray-700 px-4 py-2 border-b border-gray-200 dark:border-gray-600 text-sm font-medium text-gray-700 dark:text-gray-300 flex justify-between">
               <span>{t('tool.cron.nextScheduledDates')}</span>
               <span className="text-xs text-gray-500 dark:text-gray-400">
-                {state.timezone === 'utc' ? t('tool.time.utcTimezone') : t('tool.time.localTimezone')}
+                {state.timezone === 'utc'
+                  ? t('tool.time.utcTimezone')
+                  : t('tool.time.localTimezone')}
               </span>
             </div>
             <ul className="divide-y divide-gray-100 dark:divide-gray-700">
@@ -200,7 +227,10 @@ const CronTool: React.FC = () => {
                     {format(date, 'yyyy-MM-dd HH:mm:ss')}
                   </span>
                   <span className="text-gray-400 dark:text-gray-500">
-                    {formatDistanceToNow(date, { addSuffix: true })}
+                    {formatDistanceToNow(date, {
+                      addSuffix: true,
+                      locale: DATE_FNS_LOCALE_MAP[locale] || enUSLocale,
+                    })}
                   </span>
                 </li>
               ))}

@@ -473,6 +473,7 @@ export const jaJP = {
       extraction: '抽出',
       formatting: 'フォーマット',
       matchNumber: 'マッチ #{n}',
+      matchInfo: 'マッチ #{n} (インデックス {index}, 長さ {length})',
       atIndex: 'インデックス {n}',
       lengthLabel: '長さ: {n}',
       groups: 'グループ',

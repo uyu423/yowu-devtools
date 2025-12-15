@@ -475,6 +475,7 @@ export const enUS = {
       extraction: 'Extraction',
       formatting: 'Formatting',
       matchNumber: 'Match #{n}',
+      matchInfo: 'Match #{n} at index {index} (length: {length})',
       atIndex: 'at index {n}',
       lengthLabel: 'length: {n}',
       groups: 'Groups',

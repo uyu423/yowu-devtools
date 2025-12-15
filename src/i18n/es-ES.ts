@@ -490,6 +490,7 @@ export const esES = {
       extraction: 'Extracción',
       formatting: 'Formateo',
       matchNumber: 'Coincidencia #{n}',
+      matchInfo: 'Coincidencia #{n} en índice {index} (longitud: {length})',
       atIndex: 'índice {n}',
       lengthLabel: 'longitud: {n}',
       groups: 'Grupos',

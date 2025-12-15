@@ -468,6 +468,7 @@ export const koKR = {
       extraction: '추출',
       formatting: '포맷팅',
       matchNumber: '매치 #{n}',
+      matchInfo: '매치 #{n} (인덱스 {index}, 길이 {length})',
       atIndex: '인덱스 {n}',
       lengthLabel: '길이: {n}',
       groups: '그룹',

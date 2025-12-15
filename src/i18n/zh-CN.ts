@@ -451,6 +451,7 @@ export const zhCN = {
       extraction: '提取',
       formatting: '格式化',
       matchNumber: '匹配 #{n}',
+      matchInfo: '匹配 #{n} (索引 {index}, 长度 {length})',
       atIndex: '索引 {n}',
       lengthLabel: '长度：{n}',
       groups: '分组',

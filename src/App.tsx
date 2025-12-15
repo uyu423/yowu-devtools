@@ -14,6 +14,10 @@ import { usePWA } from '@/hooks/usePWA';
 import { useRecentTools } from '@/hooks/useRecentTools';
 import { useResolvedTheme } from '@/hooks/useThemeHooks';
 
+// Helper to convert tool id to i18n key (url-parser → urlParser)
+const toI18nToolId = (id: string) =>
+  id.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+
 // Home page component (reusable for both / and /{locale}/)
 function HomePage() {
   const { locale, t } = useI18n();
@@ -161,7 +165,7 @@ function HomePage() {
                 </div>
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-400">
-                {tool.description}
+                {t(`tool.${toI18nToolId(tool.id)}.description`)}
               </div>
             </Link>
           ))}
