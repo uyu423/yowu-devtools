@@ -156,7 +156,10 @@ const DiffTool: React.FC = () => {
               title={t('tool.diff.original')}
               value={state.left}
               onChange={(val) => updateState({ left: val })}
-              className="h-60"
+              resizable
+              minHeight={150}
+              maxHeight={600}
+              heightStorageKey="diff-left-height"
             />
             <div className="mt-3">
               <FileInput
@@ -174,7 +177,10 @@ const DiffTool: React.FC = () => {
               title={t('tool.diff.modified')}
               value={state.right}
               onChange={(val) => updateState({ right: val })}
-              className="h-60"
+              resizable
+              minHeight={150}
+              maxHeight={600}
+              heightStorageKey="diff-right-height"
             />
             <div className="mt-3">
               <FileInput

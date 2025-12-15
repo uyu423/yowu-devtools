@@ -82,8 +82,11 @@ const Base64Tool: React.FC = () => {
               ? t('tool.base64.textPlaceholder')
               : t('tool.base64.base64Placeholder')
           }
-          className="h-40 lg:h-56"
           status={conversion.error ? 'error' : 'default'}
+          resizable
+          minHeight={120}
+          maxHeight={500}
+          heightStorageKey="base64-input-height"
         />
 
         <ActionBar className="flex-col gap-4 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">

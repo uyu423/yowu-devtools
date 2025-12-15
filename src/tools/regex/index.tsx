@@ -977,17 +977,18 @@ const RegexTool: React.FC = () => {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               {t('tool.regex.testText')}
             </label>
-            <div className="h-64 flex-shrink-0">
-              <EditorPanel
-                value={state.text}
-                onChange={(value) => updateState({ text: value })}
-                placeholder={t('tool.regex.testTextPlaceholder')}
-                mode="text"
-                readOnly={false}
-                highlights={highlights}
-                className="h-full"
-              />
-            </div>
+            <EditorPanel
+              value={state.text}
+              onChange={(value) => updateState({ text: value })}
+              placeholder={t('tool.regex.testTextPlaceholder')}
+              mode="text"
+              readOnly={false}
+              highlights={highlights}
+              resizable
+              minHeight={150}
+              maxHeight={600}
+              heightStorageKey="regex-test-text-height"
+            />
           </div>
 
           {/* Replacement Preview */}

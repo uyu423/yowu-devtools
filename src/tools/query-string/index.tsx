@@ -226,8 +226,11 @@ const QueryStringTool: React.FC = () => {
           value={state.input}
           onChange={(val) => updateState({ input: val })}
           placeholder={t('tool.urlParser.inputPlaceholder')}
-          className="h-40 lg:h-48"
           status={parseResult.error ? 'error' : 'default'}
+          resizable
+          minHeight={120}
+          maxHeight={500}
+          heightStorageKey="url-parser-input-height"
         />
 
         <ActionBar className="flex-col items-start gap-4 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm sm:flex-row sm:items-center">
