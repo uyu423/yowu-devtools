@@ -8,15 +8,12 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { CommandPalette } from '@/components/common/CommandPalette';
 import { PWAUpdatePrompt } from '@/components/common/PWAUpdatePrompt';
 import { Toaster } from 'sonner';
-import { tools } from '@/tools';
+import { tools, getToolI18nKey } from '@/tools';
 import { useI18n } from '@/hooks/useI18nHooks';
 import { usePWA } from '@/hooks/usePWA';
 import { useRecentTools } from '@/hooks/useRecentTools';
 import { useResolvedTheme } from '@/hooks/useThemeHooks';
 
-// Helper to convert tool id to i18n key (url-parser → urlParser)
-const toI18nToolId = (id: string) =>
-  id.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
 
 // Pre-compute static route definitions outside of component
 // This avoids recreating these arrays on every render
@@ -194,7 +191,7 @@ function HomePage() {
                 </div>
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-400">
-                {t(`tool.${toI18nToolId(tool.id)}.description`)}
+                {t(`tool.${getToolI18nKey(tool)}.description`)}
               </div>
             </Link>
           ))}
