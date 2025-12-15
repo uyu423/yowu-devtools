@@ -54,28 +54,58 @@ const ApiTesterTool: React.FC = () => {
 
   const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
     useToolState<ApiTesterState>('api-tester', DEFAULT_STATE, {
-      // Exclude UI-only state from share
-      shareStateFilter: ({
-        method,
-        url,
-        queryParams,
-        headers,
-        body,
-        timeoutMs,
-        followRedirects,
-        credentials,
-        selectedMode,
-      }) => ({
-        method,
-        url,
-        queryParams,
-        headers,
-        body,
-        timeoutMs,
-        followRedirects,
-        credentials,
-        selectedMode,
-      }),
+      // Only include essential fields for API request reproduction
+      shareStateFilter: ({ method, url, queryParams, headers, body }) => {
+        // Filter enabled items only for queryParams and headers
+        const enabledQueryParams = queryParams.filter((p) => p.enabled && p.key);
+        const enabledHeaders = headers.filter((h) => h.enabled && h.key);
+
+        // Build minimal share state
+        const shareState: Record<string, unknown> = {
+          method,
+          url,
+        };
+
+        // Only include queryParams if there are enabled items
+        if (enabledQueryParams.length > 0) {
+          shareState.queryParams = enabledQueryParams.map(({ key, value }) => ({ key, value }));
+        }
+
+        // Only include headers if there are enabled items (excluding default Content-Type)
+        const nonDefaultHeaders = enabledHeaders.filter(
+          (h) => !(h.key === 'Content-Type' && h.value === 'application/json')
+        );
+        if (nonDefaultHeaders.length > 0) {
+          shareState.headers = nonDefaultHeaders.map(({ key, value }) => ({ key, value }));
+        }
+
+        // Only include body if it's not 'none'
+        if (body.kind !== 'none') {
+          if (body.kind === 'urlencoded') {
+            const enabledItems = body.items.filter((i) => i.enabled && i.key);
+            if (enabledItems.length > 0) {
+              shareState.body = {
+                kind: 'urlencoded',
+                items: enabledItems.map(({ key, value }) => ({ key, value })),
+              };
+            }
+          } else if (body.kind === 'multipart') {
+            // For multipart, only include text items (files are too large for URL)
+            const textItems = body.items.filter((i) => i.type === 'text' && i.key);
+            if (textItems.length > 0) {
+              shareState.body = {
+                kind: 'multipart',
+                items: textItems.map(({ key, textValue }) => ({ key, textValue })),
+              };
+            }
+          } else {
+            // text or json - include as is
+            shareState.body = body;
+          }
+        }
+
+        return shareState;
+      },
     });
 
   const { handleShare, shareModalProps } = useShareModal({
