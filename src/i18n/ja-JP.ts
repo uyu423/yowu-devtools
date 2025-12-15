@@ -1,4 +1,6 @@
 // Japanese (ja-JP)
+import type { I18nResource } from './en-US';
+
 export const jaJP = {
   common: {
     copy: 'コピー',
@@ -547,4 +549,4 @@ export const jaJP = {
       description: '無料オンラインJWTエンコーダ。カスタムHeaderとPayloadでJSON Web Tokenを作成します。',
     },
   },
-} as const;
+} as const satisfies I18nResource;

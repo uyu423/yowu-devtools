@@ -1,4 +1,6 @@
 // Korean (ko-KR)
+import type { I18nResource } from './en-US';
+
 export const koKR = {
   common: {
     copy: '복사',
@@ -442,9 +444,11 @@ export const koKR = {
         'g=전역, i=대소문자 무시, m=여러 줄, s=dotAll, u=유니코드, y=sticky',
       // Regex spec categories
       specCharacterClasses: 'Character Classes',
-      specCharacterClassesDesc: '특정 유형의 문자와 매치하기 위한 미리 정의된 문자 집합',
+      specCharacterClassesDesc:
+        '특정 유형의 문자와 매치하기 위한 미리 정의된 문자 집합',
       specQuantifiers: 'Quantifiers',
-      specQuantifiersDesc: '문자, 그룹 또는 문자 클래스가 몇 번 매치되어야 하는지 지정',
+      specQuantifiersDesc:
+        '문자, 그룹 또는 문자 클래스가 몇 번 매치되어야 하는지 지정',
       specAnchors: 'Anchors',
       specAnchorsDesc: '문자를 소비하지 않고 문자열 내 위치를 검증',
       specGroups: 'Groups',
@@ -594,4 +598,4 @@ export const koKR = {
         '무료 온라인 JWT 인코더. 사용자 정의 Header와 Payload로 JSON Web Token을 생성합니다.',
     },
   },
-} as const;
+} as const satisfies I18nResource;

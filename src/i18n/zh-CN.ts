@@ -1,4 +1,6 @@
 // Simplified Chinese (zh-CN)
+import type { I18nResource } from './en-US';
+
 export const zhCN = {
   common: {
     copy: '复制',
@@ -547,4 +549,4 @@ export const zhCN = {
       description: '免费在线JWT编码器。使用自定义Header和Payload创建JSON Web Token。',
     },
   },
-} as const;
+} as const satisfies I18nResource;

@@ -548,3 +548,14 @@ export const enUS = {
     },
   },
 } as const;
+
+// Helper type to convert literal string types to string
+type DeepStringify<T> = T extends string
+  ? string
+  : T extends object
+  ? { [K in keyof T]: DeepStringify<T[K]> }
+  : T;
+
+// Export type derived from en-US (source of truth)
+// DeepStringify converts all literal string types to 'string' to allow translations
+export type I18nResource = DeepStringify<typeof enUS>;

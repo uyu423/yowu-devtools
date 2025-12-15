@@ -1,4 +1,6 @@
 // Spanish (es-ES)
+import type { I18nResource } from './en-US';
+
 export const esES = {
   common: {
     copy: 'Copiar',
@@ -547,4 +549,4 @@ export const esES = {
       description: 'Codificador JWT online gratuito. Crea JSON Web Tokens con header y payload personalizados.',
     },
   },
-} as const;
+} as const satisfies I18nResource;
