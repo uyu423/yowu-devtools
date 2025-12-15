@@ -200,23 +200,6 @@ export function useToolState<T extends object>(
     }
   }, [generateShareUrl, toolId, t]);
 
-  // Legacy shareState function (kept for backward compatibility, but deprecated)
-  // Use copyShareLink (PC) or shareViaWebShare (mobile) instead
-  const shareState = useCallback(async () => {
-    // Detect if mobile device
-    const isMobile =
-      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-        navigator.userAgent
-      ) ||
-      (window.matchMedia && window.matchMedia('(max-width: 768px)').matches);
-
-    if (isMobile && navigator.share && typeof navigator.share === 'function') {
-      return shareViaWebShare();
-    } else {
-      return copyShareLink();
-    }
-  }, [copyShareLink, shareViaWebShare]);
-
   // Get share state info (for ShareModal)
   const getShareStateInfo = useCallback(() => {
     const stateToShare = options?.shareStateFilter
@@ -247,7 +230,6 @@ export function useToolState<T extends object>(
     setState: setAndPersist,
     updateState: applyState,
     resetState,
-    shareState, // Legacy: Use copyShareLink or shareViaWebShare instead
     generateShareUrl, // Generate share URL without copying/sharing
     copyShareLink, // PC: Copy to clipboard immediately
     shareViaWebShare, // Mobile: Use Web Share API
