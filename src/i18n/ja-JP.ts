@@ -825,6 +825,29 @@ export const jaJP = {
         '注: Signature検証は実行されません。このツールはTokenをDecodeするだけです。',
       raw: 'Raw',
     },
+    stringLength: {
+      title: '文字列長計算機',
+      description: 'テキストの文字、単語、行、バイト数を計算します。',
+      inputPlaceholder: 'テキストを入力するか、ファイルをドロップしてください...',
+      characters: '文字数',
+      charactersNoSpaces: '文字数（空白除く）',
+      words: '単語数',
+      lines: '行数',
+      bytes: 'バイト数（UTF-8）',
+      statistics: '統計',
+      uploadFile: 'ファイルをアップロード',
+      loadFromUrl: 'URLから読み込み',
+      loadSample: 'サンプル',
+      urlInputLabel: 'URLを入力',
+      invalidUrl: '無効なURL形式です。',
+      urlProtocolError: 'HTTPとHTTPS URLのみサポートされています。',
+      urlLoadedSuccess: 'URLからテキストを読み込みました。',
+      urlLoadFailed: 'URLからの読み込みに失敗しました。',
+      sampleLoaded: 'サンプルテキストを読み込みました。',
+      corsWarningTitle: 'CORS制限',
+      corsWarningDescription: '一部のウェブサイトは他のドメインからのリクエストをブロックする場合があります。読み込みに失敗した場合は、ファイルを直接ダウンロードしてください。',
+      loadButton: '読み込み',
+    },
     jwtEncoder: {
       title: 'JWT Encoder',
       description: 'HeaderとPayloadからJSON Web Tokenを作成します。',
@@ -915,6 +938,11 @@ export const jaJP = {
       title: 'JWT Encoder',
       description:
         '無料オンラインJWTエンコーダ。カスタムHeaderとPayloadでJSON Web Tokenを作成します。',
+    },
+    stringLength: {
+      title: '文字列長計算機',
+      description:
+        '無料オンライン文字列長計算機。テキストやファイルの文字、単語、行、バイト（UTF-8）数を計算します。ファイルアップロードとURLロードをサポート。',
     },
   },
 } as const satisfies I18nResource;

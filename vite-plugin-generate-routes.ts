@@ -415,6 +415,36 @@ const tools: ToolInfo[] = [
       'Performance protection (debounce, backtracking warnings)',
     ],
   },
+  {
+    id: 'string-length',
+    path: '/string-length',
+    title: 'String Length Calculator',
+    description: 'Calculate character, word, line, and byte counts for text',
+    seoDescription:
+      'Free online string length calculator. Count characters, words, lines, and bytes (UTF-8) for any text. Supports file upload. Unicode-aware counting. All processing happens in your browser.',
+    keywords: [
+      'string length',
+      'character count',
+      'word count',
+      'line count',
+      'byte count',
+      'text counter',
+      'string counter',
+      'character counter',
+      'utf8 bytes',
+      'text analyzer',
+      'text statistics',
+    ],
+    features: [
+      'Character count (with and without spaces)',
+      'Word count',
+      'Line count',
+      'Byte count (UTF-8)',
+      'File upload support',
+      'Real-time calculation',
+      'Unicode support',
+    ],
+  },
 ];
 
 export function generateRoutes(): Plugin {

@@ -837,6 +837,29 @@ export const koKR = {
       unsupportedAlgorithm:
         '지원하지 않는 알고리즘: {alg}. HS256, HS384, HS512, none만 지원됩니다.',
     },
+    stringLength: {
+      title: 'String Length',
+      description: '텍스트의 문자 수, 단어 수, 줄 수, 바이트 수를 계산합니다.',
+      inputPlaceholder: '텍스트를 입력하거나 붙여넣으세요...',
+      statistics: '통계',
+      characters: '문자 수',
+      charactersNoSpaces: '공백 제외',
+      words: '단어 수',
+      lines: '줄 수',
+      bytes: '바이트 (UTF-8)',
+      uploadFile: '파일 업로드',
+      loadFromUrl: 'URL에서 로드',
+      loadSample: '샘플',
+      urlInputLabel: 'URL 입력',
+      invalidUrl: '유효하지 않은 URL 형식입니다.',
+      urlProtocolError: 'HTTP와 HTTPS URL만 지원됩니다.',
+      urlLoadedSuccess: 'URL에서 텍스트를 로드했습니다.',
+      urlLoadFailed: 'URL에서 로드하지 못했습니다.',
+      sampleLoaded: '샘플 텍스트가 로드되었습니다.',
+      corsWarningTitle: 'CORS 제한',
+      corsWarningDescription: '일부 웹사이트는 다른 도메인의 요청을 차단할 수 있습니다. 로드에 실패하면 파일을 직접 다운로드해 보세요.',
+      loadButton: '로드',
+    },
   },
   meta: {
     json: {
@@ -908,6 +931,11 @@ export const koKR = {
       title: 'JWT Encoder',
       description:
         '무료 온라인 JWT 인코더. 사용자 정의 Header와 Payload로 JSON Web Token을 생성합니다.',
+    },
+    stringLength: {
+      title: 'String Length',
+      description:
+        '무료 온라인 문자열 길이 계산기. 텍스트의 문자 수, 단어 수, 줄 수, 바이트 수를 계산합니다.',
     },
   },
 } as const satisfies I18nResource;

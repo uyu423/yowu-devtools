@@ -23,6 +23,14 @@ interface EditorPanelProps {
   title?: string;
   status?: 'default' | 'error' | 'success';
   highlights?: HighlightRange[]; // For regex highlighting
+  /** Enable vertical resizing of the editor */
+  resizable?: boolean;
+  /** Minimum height when resizable (in pixels), default 100 */
+  minHeight?: number;
+  /** Maximum height when resizable (in pixels), default 800 */
+  maxHeight?: number;
+  /** Storage key for persisting height */
+  heightStorageKey?: string;
 }
 
 const statusStyles: Record<NonNullable<EditorPanelProps['status']>, string> = {
@@ -124,11 +132,116 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
   title,
   status = 'default',
   highlights = [],
+  resizable = false,
+  minHeight = 100,
+  maxHeight = 800,
+  heightStorageKey,
 }) => {
   const resolvedTheme = useResolvedTheme();
   const isDark = resolvedTheme === 'dark';
   const editorContainerRef = React.useRef<HTMLDivElement>(null);
+  const containerRef = React.useRef<HTMLDivElement>(null);
   const [editorHeight, setEditorHeight] = React.useState<string>('100%');
+  
+  // Resizable state
+  const [panelHeight, setPanelHeight] = React.useState<number>(() => {
+    if (resizable && heightStorageKey && typeof window !== 'undefined') {
+      const stored = localStorage.getItem(`yowu-devtools:v1:ui:${heightStorageKey}`);
+      if (stored) {
+        const parsed = parseInt(stored, 10);
+        if (!isNaN(parsed) && parsed >= minHeight && parsed <= maxHeight) {
+          return parsed;
+        }
+      }
+    }
+    // Default height from className or fallback
+    return 192; // 12rem = 192px (h-48)
+  });
+  const [isResizing, setIsResizing] = React.useState(false);
+
+  // Save height to localStorage
+  React.useEffect(() => {
+    if (resizable && heightStorageKey && typeof window !== 'undefined') {
+      localStorage.setItem(`yowu-devtools:v1:ui:${heightStorageKey}`, panelHeight.toString());
+    }
+  }, [resizable, heightStorageKey, panelHeight]);
+
+  // Handle resize
+  const handleMouseDown = React.useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizing(true);
+  }, []);
+
+  const handleMouseMove = React.useCallback(
+    (e: MouseEvent) => {
+      if (!isResizing || !containerRef.current) return;
+
+      const containerRect = containerRef.current.getBoundingClientRect();
+      const newHeight = e.clientY - containerRect.top;
+      
+      // Clamp to min/max
+      const clampedHeight = Math.max(minHeight, Math.min(maxHeight, newHeight));
+      setPanelHeight(clampedHeight);
+    },
+    [isResizing, minHeight, maxHeight]
+  );
+
+  const handleMouseUp = React.useCallback(() => {
+    setIsResizing(false);
+  }, []);
+
+  // Add global mouse event listeners when resizing
+  React.useEffect(() => {
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.body.style.userSelect = 'none';
+      document.body.style.cursor = 'row-resize';
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.userSelect = '';
+      document.body.style.cursor = '';
+    };
+  }, [isResizing, handleMouseMove, handleMouseUp]);
+
+  // Touch support for resize
+  const handleTouchStart = React.useCallback((e: React.TouchEvent) => {
+    e.preventDefault();
+    setIsResizing(true);
+  }, []);
+
+  const handleTouchMove = React.useCallback(
+    (e: TouchEvent) => {
+      if (!isResizing || !containerRef.current) return;
+
+      const touch = e.touches[0];
+      const containerRect = containerRef.current.getBoundingClientRect();
+      const newHeight = touch.clientY - containerRect.top;
+      
+      const clampedHeight = Math.max(minHeight, Math.min(maxHeight, newHeight));
+      setPanelHeight(clampedHeight);
+    },
+    [isResizing, minHeight, maxHeight]
+  );
+
+  const handleTouchEnd = React.useCallback(() => {
+    setIsResizing(false);
+  }, []);
+
+  React.useEffect(() => {
+    if (isResizing) {
+      document.addEventListener('touchmove', handleTouchMove, { passive: false });
+      document.addEventListener('touchend', handleTouchEnd);
+    }
+
+    return () => {
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [isResizing, handleTouchMove, handleTouchEnd]);
 
   // Create highlight extension when highlights change
   const highlightExtension = React.useMemo(() => {
@@ -170,15 +283,24 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
     };
   }, [className]);
 
+  // Build style for resizable
+  const containerStyle: React.CSSProperties = resizable
+    ? { height: `${panelHeight}px` }
+    : {};
+
   return (
     <div
+      ref={containerRef}
       className={cn(
         "flex flex-col overflow-hidden rounded-md border shadow-sm",
         "bg-white dark:bg-gray-800",
         statusStyles[status],
         readOnly && 'bg-gray-50 dark:bg-gray-900/50',
-        className
+        resizable && 'relative',
+        // When resizable, don't use className heights
+        !resizable && className
       )}
+      style={containerStyle}
       data-mode={mode}
     >
       {title && (
@@ -204,6 +326,30 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
           }}
         />
       </div>
+      
+      {/* Resize Handle */}
+      {resizable && (
+        <div
+          className={cn(
+            'absolute bottom-0 left-0 right-0 h-2 cursor-row-resize select-none',
+            'flex items-center justify-center',
+            'group hover:bg-blue-500/20 active:bg-blue-500/30 transition-colors',
+            isResizing && 'bg-blue-500/30'
+          )}
+          onMouseDown={handleMouseDown}
+          onTouchStart={handleTouchStart}
+          title="Drag to resize"
+        >
+          <div
+            className={cn(
+              'w-16 h-1 rounded-full transition-colors',
+              'bg-gray-300 dark:bg-gray-600',
+              'group-hover:bg-blue-500 group-active:bg-blue-600',
+              isResizing && 'bg-blue-600'
+            )}
+          />
+        </div>
+      )}
     </div>
   );
 };

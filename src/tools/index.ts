@@ -13,6 +13,7 @@ import { uuidTool } from './uuid';
 import { passwordTool } from './password';
 import { queryStringTool } from './query-string';
 import { regexTool } from './regex';
+import { stringLengthTool } from './string-length';
 
 export const tools: ToolDefinition[] = [
   jsonTool,
@@ -29,6 +30,7 @@ export const tools: ToolDefinition[] = [
   passwordTool,
   queryStringTool,
   regexTool,
+  stringLengthTool,
 ];
 
 export const getToolById = (id: string) => tools.find(t => t.id === id);

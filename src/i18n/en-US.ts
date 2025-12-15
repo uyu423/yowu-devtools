@@ -860,6 +860,29 @@ export const enUS = {
       unsupportedAlgorithm:
         'Unsupported algorithm: {alg}. Only HS256, HS384, HS512, none are supported.',
     },
+    stringLength: {
+      title: 'String Length',
+      description: 'Count characters, words, lines, and bytes in your text.',
+      inputPlaceholder: 'Enter or paste text here...',
+      statistics: 'Statistics',
+      characters: 'Characters',
+      charactersNoSpaces: 'Without Spaces',
+      words: 'Words',
+      lines: 'Lines',
+      bytes: 'Bytes (UTF-8)',
+      uploadFile: 'Upload File',
+      loadFromUrl: 'Load from URL',
+      loadSample: 'Sample',
+      urlInputLabel: 'Enter URL',
+      invalidUrl: 'Invalid URL format.',
+      urlProtocolError: 'Only HTTP and HTTPS URLs are supported.',
+      urlLoadedSuccess: 'Text loaded from URL.',
+      urlLoadFailed: 'Failed to load from URL.',
+      sampleLoaded: 'Sample text loaded.',
+      corsWarningTitle: 'CORS Restrictions',
+      corsWarningDescription: 'Some websites may block requests from other domains. If loading fails, try downloading the file manually.',
+      loadButton: 'Load',
+    },
   },
   meta: {
     json: {
@@ -931,6 +954,11 @@ export const enUS = {
       title: 'JWT Encoder',
       description:
         'Free online JWT encoder. Create JSON Web Tokens with custom header and payload.',
+    },
+    stringLength: {
+      title: 'String Length',
+      description:
+        'Free online string length counter. Count characters, words, lines, and bytes in your text.',
     },
   },
 } as const;

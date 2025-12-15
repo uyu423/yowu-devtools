@@ -760,6 +760,29 @@ export const zhCN = {
       signatureNote: '注意：不执行Signature验证。此工具仅解码Token。',
       raw: 'Raw',
     },
+    stringLength: {
+      title: '字符串长度计算器',
+      description: '计算文本的字符、单词、行和字节数。',
+      inputPlaceholder: '输入文本或拖放文件...',
+      characters: '字符数',
+      charactersNoSpaces: '字符数（不含空格）',
+      words: '单词数',
+      lines: '行数',
+      bytes: '字节数（UTF-8）',
+      statistics: '统计',
+      uploadFile: '上传文件',
+      loadFromUrl: '从URL加载',
+      loadSample: '示例',
+      urlInputLabel: '输入URL',
+      invalidUrl: '无效的URL格式。',
+      urlProtocolError: '仅支持HTTP和HTTPS URL。',
+      urlLoadedSuccess: '已从URL加载文本。',
+      urlLoadFailed: '从URL加载失败。',
+      sampleLoaded: '已加载示例文本。',
+      corsWarningTitle: 'CORS限制',
+      corsWarningDescription: '某些网站可能会阻止来自其他域的请求。如果加载失败，请尝试手动下载文件。',
+      loadButton: '加载',
+    },
     jwtEncoder: {
       title: 'JWT Encoder',
       description: '从Header和Payload创建JSON Web Token。',
@@ -846,6 +869,11 @@ export const zhCN = {
       title: 'JWT Encoder',
       description:
         '免费在线JWT编码器。使用自定义Header和Payload创建JSON Web Token。',
+    },
+    stringLength: {
+      title: '字符串长度计算器',
+      description:
+        '免费在线字符串长度计算器。计算文本或文件的字符、单词、行和字节（UTF-8）数。支持文件上传和URL加载。',
     },
   },
 } as const satisfies I18nResource;

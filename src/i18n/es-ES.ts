@@ -871,6 +871,30 @@ export const esES = {
         'Nota: No se realiza verificación de firma. Esta herramienta solo decodifica el token.',
       raw: 'Raw',
     },
+    stringLength: {
+      title: 'Calculadora de longitud de cadena',
+      description:
+        'Calcula el número de caracteres, palabras, líneas y bytes del texto.',
+      inputPlaceholder: 'Ingresa texto o arrastra un archivo aquí...',
+      characters: 'Caracteres',
+      charactersNoSpaces: 'Caracteres (sin espacios)',
+      words: 'Palabras',
+      lines: 'Líneas',
+      bytes: 'Bytes (UTF-8)',
+      statistics: 'Estadísticas',
+      uploadFile: 'Subir archivo',
+      loadFromUrl: 'Cargar desde URL',
+      loadSample: 'Ejemplo',
+      urlInputLabel: 'Ingresa URL',
+      invalidUrl: 'Formato de URL inválido.',
+      urlProtocolError: 'Solo se admiten URLs HTTP y HTTPS.',
+      urlLoadedSuccess: 'Texto cargado desde URL.',
+      urlLoadFailed: 'Error al cargar desde URL.',
+      sampleLoaded: 'Texto de ejemplo cargado.',
+      corsWarningTitle: 'Restricciones CORS',
+      corsWarningDescription: 'Algunos sitios web pueden bloquear solicitudes de otros dominios. Si la carga falla, intenta descargar el archivo manualmente.',
+      loadButton: 'Cargar',
+    },
     jwtEncoder: {
       title: 'JWT Encoder',
       description: 'Crea JSON Web Tokens a partir de Header y Payload.',
@@ -961,6 +985,11 @@ export const esES = {
       title: 'JWT Encoder',
       description:
         'Codificador JWT online gratuito. Crea JSON Web Tokens con header y payload personalizados.',
+    },
+    stringLength: {
+      title: 'Calculadora de longitud de cadena',
+      description:
+        'Calculadora de longitud de cadena online gratuita. Cuenta caracteres, palabras, líneas y bytes (UTF-8) de texto o archivos. Soporta carga de archivos y URL.',
     },
   },
 } as const satisfies I18nResource;
