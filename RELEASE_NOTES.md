@@ -1,117 +1,135 @@
+<!--
+RELEASE_NOTES.md must be written in English.
+-->
+
 # Release Notes
 
-## v1.3.3 (December 2025) - PWA Update Notification Fix
+## v1.3.3 (December 2025) - PWA Update Notification Fix & SEO Optimization
 
 **Bug Fixes:**
 
-- 🔧 **PWA 업데이트 알림 미표시 수정**:
-  - `registerType: 'prompt'` 모드에서 `skipWaiting`과 `clientsClaim` 설정 충돌 해결
-  - 새 버전 배포 후 설치된 PWA에서 업데이트 알림이 정상 표시됨
-  - vite-plugin-pwa 공식 문서 기반으로 설정 최적화
+- 🔧 **PWA Update Notification Not Showing**:
+  - Resolved conflict between `registerType: 'prompt'` mode and `skipWaiting`/`clientsClaim` settings
+  - Update notifications now display correctly in installed PWA after new version deployment
+  - Optimized configuration based on vite-plugin-pwa official documentation
 
 **Enhancements:**
 
-- ⚡ **PWA 업데이트 감지 개선**:
-  - **version.json 기반 버전 체크 추가** (Service Worker와 병행)
-    - 빌드 시 `/version.json` 파일 자동 생성
-    - 앱 기동 시 서버 버전과 비교하여 업데이트 알림
-    - 5분마다 주기적으로 버전 체크
-  - 앱이 포커스를 받을 때 (탭 전환, 창 활성화) 자동 업데이트 체크
-  - 오프라인에서 온라인으로 복귀 시 즉시 업데이트 체크
-  - 오프라인 상태에서는 업데이트 체크 스킵 (불필요한 에러 방지)
-  - `onRegisteredSW` 콜백 사용 (v0.12.8+ 권장 방식)
+- ⚡ **Improved PWA Update Detection**:
 
-- 📖 **PWA 트러블슈팅 문서 대폭 개선**:
-  - `registerType` 옵션과 `skipWaiting`/`clientsClaim` 관계 설명
-  - 업데이트가 반영되지 않는 문제 해결 가이드
-  - Console 로그 의미 설명 추가
-  - vite-plugin-pwa 공식 문서 링크 추가
+  - **Added version.json-based version check** (alongside Service Worker)
+    - Auto-generate `/version.json` file at build time
+    - Compare server version on app startup for update notification
+    - Periodic version check every 5 minutes
+  - Auto-check for updates when app receives focus (tab switch, window activation)
+  - Immediate update check when coming back online from offline
+  - Skip update check when offline (prevents unnecessary errors)
+  - Uses `onRegisteredSW` callback (v0.12.8+ recommended approach)
+
+- 🔍 **SEO: Sitemap Priority Optimization**:
+
+  - Applied priority strategy based on real developer search patterns
+  - Individual tool pages (en-US): **priority 1.0** (search engine top priority)
+  - Locale tool pages: **priority 0.9**
+  - Home pages (all locales): **priority 0.8**
+  - Developers search directly for "json formatter", "base64 decode" etc., so tool pages prioritized over homepage
+
+- 📖 **PWA Troubleshooting Documentation Overhaul**:
+  - Explained relationship between `registerType` option and `skipWaiting`/`clientsClaim`
+  - Added guide for resolving update not reflecting issues
+  - Added console log meaning explanations
+  - Added vite-plugin-pwa official documentation links
 
 **Technical:**
 
-- `vite.config.ts`: `skipWaiting`과 `clientsClaim` 옵션 제거 (prompt 모드 호환)
-- `vite-plugin-generate-routes.ts`: 빌드 시 `version.json` 자동 생성
-- `usePWA.ts`: 버전 기반 업데이트 체크 + Service Worker 업데이트 체크 병행
-- `docs/PWA_TROUBLESHOOTING.md`: 문서 전면 개편
+- `vite.config.ts`: Removed `skipWaiting` and `clientsClaim` options (prompt mode compatible)
+- `vite-plugin-generate-routes.ts`:
+  - Auto-generate `version.json` at build time
+  - Defined sitemap priority constants (`TOOL_PRIORITY`, `TOOL_LOCALE_PRIORITY`, `HOME_PRIORITY`)
+- `usePWA.ts`: Version-based update check + Service Worker update check in parallel
+- `docs/PWA_TROUBLESHOOTING.md`: Complete documentation overhaul
 
-**참고 문서:**
+**References:**
 
 - [vite-plugin-pwa Prompt for update](https://vite-pwa-org.netlify.app/guide/prompt-for-update.html)
 - [vite-plugin-pwa Periodic SW updates](https://vite-pwa-org.netlify.app/guide/periodic-sw-updates.html)
 
 ---
 
-## v1.3.2 (Upcoming) - Cron Parser Advanced
+## v1.3.2 (December 2025) - Cron Parser Advanced
 
-**🚧 개발 예정**
-
-다양한 cron 방언(UNIX, Quartz, AWS, Kubernetes, Jenkins)을 지원하고, 정확한 의미(semantics) 파싱을 제공하는 대대적인 Cron Parser 고도화입니다.
+A major Cron Parser enhancement supporting various cron dialects with accurate semantics parsing and improved UI/UX.
 
 **New Features:**
 
-- ✨ **다중 Cron 스펙 지원**:
-  - **Auto** (권장): 입력을 분석하여 자동 감지
-  - **UNIX/Vixie**: 표준 5필드, DOM/DOW OR 규칙 명확화
-  - **UNIX + Seconds**: 6필드 (초 포함)
-  - **Quartz**: 6~7필드, `? L W #` 고급 연산자 지원
-  - **AWS EventBridge**: `cron(...)` 래퍼 + year 필드
-  - **Kubernetes CronJob**: `@hourly`, `@daily` 매크로 지원
-  - **Jenkins**: `H` 해시 토큰 및 별칭 지원
+- ✨ **Multi Cron Spec Support**:
 
-- ✨ **래퍼 정규화**:
-  - `cron(...)`, `cron('...')`, `cron("...")` 자동 추출
-  - 앞뒤 여백/개행/텍스트 제거
-  - "Normalized" 및 "AWS format" 표시
+  - **Auto** (recommended): Auto-detect by analyzing input
+  - **UNIX/Vixie**: Standard 5-field, DOM/DOW OR rule clarification
+  - **UNIX + Seconds**: 6-field (includes seconds)
+  - **Quartz**: 6-7 fields, `? L W #` advanced operators support
+  - **AWS EventBridge**: `cron(...)` wrapper + year field
+  - **Kubernetes CronJob**: `@hourly`, `@daily` macro support
+  - **Jenkins**: `H` hash token and alias support
 
-- ✨ **필드별 분해 + 하이라이트**:
-  - Minutes / Hours / DOM / Month / DOW / (Year/Seconds) 카드 표시
-  - 입력 토큰 색상/밑줄 하이라이트
-  - hover 시 서로 강조 (모바일: 탭)
-  - `L/W/#/?/H` 특수 토큰 배지 표시
+- ✨ **Wrapper Normalization**:
 
-- ✨ **Next runs 계산 고도화**:
-  - "From" 기준 시각 설정 (디버깅에 유용)
-  - ISO / RFC3339 / Epoch 복사 버튼
-  - Web Worker로 UI 프리징 방지
+  - Auto-extract from `cron(...)`, `cron('...')`, `cron("...")`
+  - Remove leading/trailing whitespace/newlines/text
+  - Display "Normalized" and "AWS format"
+
+- ✨ **Field Breakdown + Highlighting**:
+
+  - Display cards for Minutes / Hours / DOM / Month / DOW / (Year/Seconds)
+  - Color/underline highlighting for input tokens
+  - Mutual highlighting on hover (mobile: tap)
+  - Badge display for `L/W/#/?/H` special tokens
+
+- ✨ **Enhanced Next Runs Calculation**:
+  - "From" base time setting (useful for debugging)
+  - Copy buttons for ISO / RFC3339 / Epoch formats
+  - Web Worker to prevent UI freezing
 
 **Enhancements:**
 
-- 🔧 **의미(semantics) 정확화**:
-  - UNIX/Vixie: DOM/DOW **OR** 규칙 명시 (AND 아님!)
-  - AWS/Quartz: DOM/DOW 동시 지정 제약 검증
-  - 스펙별 에러 메시지 차별화
+- 🔧 **Semantics Clarification**:
 
-- ⚠️ **호환성/주의사항 자동 안내**:
-  - UNIX/Vixie: DOM/DOW OR 경고
-  - Jenkins: `H/3` 짧은 주기 월말 불규칙 경고
-  - AWS: 포맷/제한/TZ/DST 특성
-  - K8s: `TZ=` 미지원, `.spec.timeZone` 권장
+  - UNIX/Vixie: Explicit DOM/DOW **OR** rule (not AND!)
+  - AWS/Quartz: DOM/DOW simultaneous specification constraint validation
+  - Differentiated error messages per spec
 
-- 🔄 **변환(Conversion) 기능** (선택):
+- ⚠️ **Automatic Compatibility/Warnings**:
+
+  - UNIX/Vixie: DOM/DOW OR warning
+  - Jenkins: `H/3` short period end-of-month irregularity warning
+  - AWS: Format/limitations/TZ/DST characteristics
+  - K8s: `TZ=` not supported, `.spec.timeZone` recommended
+
+- 🔄 **Conversion Feature** (optional):
   - UNIX(5) ↔ UNIX+Seconds(6)
   - UNIX(5) → AWS (`cron(...)`)
-  - 변환 불가/비등가 명확 경고
+  - Clear warnings for non-convertible/non-equivalent expressions
 
 **Technical:**
 
-- 스펙별 파서 모듈 분리 (`src/tools/cron/parsers/`)
-- Auto 감지 로직 (래퍼, 특수 토큰, 필드 수 기반)
-- Web Worker로 next-run 계산 오프로드
-- i18n 번역 키 추가 (`tool.cron.spec.*`, `tool.cron.field.*`, `tool.cron.warning.*`)
+- Separate parser modules per spec (`src/tools/cron/parsers/`)
+- Auto-detection logic (wrapper, special tokens, field count based)
+- Offload next-run calculation to Web Worker
+- Add i18n translation keys (`tool.cron.spec.*`, `tool.cron.field.*`, `tool.cron.warning.*`)
 
 **Dependencies:**
 
-| 라이브러리 | 용도 | 비고 |
-|-----------|------|------|
-| `cron-parser` (기존) | 다음 실행 시간 계산 | UNIX 5/6필드 |
-| `cronstrue` (기존) | Human-readable 설명 | i18n 지원 |
-| `croner` (검토 중) | Quartz 고급 문법 | `L W # ?` 지원 |
+| Library                  | Purpose                    | Notes             |
+| ------------------------ | -------------------------- | ----------------- |
+| `cron-parser` (existing) | Next run time calculation  | UNIX 5/6 fields   |
+| `cronstrue` (existing)   | Human-readable description | i18n support      |
+| `croner` (under review)  | Quartz advanced syntax     | `L W # ?` support |
 
 **Spec Verification:**
 
-- ✅ UNIX/Vixie DOM/DOW OR 규칙: [man7.org](https://man7.org/linux/man-pages/man5/crontab.5.html)
-- ✅ Quartz `?` 필수 규칙: [quartz-scheduler.org](https://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/crontrigger.html)
-- ✅ AWS EventBridge 제약: [docs.aws.amazon.com](https://docs.aws.amazon.com/scheduler/latest/UserGuide/schedule-types.html#cron-based)
+- ✅ UNIX/Vixie DOM/DOW OR rule: [man7.org](https://man7.org/linux/man-pages/man5/crontab.5.html)
+- ✅ Quartz `?` required rule: [quartz-scheduler.org](https://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/crontrigger.html)
+- ✅ AWS EventBridge constraints: [docs.aws.amazon.com](https://docs.aws.amazon.com/scheduler/latest/UserGuide/schedule-types.html#cron-based)
 
 ---
 
@@ -127,19 +145,15 @@
 - 🏗️ **New Custom Hooks**:
   - `useToolSetup`: Combines `useTitle` and `useI18n` for consistent tool setup
   - `useLocalStorage`: Generic localStorage hook with cross-tab/component sync
-  
 - 🎨 **New Common Components**:
   - `ModeToggle`: Reusable mode toggle button group (URL, Base64, Diff tools)
   - `ResultPanel`: Consistent result display with copy button
-  
 - 🌐 **i18n Improvements**:
   - ShareModal now fully internationalized
   - Added ShareModal-related translation keys to all locales
-  
 - ⚡ **Performance Optimizations**:
   - Static route generation in App.tsx (moved outside component)
   - Reduced re-renders from route definitions
-  
 - 🗑️ **Code Cleanup**:
   - Removed deprecated `shareState` function from `useToolState`
   - Simplified `useFavorites` and `useRecentTools` with `useLocalStorage`

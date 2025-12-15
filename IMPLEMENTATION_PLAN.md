@@ -6,9 +6,8 @@
 
 ## 1. 프로젝트 현황
 
-- **상태**: Phase 8 완료, Phase 9 준비 중
-- **현재 버전**: v1.3.1 (2025-12-15)
-- **다음 버전**: v1.3.2 (Cron Parser 고도화)
+- **상태**: Phase 9 완료
+- **현재 버전**: v1.3.3 (2025-12-15)
 - **주요 변경점**:
   - Phase 3: 모든 도구 기능 구현 완료 (JSON, URL, Base64, Time, YAML, Diff, Cron)
   - Phase 4: CI/CD 및 배포 설정 완료
@@ -17,7 +16,8 @@
   - Phase 7 (v1.2.1): ✅ Hash/HMAC 도구 고도화, Regex Tester 도구 추가 완료, Web Share API 텍스트 포맷팅 개선 완료
   - Phase 8 (v1.3.0): ✅ i18n(국제화) 지원 완료 - 5개 언어 지원 (en-US, ko-KR, ja-JP, zh-CN, es-ES)
   - Phase 8.5 (v1.3.1): ✅ 코드 품질 개선, JWT Encoder 버그 수정, 리팩토링 완료
-  - Phase 9 (v1.3.2): 🚧 Cron Parser 고도화 - 다중 스펙 지원, 래퍼 정규화, 필드별 하이라이트 예정
+  - Phase 9 (v1.3.2): ✅ Cron Parser 고도화 - 다중 스펙 지원, 래퍼 정규화, 필드별 하이라이트 완료
+  - Phase 9.5 (v1.3.3): ✅ PWA 업데이트 알림 수정, SEO sitemap priority 최적화 완료
 
 ---
 
@@ -700,7 +700,44 @@ src/
 
 ---
 
-### Phase 9: Cron Parser 고도화 (v1.3.2) 🚧 **예정**
+### Phase 8.6: PWA & SEO 개선 (v1.3.3) ✅ **완료**
+
+#### 8.6.1 PWA 업데이트 알림 수정 ✅ **완료**
+
+- [x] **PWA 업데이트 알림 미표시 버그 수정**:
+  - [x] `registerType: 'prompt'` 모드와 `skipWaiting`/`clientsClaim` 충돌 해결
+  - [x] vite-plugin-pwa 공식 문서 기반 설정 최적화
+
+- [x] **version.json 기반 업데이트 감지 추가**:
+  - [x] 빌드 시 `/version.json` 자동 생성
+  - [x] 앱 기동 시 서버 버전 비교
+  - [x] 5분마다 주기적 버전 체크
+  - [x] 포커스 시 자동 업데이트 체크
+  - [x] 온라인 복귀 시 업데이트 체크
+
+- [x] **PWA 트러블슈팅 문서 개선**:
+  - [x] `docs/PWA_TROUBLESHOOTING.md` 문서 전면 개편
+  - [x] `registerType` 옵션 상세 설명 추가
+
+#### 8.6.2 SEO Sitemap Priority 최적화 ✅ **완료**
+
+- [x] **Priority 전략 수립**:
+  - [x] 개발자 검색 패턴 분석 (직접 도구 검색 > 홈페이지 검색)
+  - [x] 개별 도구 페이지 우선 전략 결정
+
+- [x] **Priority 구현**:
+  - [x] 개별 도구 (en-US): priority 1.0
+  - [x] Locale 도구 페이지: priority 0.9
+  - [x] 홈 페이지 (모든 locale): priority 0.8
+  - [x] `vite-plugin-generate-routes.ts`에 상수 정의
+
+- [x] **문서 업데이트**:
+  - [x] `SAS.md`: Sitemap Priority 전략 섹션 추가
+  - [x] `RELEASE_NOTES.md`: v1.3.3 릴리즈 노트 업데이트
+
+---
+
+### Phase 9: Cron Parser 고도화 (v1.3.2) ✅ **완료**
 
 v1.3.2는 Cron Parser의 대대적인 고도화로, 여러 cron 방언(UNIX, Quartz, AWS, K8s, Jenkins)을 지원하고 정확한 의미(semantics) 파싱을 제공합니다.
 

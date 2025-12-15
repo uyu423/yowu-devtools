@@ -416,6 +416,31 @@ const { state, shareState } = useToolState<JsonToolState>(
    - 권장 크기: 1200x630px (Facebook/LinkedIn 표준)
    - 이미지에 Call-to-Action 포함 권장:
      - "Try Now", "Get Started", "Use Free Tool" 등의 텍스트
+
+### Sitemap Priority 전략 (v1.3.3+)
+
+개발자들의 실제 검색 패턴을 기반으로 sitemap.xml의 priority를 최적화합니다.
+
+**전략 근거**:
+- 개발자들은 "json formatter", "base64 decode", "url encode online" 등으로 직접 검색
+- "yowu devtools"를 검색하는 사용자는 극소수
+- 따라서 개별 도구 페이지가 홈페이지보다 검색 엔진에서 우선순위가 높아야 함
+
+**Priority 설정** (`vite-plugin-generate-routes.ts` 상수):
+
+```typescript
+const TOOL_PRIORITY = 1.0;           // 모든 개별 도구 (en-US)
+const TOOL_LOCALE_PRIORITY = 0.9;    // Locale 버전 도구 페이지
+const HOME_PRIORITY = 0.8;           // 메인 페이지 (홈)
+```
+
+| 페이지 유형 | Priority | 예시 |
+|------------|----------|------|
+| 개별 도구 (en-US) | **1.0** | `/json`, `/base64`, `/url` |
+| Locale 도구 페이지 | **0.9** | `/ko-KR/json`, `/ja-JP/base64` |
+| 홈 페이지 (모든 locale) | **0.8** | `/`, `/ko-KR`, `/ja-JP` |
+
+**참고**: Google은 priority를 무시한다고 공식 발표했으나, Bing/Yandex 등 다른 검색 엔진은 여전히 참고할 수 있습니다. 크롤 버짓 힌트 제공 및 사이트 구조 문서화 목적으로도 유용합니다.
      - 브랜드 색상과 대비되는 버튼 스타일
      - 도구의 핵심 가치 제안 포함
    - 이미지 alt 텍스트는 자동으로 `og:image:alt` 및 `twitter:image:alt` 메타 태그에 포함됨

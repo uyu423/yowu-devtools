@@ -2,13 +2,12 @@
 
 ---
 
-# tools.yowu.dev SRS (v1.3.2)
+# tools.yowu.dev SRS (v1.3.3)
 
 ## 0. 문서 메타
 
 - 프로젝트명: **tools.yowu.dev** (구 yowu-devtools)
-- 현재 버전: **v1.3.1** (Code Quality & Bug Fixes)
-- 다음 버전: **v1.3.2** (Cron Parser Advanced) - 🚧 개발 예정
+- 현재 버전: **v1.3.3** (PWA Update Notification Fix & SEO Optimization)
 - 목적: 개발자가 자주 쓰는 변환/검증/뷰어 도구를 **서버 없이** 하나의 **정적 웹앱**으로 제공
 - 배포: **GitHub Pages + Custom Domain (`tools.yowu.dev`)**
 - 변경 이력: **[RELEASE_NOTES.md](./RELEASE_NOTES.md)** 참조
@@ -1507,6 +1506,34 @@ export type ToolDefinition<TState> = {
   - `sitemap.xml`: 모든 페이지를 검색 엔진에 알림
   - `robots.txt`: 검색 엔진 크롤링 허용 및 sitemap 위치 지정
 - Vite 플러그인: `vite-plugin-generate-routes.ts`가 빌드 후 자동으로 라우트 HTML 생성
+
+#### Sitemap Priority 전략 (v1.3.3)
+
+개발자들의 실제 검색 패턴을 기반으로 sitemap.xml의 priority를 최적화합니다.
+
+**전략 근거**:
+
+- 개발자들은 "json formatter", "base64 decode", "url encode online" 등으로 직접 검색
+- "yowu devtools"를 검색하는 사용자는 극소수
+- 따라서 개별 도구 페이지가 홈페이지보다 검색 엔진에서 우선순위가 높아야 함
+
+**Priority 설정**:
+
+| 페이지 유형             | Priority | 예시                           |
+| ----------------------- | -------- | ------------------------------ |
+| 개별 도구 (en-US)       | **1.0**  | `/json`, `/base64`, `/url`     |
+| Locale 도구 페이지      | **0.9**  | `/ko-KR/json`, `/ja-JP/base64` |
+| 홈 페이지 (모든 locale) | **0.8**  | `/`, `/ko-KR`, `/ja-JP`        |
+
+**구현 위치**: `vite-plugin-generate-routes.ts`의 상수 정의
+
+```typescript
+const TOOL_PRIORITY = 1.0; // 모든 개별 도구 (en-US)
+const TOOL_LOCALE_PRIORITY = 0.9; // Locale 버전 도구 페이지
+const HOME_PRIORITY = 0.8; // 메인 페이지 (홈)
+```
+
+**참고**: Google은 priority를 무시한다고 공식 발표했으나, Bing/Yandex 등 다른 검색 엔진은 여전히 참고할 수 있으며, 크롤 버짓 힌트 제공 및 사이트 구조 문서화 목적으로 유용합니다.
 
 #### 신규 도구 추가 시 SEO 최적화 필수 사항
 
