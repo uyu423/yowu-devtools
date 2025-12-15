@@ -67,6 +67,18 @@ export const esES = {
       'La URL compartida no es válida. Restaurando estado por defecto.',
     unableToCopy: 'No se pudo copiar al portapapeles.',
   },
+  shareModal: {
+    title: 'Compartir {toolName}',
+    sensitiveWarningTitle: 'Advertencia de datos sensibles',
+    sensitiveWarningDescription:
+      'Esta herramienta puede contener información sensible. Comparta enlaces solo con partes de confianza. Los datos compartidos serán visibles para cualquier persona con el enlace.',
+    includedInShareLink: 'Incluido en el enlace:',
+    excludedUiOnly: 'Excluido (solo UI):',
+    notShared: 'no compartido',
+    footerNote:
+      'El enlace de compartir se copiará a su portapapeles. Todo el procesamiento ocurre en su navegador; no se envían datos a los servidores.',
+    generateShareLink: 'Generar enlace para compartir',
+  },
   pwa: {
     appReadyOffline: 'La aplicación está lista para usar sin conexión',
     youAreOffline: 'Actualmente estás sin conexión',

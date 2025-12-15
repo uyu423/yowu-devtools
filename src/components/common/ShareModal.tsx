@@ -1,5 +1,6 @@
 import React from 'react';
 import { X, Share2, AlertTriangle } from 'lucide-react';
+import { useI18n } from '@/hooks/useI18nHooks';
 
 interface ShareModalProps {
   isOpen: boolean;
@@ -23,6 +24,8 @@ export const ShareModal: React.FC<ShareModalProps> = ({
   isSensitive = false,
   toolName,
 }) => {
+  const { t } = useI18n();
+
   if (!isOpen) return null;
 
   return (
@@ -43,7 +46,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
           <div className="flex items-center gap-2">
             <Share2 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Share {toolName}
+              {t('shareModal.title').replace('{toolName}', toolName)}
             </h2>
           </div>
           <button
@@ -61,11 +64,10 @@ export const ShareModal: React.FC<ShareModalProps> = ({
               <AlertTriangle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 shrink-0 mt-0.5" />
               <div className="flex-1">
                 <p className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
-                  Sensitive Data Warning
+                  {t('shareModal.sensitiveWarningTitle')}
                 </p>
                 <p className="text-xs text-yellow-700 dark:text-yellow-300 mt-1">
-                  This tool may contain sensitive information. Only share links with trusted parties.
-                  The shared data will be visible to anyone with the link.
+                  {t('shareModal.sensitiveWarningDescription')}
                 </p>
               </div>
             </div>
@@ -73,7 +75,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
 
           <div>
             <p className="text-sm font-medium text-gray-900 dark:text-white mb-2">
-              Included in share link:
+              {t('shareModal.includedInShareLink')}
             </p>
             <ul className="space-y-1">
               {includedFields.map((field) => (
@@ -93,7 +95,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
           {excludedFields.length > 0 && (
             <div>
               <p className="text-sm font-medium text-gray-900 dark:text-white mb-2">
-                Excluded (UI-only):
+                {t('shareModal.excludedUiOnly')}
               </p>
               <ul className="space-y-1">
                 {excludedFields.map((field) => (
@@ -105,7 +107,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
                     <code className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-xs">
                       {field}
                     </code>
-                    <span className="text-xs italic">(not shared)</span>
+                    <span className="text-xs italic">({t('shareModal.notShared')})</span>
                   </li>
                 ))}
               </ul>
@@ -114,7 +116,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
 
           <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              The share link will be copied to your clipboard. All processing happens in your browser - no data is sent to servers.
+              {t('shareModal.footerNote')}
             </p>
           </div>
         </div>
@@ -125,13 +127,13 @@ export const ShareModal: React.FC<ShareModalProps> = ({
             onClick={onClose}
             className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
           >
-            Cancel
+            {t('common.cancel')}
           </button>
           <button
             onClick={onConfirm}
             className="px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 rounded-md transition-colors"
           >
-            Generate Share Link
+            {t('shareModal.generateShareLink')}
           </button>
         </div>
       </div>

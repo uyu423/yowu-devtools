@@ -65,6 +65,18 @@ export const jaJP = {
     sharedUrlInvalid: '共有URLが無効です。デフォルト状態に戻します。',
     unableToCopy: 'クリップボードにコピーできません。',
   },
+  shareModal: {
+    title: '{toolName}を共有',
+    sensitiveWarningTitle: '機密データの警告',
+    sensitiveWarningDescription:
+      'このツールには機密情報が含まれている可能性があります。信頼できる相手にのみリンクを共有してください。共有されたデータはリンクを持つすべての人に表示されます。',
+    includedInShareLink: '共有リンクに含まれるもの:',
+    excludedUiOnly: '除外（UI専用）:',
+    notShared: '共有されません',
+    footerNote:
+      '共有リンクがクリップボードにコピーされます。すべての処理はブラウザ内で行われ、サーバーにデータは送信されません。',
+    generateShareLink: '共有リンクを生成',
+  },
   pwa: {
     appReadyOffline: 'アプリがオフラインで使用可能になりました',
     youAreOffline: '現在オフラインです',

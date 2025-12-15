@@ -65,6 +65,18 @@ export const koKR = {
     sharedUrlInvalid: '공유 URL이 유효하지 않습니다. 기본 상태로 복원합니다.',
     unableToCopy: '클립보드에 복사할 수 없습니다.',
   },
+  shareModal: {
+    title: '{toolName} 공유',
+    sensitiveWarningTitle: '민감한 데이터 경고',
+    sensitiveWarningDescription:
+      '이 도구에는 민감한 정보가 포함될 수 있습니다. 신뢰할 수 있는 사람에게만 링크를 공유하세요. 공유된 데이터는 링크를 가진 모든 사람에게 표시됩니다.',
+    includedInShareLink: '공유 링크에 포함됨:',
+    excludedUiOnly: '제외됨 (UI 전용):',
+    notShared: '공유되지 않음',
+    footerNote:
+      '공유 링크가 클립보드에 복사됩니다. 모든 처리는 브라우저에서 이루어지며 서버로 데이터가 전송되지 않습니다.',
+    generateShareLink: '공유 링크 생성',
+  },
   pwa: {
     appReadyOffline: '앱이 오프라인에서도 사용 가능합니다',
     youAreOffline: '현재 오프라인 상태입니다',

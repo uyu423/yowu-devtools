@@ -63,6 +63,18 @@ export const enUS = {
     sharedUrlInvalid: 'Shared URL is invalid. Restoring default state.',
     unableToCopy: 'Unable to copy to clipboard.',
   },
+  shareModal: {
+    title: 'Share {toolName}',
+    sensitiveWarningTitle: 'Sensitive Data Warning',
+    sensitiveWarningDescription:
+      'This tool may contain sensitive information. Only share links with trusted parties. The shared data will be visible to anyone with the link.',
+    includedInShareLink: 'Included in share link:',
+    excludedUiOnly: 'Excluded (UI-only):',
+    notShared: 'not shared',
+    footerNote:
+      'The share link will be copied to your clipboard. All processing happens in your browser - no data is sent to servers.',
+    generateShareLink: 'Generate Share Link',
+  },
   pwa: {
     appReadyOffline: 'App is ready to work offline',
     youAreOffline: 'You are currently offline',

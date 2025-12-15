@@ -65,6 +65,18 @@ export const zhCN = {
     sharedUrlInvalid: '分享URL无效。正在恢复默认状态。',
     unableToCopy: '无法复制到剪贴板。',
   },
+  shareModal: {
+    title: '分享{toolName}',
+    sensitiveWarningTitle: '敏感数据警告',
+    sensitiveWarningDescription:
+      '此工具可能包含敏感信息。请仅与可信任的人分享链接。共享的数据将对拥有链接的任何人可见。',
+    includedInShareLink: '包含在分享链接中:',
+    excludedUiOnly: '已排除（仅UI）:',
+    notShared: '未分享',
+    footerNote:
+      '分享链接将被复制到您的剪贴板。所有处理都在您的浏览器中进行，不会将数据发送到服务器。',
+    generateShareLink: '生成分享链接',
+  },
   pwa: {
     appReadyOffline: '应用已准备好离线使用',
     youAreOffline: '当前处于离线状态',
