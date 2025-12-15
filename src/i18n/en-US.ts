@@ -76,6 +76,7 @@ export const enUS = {
     footerNote:
       'The share link will be copied to your clipboard. All processing happens in your browser - no data is sent to servers.',
     generateShareLink: 'Generate Share Link',
+    copyLink: 'Copy Link',
   },
   pwa: {
     appReadyOffline: 'App is ready to work offline',

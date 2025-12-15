@@ -10,6 +10,8 @@ interface ShareModalProps {
   excludedFields?: string[];
   isSensitive?: boolean;
   toolName: string;
+  /** Whether the user is on a mobile device (affects button text) */
+  isMobile?: boolean;
 }
 
 /**
@@ -23,6 +25,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
   excludedFields = [],
   isSensitive = false,
   toolName,
+  isMobile = false,
 }) => {
   const { t } = useI18n();
 
@@ -133,7 +136,9 @@ export const ShareModal: React.FC<ShareModalProps> = ({
             onClick={onConfirm}
             className="px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 rounded-md transition-colors"
           >
-            {t('shareModal.generateShareLink')}
+            {isMobile
+              ? t('shareModal.generateShareLink')
+              : t('shareModal.copyLink')}
           </button>
         </div>
       </div>

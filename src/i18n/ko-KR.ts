@@ -78,6 +78,7 @@ export const koKR = {
     footerNote:
       '공유 링크가 클립보드에 복사됩니다. 모든 처리는 브라우저에서 이루어지며 서버로 데이터가 전송되지 않습니다.',
     generateShareLink: '공유 링크 생성',
+    copyLink: '링크 복사',
   },
   pwa: {
     appReadyOffline: '앱이 오프라인에서도 사용 가능합니다',

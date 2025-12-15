@@ -70,13 +70,10 @@ export function useToolSetup<T extends object>(
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const isMobile = useMemo(() => isMobileDevice(), []);
 
-  const handleShare = useCallback(async () => {
-    if (isMobile) {
-      setIsShareModalOpen(true);
-    } else {
-      await copyShareLink();
-    }
-  }, [isMobile, copyShareLink]);
+  const handleShare = useCallback(() => {
+    // Both mobile and PC now show the modal first
+    setIsShareModalOpen(true);
+  }, []);
 
   const handleShareModalClose = useCallback(() => {
     setIsShareModalOpen(false);
@@ -84,8 +81,14 @@ export function useToolSetup<T extends object>(
 
   const handleShareModalConfirm = useCallback(async () => {
     setIsShareModalOpen(false);
-    await shareViaWebShare();
-  }, [shareViaWebShare]);
+    if (isMobile) {
+      // Mobile: Use Web Share API
+      await shareViaWebShare();
+    } else {
+      // PC: Copy to clipboard
+      await copyShareLink();
+    }
+  }, [isMobile, shareViaWebShare, copyShareLink]);
 
   const shareInfo = useMemo(() => getShareStateInfo(), [getShareStateInfo]);
 
@@ -99,6 +102,7 @@ export function useToolSetup<T extends object>(
       excludedFields: shareInfo.excludedFields,
       toolName: t(`tool.${i18nKey}.title`),
       isSensitive: options?.isSensitive,
+      isMobile,
     }),
     [
       isShareModalOpen,
@@ -109,6 +113,7 @@ export function useToolSetup<T extends object>(
       t,
       i18nKey,
       options?.isSensitive,
+      isMobile,
     ]
   );
 

@@ -861,12 +861,9 @@ const RegexTool: React.FC = () => {
         title={t('tool.regex.title')}
         description={t('tool.regex.description')}
         onReset={resetState}
-        onShare={async () => {
-          if (isMobile) {
-            setIsShareModalOpen(true);
-          } else {
-            await copyShareLink();
-          }
+        onShare={() => {
+          // Both mobile and PC now show the modal first
+          setIsShareModalOpen(true);
         }}
       />
 
@@ -1229,11 +1226,16 @@ const RegexTool: React.FC = () => {
         onClose={() => setIsShareModalOpen(false)}
         onConfirm={async () => {
           setIsShareModalOpen(false);
-          await shareViaWebShare();
+          if (isMobile) {
+            await shareViaWebShare();
+          } else {
+            await copyShareLink();
+          }
         }}
         includedFields={shareInfo.includedFields}
         excludedFields={shareInfo.excludedFields}
         toolName={t('tool.regex.title')}
+        isMobile={isMobile}
       />
     </div>
   );

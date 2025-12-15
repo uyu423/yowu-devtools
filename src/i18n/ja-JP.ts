@@ -78,6 +78,7 @@ export const jaJP = {
     footerNote:
       '共有リンクがクリップボードにコピーされます。すべての処理はブラウザ内で行われ、サーバーにデータは送信されません。',
     generateShareLink: '共有リンクを生成',
+    copyLink: 'リンクをコピー',
   },
   pwa: {
     appReadyOffline: 'アプリがオフラインで使用可能になりました',

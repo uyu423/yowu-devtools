@@ -211,12 +211,9 @@ const QueryStringTool: React.FC = () => {
         title={t('tool.urlParser.title')}
         description={t('tool.urlParser.description')}
         onReset={resetState}
-        onShare={async () => {
-          if (isMobile) {
-            setIsShareModalOpen(true);
-          } else {
-            await copyShareLink();
-          }
+        onShare={() => {
+          // Both mobile and PC now show the modal first
+          setIsShareModalOpen(true);
         }}
       />
       <ShareModal
@@ -224,11 +221,16 @@ const QueryStringTool: React.FC = () => {
         onClose={() => setIsShareModalOpen(false)}
         onConfirm={async () => {
           setIsShareModalOpen(false);
-          await shareViaWebShare();
+          if (isMobile) {
+            await shareViaWebShare();
+          } else {
+            await copyShareLink();
+          }
         }}
         includedFields={shareInfo.includedFields}
         excludedFields={shareInfo.excludedFields}
         toolName={t('tool.urlParser.title')}
+        isMobile={isMobile}
       />
 
       <div className="flex-1 flex flex-col gap-6">

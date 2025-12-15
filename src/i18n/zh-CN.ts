@@ -78,6 +78,7 @@ export const zhCN = {
     footerNote:
       '分享链接将被复制到您的剪贴板。所有处理都在您的浏览器中进行，不会将数据发送到服务器。',
     generateShareLink: '生成分享链接',
+    copyLink: '复制链接',
   },
   pwa: {
     appReadyOffline: '应用已准备好离线使用',

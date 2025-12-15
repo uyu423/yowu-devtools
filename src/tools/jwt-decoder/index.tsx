@@ -219,12 +219,9 @@ const JwtDecoderTool: React.FC = () => {
         title={t('tool.jwtDecoder.title')}
         description={t('tool.jwtDecoder.description')}
         onReset={resetState}
-        onShare={async () => {
-          if (isMobile) {
-            setIsShareModalOpen(true);
-          } else {
-            await copyShareLink();
-          }
+        onShare={() => {
+          // Both mobile and PC now show the modal first
+          setIsShareModalOpen(true);
         }}
       />
 
@@ -448,12 +445,17 @@ const JwtDecoderTool: React.FC = () => {
         onClose={() => setIsShareModalOpen(false)}
         onConfirm={async () => {
           setIsShareModalOpen(false);
-          await shareViaWebShare();
+          if (isMobile) {
+            await shareViaWebShare();
+          } else {
+            await copyShareLink();
+          }
         }}
         includedFields={shareInfo.includedFields}
         excludedFields={shareInfo.excludedFields}
         toolName={t('tool.jwtDecoder.title')}
         isSensitive={true}
+        isMobile={isMobile}
       />
     </div>
   );

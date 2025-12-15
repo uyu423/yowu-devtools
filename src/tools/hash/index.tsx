@@ -462,16 +462,13 @@ const HashTool: React.FC = () => {
         title={t('tool.hash.title')}
         description={t('tool.hash.description')}
         onReset={handleReset}
-        onShare={async () => {
+        onShare={() => {
           if (state.inputType === 'file') {
             toast.error(t('tool.hash.fileSharingNotSupported'));
             return;
           }
-          if (isMobile) {
-            setIsShareModalOpen(true);
-          } else {
-            await copyShareLink();
-          }
+          // Both mobile and PC now show the modal first
+          setIsShareModalOpen(true);
         }}
       />
 
@@ -815,11 +812,16 @@ const HashTool: React.FC = () => {
         onClose={() => setIsShareModalOpen(false)}
         onConfirm={async () => {
           setIsShareModalOpen(false);
-          await shareViaWebShare();
+          if (isMobile) {
+            await shareViaWebShare();
+          } else {
+            await copyShareLink();
+          }
         }}
         includedFields={shareInfo.includedFields}
         excludedFields={shareInfo.excludedFields}
         toolName={t('tool.hash.title')}
+        isMobile={isMobile}
       />
     </div>
   );

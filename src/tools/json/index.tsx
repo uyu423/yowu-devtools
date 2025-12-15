@@ -191,14 +191,9 @@ const JsonTool: React.FC = () => {
         title={t('tool.json.title')}
         description={t('tool.json.description')}
         onReset={resetState}
-        onShare={async () => {
-          if (isMobile) {
-            // Mobile: Show ShareModal, then use Web Share API
-            setIsShareModalOpen(true);
-          } else {
-            // PC: Copy to clipboard immediately
-            await copyShareLink();
-          }
+        onShare={() => {
+          // Both mobile and PC now show the modal first
+          setIsShareModalOpen(true);
         }}
       />
       <ShareModal
@@ -206,11 +201,18 @@ const JsonTool: React.FC = () => {
         onClose={() => setIsShareModalOpen(false)}
         onConfirm={async () => {
           setIsShareModalOpen(false);
-          await shareViaWebShare();
+          if (isMobile) {
+            // Mobile: Use Web Share API
+            await shareViaWebShare();
+          } else {
+            // PC: Copy to clipboard
+            await copyShareLink();
+          }
         }}
         includedFields={shareInfo.includedFields}
         excludedFields={shareInfo.excludedFields}
         toolName={t('tool.json.title')}
+        isMobile={isMobile}
       />
 
       <ResizablePanels

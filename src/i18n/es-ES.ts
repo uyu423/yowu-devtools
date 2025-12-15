@@ -80,6 +80,7 @@ export const esES = {
     footerNote:
       'El enlace de compartir se copiará a su portapapeles. Todo el procesamiento ocurre en su navegador; no se envían datos a los servidores.',
     generateShareLink: 'Generar enlace para compartir',
+    copyLink: 'Copiar enlace',
   },
   pwa: {
     appReadyOffline: 'La aplicación está lista para usar sin conexión',
