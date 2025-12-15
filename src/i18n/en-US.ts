@@ -307,6 +307,7 @@ export const enUS = {
       symbols: 'Symbols (!@#$...)',
       excludeSimilar: 'Exclude similar characters (i, l, 1, L, o, 0, O)',
       excludeAmbiguous: 'Exclude ambiguous symbols',
+      count: 'Count',
       regenerate: 'Regenerate',
       generatedPasswords: 'Generated Passwords',
       strength: 'Strength',

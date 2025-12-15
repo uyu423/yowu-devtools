@@ -307,6 +307,7 @@ export const zhCN = {
       symbols: '符号 (!@#$...)',
       excludeSimilar: '排除相似字符 (i, l, 1, L, o, 0, O)',
       excludeAmbiguous: '排除歧义符号',
+      count: '数量',
       regenerate: '重新生成',
       generatedPasswords: '生成的密码',
       strength: '强度',

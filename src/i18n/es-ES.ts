@@ -307,6 +307,7 @@ export const esES = {
       symbols: 'Símbolos (!@#$...)',
       excludeSimilar: 'Excluir caracteres similares (i, l, 1, L, o, 0, O)',
       excludeAmbiguous: 'Excluir símbolos ambiguos',
+      count: 'Cantidad',
       regenerate: 'Regenerar',
       generatedPasswords: 'Contraseñas generadas',
       strength: 'Fortaleza',

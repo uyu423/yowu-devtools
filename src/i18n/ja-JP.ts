@@ -307,6 +307,7 @@ export const jaJP = {
       symbols: '記号 (!@#$...)',
       excludeSimilar: '類似文字を除外 (i, l, 1, L, o, 0, O)',
       excludeAmbiguous: '曖昧な記号を除外',
+      count: '数',
       regenerate: '再生成',
       generatedPasswords: '生成されたパスワード',
       strength: '強度',

@@ -118,7 +118,8 @@ export const koKR = {
       base64Placeholder: 'Base64 문자열을 붙여넣으세요...',
       resultPlaceholder: '결과가 여기에 표시됩니다...',
       urlSafe: 'URL Safe',
-      urlSafeTooltip: 'URL에 안전한 Base64 알파벳(- 및 _)을 사용하고 패딩을 생략합니다.',
+      urlSafeTooltip:
+        'URL에 안전한 Base64 알파벳(- 및 _)을 사용하고 패딩을 생략합니다.',
       inputOutputSwap: '입력/출력 전환',
       conversionFailed: 'Base64 변환 실패',
     },
@@ -157,9 +158,11 @@ export const koKR = {
       numberOutOfRange: '숫자가 범위를 벗어났습니다.',
       epochValueInvalid: 'Epoch 값이 유효하지 않습니다.',
       isoFormatInvalid: 'ISO 8601 형식이 유효하지 않습니다.',
-      epochTooltip: 'Epoch Timestamp는 1970년 1월 1일 UTC 이후의 초 또는 밀리초입니다.',
+      epochTooltip:
+        'Epoch Timestamp는 1970년 1월 1일 UTC 이후의 초 또는 밀리초입니다.',
       isoTooltip: 'ISO 8601은 날짜와 시간 표현에 대한 국제 표준입니다.',
-      msTooltip: '1970-01-01 UTC 이후 밀리초로 해석합니다 (JavaScript Date 형식).',
+      msTooltip:
+        '1970-01-01 UTC 이후 밀리초로 해석합니다 (JavaScript Date 형식).',
       secTooltip: '1970-01-01 UTC 이후 초로 해석합니다 (Unix timestamp 형식).',
       localTooltip: '로컬 타임존 기준으로 표시합니다.',
       utcTooltip: 'UTC (협정 세계시) 기준으로 표시합니다.',
@@ -236,7 +239,8 @@ export const koKR = {
       expectedMacPlaceholder: '검증할 예상 MAC를 입력하세요...',
       enterExpectedMacPlaceholder: '검증할 예상 MAC를 입력하세요...',
       saveKeyInShareLinks: '공유 링크에 Key 저장',
-      saveKeyWarning: '경고: 공유 링크에 HMAC Key를 저장하면 민감한 정보가 노출될 수 있습니다.',
+      saveKeyWarning:
+        '경고: 공유 링크에 HMAC Key를 저장하면 민감한 정보가 노출될 수 있습니다.',
       generateRandom: '랜덤 생성',
       generateRandomKey: '랜덤 Key 생성',
       hashResult: 'Hash 결과',
@@ -255,21 +259,28 @@ export const koKR = {
       randomKeyGenerated: '랜덤 Key가 생성되었습니다',
       failedToGenerateKey: '랜덤 Key 생성 실패',
       hashCopied: 'Hash가 클립보드에 복사되었습니다',
-      fileSharingNotSupported: '파일 공유는 지원되지 않습니다. 텍스트 모드로 전환해 주세요.',
+      fileSharingNotSupported:
+        '파일 공유는 지원되지 않습니다. 텍스트 모드로 전환해 주세요.',
       enterTextPlaceholder: 'Hash할 텍스트를 입력하세요...',
       resultPlaceholder: 'Hash 결과가 여기에 표시됩니다...',
       note: '참고',
-      securityNote: '체크섬 검증용으로만 사용하세요. 보안 목적에는 적합하지 않습니다.',
+      securityNote:
+        '체크섬 검증용으로만 사용하세요. 보안 목적에는 적합하지 않습니다.',
       securityWarning: '보안 경고',
-      algorithmWarning: '{algorithm}은 암호학적으로 취약하므로 보안 목적으로 사용하지 마세요. SHA-256 또는 SHA-512를 사용하세요.',
-      hmacKeyWarning: '경고: 공유 링크에 HMAC Key를 저장하면 민감한 정보가 노출될 수 있습니다.',
+      algorithmWarning:
+        '{algorithm}은 암호학적으로 취약하므로 보안 목적으로 사용하지 마세요. SHA-256 또는 SHA-512를 사용하세요.',
+      hmacKeyWarning:
+        '경고: 공유 링크에 HMAC Key를 저장하면 민감한 정보가 노출될 수 있습니다.',
       rawText: 'Raw Text (UTF-8)',
       rawTextUtf8: 'Raw Text (UTF-8)',
       hex: 'Hex',
       base64: 'Base64',
-      modeTooltip: '일반 Hash 또는 HMAC (Hash 기반 메시지 인증 코드)를 선택합니다.',
-      algorithmTooltip: 'Hash 알고리즘을 선택합니다. 대부분의 경우 SHA-256을 권장합니다.',
-      outputEncodingTooltip: '출력 형식을 선택합니다. Hex는 읽기 쉽고, Base64는 간결합니다.',
+      modeTooltip:
+        '일반 Hash 또는 HMAC (Hash 기반 메시지 인증 코드)를 선택합니다.',
+      algorithmTooltip:
+        'Hash 알고리즘을 선택합니다. 대부분의 경우 SHA-256을 권장합니다.',
+      outputEncodingTooltip:
+        '출력 형식을 선택합니다. Hex는 읽기 쉽고, Base64는 간결합니다.',
       keyEncodingTooltip: 'HMAC Key 인코딩 형식입니다.',
       webCryptoNotSupported: '브라우저에서 Web Crypto API를 지원하지 않습니다.',
       processingTimeout: '처리 시간 초과. 파일이 너무 클 수 있습니다.',
@@ -291,7 +302,8 @@ export const koKR = {
       generatedIds: '생성된 ID',
       idCopied: 'ID가 클립보드에 복사되었습니다',
       allIdsCopied: '모든 ID가 클립보드에 복사되었습니다',
-      typeTooltip: 'ID 유형을 선택합니다 (UUID v4: 랜덤, UUID v7: Timestamp 기반, ULID: 더 짧음).',
+      typeTooltip:
+        'ID 유형을 선택합니다 (UUID v4: 랜덤, UUID v7: Timestamp 기반, ULID: 더 짧음).',
       countTooltip: '생성할 ID 개수 (1-100).',
       formatTooltip: '출력 형식 (소문자 또는 대문자).',
     },
@@ -307,6 +319,7 @@ export const koKR = {
       symbols: '기호 (!@#$...)',
       excludeSimilar: '유사 문자 제외 (i, l, 1, L, o, 0, O)',
       excludeAmbiguous: '모호한 기호 제외',
+      count: '개수',
       regenerate: '재생성',
       generatedPasswords: '생성된 비밀번호',
       strength: '강도',
@@ -323,8 +336,10 @@ export const koKR = {
     },
     urlParser: {
       title: 'URL Parser',
-      description: 'Protocol, Host, Path, Fragment 및 Query 파라미터를 포함한 URL 구성 요소를 분석합니다.',
-      inputPlaceholder: 'URL 또는 Query String을 입력하세요 (예: https://example.com/search?q=laptop)...',
+      description:
+        'Protocol, Host, Path, Fragment 및 Query 파라미터를 포함한 URL 구성 요소를 분석합니다.',
+      inputPlaceholder:
+        'URL 또는 Query String을 입력하세요 (예: https://example.com/search?q=laptop)...',
       urlOrQueryString: 'URL 또는 Query String',
       urlInformation: 'URL 정보',
       parameters: '파라미터',
@@ -342,7 +357,8 @@ export const koKR = {
       encoded: '인코딩됨',
       empty: '(비어 있음)',
       parsingFailed: '파싱 실패',
-      noQueryStringFound: 'Query String을 찾을 수 없습니다. Query 파라미터가 포함된 URL을 입력해 주세요.',
+      noQueryStringFound:
+        'Query String을 찾을 수 없습니다. Query 파라미터가 포함된 URL을 입력해 주세요.',
       noParametersFound: 'Query 파라미터를 찾을 수 없습니다.',
       copiedProtocol: 'Protocol이 복사되었습니다.',
       copiedHost: 'Host가 복사되었습니다.',
@@ -353,14 +369,16 @@ export const koKR = {
     },
     regex: {
       title: 'Regex Tester',
-      description: '매치 하이라이트와 치환 미리보기로 정규식을 테스트하고 시각화합니다',
+      description:
+        '매치 하이라이트와 치환 미리보기로 정규식을 테스트하고 시각화합니다',
       pattern: '패턴',
       patternPlaceholder: '정규식 패턴을 입력하세요...',
       flags: 'Flags',
       testText: '테스트 텍스트',
       testTextPlaceholder: '패턴과 매치할 텍스트를 입력하세요...',
       replacementPreview: '치환 미리보기',
-      replacementPlaceholder: '치환 문자열을 입력하세요 (그룹은 $1, $2, $<name> 사용)...',
+      replacementPlaceholder:
+        '치환 문자열을 입력하세요 (그룹은 $1, $2, $<name> 사용)...',
       replacementResult: '치환 결과',
       matches: '매치',
       presets: '프리셋',
@@ -376,20 +394,26 @@ export const koKR = {
       lengthLabel: '길이: {n}',
       groups: '그룹',
       namedGroups: '네임드 그룹',
-      noMatches: '매치를 찾을 수 없습니다. 패턴과 테스트 텍스트를 입력해 주세요.',
-      noMatchesFound: '매치를 찾을 수 없습니다. 패턴과 테스트 텍스트를 입력해 주세요.',
+      noMatches:
+        '매치를 찾을 수 없습니다. 패턴과 테스트 텍스트를 입력해 주세요.',
+      noMatchesFound:
+        '매치를 찾을 수 없습니다. 패턴과 테스트 텍스트를 입력해 주세요.',
       appliedPreset: '프리셋 적용됨: {name}',
       patternFeatures: '패턴 기능',
       clickToExpand: '클릭하여 펼치기',
       note: '참고',
-      securityNote: '이 도구는 JavaScript RegExp 엔진을 사용합니다. 복잡한 패턴에 주의하세요.',
-      flagsTooltip: 'g=전역, i=대소문자 무시, m=여러 줄, s=dotAll, u=유니코드, y=sticky',
+      securityNote:
+        '이 도구는 JavaScript RegExp 엔진을 사용합니다. 복잡한 패턴에 주의하세요.',
+      flagsTooltip:
+        'g=전역, i=대소문자 무시, m=여러 줄, s=dotAll, u=유니코드, y=sticky',
     },
     jwtDecoder: {
       title: 'JWT Decoder',
-      description: 'JSON Web Token을 Decode하여 Header, Payload, Signature를 확인합니다.',
+      description:
+        'JSON Web Token을 Decode하여 Header, Payload, Signature를 확인합니다.',
       jwtToken: 'JWT Token',
-      tokenPlaceholder: 'JWT Token을 붙여넣으세요 (예: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...)',
+      tokenPlaceholder:
+        'JWT Token을 붙여넣으세요 (예: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...)',
       validationStatus: '검증 상태',
       signatureVerification: 'Signature 검증',
       header: 'Header',
@@ -398,8 +422,10 @@ export const koKR = {
       verificationKey: '검증 Key',
       verificationKeyPlaceholder: '검증 Key를 입력하세요',
       enterVerificationKey: '검증 Key를 입력하세요',
-      hmacKeyPlaceholder: 'HMAC Secret Key를 입력하세요 (HS256, HS384, HS512용)',
-      publicKeyPlaceholder: 'Public Key를 입력하세요 (RS256/RS384/RS512/ES256/ES384/ES512용 PEM 형식)',
+      hmacKeyPlaceholder:
+        'HMAC Secret Key를 입력하세요 (HS256, HS384, HS512용)',
+      publicKeyPlaceholder:
+        'Public Key를 입력하세요 (RS256/RS384/RS512/ES256/ES384/ES512용 PEM 형식)',
       valid: '유효함',
       invalid: '유효하지 않음',
       verified: '검증됨',
@@ -413,13 +439,18 @@ export const koKR = {
       tokenIsValid: 'Token이 유효합니다 (만료되지 않음)',
       issuedAt: '발급 시간: {time}',
       signatureValid: 'Signature가 유효합니다',
-      signatureVerificationFailed: 'Signature 검증 실패. Token이 변조되었거나 Key가 잘못되었을 수 있습니다.',
+      signatureVerificationFailed:
+        'Signature 검증 실패. Token이 변조되었거나 Key가 잘못되었을 수 있습니다.',
       enterKeyToVerify: 'Signature를 검증하려면 위에 Key를 입력하세요',
-      invalidJwtFormat: '유효하지 않은 JWT 형식입니다. 점으로 구분된 3개의 부분이 필요합니다 (header.payload.signature).',
-      failedToDecodeHeader: 'JWT Header Decode 실패. 유효하지 않은 Base64URL 인코딩입니다.',
-      failedToDecodePayload: 'JWT Payload Decode 실패. 유효하지 않은 Base64URL 인코딩입니다.',
+      invalidJwtFormat:
+        '유효하지 않은 JWT 형식입니다. 점으로 구분된 3개의 부분이 필요합니다 (header.payload.signature).',
+      failedToDecodeHeader:
+        'JWT Header Decode 실패. 유효하지 않은 Base64URL 인코딩입니다.',
+      failedToDecodePayload:
+        'JWT Payload Decode 실패. 유효하지 않은 Base64URL 인코딩입니다.',
       enterJwtToDecode: 'Decode할 JWT Token을 입력하세요.',
-      signatureNote: '참고: Signature 검증은 수행되지 않습니다. 이 도구는 Token을 Decode만 합니다.',
+      signatureNote:
+        '참고: Signature 검증은 수행되지 않습니다. 이 도구는 Token을 Decode만 합니다.',
       raw: 'Raw',
     },
     jwtEncoder: {
@@ -438,65 +469,80 @@ export const koKR = {
       invalidJsonHeader: 'Header의 JSON이 유효하지 않습니다',
       invalidJsonPayload: 'Payload의 JSON이 유효하지 않습니다',
       secretKeyRequired: '서명에 Secret Key가 필요합니다',
-      unsupportedAlgorithm: '지원하지 않는 알고리즘: {alg}. HS256, HS384, HS512, none만 지원됩니다.',
+      unsupportedAlgorithm:
+        '지원하지 않는 알고리즘: {alg}. HS256, HS384, HS512, none만 지원됩니다.',
     },
   },
   meta: {
     json: {
       title: 'JSON Viewer',
-      description: '무료 온라인 JSON 뷰어, 포매터, 검증기. 구문 강조, 트리 뷰, 검색 및 복사 기능으로 JSON을 예쁘게 출력합니다.',
+      description:
+        '무료 온라인 JSON 뷰어, 포매터, 검증기. 구문 강조, 트리 뷰, 검색 및 복사 기능으로 JSON을 예쁘게 출력합니다.',
     },
     url: {
       title: 'URL Encoder',
-      description: '무료 온라인 URL 인코더/디코더. 특수 문자와 유니코드를 지원하여 URL 문자열을 인코딩/디코딩합니다.',
+      description:
+        '무료 온라인 URL 인코더/디코더. 특수 문자와 유니코드를 지원하여 URL 문자열을 인코딩/디코딩합니다.',
     },
     base64: {
       title: 'Base64 Converter',
-      description: '무료 온라인 Base64 인코더/디코더. URL 안전 변형을 지원하여 텍스트를 Base64로 변환합니다.',
+      description:
+        '무료 온라인 Base64 인코더/디코더. URL 안전 변형을 지원하여 텍스트를 Base64로 변환합니다.',
     },
     time: {
       title: 'Time Converter',
-      description: '무료 온라인 Epoch Timestamp 변환기. 타임존 지원으로 Unix Timestamp와 ISO 8601 날짜를 변환합니다.',
+      description:
+        '무료 온라인 Epoch Timestamp 변환기. 타임존 지원으로 Unix Timestamp와 ISO 8601 날짜를 변환합니다.',
     },
     yaml: {
       title: 'YAML Converter',
-      description: '무료 온라인 YAML-JSON 변환기. 구문 검증과 함께 YAML과 JSON 형식을 변환합니다.',
+      description:
+        '무료 온라인 YAML-JSON 변환기. 구문 검증과 함께 YAML과 JSON 형식을 변환합니다.',
     },
     diff: {
       title: 'Text Diff',
-      description: '무료 온라인 텍스트 Diff 도구. 두 텍스트 블록을 비교하고 분할 또는 통합 뷰로 차이점을 시각화합니다.',
+      description:
+        '무료 온라인 텍스트 Diff 도구. 두 텍스트 블록을 비교하고 분할 또는 통합 뷰로 차이점을 시각화합니다.',
     },
     cron: {
       title: 'Cron Parser',
-      description: '무료 온라인 Cron 표현식 파서. Cron 스케줄을 설명하고 다음 실행 시간을 미리 봅니다.',
+      description:
+        '무료 온라인 Cron 표현식 파서. Cron 스케줄을 설명하고 다음 실행 시간을 미리 봅니다.',
     },
     hash: {
       title: 'Hash Generator',
-      description: '무료 온라인 Hash 생성기. MD5, SHA-1, SHA-256, SHA-512 해시와 HMAC 서명을 계산합니다.',
+      description:
+        '무료 온라인 Hash 생성기. MD5, SHA-1, SHA-256, SHA-512 해시와 HMAC 서명을 계산합니다.',
     },
     uuid: {
       title: 'UUID/ULID Generator',
-      description: '무료 온라인 UUID 및 ULID 생성기. UUID v4, UUID v7, ULID 식별자를 생성합니다.',
+      description:
+        '무료 온라인 UUID 및 ULID 생성기. UUID v4, UUID v7, ULID 식별자를 생성합니다.',
     },
     password: {
       title: 'Password Generator',
-      description: '무료 온라인 비밀번호 생성기. 사용자 정의 가능한 길이와 문자 옵션으로 안전한 비밀번호를 생성합니다.',
+      description:
+        '무료 온라인 비밀번호 생성기. 사용자 정의 가능한 길이와 문자 옵션으로 안전한 비밀번호를 생성합니다.',
     },
     urlParser: {
       title: 'URL Parser',
-      description: '무료 온라인 URL 파서. Protocol, Host, Path, Query 파라미터 등 URL 구성 요소를 분석합니다.',
+      description:
+        '무료 온라인 URL 파서. Protocol, Host, Path, Query 파라미터 등 URL 구성 요소를 분석합니다.',
     },
     regex: {
       title: 'Regex Tester',
-      description: '무료 온라인 정규식 테스터. 매치 하이라이트로 정규식을 테스트하고 시각화합니다.',
+      description:
+        '무료 온라인 정규식 테스터. 매치 하이라이트로 정규식을 테스트하고 시각화합니다.',
     },
     jwtDecoder: {
       title: 'JWT Decoder',
-      description: '무료 온라인 JWT 디코더. Signature 검증으로 JSON Web Token을 디코딩하고 검사합니다.',
+      description:
+        '무료 온라인 JWT 디코더. Signature 검증으로 JSON Web Token을 디코딩하고 검사합니다.',
     },
     jwtEncoder: {
       title: 'JWT Encoder',
-      description: '무료 온라인 JWT 인코더. 사용자 정의 Header와 Payload로 JSON Web Token을 생성합니다.',
+      description:
+        '무료 온라인 JWT 인코더. 사용자 정의 Header와 Payload로 JSON Web Token을 생성합니다.',
     },
   },
 } as const;
