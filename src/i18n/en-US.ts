@@ -55,6 +55,8 @@ export const enUS = {
     lightMode: 'Light Mode',
     systemMode: 'System Mode',
     darkMode: 'Dark Mode',
+    language: 'Language',
+    selectLanguage: 'Select language',
   },
   commandPalette: {
     placeholder: 'Search tools...',

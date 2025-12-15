@@ -7,6 +7,7 @@ import { useTheme } from '@/hooks/useThemeHooks';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useRecentTools } from '@/hooks/useRecentTools';
 import { useI18n } from '@/hooks/useI18nHooks';
+import { LanguageSelector } from '@/components/common/LanguageSelector';
 import logoImg from '@/assets/yowu-logo.jpeg';
 
 interface SidebarProps {
@@ -206,8 +207,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
         </div>
       </div>
 
-      {/* Footer / Theme Toggle */}
-      <div className="p-4 border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 transition-colors">
+      {/* Footer / Language & Theme */}
+      <div className="p-4 border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 transition-colors space-y-3">
+        {/* Language Selector */}
+        <LanguageSelector />
+        
+        {/* Theme Toggle */}
         <div className="flex items-center justify-between bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
            <button 
              onClick={() => setTheme('light')}
