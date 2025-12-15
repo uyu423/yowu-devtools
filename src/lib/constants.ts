@@ -1,5 +1,6 @@
 // App version - read from package.json via Vite's define
-export const APP_VERSION = import.meta.env.APP_VERSION || '1.0.0';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const APP_VERSION = ((import.meta as any).env?.APP_VERSION as string | undefined) || '1.0.0';
 
 // Supported locales for i18n
 export type LocaleCode = 'en-US' | 'ko-KR' | 'ja-JP' | 'zh-CN' | 'es-ES';
