@@ -1,5 +1,65 @@
 # Release Notes
 
+## v1.3.2 (Upcoming) - Cron Parser Advanced
+
+**🚧 개발 예정**
+
+다양한 cron 방언(UNIX, Quartz, AWS, Kubernetes, Jenkins)을 지원하고, 정확한 의미(semantics) 파싱을 제공하는 대대적인 Cron Parser 고도화입니다.
+
+**New Features:**
+
+- ✨ **다중 Cron 스펙 지원**:
+  - **Auto** (권장): 입력을 분석하여 자동 감지
+  - **UNIX/Vixie**: 표준 5필드, DOM/DOW OR 규칙 명확화
+  - **UNIX + Seconds**: 6필드 (초 포함)
+  - **Quartz**: 6~7필드, `? L W #` 고급 연산자 지원
+  - **AWS EventBridge**: `cron(...)` 래퍼 + year 필드
+  - **Kubernetes CronJob**: `@hourly`, `@daily` 매크로 지원
+  - **Jenkins**: `H` 해시 토큰 및 별칭 지원
+
+- ✨ **래퍼 정규화**:
+  - `cron(...)`, `cron('...')`, `cron("...")` 자동 추출
+  - 앞뒤 여백/개행/텍스트 제거
+  - "Normalized" 및 "AWS format" 표시
+
+- ✨ **필드별 분해 + 하이라이트**:
+  - Minutes / Hours / DOM / Month / DOW / (Year/Seconds) 카드 표시
+  - 입력 토큰 색상/밑줄 하이라이트
+  - hover 시 서로 강조 (모바일: 탭)
+  - `L/W/#/?/H` 특수 토큰 배지 표시
+
+- ✨ **Next runs 계산 고도화**:
+  - "From" 기준 시각 설정 (디버깅에 유용)
+  - ISO / RFC3339 / Epoch 복사 버튼
+  - Web Worker로 UI 프리징 방지
+
+**Enhancements:**
+
+- 🔧 **의미(semantics) 정확화**:
+  - UNIX/Vixie: DOM/DOW **OR** 규칙 명시 (AND 아님!)
+  - AWS/Quartz: DOM/DOW 동시 지정 제약 검증
+  - 스펙별 에러 메시지 차별화
+
+- ⚠️ **호환성/주의사항 자동 안내**:
+  - UNIX/Vixie: DOM/DOW OR 경고
+  - Jenkins: `H/3` 짧은 주기 월말 불규칙 경고
+  - AWS: 포맷/제한/TZ/DST 특성
+  - K8s: `TZ=` 미지원, `.spec.timeZone` 권장
+
+- 🔄 **변환(Conversion) 기능** (선택):
+  - UNIX(5) ↔ UNIX+Seconds(6)
+  - UNIX(5) → AWS (`cron(...)`)
+  - 변환 불가/비등가 명확 경고
+
+**Technical:**
+
+- 스펙별 파서 모듈 분리 (`src/tools/cron/parsers/`)
+- Auto 감지 로직 (래퍼, 특수 토큰, 필드 수 기반)
+- Web Worker로 next-run 계산 오프로드
+- i18n 번역 키 추가 (`tool.cron.spec.*`, `tool.cron.field.*`, `tool.cron.warning.*`)
+
+---
+
 ## v1.3.1 (December 2025) - Code Quality & Bug Fixes
 
 **Bug Fixes:**

@@ -6,9 +6,9 @@
 
 ## 1. 프로젝트 현황
 
-- **상태**: Phase 8 완료 (v1.3.0 릴리즈 완료)
-- **현재 버전**: v1.3.0 (2025-12-15)
-- **다음 버전**: v1.4.0 (미정)
+- **상태**: Phase 8 완료, Phase 9 준비 중
+- **현재 버전**: v1.3.1 (2025-12-15)
+- **다음 버전**: v1.3.2 (Cron Parser 고도화)
 - **주요 변경점**:
   - Phase 3: 모든 도구 기능 구현 완료 (JSON, URL, Base64, Time, YAML, Diff, Cron)
   - Phase 4: CI/CD 및 배포 설정 완료
@@ -16,6 +16,8 @@
   - Phase 6 (v1.2.0): ✅ Command Palette, 파일 워크플로우, 공유 고도화, PWA 폴리싱, 버전 체계 정리, Hash/UUID/URL Parser 도구 추가 완료
   - Phase 7 (v1.2.1): ✅ Hash/HMAC 도구 고도화, Regex Tester 도구 추가 완료, Web Share API 텍스트 포맷팅 개선 완료
   - Phase 8 (v1.3.0): ✅ i18n(국제화) 지원 완료 - 5개 언어 지원 (en-US, ko-KR, ja-JP, zh-CN, es-ES)
+  - Phase 8.5 (v1.3.1): ✅ 코드 품질 개선, JWT Encoder 버그 수정, 리팩토링 완료
+  - Phase 9 (v1.3.2): 🚧 Cron Parser 고도화 - 다중 스펙 지원, 래퍼 정규화, 필드별 하이라이트 예정
 
 ---
 
@@ -695,3 +697,154 @@ src/
 
 - [x] **GitHub Stars 뱃지 추가**:
   - [x] 메인 페이지 하단에 GitHub stars 뱃지 표시
+
+---
+
+### Phase 9: Cron Parser 고도화 (v1.3.2) 🚧 **예정**
+
+v1.3.2는 Cron Parser의 대대적인 고도화로, 여러 cron 방언(UNIX, Quartz, AWS, K8s, Jenkins)을 지원하고 정확한 의미(semantics) 파싱을 제공합니다.
+
+#### 9.1 스펙(방언) 지원 인프라 구축
+
+- [ ] **타입 정의**:
+  - [ ] `CronSpec` 타입 정의 (`'auto' | 'unix' | 'unix-seconds' | 'quartz' | 'aws' | 'k8s' | 'jenkins'`)
+  - [ ] `CronToolState` 확장 (`spec`, `fromDateTime` 필드 추가)
+  - [ ] 스펙별 특수 토큰 정의 (`? L W # H` 등)
+
+- [ ] **스펙별 파서 모듈**:
+  - [ ] `src/tools/cron/parsers/unix.ts` - UNIX/Vixie 5필드 파서
+  - [ ] `src/tools/cron/parsers/unix-seconds.ts` - 6필드 파서
+  - [ ] `src/tools/cron/parsers/quartz.ts` - Quartz 6~7필드 파서 (`? L W #` 지원)
+  - [ ] `src/tools/cron/parsers/aws.ts` - AWS EventBridge 파서 (래퍼 추출 + year 필드)
+  - [ ] `src/tools/cron/parsers/k8s.ts` - Kubernetes 매크로 지원 (`@hourly` 등)
+  - [ ] `src/tools/cron/parsers/jenkins.ts` - Jenkins H 토큰 파서
+
+#### 9.2 Auto 감지 로직 구현
+
+- [ ] **Auto 감지 규칙**:
+  - [ ] `cron(...)` 래퍼 감지 → AWS
+  - [ ] `H`, `H(...)` 감지 → Jenkins
+  - [ ] `?`, `L`, `W`, `#` 감지 → Quartz/AWS
+  - [ ] 필드 수 기반 1차 분기 (5/6/7)
+  - [ ] `@hourly`, `@daily` 매크로 감지 → K8s
+
+- [ ] **래퍼 정규화**:
+  - [ ] `cron(...)` 래퍼 추출
+  - [ ] `cron('...')`, `cron("...")` 따옴표 제거
+  - [ ] 앞뒤 여백/개행/텍스트 제거
+
+#### 9.3 의미(semantics) 정확화
+
+- [ ] **DOM/DOW OR 규칙 (UNIX/Vixie)**:
+  - [ ] Human readable에 "OR" 명시
+  - [ ] Next runs 계산에 OR 규칙 적용
+  - [ ] "AND가 필요하면 표현식 분리" 경고
+
+- [ ] **DOM/DOW 제약 검증 (AWS/Quartz)**:
+  - [ ] `*` 동시 사용 금지 규칙
+  - [ ] 한쪽 `?` 필요 규칙
+  - [ ] 스펙별 에러 메시지
+
+#### 9.4 UI/UX 고도화
+
+- [ ] **컨트롤 바 개선**:
+  - [ ] Spec/Profile 드롭다운 추가
+  - [ ] Include seconds 동적 활성화/비활성화
+  - [ ] Timezone 스펙별 설명 추가
+
+- [ ] **Normalized 표시**:
+  - [ ] 입력 아래 "Normalized" 라인
+  - [ ] AWS 선택 시 "AWS format" 출력
+
+- [ ] **필드별 분해 + 하이라이트**:
+  - [ ] 필드별 해석 카드 (Minutes/Hours/DOM/Month/DOW/Year/Seconds)
+  - [ ] 입력 토큰 색상/밑줄 하이라이트
+  - [ ] hover 시 서로 강조 (모바일: 탭)
+  - [ ] 특수 토큰 배지 표시 (`L/W/#/?/H`)
+
+- [ ] **호환성/주의사항 영역**:
+  - [ ] UNIX/Vixie: DOM/DOW OR 경고
+  - [ ] Jenkins: H/3 월말 불규칙 경고
+  - [ ] AWS: 포맷/제한/TZ/DST 특성
+  - [ ] K8s: `TZ=` 미지원 경고
+
+#### 9.5 Next runs 계산 고도화
+
+- [ ] **기준 시각(From) 설정**:
+  - [ ] "From" datetime 입력 UI
+  - [ ] 기본값 Now, 사용자 지정 가능
+
+- [ ] **출력 포맷 옵션**:
+  - [ ] Localized 표시 (i18n)
+  - [ ] ISO / RFC3339 / Epoch 복사 버튼
+
+- [ ] **성능 최적화**:
+  - [ ] Web Worker로 next-run 계산 오프로드
+  - [ ] 계산 중 skeleton + cancel 버튼
+  - [ ] 복잡한 표현식 UI 프리징 방지
+
+#### 9.6 변환(Conversion) 기능 (선택)
+
+- [ ] **Convert to 드롭다운**:
+  - [ ] UNIX(5) ↔ UNIX+Seconds(6)
+  - [ ] UNIX(5) → AWS (`cron(...)` + year)
+  - [ ] Jenkins `@hourly`/`H` 설명 출력
+
+- [ ] **변환 불가/비등가 경고**:
+  - [ ] UNIX DOM/DOW OR → Quartz/AWS 변환 불가 안내
+
+#### 9.7 i18n 지원
+
+- [ ] **번역 키 추가**:
+  - [ ] `tool.cron.spec.*` - 스펙 이름/설명
+  - [ ] `tool.cron.field.*` - 필드 이름 (minutes, hours, dom, month, dow, year, seconds)
+  - [ ] `tool.cron.warning.*` - 경고 메시지
+  - [ ] `tool.cron.normalized` - "Normalized" 라벨
+  - [ ] `tool.cron.awsFormat` - "AWS format" 라벨
+  - [ ] `tool.cron.fromDateTime` - "From" 라벨
+  - [ ] `tool.cron.orSemantics` - DOM/DOW OR 설명
+
+- [ ] **모든 로케일에 번역 추가**:
+  - [ ] en-US
+  - [ ] ko-KR
+  - [ ] ja-JP
+  - [ ] zh-CN
+  - [ ] es-ES
+
+#### 9.8 테스트 및 검증
+
+- [ ] **파서 단위 테스트**:
+  - [ ] 각 스펙별 파서 정확성 테스트
+  - [ ] Auto 감지 로직 테스트
+  - [ ] 래퍼 정규화 테스트
+
+- [ ] **UI 테스트**:
+  - [ ] Spec 드롭다운 동작 확인
+  - [ ] 하이라이트 동작 확인
+  - [ ] From datetime 입력 동작 확인
+  - [ ] Worker 성능 테스트
+
+- [ ] **스펙별 검증 테스트**:
+  - [ ] UNIX DOM/DOW OR 계산 정확성
+  - [ ] AWS 제약 조건 검증
+  - [ ] Quartz 특수 문법 파싱
+  - [ ] Jenkins H 토큰 처리
+
+#### 9.9 문서 업데이트
+
+- [ ] **개발 문서**:
+  - [ ] `SAS.md` 7.7 섹션 업데이트 ✅ 완료
+  - [ ] `IMPLEMENTATION_PLAN.md` Phase 9 추가 ✅ 완료
+  - [ ] `RELEASE_NOTES.md` v1.3.2 섹션 추가
+
+- [ ] **SEO 업데이트**:
+  - [ ] `vite-plugin-generate-routes.ts` cron 도구 메타 업데이트
+  - [ ] keywords에 방언 관련 키워드 추가
+
+#### 참고 문서
+
+- [AWS EventBridge Schedule Types](https://docs.aws.amazon.com/scheduler/latest/UserGuide/schedule-types.html)
+- [UNIX crontab(5) man page](https://man7.org/linux/man-pages/man5/crontab.5.html)
+- [Quartz CronTrigger Tutorial](https://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/crontrigger.html)
+- [Kubernetes CronJob](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/)
+- [Jenkins Pipeline Syntax](https://www.jenkins.io/doc/book/pipeline/syntax/)
