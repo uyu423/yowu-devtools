@@ -157,12 +157,13 @@ export const useApiHistory = (): UseApiHistoryReturn => {
   }, []);
 
   /**
-   * Clear all history
+   * Clear all history (preserves favorites)
    */
   const clearHistory = useCallback(() => {
-    setHistory([]);
-    setFavorites(new Set());
-  }, []);
+    // Keep only favorited items
+    setHistory((prev) => prev.filter((item) => favorites.has(item.id)));
+    // Do not clear favorites - they should be preserved
+  }, [favorites]);
 
   /**
    * Toggle favorite status

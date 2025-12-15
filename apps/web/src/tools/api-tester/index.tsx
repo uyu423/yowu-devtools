@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { Globe, Check, Terminal, PanelRightClose, PanelRightOpen } from 'lucide-react';
+import { Globe, Check, Terminal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ToolDefinition } from '@/tools/types';
 import { ToolHeader } from '@/components/common/ToolHeader';
@@ -215,28 +215,12 @@ const ApiTesterTool: React.FC = () => {
     <div className="flex flex-col h-full">
       {/* Header */}
       <div className="flex-shrink-0 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-        <div className="flex items-center justify-between">
-          <ToolHeader
-            title={t('tool.apiTester.title')}
-            description={t('tool.apiTester.description')}
-            onReset={resetState}
-            onShare={handleShare}
-          />
-          <div className="flex items-center gap-2">
-            <ExtensionStatus status={extensionStatus} onRetry={checkExtension} />
-            <button
-              onClick={() => setShowHistory(!showHistory)}
-              className={cn(
-                'p-2 rounded-lg transition-colors',
-                showHistory
-                  ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
-                  : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
-              )}
-            >
-              {showHistory ? <PanelRightClose className="w-5 h-5" /> : <PanelRightOpen className="w-5 h-5" />}
-            </button>
-          </div>
-        </div>
+        <ToolHeader
+          title={t('tool.apiTester.title')}
+          description={t('tool.apiTester.description')}
+          onReset={resetState}
+          onShare={handleShare}
+        />
       </div>
 
       <div className="flex flex-1 overflow-hidden">
@@ -261,8 +245,9 @@ const ApiTesterTool: React.FC = () => {
               />
             </div>
 
-            {/* Copy as cURL */}
-            <div className="flex items-center justify-end mt-2">
+            {/* Extension status and Copy as cURL */}
+            <div className="flex items-center justify-between mt-2">
+              <ExtensionStatus status={extensionStatus} onRetry={checkExtension} />
               <button
                 onClick={handleCopyCurl}
                 className={cn(
@@ -358,7 +343,7 @@ const ApiTesterTool: React.FC = () => {
           onClear={clearHistory}
           onRename={renameHistory}
           isOpen={showHistory}
-          onClose={() => setShowHistory(false)}
+          onToggle={() => setShowHistory(!showHistory)}
         />
       </div>
 

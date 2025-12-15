@@ -4,7 +4,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { cn } from '@/lib/utils';
-import { Search, Star, Trash2, Clock, MoreVertical, X, Edit2, Check } from 'lucide-react';
+import { Search, Star, Trash2, Clock, MoreVertical, X, Edit2, Check, PanelRightClose, PanelRightOpen } from 'lucide-react';
 import type { HistoryItem, HttpMethod } from '../types';
 import { getStatusColor } from '../types';
 
@@ -17,7 +17,7 @@ interface HistorySidebarProps {
   onClear: () => void;
   onRename: (id: string, name: string) => void;
   isOpen?: boolean;
-  onClose?: () => void;
+  onToggle?: () => void;
 }
 
 const METHOD_COLORS: Record<HttpMethod, string> = {
@@ -66,7 +66,7 @@ export const HistorySidebar: React.FC<HistorySidebarProps> = ({
   onClear,
   onRename,
   isOpen = true,
-  onClose,
+  onToggle,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -245,7 +245,27 @@ export const HistorySidebar: React.FC<HistorySidebarProps> = ({
     );
   };
 
-  if (!isOpen) return null;
+  // Collapsed state - show only toggle button
+  if (!isOpen) {
+    return (
+      <div className="flex flex-col h-full border-l border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+        <div className="px-2 py-3 border-b border-gray-200 dark:border-gray-700">
+          {onToggle && (
+            <button
+              onClick={onToggle}
+              className={cn(
+                'p-2 rounded-lg transition-colors',
+                'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
+              )}
+              title="Show History"
+            >
+              <PanelRightOpen className="w-5 h-5" />
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full w-96 border-l border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
@@ -261,12 +281,16 @@ export const HistorySidebar: React.FC<HistorySidebarProps> = ({
               Clear All
             </button>
           )}
-          {onClose && (
+          {onToggle && (
             <button
-              onClick={onClose}
-              className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              onClick={onToggle}
+              className={cn(
+                'p-1.5 rounded-lg transition-colors',
+                'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+              )}
+              title="Hide History"
             >
-              <X className="w-4 h-4" />
+              <PanelRightClose className="w-4 h-4" />
             </button>
           )}
         </div>
