@@ -7,6 +7,10 @@ import {
   type LocaleCode,
 } from './src/lib/constants';
 
+// package.json에서 버전 정보 읽기
+const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf-8'));
+const appVersion = packageJson.version;
+
 // 도구 정보 타입
 interface ToolInfo {
   id: string;
@@ -779,6 +783,18 @@ Sitemap: https://tools.yowu.dev/sitemap.xml`;
       const cname = 'tools.yowu.dev';
       fs.writeFileSync(path.join(distDir, 'CNAME'), cname, 'utf-8');
       console.log(`✅ Generated: CNAME (${cname})`);
+
+      // version.json 생성 (PWA 업데이트 감지용)
+      const versionInfo = {
+        version: appVersion,
+        buildTime: new Date().toISOString(),
+      };
+      fs.writeFileSync(
+        path.join(distDir, 'version.json'),
+        JSON.stringify(versionInfo, null, 2),
+        'utf-8'
+      );
+      console.log(`✅ Generated: version.json (v${appVersion})`);
 
       console.log(
         '\n🎉 All route HTML files and SEO files generated successfully!'

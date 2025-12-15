@@ -1,9 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 // @ts-expect-error - virtual module provided by vite-plugin-pwa
 import { registerSW } from 'virtual:pwa-register';
+import { APP_VERSION } from '@/lib/constants';
 
 // 업데이트 체크 간격 (밀리초)
 const UPDATE_CHECK_INTERVAL = 60 * 60 * 1000; // 1시간
+// 버전 체크 간격 (밀리초) - Service Worker보다 더 자주 체크
+const VERSION_CHECK_INTERVAL = 5 * 60 * 1000; // 5분
+
+interface VersionInfo {
+  version: string;
+  buildTime: string;
+}
 
 interface UsePWAResult {
   needRefresh: boolean;
@@ -19,6 +27,7 @@ interface UsePWAResult {
 /**
  * PWA 기능을 관리하는 커스텀 훅
  * - Service Worker 업데이트 감지
+ * - version.json 기반 업데이트 감지 (보조)
  * - 앱 설치 프롬프트
  * - 오프라인 상태 감지
  *
@@ -32,7 +41,45 @@ export function usePWA(): UsePWAResult {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [updateSW, setUpdateSW] = useState<(() => Promise<void>) | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const versionIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const registrationRef = useRef<ServiceWorkerRegistration | null>(null);
+
+  /**
+   * version.json을 조회하여 서버 버전과 현재 앱 버전 비교
+   * - 버전이 다르면 업데이트 알림 표시
+   * - 캐시를 우회하기 위해 타임스탬프 쿼리 파라미터 추가
+   */
+  const checkVersionUpdate = useCallback(async () => {
+    // 오프라인이면 스킵
+    if (!navigator.onLine) {
+      console.log('[PWA] Skipping version check - offline');
+      return;
+    }
+
+    try {
+      // 캐시 우회를 위해 타임스탬프 추가
+      const response = await fetch(`/version.json?t=${Date.now()}`, {
+        cache: 'no-store',
+      });
+
+      if (!response.ok) {
+        console.warn('[PWA] Version check failed - response not ok');
+        return;
+      }
+
+      const serverVersion: VersionInfo = await response.json();
+      console.log(`[PWA] Version check: server=${serverVersion.version}, client=${APP_VERSION}`);
+
+      // 버전이 다르면 업데이트 알림
+      if (serverVersion.version !== APP_VERSION) {
+        console.log('[PWA] New version detected via version.json');
+        setNeedRefresh(true);
+      }
+    } catch (error) {
+      // 네트워크 오류 등은 조용히 처리 (개발 환경에서는 version.json이 없을 수 있음)
+      console.warn('[PWA] Version check failed:', error);
+    }
+  }, []);
 
   /**
    * Service Worker 업데이트 체크
@@ -59,6 +106,17 @@ export function usePWA(): UsePWAResult {
   }, []);
 
   useEffect(() => {
+    // 앱 기동 시 즉시 버전 체크 (Service Worker 등록과 별개로)
+    // 약간의 지연을 두어 초기 렌더링 완료 후 체크
+    const initialCheckTimeout = setTimeout(() => {
+      checkVersionUpdate();
+    }, 1000);
+
+    // 주기적 버전 체크 설정 (Service Worker 체크보다 더 자주)
+    versionIntervalRef.current = setInterval(() => {
+      checkVersionUpdate();
+    }, VERSION_CHECK_INTERVAL);
+
     // Service Worker 등록 및 업데이트 감지
     // onRegisteredSW 사용 (v0.12.8+, onRegistered 대체)
     const updateSWFn = registerSW({
@@ -77,7 +135,7 @@ export function usePWA(): UsePWAResult {
         if (registration) {
           registrationRef.current = registration;
 
-          // 주기적 업데이트 체크 설정
+          // 주기적 Service Worker 업데이트 체크 설정
           // Edge case 처리: 온라인/오프라인 상태에 따라 동적 처리
           intervalRef.current = setInterval(() => {
             checkForUpdates();
@@ -88,6 +146,7 @@ export function usePWA(): UsePWAResult {
             if (document.visibilityState === 'visible') {
               console.log('[PWA] App became visible - checking for updates');
               checkForUpdates();
+              checkVersionUpdate(); // 버전 체크도 함께 수행
             }
           };
           document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -96,6 +155,7 @@ export function usePWA(): UsePWAResult {
           const handleOnline = () => {
             console.log('[PWA] Back online - checking for updates');
             checkForUpdates();
+            checkVersionUpdate(); // 버전 체크도 함께 수행
           };
           window.addEventListener('online', handleOnline);
 
@@ -132,15 +192,19 @@ export function usePWA(): UsePWAResult {
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
     return () => {
-      // 인터벌 정리
+      // 타임아웃 및 인터벌 정리
+      clearTimeout(initialCheckTimeout);
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
+      }
+      if (versionIntervalRef.current) {
+        clearInterval(versionIntervalRef.current);
       }
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
-  }, [checkForUpdates]);
+  }, [checkForUpdates, checkVersionUpdate]);
 
   const updateServiceWorker = async () => {
     if (updateSW) {

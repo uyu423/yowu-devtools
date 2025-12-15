@@ -49,12 +49,35 @@ VitePWA({
 
 **해결책** (v1.3.3에서 개선됨):
 
-- 앱이 포커스를 받을 때 업데이트 체크
-- 온라인 상태가 되면 즉시 업데이트 체크
-- 오프라인일 때는 업데이트 체크 스킵
+1. **version.json 기반 버전 체크** (보조 메커니즘)
+   - 빌드 시 `/version.json` 파일 자동 생성
+   - 앱 기동 시 서버 버전과 비교
+   - 5분마다 주기적으로 버전 체크
+   - Service Worker와 독립적으로 동작
+
+2. **Service Worker 업데이트 체크**
+   - 앱이 포커스를 받을 때 업데이트 체크
+   - 온라인 상태가 되면 즉시 업데이트 체크
+   - 오프라인일 때는 업데이트 체크 스킵
 
 ```typescript
-// usePWA.ts
+// usePWA.ts - 버전 체크 로직
+const checkVersionUpdate = async () => {
+  if (!navigator.onLine) return;
+
+  const response = await fetch(`/version.json?t=${Date.now()}`, {
+    cache: 'no-store',
+  });
+  const serverVersion = await response.json();
+
+  if (serverVersion.version !== APP_VERSION) {
+    setNeedRefresh(true); // 업데이트 알림 표시
+  }
+};
+```
+
+```typescript
+// usePWA.ts - Service Worker 업데이트 체크
 const updateSWFn = registerSW({
   immediate: true,
   onNeedRefresh() {
@@ -253,18 +276,26 @@ window.addEventListener('beforeinstallprompt', (e) => {
 if (navigator.serviceWorker.controller) {
   console.log('Controller:', navigator.serviceWorker.controller.scriptURL);
 }
+
+// 서버 버전 확인 (version.json)
+fetch('/version.json?t=' + Date.now())
+  .then((res) => res.json())
+  .then((v) => console.log('Server version:', v));
 ```
 
 ### Console 로그 의미
 
-| 로그                                              | 의미                         |
-| ------------------------------------------------- | ---------------------------- |
-| `[PWA] Service Worker registered`                 | SW 등록 성공                 |
-| `[PWA] New content available - refresh needed`    | 새 버전 발견, 업데이트 필요  |
-| `[PWA] App ready to work offline`                 | 오프라인 모드 준비 완료      |
-| `[PWA] App became visible - checking for updates` | 앱 포커스 시 업데이트 체크   |
-| `[PWA] Back online - checking for updates`        | 온라인 복귀 시 업데이트 체크 |
-| `[PWA] Skipping update check - offline`           | 오프라인 상태로 체크 스킵    |
+| 로그                                                         | 의미                                |
+| ------------------------------------------------------------ | ----------------------------------- |
+| `[PWA] Service Worker registered`                            | SW 등록 성공                        |
+| `[PWA] New content available - refresh needed`               | 새 버전 발견, 업데이트 필요         |
+| `[PWA] App ready to work offline`                            | 오프라인 모드 준비 완료             |
+| `[PWA] App became visible - checking for updates`            | 앱 포커스 시 업데이트 체크          |
+| `[PWA] Back online - checking for updates`                   | 온라인 복귀 시 업데이트 체크        |
+| `[PWA] Skipping update check - offline`                      | 오프라인 상태로 체크 스킵           |
+| `[PWA] Version check: server=x.x.x, client=y.y.y`            | 버전 비교 결과                      |
+| `[PWA] New version detected via version.json`                | version.json으로 새 버전 감지       |
+| `[PWA] Skipping version check - offline`                     | 오프라인 상태로 버전 체크 스킵      |
 
 ---
 

@@ -12,6 +12,10 @@
 **Enhancements:**
 
 - ⚡ **PWA 업데이트 감지 개선**:
+  - **version.json 기반 버전 체크 추가** (Service Worker와 병행)
+    - 빌드 시 `/version.json` 파일 자동 생성
+    - 앱 기동 시 서버 버전과 비교하여 업데이트 알림
+    - 5분마다 주기적으로 버전 체크
   - 앱이 포커스를 받을 때 (탭 전환, 창 활성화) 자동 업데이트 체크
   - 오프라인에서 온라인으로 복귀 시 즉시 업데이트 체크
   - 오프라인 상태에서는 업데이트 체크 스킵 (불필요한 에러 방지)
@@ -26,7 +30,8 @@
 **Technical:**
 
 - `vite.config.ts`: `skipWaiting`과 `clientsClaim` 옵션 제거 (prompt 모드 호환)
-- `usePWA.ts`: 주기적 업데이트 체크 로직 리팩토링 및 edge case 처리
+- `vite-plugin-generate-routes.ts`: 빌드 시 `version.json` 자동 생성
+- `usePWA.ts`: 버전 기반 업데이트 체크 + Service Worker 업데이트 체크 병행
 - `docs/PWA_TROUBLESHOOTING.md`: 문서 전면 개편
 
 **참고 문서:**
