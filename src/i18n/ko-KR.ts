@@ -67,11 +67,13 @@ export const koKR = {
     appReadyOffline: '앱이 오프라인에서도 사용 가능합니다',
     youAreOffline: '현재 오프라인 상태입니다',
     newVersionAvailable: '새 버전 사용 가능',
-    newVersionDescription: '새 버전의 앱을 사용할 수 있습니다. 지금 업데이트하여 최신 기능을 사용하세요.',
+    newVersionDescription:
+      '새 버전의 앱을 사용할 수 있습니다. 지금 업데이트하여 최신 기능을 사용하세요.',
     updateNow: '지금 업데이트',
     later: '나중에',
     installApp: '앱 설치',
-    installAppDescription: '빠른 접근과 오프라인 사용을 위해 이 앱을 기기에 설치하세요.',
+    installAppDescription:
+      '빠른 접근과 오프라인 사용을 위해 이 앱을 기기에 설치하세요.',
     install: '설치',
     notNow: '나중에',
   },
@@ -430,6 +432,7 @@ export const koKR = {
       noMatchesFound:
         '매치를 찾을 수 없습니다. 패턴과 테스트 텍스트를 입력해 주세요.',
       appliedPreset: '프리셋 적용됨: {name}',
+      presetApplied: '프리셋 적용됨: {name}',
       patternFeatures: '패턴 기능',
       clickToExpand: '클릭하여 펼치기',
       note: '참고',
@@ -437,6 +440,21 @@ export const koKR = {
         '이 도구는 JavaScript RegExp 엔진을 사용합니다. 복잡한 패턴에 주의하세요.',
       flagsTooltip:
         'g=전역, i=대소문자 무시, m=여러 줄, s=dotAll, u=유니코드, y=sticky',
+      // Regex spec categories
+      specCharacterClasses: 'Character Classes',
+      specCharacterClassesDesc: '특정 유형의 문자와 매치하기 위한 미리 정의된 문자 집합',
+      specQuantifiers: 'Quantifiers',
+      specQuantifiersDesc: '문자, 그룹 또는 문자 클래스가 몇 번 매치되어야 하는지 지정',
+      specAnchors: 'Anchors',
+      specAnchorsDesc: '문자를 소비하지 않고 문자열 내 위치를 검증',
+      specGroups: 'Groups',
+      specGroupsDesc: '패턴의 일부를 그룹화하고 캡처하거나 참조',
+      specCharacterSets: 'Character Sets',
+      specCharacterSetsDesc: '문자 집합 중 하나와 매치',
+      specFlags: 'Flags',
+      specFlagsDesc: '정규식의 동작을 수정',
+      specUnicode: 'Unicode Features',
+      specUnicodeDesc: 'Unicode 전용 매칭 기능',
     },
     jwtDecoder: {
       title: 'JWT Decoder',

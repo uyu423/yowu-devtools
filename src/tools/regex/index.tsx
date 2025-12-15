@@ -349,6 +349,26 @@ const RegexTool: React.FC = () => {
     await copyToClipboard(text, t('common.copiedToClipboard'));
   };
 
+  // Category key to i18n key mapping
+  const getCategoryI18n = React.useCallback((categoryKey: string): { name: string; description: string } => {
+    const categoryMap: Record<string, { nameKey: string; descKey: string }> = {
+      characterClasses: { nameKey: 'tool.regex.specCharacterClasses', descKey: 'tool.regex.specCharacterClassesDesc' },
+      quantifiers: { nameKey: 'tool.regex.specQuantifiers', descKey: 'tool.regex.specQuantifiersDesc' },
+      anchors: { nameKey: 'tool.regex.specAnchors', descKey: 'tool.regex.specAnchorsDesc' },
+      groups: { nameKey: 'tool.regex.specGroups', descKey: 'tool.regex.specGroupsDesc' },
+      characterSets: { nameKey: 'tool.regex.specCharacterSets', descKey: 'tool.regex.specCharacterSetsDesc' },
+      flags: { nameKey: 'tool.regex.specFlags', descKey: 'tool.regex.specFlagsDesc' },
+      unicode: { nameKey: 'tool.regex.specUnicode', descKey: 'tool.regex.specUnicodeDesc' },
+    };
+    const keys = categoryMap[categoryKey];
+    if (keys) {
+      return { name: t(keys.nameKey), description: t(keys.descKey) };
+    }
+    // Fallback to original category name from JSON
+    const category = regexSpecs.features[categoryKey as keyof typeof regexSpecs.features];
+    return { name: category?.name || categoryKey, description: category?.description || '' };
+  }, [t]);
+
   // Analyze pattern to detect used features
   const detectedFeatures = React.useMemo(() => {
     if (!debouncedPattern.trim()) {
@@ -358,6 +378,7 @@ const RegexTool: React.FC = () => {
     const features: Array<{
       category: string;
       categoryName: string;
+      categoryDescription: string;
       feature: {
         name: string;
         description: string;
@@ -382,9 +403,11 @@ const RegexTool: React.FC = () => {
               (f) => f.category === categoryKey && f.feature.name === patternSpec.name
             );
             if (!alreadyAdded) {
+              const categoryI18n = getCategoryI18n(categoryKey);
               features.push({
                 category: categoryKey,
-                categoryName: category.name,
+                categoryName: categoryI18n.name,
+                categoryDescription: categoryI18n.description,
                 feature: {
                   name: patternSpec.name,
                   description: patternSpec.description,
@@ -410,9 +433,11 @@ const RegexTool: React.FC = () => {
             (f) => f.category === 'flags' && f.feature.name === flagSpec.name
           );
           if (!alreadyAdded) {
+            const categoryI18n = getCategoryI18n('flags');
             features.push({
               category: 'flags',
-              categoryName: 'Flags',
+              categoryName: categoryI18n.name,
+              categoryDescription: categoryI18n.description,
               feature: {
                 name: flagSpec.name,
                 description: flagSpec.description,
@@ -425,7 +450,7 @@ const RegexTool: React.FC = () => {
     });
 
     return features;
-  }, [debouncedPattern, state.flags]);
+  }, [debouncedPattern, state.flags, getCategoryI18n]);
 
   // Build highlights array for CodeMirror decoration
   const highlights = React.useMemo(() => {
@@ -715,16 +740,20 @@ const RegexTool: React.FC = () => {
                         if (!acc[item.category]) {
                           acc[item.category] = {
                             categoryName: item.categoryName,
+                            categoryDescription: item.categoryDescription,
                             features: [],
                           };
                         }
                         acc[item.category].features.push(item.feature);
                         return acc;
-                      }, {} as Record<string, { categoryName: string; features: Array<{ name: string; description: string; example: string }> }>)
+                      }, {} as Record<string, { categoryName: string; categoryDescription: string; features: Array<{ name: string; description: string; example: string }> }>)
                     ).map(([category, data]) => (
                       <div key={category} className="text-xs">
-                        <div className="font-semibold text-blue-800 dark:text-blue-200 mb-1.5">
+                        <div className="font-semibold text-blue-800 dark:text-blue-200 mb-0.5">
                           {data.categoryName}
+                        </div>
+                        <div className="text-blue-600 dark:text-blue-400 mb-1.5 text-[11px]">
+                          {data.categoryDescription}
                         </div>
                         <div className="space-y-2 pl-2 border-l-2 border-blue-300 dark:border-blue-700">
                           {data.features.map((feature, idx) => (
