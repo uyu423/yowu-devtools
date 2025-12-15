@@ -7,6 +7,7 @@ import { EditorPanel } from '@/components/common/EditorPanel';
 import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
 import { useTitle } from '@/hooks/useTitle';
+import { useI18n } from '@/hooks/useI18nHooks';
 import { copyToClipboard } from '@/lib/clipboard';
 import { toast } from 'sonner';
 import { isMobileDevice } from '@/lib/utils';
@@ -94,7 +95,8 @@ const generateUlid = (): string => {
 };
 
 const UuidTool: React.FC = () => {
-  useTitle('UUID/ULID Generator');
+  const { t } = useI18n();
+  useTitle(t('tool.uuid.title'));
   const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } = useToolState<UuidToolState>(
     'uuid',
     DEFAULT_STATE,
@@ -143,8 +145,8 @@ const UuidTool: React.FC = () => {
   const handleCopy = async (id?: string) => {
     const textToCopy = id || generatedIds.join('\n');
     if (textToCopy) {
-      await copyToClipboard(textToCopy);
-      toast.success(id ? 'ID copied to clipboard' : 'All IDs copied to clipboard');
+      await copyToClipboard(textToCopy, t('common.copiedToClipboard'));
+      toast.success(id ? t('tool.uuid.idCopied') : t('tool.uuid.allIdsCopied'));
     }
   };
 
@@ -153,8 +155,8 @@ const UuidTool: React.FC = () => {
   return (
     <div className="flex flex-col h-full p-4 md:p-6 max-w-5xl mx-auto">
       <ToolHeader
-        title="UUID/ULID Generator"
-        description="Generate UUID v4, UUID v7, and ULID identifiers"
+        title={t('tool.uuid.title')}
+        description={t('tool.uuid.description')}
         onReset={resetState}
         onShare={async () => {
           if (isMobile) {
@@ -168,9 +170,9 @@ const UuidTool: React.FC = () => {
       {/* Options */}
       <div className="mb-4 space-y-3">
         <div className="flex flex-wrap gap-4">
-          <OptionLabel tooltip="Select ID type (UUID v4: random, UUID v7: timestamp-based, ULID: shorter timestamp-based)">
+          <OptionLabel tooltip={t('tool.uuid.typeTooltip')}>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Type
+              {t('tool.uuid.type')}
             </label>
             <select
               value={state.type}
@@ -181,15 +183,15 @@ const UuidTool: React.FC = () => {
               }
               className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="uuid-v4">UUID v4 (Random)</option>
-              <option value="uuid-v7">UUID v7 (Timestamp-based)</option>
-              <option value="ulid">ULID (Shorter timestamp-based)</option>
+              <option value="uuid-v4">{t('tool.uuid.uuidV4')}</option>
+              <option value="uuid-v7">{t('tool.uuid.uuidV7')}</option>
+              <option value="ulid">{t('tool.uuid.ulid')}</option>
             </select>
           </OptionLabel>
 
-          <OptionLabel tooltip="Number of IDs to generate (1-100)">
+          <OptionLabel tooltip={t('tool.uuid.countTooltip')}>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Count
+              {t('tool.uuid.count')}
             </label>
             <input
               type="number"
@@ -204,9 +206,9 @@ const UuidTool: React.FC = () => {
             />
           </OptionLabel>
 
-          <OptionLabel tooltip="Output format (lowercase or uppercase)">
+          <OptionLabel tooltip={t('tool.uuid.formatTooltip')}>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Format
+              {t('tool.uuid.format')}
             </label>
             <select
               value={state.format}
@@ -217,8 +219,8 @@ const UuidTool: React.FC = () => {
               }
               className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="lowercase">Lowercase</option>
-              <option value="uppercase">Uppercase</option>
+              <option value="lowercase">{t('tool.uuid.lowercase')}</option>
+              <option value="uppercase">{t('tool.uuid.uppercase')}</option>
             </select>
           </OptionLabel>
         </div>
@@ -227,7 +229,7 @@ const UuidTool: React.FC = () => {
           onClick={generateIds}
           className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors"
         >
-          Regenerate
+          {t('tool.uuid.regenerate')}
         </button>
       </div>
 
@@ -235,14 +237,14 @@ const UuidTool: React.FC = () => {
       <div className="mb-4 flex-1 min-h-0">
         <div className="flex items-center justify-between mb-2">
           <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            Generated IDs ({generatedIds.length})
+            {t('tool.uuid.generatedIds')} ({generatedIds.length})
           </label>
           {state.count === 1 && (
             <button
               onClick={() => handleCopy()}
               disabled={!outputText}
               className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              title="Copy ID"
+              title={t('common.copy')}
             >
               <Copy className="w-4 h-4" />
             </button>
@@ -253,7 +255,7 @@ const UuidTool: React.FC = () => {
             <EditorPanel
               value={outputText}
               onChange={() => {}}
-              placeholder="Generated ID will appear here..."
+              placeholder={t('tool.uuid.resultPlaceholder')}
               mode="text"
               readOnly={true}
             />
@@ -270,7 +272,7 @@ const UuidTool: React.FC = () => {
                   <button
                     onClick={() => handleCopy(id)}
                     className="ml-4 p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
-                    title="Copy ID"
+                    title={t('common.copy')}
                   >
                     <Copy className="w-4 h-4" />
                   </button>
@@ -289,7 +291,7 @@ const UuidTool: React.FC = () => {
         }}
         includedFields={shareInfo.includedFields}
         excludedFields={shareInfo.excludedFields}
-        toolName="UUID/ULID Generator"
+        toolName={t('tool.uuid.title')}
       />
     </div>
   );
@@ -317,4 +319,3 @@ export const uuidTool: ToolDefinition<UuidToolState> = {
   defaultState: DEFAULT_STATE,
   Component: UuidTool,
 };
-

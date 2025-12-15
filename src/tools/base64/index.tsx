@@ -10,6 +10,7 @@ import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useTitle } from '@/hooks/useTitle';
+import { useI18n } from '@/hooks/useI18nHooks';
 import { copyToClipboard } from '@/lib/clipboard';
 import { isMobileDevice } from '@/lib/utils';
 import { ShareModal } from '@/components/common/ShareModal';
@@ -27,7 +28,8 @@ const DEFAULT_STATE: Base64State = {
 };
 
 const Base64Tool: React.FC = () => {
-  useTitle('Base64 Converter');
+  const { t } = useI18n();
+  useTitle(t('tool.base64.title'));
   // Base64 tool state contains: input (string), mode, urlSafe
   // All fields are necessary for sharing - input may be large but required
   const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
@@ -65,8 +67,8 @@ const Base64Tool: React.FC = () => {
   return (
     <div className="flex flex-col h-full p-4 md:p-6 max-w-5xl mx-auto">
       <ToolHeader
-        title="Base64 Converter"
-        description="Encode or decode UTF-8 text, including Base64URL."
+        title={t('tool.base64.title')}
+        description={t('tool.base64.description')}
         onReset={resetState}
         onShare={async () => {
           if (isMobile) {
@@ -85,18 +87,18 @@ const Base64Tool: React.FC = () => {
         }}
         includedFields={shareInfo.includedFields}
         excludedFields={shareInfo.excludedFields}
-        toolName="Base64 Converter"
+        toolName={t('tool.base64.title')}
       />
 
       <div className="flex-1 flex flex-col gap-6">
         <EditorPanel
-          title={state.mode === 'encode' ? 'Text Input' : 'Base64 Input'}
+          title={state.mode === 'encode' ? t('tool.base64.textInput') : t('tool.base64.base64Input')}
           value={state.input}
           onChange={(val) => updateState({ input: val })}
           placeholder={
             state.mode === 'encode'
-              ? 'Type text to encode...'
-              : 'Paste Base64 string...'
+              ? t('tool.base64.textPlaceholder')
+              : t('tool.base64.base64Placeholder')
           }
           className="h-40 lg:h-56"
           status={conversion.error ? 'error' : 'default'}
@@ -116,7 +118,7 @@ const Base64Tool: React.FC = () => {
                   updateState({ mode: mode as Base64State['mode'] })
                 }
               >
-                {mode === 'encode' ? 'Encode' : 'Decode'}
+                {mode === 'encode' ? t('common.encode') : t('common.decode')}
               </button>
             ))}
           </div>
@@ -128,8 +130,8 @@ const Base64Tool: React.FC = () => {
               checked={state.urlSafe}
               onChange={(e) => updateState({ urlSafe: e.target.checked })}
             />
-            <OptionLabel tooltip="Use the URL-safe Base64 alphabet (- and _) and omit padding for link-friendly strings. This variant replaces '+' with '-' and '/' with '_', making the encoded string safe to use in URLs without additional encoding.">
-              URL Safe
+            <OptionLabel tooltip={t('tool.base64.urlSafeTooltip')}>
+              {t('tool.base64.urlSafe')}
             </OptionLabel>
           </label>
 
@@ -139,13 +141,13 @@ const Base64Tool: React.FC = () => {
             disabled={!conversion.result}
           >
             <RefreshCw className="h-4 w-4" />
-            Input/Output Swap
+            {t('tool.base64.inputOutputSwap')}
           </button>
         </ActionBar>
 
         {conversion.error && (
           <ErrorBanner
-            message="Base64 conversion failed"
+            message={t('tool.base64.conversionFailed')}
             details={conversion.error}
           />
         )}
@@ -153,16 +155,16 @@ const Base64Tool: React.FC = () => {
         <div className="flex flex-col">
           <div className="flex items-center justify-between px-3 py-1.5 border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-900 shrink-0 rounded-t-md border border-b-0">
             <span className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-              Result
+              {t('common.result')}
             </span>
             <button
               onClick={() =>
                 conversion.result &&
-                copyToClipboard(conversion.result, 'Copied result.')
+                copyToClipboard(conversion.result, t('common.copiedResult'))
               }
               disabled={!conversion.result}
               className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              title="Copy Result"
+              title={t('common.copy')}
             >
               <Copy className="w-4 h-4" />
             </button>
@@ -171,7 +173,7 @@ const Base64Tool: React.FC = () => {
             title=""
             value={conversion.result}
             readOnly
-            placeholder="Result will appear here..."
+            placeholder={t('tool.base64.resultPlaceholder')}
             className="h-40 lg:h-56 rounded-t-none"
             status={conversion.error ? 'error' : 'success'}
           />

@@ -9,6 +9,7 @@ import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useTitle } from '@/hooks/useTitle';
+import { useI18n } from '@/hooks/useI18nHooks';
 import { copyToClipboard } from '@/lib/clipboard';
 import { toast } from 'sonner';
 import { isMobileDevice } from '@/lib/utils';
@@ -71,6 +72,7 @@ interface PresetSelectorProps {
 }
 
 const PresetSelector: React.FC<PresetSelectorProps> = ({ onSelect }) => {
+  const { t } = useI18n();
   const [isOpen, setIsOpen] = React.useState(false);
   const buttonRef = React.useRef<HTMLButtonElement>(null);
   const menuRef = React.useRef<HTMLDivElement>(null);
@@ -94,9 +96,9 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({ onSelect }) => {
   }, [isOpen]);
 
   const categories = [
-    { id: 'validation', name: 'Validation', presets: REGEX_PRESETS.filter(p => p.category === 'validation') },
-    { id: 'extraction', name: 'Extraction', presets: REGEX_PRESETS.filter(p => p.category === 'extraction') },
-    { id: 'formatting', name: 'Formatting', presets: REGEX_PRESETS.filter(p => p.category === 'formatting') },
+    { id: 'validation', name: t('tool.regex.validation'), presets: REGEX_PRESETS.filter(p => p.category === 'validation') },
+    { id: 'extraction', name: t('tool.regex.extraction'), presets: REGEX_PRESETS.filter(p => p.category === 'extraction') },
+    { id: 'formatting', name: t('tool.regex.formatting'), presets: REGEX_PRESETS.filter(p => p.category === 'formatting') },
   ];
 
   return (
@@ -107,7 +109,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({ onSelect }) => {
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors"
       >
-        <span>Presets</span>
+        <span>{t('tool.regex.presets')}</span>
         <ChevronDown className={cn('w-3 h-3 transition-transform', isOpen && 'rotate-180')} />
       </button>
 
@@ -157,7 +159,8 @@ interface MatchResult {
 }
 
 const RegexTool: React.FC = () => {
-  useTitle('Regex Tester');
+  const { t } = useI18n();
+  useTitle(t('tool.regex.title'));
   const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } = useToolState<RegexToolState>(
     'regex',
     DEFAULT_STATE,
@@ -321,14 +324,14 @@ const RegexTool: React.FC = () => {
           setReplaceResult('');
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Invalid regular expression');
+        setError(err instanceof Error ? err.message : t('tool.regex.invalidRegex'));
         setMatches([]);
         setReplaceResult('');
       }
     }, 100);
 
     return () => clearTimeout(timeoutId);
-  }, [debouncedPattern, debouncedText, state.flags, state.replacementEnabled, state.replacement, state.replaceMode, buildFlagsString]);
+  }, [debouncedPattern, debouncedText, state.flags, state.replacementEnabled, state.replacement, state.replaceMode, buildFlagsString, t]);
 
   // Sync replaceMode with g flag
   React.useEffect(() => {
@@ -343,8 +346,7 @@ const RegexTool: React.FC = () => {
   // CodeMirror doesn't easily support programmatic scrolling to match positions
 
   const handleCopy = async (text: string) => {
-    await copyToClipboard(text);
-    toast.success('Copied to clipboard');
+    await copyToClipboard(text, t('common.copiedToClipboard'));
   };
 
   // Analyze pattern to detect used features
@@ -491,8 +493,8 @@ const RegexTool: React.FC = () => {
   return (
     <div className="flex flex-col h-full p-4 md:p-6 max-w-[90rem] mx-auto">
       <ToolHeader
-        title="Regex Tester"
-        description="Test and visualize regular expressions with match highlighting and replacement preview"
+        title={t('tool.regex.title')}
+        description={t('tool.regex.description')}
         onReset={resetState}
         onShare={async () => {
           if (isMobile) {
@@ -513,7 +515,7 @@ const RegexTool: React.FC = () => {
           <div className="mb-4">
             <div className="flex items-center justify-between mb-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Pattern
+                {t('tool.regex.pattern')}
               </label>
               <PresetSelector
                 onSelect={(preset) => {
@@ -527,7 +529,7 @@ const RegexTool: React.FC = () => {
                   if (preset.exampleText) {
                     updateState({ text: preset.exampleText });
                   }
-                  toast.success(`Applied preset: ${preset.name}`);
+                  toast.success(t('tool.regex.presetApplied').replace('{name}', preset.name));
                 }}
               />
             </div>
@@ -535,16 +537,16 @@ const RegexTool: React.FC = () => {
               type="text"
               value={state.pattern}
               onChange={(e) => updateState({ pattern: e.target.value })}
-              placeholder="Enter regular expression pattern..."
+              placeholder={t('tool.regex.patternPlaceholder')}
               className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
             />
           </div>
 
           {/* Flags */}
           <div className="mb-4">
-            <OptionLabel tooltip="Regular expression flags. g=global, i=ignore case, m=multiline, s=dotAll, u=unicode, y=sticky">
+            <OptionLabel tooltip={t('tool.regex.flagsTooltip')}>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Flags
+                {t('tool.regex.flags')}
               </label>
             </OptionLabel>
             <div className="flex flex-wrap gap-2">
@@ -587,13 +589,13 @@ const RegexTool: React.FC = () => {
           {/* Test Text */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Test Text
+              {t('tool.regex.testText')}
             </label>
             <div className="h-64 flex-shrink-0">
               <EditorPanel
                 value={state.text}
                 onChange={(value) => updateState({ text: value })}
-                placeholder="Enter text to test against the pattern..."
+                placeholder={t('tool.regex.testTextPlaceholder')}
                 mode="text"
                 readOnly={false}
                 highlights={highlights}
@@ -612,7 +614,7 @@ const RegexTool: React.FC = () => {
                   onChange={(e) => updateState({ replacementEnabled: e.target.checked })}
                   className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                 />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Replacement Preview</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('tool.regex.replacementPreview')}</span>
               </label>
               {state.replacementEnabled && (
                 <div className="flex gap-2">
@@ -625,7 +627,7 @@ const RegexTool: React.FC = () => {
                       disabled={state.flags.g}
                       className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                     />
-                    <span className="text-xs text-gray-700 dark:text-gray-300">First</span>
+                    <span className="text-xs text-gray-700 dark:text-gray-300">{t('tool.regex.replaceFirst')}</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -635,7 +637,7 @@ const RegexTool: React.FC = () => {
                       onChange={() => updateState({ replaceMode: 'all' })}
                       className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                     />
-                    <span className="text-xs text-gray-700 dark:text-gray-300">All</span>
+                    <span className="text-xs text-gray-700 dark:text-gray-300">{t('tool.regex.replaceAll')}</span>
                   </label>
                 </div>
               )}
@@ -647,7 +649,7 @@ const RegexTool: React.FC = () => {
                     type="text"
                     value={state.replacement}
                     onChange={(e) => updateState({ replacement: e.target.value })}
-                    placeholder="Enter replacement string (use $1, $2, $<name> for groups)..."
+                    placeholder={t('tool.regex.replacementPlaceholder')}
                     className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
                   />
                 </div>
@@ -655,12 +657,12 @@ const RegexTool: React.FC = () => {
                   <div className="h-32">
                     <div className="flex items-center justify-between mb-2">
                       <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Replacement Result
+                        {t('tool.regex.replacementResult')}
                       </label>
                       <button
                         onClick={() => handleCopy(replaceResult)}
                         className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
-                        title="Copy result"
+                        title={t('common.copy')}
                       >
                         <Copy className="w-4 h-4" />
                       </button>
@@ -668,7 +670,7 @@ const RegexTool: React.FC = () => {
                     <EditorPanel
                       value={replaceResult}
                       onChange={() => {}} // Read-only
-                      placeholder="Replacement result will appear here..."
+                      placeholder={t('tool.regex.replacementResultPlaceholder')}
                       mode="text"
                       readOnly={true}
                     />
@@ -681,7 +683,7 @@ const RegexTool: React.FC = () => {
           {/* Security Note */}
           <div className="mb-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              <strong className="text-gray-700 dark:text-gray-300">Note:</strong> This tool uses JavaScript RegExp engine. Be cautious with complex patterns that may cause backtracking issues.
+              <strong className="text-gray-700 dark:text-gray-300">{t('tool.regex.note')}:</strong> {t('tool.regex.securityNote')}
             </p>
           </div>
 
@@ -692,10 +694,10 @@ const RegexTool: React.FC = () => {
                 <summary className="flex items-center gap-2 cursor-pointer list-none p-2.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors">
                   <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
                   <span className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                    Pattern Features ({detectedFeatures.length})
+                    {t('tool.regex.patternFeatures')} ({detectedFeatures.length})
                   </span>
                   <span className="ml-auto text-xs text-blue-600 dark:text-blue-400 group-open:hidden">
-                    Click to expand
+                    {t('tool.regex.clickToExpand')}
                   </span>
                   <svg 
                     className="w-4 h-4 text-blue-600 dark:text-blue-400 transition-transform group-open:rotate-180" 
@@ -752,7 +754,7 @@ const RegexTool: React.FC = () => {
             <>
               <div className="flex items-center justify-between mb-2">
                 <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Matches ({matches.length})
+                  {t('tool.regex.matches')} ({matches.length})
                 </label>
               </div>
               <div className="flex-1 min-h-0 overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800">
@@ -766,19 +768,19 @@ const RegexTool: React.FC = () => {
                     )}
                   >
                     <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                      Match #{index + 1} at index {match.index} (length: {match.match.length})
+                      {t('tool.regex.matchNumber').replace('{n}', String(index + 1))} at index {match.index} (length: {match.match.length})
                     </div>
                     <div className="text-sm font-mono text-gray-900 dark:text-gray-100 break-all">
                       {match.match}
                     </div>
                     {match.groups.some((g) => g !== undefined) && (
                       <div className="mt-1 text-xs text-gray-600 dark:text-gray-400">
-                        Groups: {match.groups.filter((g) => g !== undefined).map((g, i) => `$${i + 1}=${g}`).join(', ')}
+                        {t('tool.regex.groups')}: {match.groups.filter((g) => g !== undefined).map((g, i) => `$${i + 1}=${g}`).join(', ')}
                       </div>
                     )}
                     {Object.keys(match.namedGroups).length > 0 && (
                       <div className="mt-1 text-xs text-gray-600 dark:text-gray-400">
-                        Named: {Object.entries(match.namedGroups).map(([name, value]) => `$${name}=${value}`).join(', ')}
+                        {t('tool.regex.named')}: {Object.entries(match.namedGroups).map(([name, value]) => `$${name}=${value}`).join(', ')}
                       </div>
                     )}
                   </div>
@@ -788,7 +790,7 @@ const RegexTool: React.FC = () => {
           ) : (
             <div className="flex-1 min-h-0 flex items-center justify-center border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800">
               <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
-                  No matches found. Enter a pattern and test text to see results.
+                {t('tool.regex.noMatches')}
               </p>
             </div>
           )}
@@ -804,7 +806,7 @@ const RegexTool: React.FC = () => {
         }}
         includedFields={shareInfo.includedFields}
         excludedFields={shareInfo.excludedFields}
-        toolName="Regex Tester"
+        toolName={t('tool.regex.title')}
       />
     </div>
   );
@@ -830,4 +832,3 @@ export const regexTool: ToolDefinition<RegexToolState> = {
   defaultState: DEFAULT_STATE,
   Component: RegexTool,
 };
-

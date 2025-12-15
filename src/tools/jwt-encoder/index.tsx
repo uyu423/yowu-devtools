@@ -7,6 +7,7 @@ import { EditorPanel } from '@/components/common/EditorPanel';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
 import { useToolState } from '@/hooks/useToolState';
 import { useTitle } from '@/hooks/useTitle';
+import { useI18n } from '@/hooks/useI18nHooks';
 import { copyToClipboard } from '@/lib/clipboard';
 import { isMobileDevice } from '@/lib/utils';
 import { ShareModal } from '@/components/common/ShareModal';
@@ -27,13 +28,14 @@ const DEFAULT_STATE: JwtEncoderState = {
 };
 
 const JwtEncoderTool: React.FC = () => {
+  const { t } = useI18n();
   const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
     useToolState<JwtEncoderState>('jwt-encoder', DEFAULT_STATE);
   const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
   const shareInfo = getShareStateInfo();
   const isMobile = isMobileDevice();
   
-  useTitle('JWT Encoder');
+  useTitle(t('tool.jwtEncoder.title'));
 
   // Encoding logic
   const encodedToken = useMemo((): string | null => {
@@ -150,33 +152,33 @@ const JwtEncoderTool: React.FC = () => {
     try {
       JSON.parse(state.headerJson);
     } catch {
-      return 'Invalid JSON in header';
+      return t('tool.jwtEncoder.invalidHeaderJson');
     }
 
     try {
       JSON.parse(state.payloadJson);
     } catch {
-      return 'Invalid JSON in payload';
+      return t('tool.jwtEncoder.invalidPayloadJson');
     }
 
     if (state.algorithm !== 'none' && !state.secretKey) {
-      return 'Secret key is required for signing';
+      return t('tool.jwtEncoder.secretKeyRequired');
     }
 
     return null;
-  }, [state.headerJson, state.payloadJson, state.algorithm, state.secretKey]);
+  }, [state.headerJson, state.payloadJson, state.algorithm, state.secretKey, t]);
 
   const handleCopyToken = () => {
     if (finalToken) {
-      copyToClipboard(finalToken);
+      copyToClipboard(finalToken, t('common.copiedToClipboard'));
     }
   };
 
   return (
     <div className="flex flex-col h-full p-4 md:p-6 max-w-5xl mx-auto">
       <ToolHeader
-        title="JWT Encoder"
-        description="Encode JSON Web Tokens from header and payload."
+        title={t('tool.jwtEncoder.title')}
+        description={t('tool.jwtEncoder.description')}
         onReset={resetState}
         onShare={async () => {
           if (isMobile) {
@@ -192,7 +194,7 @@ const JwtEncoderTool: React.FC = () => {
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Header (JSON)
+              {t('tool.jwtEncoder.headerJson')}
             </label>
           </div>
           <EditorPanel
@@ -209,7 +211,7 @@ const JwtEncoderTool: React.FC = () => {
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Payload (JSON)
+              {t('tool.jwtEncoder.payloadJson')}
             </label>
           </div>
           <EditorPanel
@@ -225,9 +227,9 @@ const JwtEncoderTool: React.FC = () => {
         {/* Algorithm Selection */}
         <div className="flex flex-col gap-2">
           <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            Algorithm
+            {t('tool.jwtEncoder.algorithm')}
             <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
-              (updates header.alg)
+              ({t('tool.jwtEncoder.updatesHeaderAlg')})
             </span>
           </label>
           <select
@@ -246,7 +248,7 @@ const JwtEncoderTool: React.FC = () => {
             }}
             className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-gray-100"
           >
-            <option value="none">None (unsigned)</option>
+            <option value="none">{t('tool.jwtEncoder.noneUnsigned')}</option>
             <option value="HS256">HS256</option>
             <option value="HS384">HS384</option>
             <option value="HS512">HS512</option>
@@ -257,13 +259,13 @@ const JwtEncoderTool: React.FC = () => {
         {state.algorithm !== 'none' && (
           <div className="flex flex-col gap-2">
             <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Secret Key
+              {t('tool.jwtEncoder.secretKey')}
             </label>
             <input
               type="text"
               value={state.secretKey}
               onChange={(e) => updateState({ secretKey: e.target.value })}
-              placeholder="Enter secret key for signing"
+              placeholder={t('tool.jwtEncoder.secretKeyPlaceholder')}
               className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-gray-100"
             />
           </div>
@@ -276,12 +278,12 @@ const JwtEncoderTool: React.FC = () => {
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Encoded JWT Token
+                {t('tool.jwtEncoder.encodedJwtToken')}
               </label>
               <button
                 onClick={handleCopyToken}
                 className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
-                title="Copy Token"
+                title={t('common.copy')}
               >
                 <Copy className="w-4 h-4" />
               </button>
@@ -306,7 +308,7 @@ const JwtEncoderTool: React.FC = () => {
         }}
         includedFields={shareInfo.includedFields}
         excludedFields={shareInfo.excludedFields}
-        toolName="JWT Encoder"
+        toolName={t('tool.jwtEncoder.title')}
         isSensitive={true}
       />
     </div>
@@ -324,4 +326,3 @@ export const jwtEncoderTool: ToolDefinition<JwtEncoderState> = {
   defaultState: DEFAULT_STATE,
   Component: JwtEncoderTool,
 };
-

@@ -12,6 +12,7 @@ import { getMimeType } from '@/lib/fileUtils';
 import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
 import { useTitle } from '@/hooks/useTitle';
+import { useI18n } from '@/hooks/useI18nHooks';
 import { useWebWorker, shouldUseWorkerForText } from '@/hooks/useWebWorker';
 import { copyToClipboard } from '@/lib/clipboard';
 import { isMobileDevice } from '@/lib/utils';
@@ -31,7 +32,8 @@ const DEFAULT_STATE: YamlToolState = {
 };
 
 const YamlTool: React.FC = () => {
-  useTitle('YAML Converter');
+  const { t } = useI18n();
+  useTitle(t('tool.yaml.title'));
   // YAML tool state contains: source (input string), direction, indent
   // All fields are necessary for sharing - input may be large but required
   const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
@@ -130,8 +132,8 @@ const YamlTool: React.FC = () => {
   return (
     <div className="flex flex-col h-full p-4 md:p-6 max-w-[90rem] mx-auto">
       <ToolHeader
-        title="YAML ↔ JSON"
-        description="Convert both directions and inspect parse errors quickly."
+        title={t('tool.yaml.title')}
+        description={t('tool.yaml.description')}
         onReset={resetState}
         onShare={async () => {
           if (isMobile) {
@@ -146,7 +148,7 @@ const YamlTool: React.FC = () => {
         <div className="flex-1 flex flex-col min-h-0">
           <EditorPanel
             title={
-              state.direction === 'yaml2json' ? 'YAML Input' : 'JSON Input'
+              state.direction === 'yaml2json' ? t('tool.yaml.yamlInput') : t('tool.yaml.jsonInput')
             }
             value={state.source}
             onChange={(val) => updateState({ source: val })}
@@ -169,7 +171,7 @@ const YamlTool: React.FC = () => {
           <button
             onClick={handleSwap}
             className="p-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors"
-            title="Switch Direction"
+            title={t('tool.yaml.switchDirection')}
             disabled={!!conversion.error || !conversion.output || isProcessing}
           >
             <ArrowRightLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
@@ -179,23 +181,23 @@ const YamlTool: React.FC = () => {
           {isProcessing && (
             <div className="flex items-center gap-2 p-4 text-sm text-gray-600 dark:text-gray-400">
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 dark:border-gray-600 border-t-blue-600 dark:border-t-blue-400"></div>
-              Converting large file...
+              {t('tool.yaml.convertingLargeFile')}
             </div>
           )}
           {!isProcessing && (
             <div className="flex flex-col h-full">
               <div className="flex items-center justify-between px-3 py-1.5 border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-900 shrink-0">
                 <span className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                  {state.direction === 'yaml2json' ? 'JSON Output' : 'YAML Output'}
+                  {state.direction === 'yaml2json' ? t('tool.yaml.jsonOutput') : t('tool.yaml.yamlOutput')}
                 </span>
                 <button
                   onClick={() =>
                     conversion.output &&
-                    copyToClipboard(conversion.output, 'Copied output.')
+                    copyToClipboard(conversion.output, t('tool.yaml.copiedOutput'))
                   }
                   disabled={!conversion.output || !!conversion.error}
                   className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  title="Copy Output"
+                  title={t('common.copy')}
                 >
                   <Copy className="w-4 h-4" />
                 </button>
@@ -224,15 +226,15 @@ const YamlTool: React.FC = () => {
       {!isProcessing && conversion.error && (
         <ErrorBanner
           className="mt-4"
-          message="Conversion failed"
+          message={t('tool.yaml.conversionFailed')}
           details={conversion.error}
         />
       )}
 
       <ActionBar className="mt-4 flex-wrap items-center justify-between">
         <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-          <OptionLabel tooltip="Adjust the indentation width used when formatting converted output. This controls how many spaces are used for each level of nesting in the converted YAML or JSON.">
-            Indent
+          <OptionLabel tooltip={t('tool.yaml.indentTooltip')}>
+            {t('common.indent')}
           </OptionLabel>
           <select
             className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-2 py-1"
@@ -241,8 +243,8 @@ const YamlTool: React.FC = () => {
               updateState({ indent: Number(e.target.value) as 2 | 4 })
             }
           >
-            <option value={2}>2 spaces</option>
-            <option value={4}>4 spaces</option>
+            <option value={2}>{t('common.spaces2')}</option>
+            <option value={4}>{t('common.spaces4')}</option>
           </select>
         </label>
         <div className="flex flex-wrap gap-2">
@@ -253,7 +255,7 @@ const YamlTool: React.FC = () => {
             disabled={!conversion.output || !!conversion.error}
             className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
           >
-            Download
+            {t('common.download')}
           </FileDownload>
         </div>
       </ActionBar>
@@ -266,7 +268,7 @@ const YamlTool: React.FC = () => {
         }}
         includedFields={shareInfo.includedFields}
         excludedFields={shareInfo.excludedFields}
-        toolName="YAML Converter"
+        toolName={t('tool.yaml.title')}
       />
     </div>
   );

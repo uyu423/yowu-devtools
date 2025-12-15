@@ -7,6 +7,7 @@ import { EditorPanel } from '@/components/common/EditorPanel';
 import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
 import { useTitle } from '@/hooks/useTitle';
+import { useI18n } from '@/hooks/useI18nHooks';
 import { copyToClipboard } from '@/lib/clipboard';
 import { toast } from 'sonner';
 import { cn, isMobileDevice } from '@/lib/utils';
@@ -53,19 +54,6 @@ function calculateStrength(password: string, charsetSize: number): StrengthLevel
   if (entropy < 40) return 'medium';
   if (entropy < 60) return 'strong';
   return 'very-strong';
-}
-
-function getStrengthLabel(strength: StrengthLevel): string {
-  switch (strength) {
-    case 'weak':
-      return 'Weak';
-    case 'medium':
-      return 'Medium';
-    case 'strong':
-      return 'Strong';
-    case 'very-strong':
-      return 'Very Strong';
-  }
 }
 
 function getStrengthColor(strength: StrengthLevel): string {
@@ -139,7 +127,8 @@ function generatePassword(state: PasswordToolState): string {
 }
 
 const PasswordTool: React.FC = () => {
-  useTitle('Password Generator');
+  const { t } = useI18n();
+  useTitle(t('tool.password.title'));
   const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } = useToolState<PasswordToolState>(
     'password',
     DEFAULT_STATE,
@@ -193,14 +182,14 @@ const PasswordTool: React.FC = () => {
       
       // Validate at least one character type is selected
       if (!state.includeUppercase && !state.includeLowercase && !state.includeNumbers && !state.includeSymbols) {
-        setError('At least one character type must be selected');
+        setError(t('tool.password.atLeastOneCharType'));
         setPasswords([]);
         return;
       }
       
       // Validate length
       if (state.length < 4 || state.length > 128) {
-        setError('Password length must be between 4 and 128');
+        setError(t('tool.password.lengthError'));
         setPasswords([]);
         return;
       }
@@ -211,10 +200,10 @@ const PasswordTool: React.FC = () => {
       }
       setPasswords(generated);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to generate password');
+      setError(err instanceof Error ? err.message : t('tool.password.failedToGenerate'));
       setPasswords([]);
     }
-  }, [state]);
+  }, [state, t]);
 
   // Auto-generate on mount and when options change
   React.useEffect(() => {
@@ -224,19 +213,32 @@ const PasswordTool: React.FC = () => {
   const handleCopy = async (password?: string) => {
     const textToCopy = password || passwords.join('\n');
     if (textToCopy) {
-      await copyToClipboard(textToCopy);
-      toast.success(password ? 'Password copied to clipboard' : 'All passwords copied to clipboard');
+      await copyToClipboard(textToCopy, t('common.copiedToClipboard'));
+      toast.success(password ? t('tool.password.passwordCopied') : t('tool.password.allPasswordsCopied'));
     }
   };
 
   const charsetSize = getCharsetSize();
   const strength = passwords.length > 0 && passwords[0] ? calculateStrength(passwords[0], charsetSize) : null;
 
+  const getStrengthLabel = (s: StrengthLevel): string => {
+    switch (s) {
+      case 'weak':
+        return t('tool.password.weak');
+      case 'medium':
+        return t('tool.password.medium');
+      case 'strong':
+        return t('tool.password.strong');
+      case 'very-strong':
+        return t('tool.password.veryStrong');
+    }
+  };
+
   return (
     <div className="flex flex-col h-full p-4 md:p-6 max-w-5xl mx-auto">
       <ToolHeader
-        title="Password Generator"
-        description="Generate secure passwords with customizable options"
+        title={t('tool.password.title')}
+        description={t('tool.password.description')}
         onReset={resetState}
         onShare={async () => {
           if (isMobile) {
@@ -251,9 +253,9 @@ const PasswordTool: React.FC = () => {
       <div className="mb-4 space-y-4">
         {/* Length */}
         <div>
-          <OptionLabel tooltip="Password length (4-128 characters)">
+          <OptionLabel tooltip={t('tool.password.lengthTooltip')}>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Length: {state.length}
+              {t('tool.password.length')}: {state.length}
             </label>
             <div className="flex items-center gap-4">
               <input
@@ -285,7 +287,7 @@ const PasswordTool: React.FC = () => {
         {/* Character Types */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Character Types
+            {t('tool.password.characterTypes')}
           </label>
           <div className="flex flex-wrap gap-4">
             <label className="flex items-center gap-2 cursor-pointer">
@@ -295,7 +297,7 @@ const PasswordTool: React.FC = () => {
                 onChange={(e) => updateState({ includeUppercase: e.target.checked })}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
-              <span className="text-sm text-gray-700 dark:text-gray-300">Uppercase (A-Z)</span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">{t('tool.password.uppercase')}</span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -304,7 +306,7 @@ const PasswordTool: React.FC = () => {
                 onChange={(e) => updateState({ includeLowercase: e.target.checked })}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
-              <span className="text-sm text-gray-700 dark:text-gray-300">Lowercase (a-z)</span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">{t('tool.password.lowercase')}</span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -313,7 +315,7 @@ const PasswordTool: React.FC = () => {
                 onChange={(e) => updateState({ includeNumbers: e.target.checked })}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
-              <span className="text-sm text-gray-700 dark:text-gray-300">Numbers (0-9)</span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">{t('tool.password.numbers')}</span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -322,7 +324,7 @@ const PasswordTool: React.FC = () => {
                 onChange={(e) => updateState({ includeSymbols: e.target.checked })}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
-              <span className="text-sm text-gray-700 dark:text-gray-300">Symbols (!@#$...)</span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">{t('tool.password.symbols')}</span>
             </label>
           </div>
         </div>
@@ -330,7 +332,7 @@ const PasswordTool: React.FC = () => {
         {/* Exclusion Options */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Exclusion Options
+            {t('tool.password.exclusionOptions')}
           </label>
           <div className="flex flex-wrap gap-4">
             <label className="flex items-center gap-2 cursor-pointer">
@@ -341,7 +343,7 @@ const PasswordTool: React.FC = () => {
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
               <span className="text-sm text-gray-700 dark:text-gray-300">
-                Exclude similar characters (i, l, 1, L, o, 0, O)
+                {t('tool.password.excludeSimilar')}
               </span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
@@ -352,7 +354,7 @@ const PasswordTool: React.FC = () => {
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
               <span className="text-sm text-gray-700 dark:text-gray-300">
-                Exclude ambiguous symbols ({AMBIGUOUS_SYMBOLS})
+                {t('tool.password.excludeAmbiguous')} ({AMBIGUOUS_SYMBOLS})
               </span>
             </label>
           </div>
@@ -360,9 +362,9 @@ const PasswordTool: React.FC = () => {
 
         {/* Count */}
         <div className="flex items-center gap-4">
-          <OptionLabel tooltip="Number of passwords to generate (1-20)">
+          <OptionLabel tooltip={t('tool.password.countTooltip')}>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Count
+              {t('tool.password.count')}
             </label>
             <input
               type="number"
@@ -381,7 +383,7 @@ const PasswordTool: React.FC = () => {
             onClick={generatePasswords}
             className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors mt-6"
           >
-            Regenerate
+            {t('tool.password.regenerate')}
           </button>
         </div>
       </div>
@@ -398,11 +400,11 @@ const PasswordTool: React.FC = () => {
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-3">
             <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Generated Passwords ({passwords.length})
+              {t('tool.password.generatedPasswords')} ({passwords.length})
             </label>
             {strength && state.count === 1 && (
               <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-500 dark:text-gray-400">Strength:</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">{t('tool.password.strength')}:</span>
                 <div className="flex items-center gap-2">
                   <div className={cn('w-2 h-2 rounded-full', getStrengthColor(strength))} />
                   <span className={cn(
@@ -422,7 +424,7 @@ const PasswordTool: React.FC = () => {
             <button
               onClick={() => handleCopy()}
               className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
-              title="Copy password"
+              title={t('common.copy')}
             >
               <Copy className="w-4 h-4" />
             </button>
@@ -433,7 +435,7 @@ const PasswordTool: React.FC = () => {
             <EditorPanel
               value={passwords[0] || ''}
               onChange={() => {}}
-              placeholder="Generated password will appear here..."
+              placeholder={t('tool.password.resultPlaceholder')}
               mode="text"
               readOnly={true}
             />
@@ -466,7 +468,7 @@ const PasswordTool: React.FC = () => {
                     <button
                       onClick={() => handleCopy(password)}
                       className="ml-4 p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors shrink-0"
-                      title="Copy password"
+                      title={t('common.copy')}
                     >
                       <Copy className="w-4 h-4" />
                     </button>
@@ -486,7 +488,7 @@ const PasswordTool: React.FC = () => {
         }}
         includedFields={shareInfo.includedFields}
         excludedFields={shareInfo.excludedFields}
-        toolName="Password Generator"
+        toolName={t('tool.password.title')}
       />
     </div>
   );
@@ -514,4 +516,3 @@ export const passwordTool: ToolDefinition<PasswordToolState> = {
   defaultState: DEFAULT_STATE,
   Component: PasswordTool,
 };
-

@@ -16,6 +16,7 @@ import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useTitle } from '@/hooks/useTitle';
 import { useResolvedTheme } from '@/hooks/useThemeHooks';
 import { useWebWorker, shouldUseWorkerForText } from '@/hooks/useWebWorker';
+import { useI18n } from '@/hooks/useI18nHooks';
 import { copyToClipboard } from '@/lib/clipboard';
 import { isMobileDevice } from '@/lib/utils';
 import { JsonView, defaultStyles } from 'react-json-view-lite';
@@ -40,7 +41,8 @@ const DEFAULT_STATE: JsonToolState = {
 };
 
 const JsonTool: React.FC = () => {
-  useTitle('JSON Viewer');
+  const { t } = useI18n();
+  useTitle(t('tool.json.title'));
   const resolvedTheme = useResolvedTheme();
   const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
     useToolState<JsonToolState>('json', DEFAULT_STATE, {
@@ -183,8 +185,8 @@ const JsonTool: React.FC = () => {
   return (
     <div className="flex h-full flex-col p-4 md:p-6 max-w-[90rem] mx-auto overflow-hidden">
       <ToolHeader
-        title="JSON Pretty Viewer"
-        description="Format JSON instantly and explore the structure as a tree."
+        title={t('tool.json.title')}
+        description={t('tool.json.description')}
         onReset={resetState}
         onShare={async () => {
           if (isMobile) {
@@ -205,7 +207,7 @@ const JsonTool: React.FC = () => {
         }}
         includedFields={shareInfo.includedFields}
         excludedFields={shareInfo.excludedFields}
-        toolName="JSON Viewer"
+        toolName={t('tool.json.title')}
       />
 
       <div className="flex flex-col gap-6 lg:flex-row flex-1 min-h-0 overflow-hidden">
@@ -213,10 +215,10 @@ const JsonTool: React.FC = () => {
           <div className="mb-3 flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400 shrink-0">
             <label className="flex items-center gap-2">
               <OptionLabel
-                tooltip="Choose how many spaces to use when pretty-printing JSON output. This affects the indentation level in formatted JSON views."
+                tooltip={t('tool.json.indentTooltip')}
                 className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
               >
-                Indent
+                {t('common.indent')}
               </OptionLabel>
               <select
                 className="rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-2 py-1 text-sm"
@@ -225,8 +227,8 @@ const JsonTool: React.FC = () => {
                   updateState({ indent: Number(e.target.value) as 2 | 4 })
                 }
               >
-                <option value={2}>2 spaces</option>
-                <option value={4}>4 spaces</option>
+                <option value={2}>{t('common.spaces2')}</option>
+                <option value={4}>{t('common.spaces4')}</option>
               </select>
             </label>
 
@@ -237,17 +239,17 @@ const JsonTool: React.FC = () => {
                 onChange={(e) => updateState({ sortKeys: e.target.checked })}
                 className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-500 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-0 cursor-pointer"
               />
-              <OptionLabel tooltip="Order object keys alphabetically before formatting or rendering the view. This ensures consistent key ordering regardless of the original JSON structure.">
-                Sort keys
+              <OptionLabel tooltip={t('tool.json.sortKeysTooltip')}>
+                {t('tool.json.sortKeys')}
               </OptionLabel>
             </label>
 
             <label className="flex items-center gap-2">
               <OptionLabel
-                tooltip="Control how many nesting levels automatically expand in the tree view. Set to '∞' for unlimited depth to expand all nested objects and arrays automatically."
+                tooltip={t('tool.json.treeDepthTooltip')}
                 className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
               >
-                Tree Depth
+                {t('tool.json.treeDepth')}
               </OptionLabel>
               <input
                 type="range"
@@ -280,8 +282,8 @@ const JsonTool: React.FC = () => {
                 }`}
                 title={
                   state.expandLevel === Infinity
-                    ? 'Set to level 6'
-                    : 'Expand all levels'
+                    ? t('tool.json.setToLevel').replace('{n}', '6')
+                    : t('tool.json.expandAllLevels')
                 }
               >
                 ∞
@@ -291,11 +293,11 @@ const JsonTool: React.FC = () => {
 
           <div className="flex-1 min-h-0 flex flex-col">
             <EditorPanel
-              title="Input JSON"
+              title={t('tool.json.inputTitle')}
               value={state.input}
               onChange={(val) => updateState({ input: val })}
               mode="json"
-              placeholder='{"key": "value"}'
+              placeholder={t('tool.json.inputPlaceholder')}
               status={
                 !hasInput ? 'default' : parseResult.error ? 'error' : 'success'
               }
@@ -318,9 +320,9 @@ const JsonTool: React.FC = () => {
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2 shrink-0">
             <div className="flex gap-1 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 p-1 text-sm font-medium shadow-sm">
               {[
-                { key: 'tree', label: 'Tree', icon: ListTree },
-                { key: 'pretty', label: 'Pretty', icon: Rows4 },
-                { key: 'minified', label: 'Minified', icon: Text },
+                { key: 'tree', label: t('tool.json.viewTree'), icon: ListTree },
+                { key: 'pretty', label: t('tool.json.viewPretty'), icon: Rows4 },
+                { key: 'minified', label: t('tool.json.viewMinified'), icon: Text },
               ].map(({ key, label, icon: Icon }) => (
                 <button
                   key={key}
@@ -342,7 +344,7 @@ const JsonTool: React.FC = () => {
               type="text"
               value={state.search}
               onChange={(e) => updateState({ search: e.target.value })}
-              placeholder="Search..."
+              placeholder={t('tool.json.searchPlaceholder')}
               className="h-9 w-full max-w-xs rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 text-sm placeholder-gray-400 dark:placeholder-gray-500"
             />
           </div>
@@ -351,7 +353,7 @@ const JsonTool: React.FC = () => {
             {!hasInput && (
               <div className="p-4">
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Paste JSON on the left to preview the result.
+                  {t('tool.json.pasteJsonHint')}
                 </p>
               </div>
             )}
@@ -359,14 +361,14 @@ const JsonTool: React.FC = () => {
               <div className="p-4">
                 <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                   <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 dark:border-gray-600 border-t-blue-600 dark:border-t-blue-400"></div>
-                  Processing large JSON data...
+                  {t('tool.json.processingLargeJson')}
                 </div>
               </div>
             )}
             {!isProcessing && parseResult.error && (
               <div className="p-4">
                 <ErrorBanner
-                  message="JSON parsing failed"
+                  message={t('tool.json.jsonParsingFailed')}
                   details={parseResult.error}
                 />
               </div>
@@ -377,16 +379,16 @@ const JsonTool: React.FC = () => {
                 <div className="flex flex-col flex-1 min-h-0">
                   <div className="flex items-center justify-between px-4 pt-4 pb-2 shrink-0">
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Tree View
+                      {t('tool.json.treeView')}
                     </span>
                     <button
                       onClick={() =>
                         isValid &&
-                        copyToClipboard(parseResult.formatted, 'Copied JSON.')
+                        copyToClipboard(parseResult.formatted, t('tool.json.copiedJson'))
                       }
                       disabled={!isValid}
                       className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      title="Copy JSON"
+                      title={t('tool.json.copyJson')}
                     >
                       <Copy className="w-4 h-4" />
                     </button>
@@ -410,7 +412,7 @@ const JsonTool: React.FC = () => {
                 <div className="flex flex-col flex-1 min-h-0">
                   <div className="flex items-center justify-between px-4 pt-4 pb-2 shrink-0">
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      {state.viewMode === 'pretty' ? 'Pretty JSON' : 'Minified JSON'}
+                      {state.viewMode === 'pretty' ? t('tool.json.prettyJson') : t('tool.json.minifiedJson')}
                     </span>
                     <button
                       onClick={() =>
@@ -420,13 +422,13 @@ const JsonTool: React.FC = () => {
                             ? parseResult.formatted
                             : parseResult.minified,
                           state.viewMode === 'pretty'
-                            ? 'Copied pretty JSON.'
-                            : 'Copied minified JSON.'
+                            ? t('tool.json.copiedPrettyJson')
+                            : t('tool.json.copiedMinifiedJson')
                         )
                       }
                       disabled={!isValid}
                       className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      title={`Copy ${state.viewMode === 'pretty' ? 'Pretty' : 'Minified'} JSON`}
+                      title={`${t('common.copy')} ${state.viewMode === 'pretty' ? t('tool.json.viewPretty') : t('tool.json.viewMinified')} JSON`}
                     >
                       <Copy className="w-4 h-4" />
                     </button>
@@ -455,7 +457,7 @@ const JsonTool: React.FC = () => {
             disabled={!isValid}
             className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
           >
-            Download Pretty
+            {t('tool.json.downloadPretty')}
           </FileDownload>
           <FileDownload
             content={parseResult.minified || ''}
@@ -464,7 +466,7 @@ const JsonTool: React.FC = () => {
             disabled={!isValid}
             className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
           >
-            Download Minified
+            {t('tool.json.downloadMinified')}
           </FileDownload>
         </div>
       </ActionBar>
