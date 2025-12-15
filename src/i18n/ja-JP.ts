@@ -42,6 +42,8 @@ export const jaJP = {
     spaces4: '4スペース',
     copiedResult: '結果をコピーしました。',
     copiedToClipboard: 'クリップボードにコピーしました',
+    fullscreen: 'フルスクリーン',
+    exitFullscreen: 'フルスクリーン解除',
     processingLargeData: '大きなデータを処理中...',
     noDataFound: 'データが見つかりません',
     invalidInput: '無効な入力',
@@ -76,6 +78,7 @@ export const jaJP = {
     footerNote:
       '共有リンクがクリップボードにコピーされます。すべての処理はブラウザ内で行われ、サーバーにデータは送信されません。',
     generateShareLink: '共有リンクを生成',
+    copyLink: 'リンクをコピー',
   },
   pwa: {
     appReadyOffline: 'アプリがオフラインで使用可能になりました',
@@ -99,6 +102,7 @@ export const jaJP = {
     allTools: 'すべてのツール',
     noToolsLoaded: 'ツールが読み込めません',
     moreComingSoon: 'もっと追加予定...',
+    suggestFeature: '機能をリクエスト',
     removeFromFavorites: 'お気に入りから削除',
     addToFavorites: 'お気に入りに追加',
     lightMode: 'ライトモード',

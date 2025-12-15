@@ -42,6 +42,8 @@ export const koKR = {
     spaces4: '4칸',
     copiedResult: '결과가 복사되었습니다.',
     copiedToClipboard: '클립보드에 복사되었습니다',
+    fullscreen: '전체 화면',
+    exitFullscreen: '전체 화면 종료',
     processingLargeData: '대용량 데이터 처리 중...',
     noDataFound: '데이터를 찾을 수 없습니다',
     invalidInput: '잘못된 입력입니다',
@@ -76,6 +78,7 @@ export const koKR = {
     footerNote:
       '공유 링크가 클립보드에 복사됩니다. 모든 처리는 브라우저에서 이루어지며 서버로 데이터가 전송되지 않습니다.',
     generateShareLink: '공유 링크 생성',
+    copyLink: '링크 복사',
   },
   pwa: {
     appReadyOffline: '앱이 오프라인에서도 사용 가능합니다',
@@ -99,6 +102,7 @@ export const koKR = {
     allTools: '모든 도구',
     noToolsLoaded: '도구를 불러올 수 없습니다',
     moreComingSoon: '곧 더 많은 도구가 추가됩니다...',
+    suggestFeature: '기능 제안하기',
     removeFromFavorites: '즐겨찾기에서 제거',
     addToFavorites: '즐겨찾기에 추가',
     lightMode: '라이트 모드',

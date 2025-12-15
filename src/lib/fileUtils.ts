@@ -49,3 +49,4 @@ export function getMimeType(extension: string): string {
   return extToMime[extension.toLowerCase()] || 'text/plain';
 }
 
+

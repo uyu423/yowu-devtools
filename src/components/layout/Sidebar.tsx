@@ -1,4 +1,4 @@
-import { Clock, Laptop, Moon, Sparkles, Star, Sun, X } from 'lucide-react';
+import { Clock, ExternalLink, Laptop, Moon, Sparkles, Star, Sun, X } from 'lucide-react';
 import { getToolById, tools } from '@/tools';
 
 import { LanguageSelector } from '@/components/common/LanguageSelector';
@@ -238,15 +238,24 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
           )}
         </nav>
 
-        {/* Easter Egg Badge */}
-        <div className="mt-6 px-4">
+        {/* Coming Soon Badge & Feature Request */}
+        <div className="mt-6 px-4 flex flex-col items-center gap-2">
           <div
-            className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-medium bg-gradient-to-r from-purple-100 to-blue-100 text-purple-700 dark:from-purple-900/30 dark:to-blue-900/30 dark:text-purple-300 border border-purple-200 dark:border-purple-800/50 cursor-help group transition-all hover:scale-105"
+            className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-medium bg-gradient-to-r from-purple-100 to-blue-100 text-purple-700 dark:from-purple-900/30 dark:to-blue-900/30 dark:text-purple-300 border border-purple-200 dark:border-purple-800/50 cursor-help transition-all hover:scale-105"
             title={t('sidebar.moreComingSoon')}
           >
             <Sparkles className="w-3 h-3 mr-1.5 animate-pulse" />
             <span>{t('sidebar.moreComingSoon')}</span>
           </div>
+          <a
+            href="https://github.com/uyu423/yowu-devtools/issues"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-[10px] text-gray-400 dark:text-gray-500 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+          >
+            <span>{t('sidebar.suggestFeature')}</span>
+            <ExternalLink className="w-2.5 h-2.5" />
+          </a>
         </div>
       </div>
 

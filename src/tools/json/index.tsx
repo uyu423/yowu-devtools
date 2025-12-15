@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { useMemo } from 'react';
 import type { ToolDefinition } from '@/tools/types';
-import { FileJson, ListTree, Rows4, Text, Copy } from 'lucide-react';
+import { FileJson, ListTree, Rows4, Text, Copy, Maximize2, Minimize2 } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { EditorPanel } from '@/components/common/EditorPanel';
 import { ActionBar } from '@/components/common/ActionBar';
@@ -9,6 +9,7 @@ import { ErrorBanner } from '@/components/common/ErrorBanner';
 import { FileInput } from '@/components/common/FileInput';
 import { FileDownload } from '@/components/common/FileDownload';
 import { ShareModal } from '@/components/common/ShareModal';
+import { ResizablePanels } from '@/components/common/ResizablePanels';
 import { getMimeType } from '@/lib/fileUtils';
 import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
@@ -63,6 +64,7 @@ const JsonTool: React.FC = () => {
     });
   
   const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
+  const [isRightPanelExpanded, setIsRightPanelExpanded] = React.useState(false);
   const shareInfo = getShareStateInfo();
   const isMobile = isMobileDevice();
   const debouncedInput = useDebouncedValue(state.input, 300);
@@ -84,6 +86,7 @@ const JsonTool: React.FC = () => {
       childFieldsContainer: `${
         defaultStyles.childFieldsContainer ?? ''
       } child-fields-container`,
+      stringValue: `${defaultStyles.stringValue} json-string-value`,
     }),
     [isDark]
   );
@@ -188,14 +191,9 @@ const JsonTool: React.FC = () => {
         title={t('tool.json.title')}
         description={t('tool.json.description')}
         onReset={resetState}
-        onShare={async () => {
-          if (isMobile) {
-            // Mobile: Show ShareModal, then use Web Share API
-            setIsShareModalOpen(true);
-          } else {
-            // PC: Copy to clipboard immediately
-            await copyShareLink();
-          }
+        onShare={() => {
+          // Both mobile and PC now show the modal first
+          setIsShareModalOpen(true);
         }}
       />
       <ShareModal
@@ -203,250 +201,293 @@ const JsonTool: React.FC = () => {
         onClose={() => setIsShareModalOpen(false)}
         onConfirm={async () => {
           setIsShareModalOpen(false);
-          await shareViaWebShare();
+          if (isMobile) {
+            // Mobile: Use Web Share API
+            await shareViaWebShare();
+          } else {
+            // PC: Copy to clipboard
+            await copyShareLink();
+          }
         }}
         includedFields={shareInfo.includedFields}
         excludedFields={shareInfo.excludedFields}
         toolName={t('tool.json.title')}
+        isMobile={isMobile}
       />
 
-      <div className="flex flex-col gap-6 lg:flex-row flex-1 min-h-0 overflow-hidden">
-        <div className="flex flex-col flex-1 min-h-0">
-          <div className="mb-3 flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400 shrink-0">
-            <label className="flex items-center gap-2">
-              <OptionLabel
-                tooltip={t('tool.json.indentTooltip')}
-                className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
-              >
-                {t('common.indent')}
-              </OptionLabel>
-              <select
-                className="rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-2 py-1 text-sm"
-                value={state.indent}
-                onChange={(e) =>
-                  updateState({ indent: Number(e.target.value) as 2 | 4 })
-                }
-              >
-                <option value={2}>{t('common.spaces2')}</option>
-                <option value={4}>{t('common.spaces4')}</option>
-              </select>
-            </label>
-
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={state.sortKeys}
-                onChange={(e) => updateState({ sortKeys: e.target.checked })}
-                className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-500 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-0 cursor-pointer"
-              />
-              <OptionLabel tooltip={t('tool.json.sortKeysTooltip')}>
-                {t('tool.json.sortKeys')}
-              </OptionLabel>
-            </label>
-
-            <label className="flex items-center gap-2">
-              <OptionLabel
-                tooltip={t('tool.json.treeDepthTooltip')}
-                className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
-              >
-                {t('tool.json.treeDepth')}
-              </OptionLabel>
-              <input
-                type="range"
-                min={1}
-                max={6}
-                value={
-                  state.expandLevel === Infinity
-                    ? 6
-                    : Math.min(state.expandLevel, 6)
-                }
-                onChange={(e) => {
-                  const value = Number(e.target.value);
-                  updateState({ expandLevel: value });
-                }}
-              />
-              <span className="tabular-nums text-xs text-gray-500 dark:text-gray-400 min-w-[3ch] text-right">
-                {state.expandLevel === Infinity ? '∞' : state.expandLevel}
-              </span>
-              <button
-                type="button"
-                onClick={() =>
-                  updateState({
-                    expandLevel: state.expandLevel === Infinity ? 6 : Infinity,
-                  })
-                }
-                className={`text-xs px-2 py-0.5 rounded transition ${
-                  state.expandLevel === Infinity
-                    ? 'bg-blue-600 dark:bg-blue-700 text-white'
-                    : 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30'
-                }`}
-                title={
-                  state.expandLevel === Infinity
-                    ? t('tool.json.setToLevel').replace('{n}', '6')
-                    : t('tool.json.expandAllLevels')
-                }
-              >
-                ∞
-              </button>
-            </label>
-          </div>
-
-          <div className="flex-1 min-h-0 flex flex-col">
-            <EditorPanel
-              title={t('tool.json.inputTitle')}
-              value={state.input}
-              onChange={(val) => updateState({ input: val })}
-              mode="json"
-              placeholder={t('tool.json.inputPlaceholder')}
-              status={
-                !hasInput ? 'default' : parseResult.error ? 'error' : 'success'
-              }
-              className="flex-1 min-h-0"
-            />
-            <div className="mt-3">
-              <FileInput
-                onFileLoad={(content) => {
-                  updateState({ input: content });
-                }}
-                accept=".json,application/json"
-                maxSize={50 * 1024 * 1024} // 50MB
-                className="w-full"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="flex flex-col flex-1 min-h-0">
-          <div className="mb-3 flex flex-wrap items-center justify-between gap-2 shrink-0">
-            <div className="flex gap-1 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 p-1 text-sm font-medium shadow-sm">
-              {[
-                { key: 'tree', label: t('tool.json.viewTree'), icon: ListTree },
-                { key: 'pretty', label: t('tool.json.viewPretty'), icon: Rows4 },
-                { key: 'minified', label: t('tool.json.viewMinified'), icon: Text },
-              ].map(({ key, label, icon: Icon }) => (
-                <button
-                  key={key}
-                  className={`flex items-center gap-1 rounded-md px-3 py-1.5 transition ${
-                    state.viewMode === key
-                      ? 'bg-blue-600 text-white'
-                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
-                  }`}
-                  onClick={() =>
-                    updateState({ viewMode: key as JsonToolState['viewMode'] })
+      <ResizablePanels
+        storageKey="json-panel-width"
+        initialLeftWidth={50}
+        minLeftWidth={25}
+        maxLeftWidth={75}
+        expandRightPanel={isRightPanelExpanded}
+        leftPanel={
+          <div className="flex flex-col flex-1 min-h-0">
+            <div className="mb-3 flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400 shrink-0">
+              <label className="flex items-center gap-2">
+                <OptionLabel
+                  tooltip={t('tool.json.indentTooltip')}
+                  className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                >
+                  {t('common.indent')}
+                </OptionLabel>
+                <select
+                  className="rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-2 py-1 text-sm"
+                  value={state.indent}
+                  onChange={(e) =>
+                    updateState({ indent: Number(e.target.value) as 2 | 4 })
                   }
                 >
-                  <Icon className="h-4 w-4" />
-                  {label}
-                </button>
-              ))}
-            </div>
-            <input
-              type="text"
-              value={state.search}
-              onChange={(e) => updateState({ search: e.target.value })}
-              placeholder={t('tool.json.searchPlaceholder')}
-              className="h-9 w-full max-w-xs rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 text-sm placeholder-gray-400 dark:placeholder-gray-500"
-            />
-          </div>
+                  <option value={2}>{t('common.spaces2')}</option>
+                  <option value={4}>{t('common.spaces4')}</option>
+                </select>
+              </label>
 
-          <div className="flex-1 min-h-0 flex flex-col rounded-md border dark:border-gray-700 bg-white dark:bg-gray-800 shadow-inner overflow-hidden">
-            {!hasInput && (
-              <div className="p-4">
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {t('tool.json.pasteJsonHint')}
-                </p>
-              </div>
-            )}
-            {isProcessing && (
-              <div className="p-4">
-                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 dark:border-gray-600 border-t-blue-600 dark:border-t-blue-400"></div>
-                  {t('tool.json.processingLargeJson')}
-                </div>
-              </div>
-            )}
-            {!isProcessing && parseResult.error && (
-              <div className="p-4">
-                <ErrorBanner
-                  message={t('tool.json.jsonParsingFailed')}
-                  details={parseResult.error}
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={state.sortKeys}
+                  onChange={(e) => updateState({ sortKeys: e.target.checked })}
+                  className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-500 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-0 cursor-pointer"
+                />
+                <OptionLabel tooltip={t('tool.json.sortKeysTooltip')}>
+                  {t('tool.json.sortKeys')}
+                </OptionLabel>
+              </label>
+
+              <label className="flex items-center gap-2">
+                <OptionLabel
+                  tooltip={t('tool.json.treeDepthTooltip')}
+                  className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                >
+                  {t('tool.json.treeDepth')}
+                </OptionLabel>
+                <input
+                  type="range"
+                  min={1}
+                  max={6}
+                  value={
+                    state.expandLevel === Infinity
+                      ? 6
+                      : Math.min(state.expandLevel, 6)
+                  }
+                  onChange={(e) => {
+                    const value = Number(e.target.value);
+                    updateState({ expandLevel: value });
+                  }}
+                />
+                <span className="tabular-nums text-xs text-gray-500 dark:text-gray-400 min-w-[3ch] text-right">
+                  {state.expandLevel === Infinity ? '∞' : state.expandLevel}
+                </span>
+                <button
+                  type="button"
+                  onClick={() =>
+                    updateState({
+                      expandLevel: state.expandLevel === Infinity ? 6 : Infinity,
+                    })
+                  }
+                  className={`text-xs px-2 py-0.5 rounded transition ${
+                    state.expandLevel === Infinity
+                      ? 'bg-blue-600 dark:bg-blue-700 text-white'
+                      : 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30'
+                  }`}
+                  title={
+                    state.expandLevel === Infinity
+                      ? t('tool.json.setToLevel').replace('{n}', '6')
+                      : t('tool.json.expandAllLevels')
+                  }
+                >
+                  ∞
+                </button>
+              </label>
+            </div>
+
+            <div className="flex-1 min-h-0 flex flex-col">
+              <EditorPanel
+                title={t('tool.json.inputTitle')}
+                value={state.input}
+                onChange={(val) => updateState({ input: val })}
+                mode="json"
+                placeholder={t('tool.json.inputPlaceholder')}
+                status={
+                  !hasInput ? 'default' : parseResult.error ? 'error' : 'success'
+                }
+                className="flex-1 min-h-0"
+              />
+              <div className="mt-3">
+                <FileInput
+                  onFileLoad={(content) => {
+                    updateState({ input: content });
+                  }}
+                  accept=".json,application/json"
+                  maxSize={50 * 1024 * 1024} // 50MB
+                  className="w-full"
                 />
               </div>
-            )}
-            {!parseResult.error &&
-              state.viewMode === 'tree' &&
-              parseResult.data && (
-                <div className="flex flex-col flex-1 min-h-0">
-                  <div className="flex items-center justify-between px-4 pt-4 pb-2 shrink-0">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      {t('tool.json.treeView')}
-                    </span>
-                    <button
-                      onClick={() =>
-                        isValid &&
-                        copyToClipboard(parseResult.formatted, t('tool.json.copiedJson'))
-                      }
-                      disabled={!isValid}
-                      className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      title={t('tool.json.copyJson')}
-                    >
-                      <Copy className="w-4 h-4" />
-                    </button>
-                  </div>
-                  <div className="flex-1 min-h-0 overflow-auto p-4">
-                    <JsonView
-                      key={`json-view-${isDark ? 'dark' : 'light'}`}
-                      data={parseResult.data}
-                      shouldExpandNode={(level) =>
-                        state.expandLevel === Infinity ||
-                        level < state.expandLevel
-                      }
-                      style={jsonViewStyles}
-                    />
+            </div>
+          </div>
+        }
+        rightPanel={
+          <div className="flex flex-col flex-1 min-h-0">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2 shrink-0">
+              <div className="flex gap-1 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 p-1 text-sm font-medium shadow-sm">
+                {[
+                  { key: 'tree', label: t('tool.json.viewTree'), icon: ListTree },
+                  { key: 'pretty', label: t('tool.json.viewPretty'), icon: Rows4 },
+                  { key: 'minified', label: t('tool.json.viewMinified'), icon: Text },
+                ].map(({ key, label, icon: Icon }) => (
+                  <button
+                    key={key}
+                    className={`flex items-center gap-1 rounded-md px-3 py-1.5 transition ${
+                      state.viewMode === key
+                        ? 'bg-blue-600 text-white'
+                        : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+                    }`}
+                    onClick={() =>
+                      updateState({ viewMode: key as JsonToolState['viewMode'] })
+                    }
+                  >
+                    <Icon className="h-4 w-4" />
+                    {label}
+                  </button>
+                ))}
+              </div>
+              {state.viewMode === 'pretty' && (
+                <input
+                  type="text"
+                  value={state.search}
+                  onChange={(e) => updateState({ search: e.target.value })}
+                  placeholder={t('tool.json.searchPlaceholder')}
+                  className="h-9 w-full max-w-xs rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 text-sm placeholder-gray-400 dark:placeholder-gray-500"
+                />
+              )}
+            </div>
+
+            <div className="flex-1 min-h-0 flex flex-col rounded-md border dark:border-gray-700 bg-white dark:bg-gray-800 shadow-inner overflow-hidden">
+              {!hasInput && (
+                <div className="p-4">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {t('tool.json.pasteJsonHint')}
+                  </p>
+                </div>
+              )}
+              {isProcessing && (
+                <div className="p-4">
+                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 dark:border-gray-600 border-t-blue-600 dark:border-t-blue-400"></div>
+                    {t('tool.json.processingLargeJson')}
                   </div>
                 </div>
               )}
-            {!parseResult.error &&
-              state.viewMode !== 'tree' &&
-              parseResult.formatted && (
-                <div className="flex flex-col flex-1 min-h-0">
-                  <div className="flex items-center justify-between px-4 pt-4 pb-2 shrink-0">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      {state.viewMode === 'pretty' ? t('tool.json.prettyJson') : t('tool.json.minifiedJson')}
-                    </span>
-                    <button
-                      onClick={() =>
-                        isValid &&
-                        copyToClipboard(
-                          state.viewMode === 'pretty'
-                            ? parseResult.formatted
-                            : parseResult.minified,
-                          state.viewMode === 'pretty'
-                            ? t('tool.json.copiedPrettyJson')
-                            : t('tool.json.copiedMinifiedJson')
-                        )
-                      }
-                      disabled={!isValid}
-                      className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      title={`${t('common.copy')} ${state.viewMode === 'pretty' ? t('tool.json.viewPretty') : t('tool.json.viewMinified')} JSON`}
-                    >
-                      <Copy className="w-4 h-4" />
-                    </button>
-                  </div>
-                  <pre
-                    className="flex-1 min-h-0 overflow-auto whitespace-pre-wrap break-all font-mono text-sm text-gray-800 dark:text-gray-200 p-4 m-0"
-                    dangerouslySetInnerHTML={{
-                      __html:
-                        state.viewMode === 'pretty'
-                          ? highlightedPretty
-                          : escapeHtml(parseResult.minified),
-                    }}
+              {!isProcessing && parseResult.error && (
+                <div className="p-4">
+                  <ErrorBanner
+                    message={t('tool.json.jsonParsingFailed')}
+                    details={parseResult.error}
                   />
                 </div>
               )}
+              {!parseResult.error &&
+                state.viewMode === 'tree' &&
+                parseResult.data && (
+                  <div className="flex flex-col flex-1 min-h-0">
+                    <div className="flex items-center justify-between px-4 pt-4 pb-2 shrink-0">
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        {t('tool.json.treeView')}
+                      </span>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() =>
+                            isValid &&
+                            copyToClipboard(parseResult.formatted, t('tool.json.copiedJson'))
+                          }
+                          disabled={!isValid}
+                          className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          title={t('tool.json.copyJson')}
+                        >
+                          <Copy className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => setIsRightPanelExpanded(!isRightPanelExpanded)}
+                          className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+                          title={isRightPanelExpanded ? t('common.exitFullscreen') : t('common.fullscreen')}
+                        >
+                          {isRightPanelExpanded ? (
+                            <Minimize2 className="w-4 h-4" />
+                          ) : (
+                            <Maximize2 className="w-4 h-4" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                    <div className="flex-1 min-h-0 overflow-auto p-4 json-tree-view">
+                      <JsonView
+                        key={`json-view-${isDark ? 'dark' : 'light'}`}
+                        data={parseResult.data}
+                        shouldExpandNode={(level) =>
+                          state.expandLevel === Infinity ||
+                          level < state.expandLevel
+                        }
+                        style={jsonViewStyles}
+                      />
+                    </div>
+                  </div>
+                )}
+              {!parseResult.error &&
+                state.viewMode !== 'tree' &&
+                parseResult.formatted && (
+                  <div className="flex flex-col flex-1 min-h-0">
+                    <div className="flex items-center justify-between px-4 pt-4 pb-2 shrink-0">
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        {state.viewMode === 'pretty' ? t('tool.json.prettyJson') : t('tool.json.minifiedJson')}
+                      </span>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() =>
+                            isValid &&
+                            copyToClipboard(
+                              state.viewMode === 'pretty'
+                                ? parseResult.formatted
+                                : parseResult.minified,
+                              state.viewMode === 'pretty'
+                                ? t('tool.json.copiedPrettyJson')
+                                : t('tool.json.copiedMinifiedJson')
+                            )
+                          }
+                          disabled={!isValid}
+                          className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          title={`${t('common.copy')} ${state.viewMode === 'pretty' ? t('tool.json.viewPretty') : t('tool.json.viewMinified')} JSON`}
+                        >
+                          <Copy className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => setIsRightPanelExpanded(!isRightPanelExpanded)}
+                          className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+                          title={isRightPanelExpanded ? t('common.exitFullscreen') : t('common.fullscreen')}
+                        >
+                          {isRightPanelExpanded ? (
+                            <Minimize2 className="w-4 h-4" />
+                          ) : (
+                            <Maximize2 className="w-4 h-4" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                    <pre
+                      className="flex-1 min-h-0 overflow-auto whitespace-pre-wrap break-all font-mono text-sm text-gray-800 dark:text-gray-200 p-4 m-0"
+                      dangerouslySetInnerHTML={{
+                        __html:
+                          state.viewMode === 'pretty'
+                            ? highlightedPretty
+                            : escapeHtml(parseResult.minified),
+                      }}
+                    />
+                  </div>
+                )}
+            </div>
           </div>
-        </div>
-      </div>
+        }
+      />
 
       <ActionBar className="mt-6 flex-wrap justify-end border-t dark:border-gray-700 pt-4 shrink-0">
         <div className="flex flex-wrap gap-2">

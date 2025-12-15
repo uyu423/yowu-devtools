@@ -42,6 +42,8 @@ export const esES = {
     spaces4: '4 espacios',
     copiedResult: 'Resultado copiado.',
     copiedToClipboard: 'Copiado al portapapeles',
+    fullscreen: 'Pantalla completa',
+    exitFullscreen: 'Salir de pantalla completa',
     processingLargeData: 'Procesando datos grandes...',
     noDataFound: 'No se encontraron datos',
     invalidInput: 'Entrada no válida',
@@ -78,6 +80,7 @@ export const esES = {
     footerNote:
       'El enlace de compartir se copiará a su portapapeles. Todo el procesamiento ocurre en su navegador; no se envían datos a los servidores.',
     generateShareLink: 'Generar enlace para compartir',
+    copyLink: 'Copiar enlace',
   },
   pwa: {
     appReadyOffline: 'La aplicación está lista para usar sin conexión',
@@ -101,6 +104,7 @@ export const esES = {
     allTools: 'Todas las herramientas',
     noToolsLoaded: 'No se pudieron cargar herramientas',
     moreComingSoon: 'Más próximamente...',
+    suggestFeature: 'Sugerir una función',
     removeFromFavorites: 'Quitar de favoritos',
     addToFavorites: 'Añadir a favoritos',
     lightMode: 'Modo claro',

@@ -42,6 +42,8 @@ export const zhCN = {
     spaces4: '4个空格',
     copiedResult: '结果已复制。',
     copiedToClipboard: '已复制到剪贴板',
+    fullscreen: '全屏',
+    exitFullscreen: '退出全屏',
     processingLargeData: '正在处理大量数据...',
     noDataFound: '未找到数据',
     invalidInput: '无效输入',
@@ -76,6 +78,7 @@ export const zhCN = {
     footerNote:
       '分享链接将被复制到您的剪贴板。所有处理都在您的浏览器中进行，不会将数据发送到服务器。',
     generateShareLink: '生成分享链接',
+    copyLink: '复制链接',
   },
   pwa: {
     appReadyOffline: '应用已准备好离线使用',
@@ -97,6 +100,7 @@ export const zhCN = {
     allTools: '所有工具',
     noToolsLoaded: '无法加载工具',
     moreComingSoon: '更多即将推出...',
+    suggestFeature: '建议功能',
     removeFromFavorites: '从收藏夹移除',
     addToFavorites: '添加到收藏夹',
     lightMode: '浅色模式',

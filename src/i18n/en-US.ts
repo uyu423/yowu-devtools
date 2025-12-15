@@ -40,6 +40,8 @@ export const enUS = {
     spaces4: '4 spaces',
     copiedResult: 'Result copied.',
     copiedToClipboard: 'Copied to clipboard',
+    fullscreen: 'Fullscreen',
+    exitFullscreen: 'Exit Fullscreen',
     processingLargeData: 'Processing large data...',
     noDataFound: 'No data found',
     invalidInput: 'Invalid input',
@@ -74,6 +76,7 @@ export const enUS = {
     footerNote:
       'The share link will be copied to your clipboard. All processing happens in your browser - no data is sent to servers.',
     generateShareLink: 'Generate Share Link',
+    copyLink: 'Copy Link',
   },
   pwa: {
     appReadyOffline: 'App is ready to work offline',
@@ -97,6 +100,7 @@ export const enUS = {
     allTools: 'All Tools',
     noToolsLoaded: 'No tools loaded',
     moreComingSoon: 'More coming soon...',
+    suggestFeature: 'Suggest a feature',
     removeFromFavorites: 'Remove from favorites',
     addToFavorites: 'Add to favorites',
     lightMode: 'Light Mode',
