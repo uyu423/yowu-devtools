@@ -9,13 +9,10 @@ import { FileInput } from '@/components/common/FileInput';
 import { FileDownload } from '@/components/common/FileDownload';
 import { getMimeType } from '@/lib/fileUtils';
 import { OptionLabel } from '@/components/ui/OptionLabel';
-import { useToolState } from '@/hooks/useToolState';
+import { useToolSetup } from '@/hooks/useToolSetup';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
-import { useTitle } from '@/hooks/useTitle';
-import { useI18n } from '@/hooks/useI18nHooks';
 import { useWebWorker, shouldUseWorkerForText } from '@/hooks/useWebWorker';
 import { copyToClipboard } from '@/lib/clipboard';
-import { isMobileDevice } from '@/lib/utils';
 import { ShareModal } from '@/components/common/ShareModal';
 import DiffMatchPatch from 'diff-match-patch';
 import type { Diff } from 'diff-match-patch';
@@ -37,15 +34,15 @@ const DEFAULT_STATE: DiffToolState = {
 };
 
 const DiffTool: React.FC = () => {
-  const { t } = useI18n();
-  useTitle(t('tool.diff.title'));
-  // Diff tool state contains: left (string), right (string), view, ignoreWhitespace, ignoreCase
-  // All fields are necessary for sharing - input strings may be large but required
-  const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
-    useToolState<DiffToolState>('diff', DEFAULT_STATE);
-  const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
-  const shareInfo = getShareStateInfo();
-  const isMobile = isMobileDevice();
+  const {
+    state,
+    updateState,
+    resetState,
+    t,
+    handleShare,
+    shareModalProps,
+  } = useToolSetup<DiffToolState>('diff', 'diff', DEFAULT_STATE);
+
   const debouncedLeft = useDebouncedValue(state.left, 250);
   const debouncedRight = useDebouncedValue(state.right, 250);
 
@@ -147,14 +144,9 @@ const DiffTool: React.FC = () => {
         title={t('tool.diff.title')}
         description={t('tool.diff.description')}
         onReset={() => resetState()}
-        onShare={async () => {
-          if (isMobile) {
-            setIsShareModalOpen(true);
-          } else {
-            await copyShareLink();
-          }
-        }}
+        onShare={handleShare}
       />
+      <ShareModal {...shareModalProps} />
 
       <div className="flex flex-col gap-4">
         <div className="grid gap-4 lg:grid-cols-2">
@@ -304,17 +296,6 @@ const DiffTool: React.FC = () => {
           )}
         </div>
       </div>
-      <ShareModal
-        isOpen={isShareModalOpen}
-        onClose={() => setIsShareModalOpen(false)}
-        onConfirm={async () => {
-          setIsShareModalOpen(false);
-          await shareViaWebShare();
-        }}
-        includedFields={shareInfo.includedFields}
-        excludedFields={shareInfo.excludedFields}
-        toolName={t('tool.diff.title')}
-      />
     </div>
   );
 };

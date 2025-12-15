@@ -5,9 +5,7 @@ import { Timer } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
 import { OptionLabel } from '@/components/ui/OptionLabel';
-import { useToolState } from '@/hooks/useToolState';
-import { useTitle } from '@/hooks/useTitle';
-import { useI18n } from '@/hooks/useI18nHooks';
+import { useToolSetup } from '@/hooks/useToolSetup';
 import { format, formatDistanceToNow } from 'date-fns';
 import { enUS as enUSLocale, ko, ja, zhCN, es } from 'date-fns/locale';
 import CronExpressionParser, { type CronExpressionOptions } from 'cron-parser';
@@ -17,8 +15,8 @@ import 'cronstrue/locales/ko';
 import 'cronstrue/locales/ja';
 import 'cronstrue/locales/zh_CN';
 import 'cronstrue/locales/es';
-import { isMobileDevice } from '@/lib/utils';
 import { ShareModal } from '@/components/common/ShareModal';
+import { useI18n } from '@/hooks/useI18nHooks';
 
 interface CronToolState {
   expression: string;
@@ -53,21 +51,15 @@ const DATE_FNS_LOCALE_MAP: Record<string, typeof enUSLocale> = {
 };
 
 const CronTool: React.FC = () => {
-  const { t, locale } = useI18n();
-  useTitle(t('tool.cron.title'));
-  // Cron tool state is small (expression string, boolean flags, small numbers)
-  // No filter needed - all fields are necessary and small
+  const { locale } = useI18n();
   const {
     state,
     updateState,
     resetState,
-    copyShareLink,
-    shareViaWebShare,
-    getShareStateInfo,
-  } = useToolState<CronToolState>('cron', DEFAULT_STATE);
-  const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
-  const shareInfo = getShareStateInfo();
-  const isMobile = isMobileDevice();
+    t,
+    handleShare,
+    shareModalProps,
+  } = useToolSetup<CronToolState>('cron', 'cron', DEFAULT_STATE);
 
   const cronResult = useMemo(() => {
     if (!state.expression.trim()) {
@@ -122,14 +114,9 @@ const CronTool: React.FC = () => {
         title={t('tool.cron.title')}
         description={t('tool.cron.description')}
         onReset={resetState}
-        onShare={async () => {
-          if (isMobile) {
-            setIsShareModalOpen(true);
-          } else {
-            await copyShareLink();
-          }
-        }}
+        onShare={handleShare}
       />
+      <ShareModal {...shareModalProps} />
 
       <div className="flex-1 flex flex-col gap-6">
         <div>
@@ -238,17 +225,6 @@ const CronTool: React.FC = () => {
           </div>
         )}
       </div>
-      <ShareModal
-        isOpen={isShareModalOpen}
-        onClose={() => setIsShareModalOpen(false)}
-        onConfirm={async () => {
-          setIsShareModalOpen(false);
-          await shareViaWebShare();
-        }}
-        includedFields={shareInfo.includedFields}
-        excludedFields={shareInfo.excludedFields}
-        toolName={t('tool.cron.title')}
-      />
     </div>
   );
 };

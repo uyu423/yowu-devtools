@@ -7,12 +7,9 @@ import { EditorPanel } from '@/components/common/EditorPanel';
 import { ActionBar } from '@/components/common/ActionBar';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
 import { OptionLabel } from '@/components/ui/OptionLabel';
-import { useToolState } from '@/hooks/useToolState';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
-import { useTitle } from '@/hooks/useTitle';
-import { useI18n } from '@/hooks/useI18nHooks';
+import { useToolSetup } from '@/hooks/useToolSetup';
 import { copyToClipboard } from '@/lib/clipboard';
-import { isMobileDevice } from '@/lib/utils';
 import { ShareModal } from '@/components/common/ShareModal';
 
 interface UrlToolState {
@@ -28,15 +25,15 @@ const DEFAULT_STATE: UrlToolState = {
 };
 
 const UrlTool: React.FC = () => {
-  const { t } = useI18n();
-  useTitle(t('tool.url.title'));
-  // URL tool state contains: input (string), mode, plusForSpace
-  // All fields are necessary for sharing - input may be large but required
-  const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
-    useToolState<UrlToolState>('url', DEFAULT_STATE);
-  const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
-  const shareInfo = getShareStateInfo();
-  const isMobile = isMobileDevice();
+  const {
+    state,
+    updateState,
+    resetState,
+    t,
+    handleShare,
+    shareModalProps,
+  } = useToolSetup<UrlToolState>('url', 'url', DEFAULT_STATE);
+
   const debouncedInput = useDebouncedValue(state.input, 200);
 
   const conversion = useMemo(() => {
@@ -77,25 +74,10 @@ const UrlTool: React.FC = () => {
         title={t('tool.url.title')}
         description={t('tool.url.description')}
         onReset={resetState}
-        onShare={async () => {
-          if (isMobile) {
-            setIsShareModalOpen(true);
-          } else {
-            await copyShareLink();
-          }
-        }}
+        onShare={handleShare}
       />
-      <ShareModal
-        isOpen={isShareModalOpen}
-        onClose={() => setIsShareModalOpen(false)}
-        onConfirm={async () => {
-          setIsShareModalOpen(false);
-          await shareViaWebShare();
-        }}
-        includedFields={shareInfo.includedFields}
-        excludedFields={shareInfo.excludedFields}
-        toolName={t('tool.url.title')}
-      />
+      <ShareModal {...shareModalProps} />
+
       <div className="flex-1 flex flex-col gap-6">
         <EditorPanel
           title={t('common.input')}

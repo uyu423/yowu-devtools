@@ -10,12 +10,9 @@ import { FileInput } from '@/components/common/FileInput';
 import { FileDownload } from '@/components/common/FileDownload';
 import { getMimeType } from '@/lib/fileUtils';
 import { OptionLabel } from '@/components/ui/OptionLabel';
-import { useToolState } from '@/hooks/useToolState';
-import { useTitle } from '@/hooks/useTitle';
-import { useI18n } from '@/hooks/useI18nHooks';
+import { useToolSetup } from '@/hooks/useToolSetup';
 import { useWebWorker, shouldUseWorkerForText } from '@/hooks/useWebWorker';
 import { copyToClipboard } from '@/lib/clipboard';
-import { isMobileDevice } from '@/lib/utils';
 import { ShareModal } from '@/components/common/ShareModal';
 import YAML from 'yaml';
 
@@ -32,15 +29,14 @@ const DEFAULT_STATE: YamlToolState = {
 };
 
 const YamlTool: React.FC = () => {
-  const { t } = useI18n();
-  useTitle(t('tool.yaml.title'));
-  // YAML tool state contains: source (input string), direction, indent
-  // All fields are necessary for sharing - input may be large but required
-  const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
-    useToolState<YamlToolState>('yaml', DEFAULT_STATE);
-  const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
-  const shareInfo = getShareStateInfo();
-  const isMobile = isMobileDevice();
+  const {
+    state,
+    updateState,
+    resetState,
+    t,
+    handleShare,
+    shareModalProps,
+  } = useToolSetup<YamlToolState>('yaml', 'yaml', DEFAULT_STATE);
 
   // Worker 사용 여부 결정
   const shouldUseWorker = React.useMemo(
@@ -135,14 +131,9 @@ const YamlTool: React.FC = () => {
         title={t('tool.yaml.title')}
         description={t('tool.yaml.description')}
         onReset={resetState}
-        onShare={async () => {
-          if (isMobile) {
-            setIsShareModalOpen(true);
-          } else {
-            await copyShareLink();
-          }
-        }}
+        onShare={handleShare}
       />
+      <ShareModal {...shareModalProps} />
 
       <div className="flex-1 flex flex-col lg:flex-row gap-4 min-h-0">
         <div className="flex-1 flex flex-col min-h-0">
@@ -261,17 +252,6 @@ const YamlTool: React.FC = () => {
           </FileDownload>
         </div>
       </ActionBar>
-      <ShareModal
-        isOpen={isShareModalOpen}
-        onClose={() => setIsShareModalOpen(false)}
-        onConfirm={async () => {
-          setIsShareModalOpen(false);
-          await shareViaWebShare();
-        }}
-        includedFields={shareInfo.includedFields}
-        excludedFields={shareInfo.excludedFields}
-        toolName={t('tool.yaml.title')}
-      />
     </div>
   );
 };

@@ -7,12 +7,9 @@ import { EditorPanel } from '@/components/common/EditorPanel';
 import { ActionBar } from '@/components/common/ActionBar';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
 import { OptionLabel } from '@/components/ui/OptionLabel';
-import { useToolState } from '@/hooks/useToolState';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
-import { useTitle } from '@/hooks/useTitle';
-import { useI18n } from '@/hooks/useI18nHooks';
+import { useToolSetup } from '@/hooks/useToolSetup';
 import { copyToClipboard } from '@/lib/clipboard';
-import { isMobileDevice } from '@/lib/utils';
 import { ShareModal } from '@/components/common/ShareModal';
 
 interface Base64State {
@@ -28,15 +25,15 @@ const DEFAULT_STATE: Base64State = {
 };
 
 const Base64Tool: React.FC = () => {
-  const { t } = useI18n();
-  useTitle(t('tool.base64.title'));
-  // Base64 tool state contains: input (string), mode, urlSafe
-  // All fields are necessary for sharing - input may be large but required
-  const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
-    useToolState<Base64State>('base64', DEFAULT_STATE);
-  const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
-  const shareInfo = getShareStateInfo();
-  const isMobile = isMobileDevice();
+  const {
+    state,
+    updateState,
+    resetState,
+    t,
+    handleShare,
+    shareModalProps,
+  } = useToolSetup<Base64State>('base64', 'base64', DEFAULT_STATE);
+
   const debouncedInput = useDebouncedValue(state.input, 300);
 
   const conversion = React.useMemo(() => {
@@ -70,25 +67,9 @@ const Base64Tool: React.FC = () => {
         title={t('tool.base64.title')}
         description={t('tool.base64.description')}
         onReset={resetState}
-        onShare={async () => {
-          if (isMobile) {
-            setIsShareModalOpen(true);
-          } else {
-            await copyShareLink();
-          }
-        }}
+        onShare={handleShare}
       />
-      <ShareModal
-        isOpen={isShareModalOpen}
-        onClose={() => setIsShareModalOpen(false)}
-        onConfirm={async () => {
-          setIsShareModalOpen(false);
-          await shareViaWebShare();
-        }}
-        includedFields={shareInfo.includedFields}
-        excludedFields={shareInfo.excludedFields}
-        toolName={t('tool.base64.title')}
-      />
+      <ShareModal {...shareModalProps} />
 
       <div className="flex-1 flex flex-col gap-6">
         <EditorPanel
