@@ -51,6 +51,33 @@ function isOriginAllowed(origin: string | undefined): boolean {
 // Permission Management
 // =============================================================================
 
+/**
+ * Get permission patterns for an origin, including parent domains for cookie access
+ * e.g., "https://api.sub.example.com" ->
+ *   ["https://api.sub.example.com/*", "https://*.sub.example.com/*", "https://*.example.com/*"]
+ */
+function getPermissionPatterns(origin: string): string[] {
+  try {
+    const url = new URL(origin);
+    const hostname = url.hostname;
+    const protocol = url.protocol;
+    const parts = hostname.split('.');
+    
+    const patterns: string[] = [`${origin}/*`];
+    
+    // Add wildcard patterns for parent domains (for cookie access)
+    // e.g., *.sub.example.com, *.example.com
+    for (let i = 1; i < parts.length - 1; i++) {
+      const parentDomain = parts.slice(i).join('.');
+      patterns.push(`${protocol}//*.${parentDomain}/*`);
+    }
+    
+    return patterns;
+  } catch {
+    return [`${origin}/*`];
+  }
+}
+
 async function hasPermission(origin: string): Promise<boolean> {
   try {
     const pattern = `${origin}/*`;
@@ -64,11 +91,15 @@ async function hasPermission(origin: string): Promise<boolean> {
 
 async function requestPermission(origin: string): Promise<boolean> {
   try {
-    const pattern = `${origin}/*`;
+    // Request permissions for the origin AND parent domains (for cookie access)
+    const patterns = getPermissionPatterns(origin);
+    console.log('[Extension] Requesting permissions for patterns:', patterns);
+    
     return await chrome.permissions.request({
-      origins: [pattern],
+      origins: patterns,
     });
-  } catch {
+  } catch (err) {
+    console.error('[Extension] Permission request failed:', err);
     return false;
   }
 }
@@ -102,65 +133,89 @@ async function getGrantedOrigins(): Promise<string[]> {
 // =============================================================================
 
 /**
- * Get cookies for a URL and format them as a Cookie header value
+ * Extract all possible domain patterns from a hostname
+ * e.g., "api.sub.example.com" -> 
+ *   ["api.sub.example.com", ".sub.example.com", ".example.com"]
+ */
+function getDomainPatterns(hostname: string): string[] {
+  const patterns: string[] = [hostname];
+  const parts = hostname.split('.');
+  
+  // Generate parent domain patterns (with leading dot for wildcard matching)
+  // Skip the last two parts (e.g., "example.com") to avoid too broad patterns
+  for (let i = 1; i < parts.length - 1; i++) {
+    patterns.push('.' + parts.slice(i).join('.'));
+  }
+  
+  return patterns;
+}
+
+/**
+ * Get cookies for a URL including parent domain cookies
+ * This collects cookies from all matching domains (e.g., .example.com for *.example.com)
  */
 async function getCookiesForUrl(url: string): Promise<string | null> {
   try {
-    const cookies = await chrome.cookies.getAll({ url });
+    const parsedUrl = new URL(url);
+    const hostname = parsedUrl.hostname;
+    const domainPatterns = getDomainPatterns(hostname);
+    
+    console.log('[Extension] Getting cookies for URL:', url);
+    console.log('[Extension] Domain patterns to check:', domainPatterns);
+    
+    // Collect cookies from all domain patterns
+    const cookieMap = new Map<string, chrome.cookies.Cookie>();
+    
+    for (const domain of domainPatterns) {
+      try {
+        // Get cookies by domain pattern
+        const domainCookies = await chrome.cookies.getAll({ domain });
+        console.log(`[Extension] Found ${domainCookies.length} cookies for domain: ${domain}`);
+        
+        for (const cookie of domainCookies) {
+          // Check if cookie applies to this URL
+          const cookieApplies = 
+            // Domain matches
+            (hostname === cookie.domain || hostname.endsWith(cookie.domain)) &&
+            // Path matches
+            parsedUrl.pathname.startsWith(cookie.path) &&
+            // Secure flag matches
+            (!cookie.secure || parsedUrl.protocol === 'https:');
+          
+          if (cookieApplies) {
+            // Use cookie name as key to avoid duplicates (later cookies override earlier)
+            cookieMap.set(cookie.name, cookie);
+          }
+        }
+      } catch (err) {
+        console.warn(`[Extension] Failed to get cookies for domain ${domain}:`, err);
+      }
+    }
+    
+    // Also try the URL-based approach as fallback
+    try {
+      const urlCookies = await chrome.cookies.getAll({ url });
+      console.log(`[Extension] Found ${urlCookies.length} cookies by URL`);
+      for (const cookie of urlCookies) {
+        cookieMap.set(cookie.name, cookie);
+      }
+    } catch (err) {
+      console.warn('[Extension] Failed to get cookies by URL:', err);
+    }
+    
+    const cookies = Array.from(cookieMap.values());
+    console.log('[Extension] Total unique cookies:', cookies.length);
+    
     if (cookies.length === 0) return null;
     
-    return cookies.map(cookie => `${cookie.name}=${cookie.value}`).join('; ');
+    const cookieString = cookies.map(cookie => `${cookie.name}=${cookie.value}`).join('; ');
+    console.log('[Extension] Cookie header length:', cookieString.length);
+    return cookieString;
   } catch (error) {
     console.warn('[Extension] Failed to get cookies:', error);
     return null;
   }
 }
-
-/**
- * Add a dynamic rule to set Cookie header for a specific request
- */
-async function addCookieRule(ruleId: number, urlFilter: string, cookieValue: string): Promise<void> {
-  try {
-    await chrome.declarativeNetRequest.updateSessionRules({
-      addRules: [{
-        id: ruleId,
-        priority: 2,
-        action: {
-          type: chrome.declarativeNetRequest.RuleActionType.MODIFY_HEADERS,
-          requestHeaders: [
-            { header: 'cookie', operation: chrome.declarativeNetRequest.HeaderOperation.SET, value: cookieValue }
-          ]
-        },
-        condition: {
-          urlFilter: urlFilter,
-          resourceTypes: [
-            chrome.declarativeNetRequest.ResourceType.XMLHTTPREQUEST,
-            chrome.declarativeNetRequest.ResourceType.OTHER
-          ]
-        }
-      }],
-      removeRuleIds: [ruleId]
-    });
-  } catch (error) {
-    console.warn('[Extension] Failed to add cookie rule:', error);
-  }
-}
-
-/**
- * Remove a dynamic cookie rule
- */
-async function removeCookieRule(ruleId: number): Promise<void> {
-  try {
-    await chrome.declarativeNetRequest.updateSessionRules({
-      removeRuleIds: [ruleId]
-    });
-  } catch (error) {
-    console.warn('[Extension] Failed to remove cookie rule:', error);
-  }
-}
-
-// Counter for generating unique rule IDs
-let cookieRuleIdCounter = 1000;
 
 // =============================================================================
 // Request Executor
@@ -274,13 +329,12 @@ async function executeRequest(spec: RequestSpec): Promise<ResponseSpec> {
     };
   }
 
-  // Get cookies for the target URL and add dynamic rule
-  const cookieRuleId = cookieRuleIdCounter++;
+  // Get cookies for the target URL and add to headers
+  // Note: In Service Worker context, we can set Cookie header directly
   const cookieValue = await getCookiesForUrl(spec.url);
-  
   if (cookieValue) {
-    console.log('[Extension] Adding cookies for:', targetOrigin);
-    await addCookieRule(cookieRuleId, spec.url, cookieValue);
+    console.log('[Extension] Adding cookies to request headers for:', targetOrigin);
+    headers['Cookie'] = cookieValue;
   }
 
   // Create AbortController for timeout
@@ -288,6 +342,7 @@ async function executeRequest(spec: RequestSpec): Promise<ResponseSpec> {
   const timeoutId = setTimeout(() => controller.abort(), spec.options.timeoutMs);
 
   try {
+    console.log('[Extension] Executing fetch with headers:', Object.keys(headers));
     const response = await fetch(spec.url, {
       method,
       headers,
@@ -298,11 +353,6 @@ async function executeRequest(spec: RequestSpec): Promise<ResponseSpec> {
     });
 
     clearTimeout(timeoutId);
-    
-    // Clean up cookie rule
-    if (cookieValue) {
-      await removeCookieRule(cookieRuleId);
-    }
 
     const timingMs = Math.round(performance.now() - startTime);
 
@@ -341,12 +391,6 @@ async function executeRequest(spec: RequestSpec): Promise<ResponseSpec> {
     };
   } catch (error) {
     clearTimeout(timeoutId);
-    
-    // Clean up cookie rule
-    if (cookieValue) {
-      await removeCookieRule(cookieRuleId);
-    }
-
     const timingMs = Math.round(performance.now() - startTime);
 
     if (error instanceof Error) {
