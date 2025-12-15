@@ -192,6 +192,11 @@ export default defineConfig({
       workbox: {
         // Network First 전략: 최신 버전 우선, 실패 시 캐시 사용
         runtimeCaching: [
+          // version.json은 항상 네트워크에서 가져옴 (캐시 안함)
+          {
+            urlPattern: /\/version\.json$/,
+            handler: 'NetworkOnly',
+          },
           {
             urlPattern: /^https:\/\/tools\.yowu\.dev\/.*$/i,
             handler: 'NetworkFirst',
