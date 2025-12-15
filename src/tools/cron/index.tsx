@@ -23,7 +23,7 @@ import { cn } from '@/lib/utils';
 
 // v1.3.2 imports
 import type { CronToolState, CronSpec, ParsedCronField, CronWarning } from './types';
-import { DEFAULT_CRON_STATE, CRON_SPECS, CRON_MACROS } from './types';
+import { DEFAULT_CRON_STATE, CRON_SPECS } from './types';
 import {
   parseCronExpression,
   normalizeCronExpression,
@@ -355,17 +355,30 @@ const CronTool: React.FC = () => {
             <input
               type="datetime-local"
               className="rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-2 py-1 text-sm"
-              value={state.fromDateTime || ''}
+              value={state.fromDateTime || new Date().toISOString().slice(0, 16)}
               onChange={(e) => updateState({ fromDateTime: e.target.value || undefined })}
             />
             <button
               type="button"
               className="px-2 py-1 text-xs rounded bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
-              onClick={() => updateState({ fromDateTime: undefined })}
+              onClick={() => {
+                const now = new Date().toISOString().slice(0, 16);
+                updateState({ fromDateTime: now });
+              }}
             >
               {t('tool.cron.now')}
             </button>
           </div>
+
+          {/* Spec description */}
+          {state.spec !== 'auto' && (
+            <div className="mt-2 text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+              <Info className="w-3.5 h-3.5 flex-shrink-0" />
+              <span>
+                {t(`tool.cron.${SPEC_OPTIONS.find(opt => opt.value === state.spec)?.descKey || 'specAutoDesc'}`)}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Error Banner */}
