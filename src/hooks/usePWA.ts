@@ -1,6 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 // @ts-expect-error - virtual module provided by vite-plugin-pwa
 import { registerSW } from 'virtual:pwa-register';
+
+// 업데이트 체크 간격 (밀리초)
+const UPDATE_CHECK_INTERVAL = 60 * 60 * 1000; // 1시간
 
 interface UsePWAResult {
   needRefresh: boolean;
@@ -18,6 +21,9 @@ interface UsePWAResult {
  * - Service Worker 업데이트 감지
  * - 앱 설치 프롬프트
  * - 오프라인 상태 감지
+ *
+ * @see https://vite-pwa-org.netlify.app/guide/prompt-for-update.html
+ * @see https://vite-pwa-org.netlify.app/guide/periodic-sw-updates.html
  */
 export function usePWA(): UsePWAResult {
   const [needRefresh, setNeedRefresh] = useState(false);
@@ -25,53 +31,86 @@ export function usePWA(): UsePWAResult {
   const [isInstallable, setIsInstallable] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [updateSW, setUpdateSW] = useState<(() => Promise<void>) | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const registrationRef = useRef<ServiceWorkerRegistration | null>(null);
+
+  /**
+   * Service Worker 업데이트 체크
+   * - 오프라인이면 스킵
+   * - 에러 발생 시 조용히 실패
+   */
+  const checkForUpdates = useCallback(async () => {
+    const registration = registrationRef.current;
+    if (!registration) return;
+
+    // 오프라인이면 업데이트 체크 스킵
+    if (!navigator.onLine) {
+      console.log('[PWA] Skipping update check - offline');
+      return;
+    }
+
+    try {
+      await registration.update();
+      console.log('[PWA] Update check completed');
+    } catch (error) {
+      // 서버 다운 등의 이유로 실패해도 조용히 처리
+      console.warn('[PWA] Update check failed:', error);
+    }
+  }, []);
 
   useEffect(() => {
     // Service Worker 등록 및 업데이트 감지
+    // onRegisteredSW 사용 (v0.12.8+, onRegistered 대체)
     const updateSWFn = registerSW({
       immediate: true,
       onNeedRefresh() {
-        console.log('Service Worker update available - refresh needed');
+        console.log('[PWA] New content available - refresh needed');
         setNeedRefresh(true);
       },
       onOfflineReady() {
-        console.log('Service Worker offline ready');
+        console.log('[PWA] App ready to work offline');
         setOfflineReady(true);
       },
-      onRegistered(registration: ServiceWorkerRegistration | undefined) {
-        console.log('Service Worker registered:', registration);
-        
-        // Service Worker 업데이트 감지 (추가 보장)
-        if (registration) {
-          // 주기적으로 업데이트 확인 (1시간마다)
-          setInterval(() => {
-            registration.update().catch((error) => {
-              console.error('Failed to check for updates:', error);
-            });
-          }, 60 * 60 * 1000); // 1시간
+      onRegisteredSW(swUrl: string, registration: ServiceWorkerRegistration | undefined) {
+        console.log('[PWA] Service Worker registered:', swUrl);
 
-          // Service Worker 업데이트 발견 시 알림
-          registration.addEventListener('updatefound', () => {
-            console.log('Service Worker update found');
-            const newWorker = registration.installing;
-            if (newWorker) {
-              newWorker.addEventListener('statechange', () => {
-                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  // 새 버전이 설치되었고, 현재 활성화된 Service Worker가 있으면 업데이트 필요
-                  console.log('New Service Worker installed - refresh needed');
-                  setNeedRefresh(true);
-                }
-              });
+        if (registration) {
+          registrationRef.current = registration;
+
+          // 주기적 업데이트 체크 설정
+          // Edge case 처리: 온라인/오프라인 상태에 따라 동적 처리
+          intervalRef.current = setInterval(() => {
+            checkForUpdates();
+          }, UPDATE_CHECK_INTERVAL);
+
+          // 앱이 포커스를 받을 때 업데이트 체크 (페이지 전환, 탭 전환 등)
+          const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+              console.log('[PWA] App became visible - checking for updates');
+              checkForUpdates();
             }
-          });
+          };
+          document.addEventListener('visibilitychange', handleVisibilityChange);
+
+          // 온라인 상태가 되면 업데이트 체크
+          const handleOnline = () => {
+            console.log('[PWA] Back online - checking for updates');
+            checkForUpdates();
+          };
+          window.addEventListener('online', handleOnline);
+
+          // 클린업
+          return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            window.removeEventListener('online', handleOnline);
+          };
         }
       },
       onRegisterError(error: Error) {
-        console.error('Service Worker registration error:', error);
+        console.error('[PWA] Service Worker registration error:', error);
       },
     });
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setUpdateSW(() => updateSWFn);
 
     // 네트워크 상태 감지
@@ -93,11 +132,15 @@ export function usePWA(): UsePWAResult {
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
     return () => {
+      // 인터벌 정리
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
-  }, []);
+  }, [checkForUpdates]);
 
   const updateServiceWorker = async () => {
     if (updateSW) {

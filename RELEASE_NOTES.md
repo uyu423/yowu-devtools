@@ -1,5 +1,41 @@
 # Release Notes
 
+## v1.3.3 (December 2025) - PWA Update Notification Fix
+
+**Bug Fixes:**
+
+- 🔧 **PWA 업데이트 알림 미표시 수정**:
+  - `registerType: 'prompt'` 모드에서 `skipWaiting`과 `clientsClaim` 설정 충돌 해결
+  - 새 버전 배포 후 설치된 PWA에서 업데이트 알림이 정상 표시됨
+  - vite-plugin-pwa 공식 문서 기반으로 설정 최적화
+
+**Enhancements:**
+
+- ⚡ **PWA 업데이트 감지 개선**:
+  - 앱이 포커스를 받을 때 (탭 전환, 창 활성화) 자동 업데이트 체크
+  - 오프라인에서 온라인으로 복귀 시 즉시 업데이트 체크
+  - 오프라인 상태에서는 업데이트 체크 스킵 (불필요한 에러 방지)
+  - `onRegisteredSW` 콜백 사용 (v0.12.8+ 권장 방식)
+
+- 📖 **PWA 트러블슈팅 문서 대폭 개선**:
+  - `registerType` 옵션과 `skipWaiting`/`clientsClaim` 관계 설명
+  - 업데이트가 반영되지 않는 문제 해결 가이드
+  - Console 로그 의미 설명 추가
+  - vite-plugin-pwa 공식 문서 링크 추가
+
+**Technical:**
+
+- `vite.config.ts`: `skipWaiting`과 `clientsClaim` 옵션 제거 (prompt 모드 호환)
+- `usePWA.ts`: 주기적 업데이트 체크 로직 리팩토링 및 edge case 처리
+- `docs/PWA_TROUBLESHOOTING.md`: 문서 전면 개편
+
+**참고 문서:**
+
+- [vite-plugin-pwa Prompt for update](https://vite-pwa-org.netlify.app/guide/prompt-for-update.html)
+- [vite-plugin-pwa Periodic SW updates](https://vite-pwa-org.netlify.app/guide/periodic-sw-updates.html)
+
+---
+
 ## v1.3.2 (Upcoming) - Cron Parser Advanced
 
 **🚧 개발 예정**
