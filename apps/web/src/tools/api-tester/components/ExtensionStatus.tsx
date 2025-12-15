@@ -4,11 +4,12 @@
  * Accessibility: Uses blue for success (colorblind-friendly, avoids red/green confusion)
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { Loader2, Plug, PlugZap, ShieldAlert, RefreshCw } from 'lucide-react';
 import type { ExtensionStatus as ExtensionStatusType } from '../types';
 import { Tooltip } from '@/components/ui/Tooltip';
+import { useI18n } from '@/hooks/useI18nHooks';
 
 interface ExtensionStatusProps {
   status: ExtensionStatusType;
@@ -18,8 +19,8 @@ interface ExtensionStatusProps {
 
 interface StatusConfig {
   icon: React.ElementType;
-  label: string;
-  tooltip: string;
+  labelKey: string;
+  tooltipKey: string;
   badgeClass: string;
   iconClass: string;
   showPulse?: boolean;
@@ -30,31 +31,31 @@ interface StatusConfig {
 const STATUS_CONFIG: Record<ExtensionStatusType, StatusConfig> = {
   checking: {
     icon: RefreshCw,
-    label: 'Checking...',
-    tooltip: 'Verifying extension connection. Please wait...',
+    labelKey: 'extensionChecking',
+    tooltipKey: 'extensionTooltipChecking',
     badgeClass: 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400',
     iconClass: 'text-gray-400 dark:text-gray-500',
     showSpinner: true,
   },
   'not-installed': {
     icon: Plug,
-    label: 'Not Connected',
-    tooltip: 'Extension not detected. Install the CORS Helper extension to bypass CORS restrictions. Click to retry detection.',
+    labelKey: 'extensionNotConnected',
+    tooltipKey: 'extensionTooltipNotConnected',
     badgeClass: 'bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800/50',
     iconClass: 'text-red-500 dark:text-red-400',
     clickable: true,
   },
   'permission-required': {
     icon: ShieldAlert,
-    label: 'Permission Required',
-    tooltip: 'Extension detected but needs permission for this domain. Click the extension icon and allow access to continue.',
+    labelKey: 'extensionPermissionRequired',
+    tooltipKey: 'extensionTooltipPermissionRequired',
     badgeClass: 'bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800/50',
     iconClass: 'text-amber-500 dark:text-amber-400',
   },
   connected: {
     icon: PlugZap,
-    label: 'CORS Bypass Ready',
-    tooltip: 'Extension connected and ready! CORS restrictions will be bypassed automatically when needed.',
+    labelKey: 'extensionConnected',
+    tooltipKey: 'extensionTooltipConnected',
     badgeClass: 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800/50',
     iconClass: 'text-blue-500 dark:text-blue-400',
     showPulse: true,
@@ -66,8 +67,12 @@ export const ExtensionStatus: React.FC<ExtensionStatusProps> = ({
   onRetry,
   className,
 }) => {
+  const { t } = useI18n();
   const config = STATUS_CONFIG[status];
   const Icon = config.icon;
+
+  const label = useMemo(() => t(`tool.apiTester.${config.labelKey}`), [t, config.labelKey]);
+  const tooltip = useMemo(() => t(`tool.apiTester.${config.tooltipKey}`), [t, config.tooltipKey]);
 
   const handleClick = () => {
     if (config.clickable && onRetry) {
@@ -76,7 +81,7 @@ export const ExtensionStatus: React.FC<ExtensionStatusProps> = ({
   };
 
   return (
-    <Tooltip content={config.tooltip}>
+    <Tooltip content={tooltip}>
       <button
         onClick={handleClick}
         className={cn(
@@ -106,7 +111,7 @@ export const ExtensionStatus: React.FC<ExtensionStatusProps> = ({
         </span>
 
         {/* Label */}
-        <span>{config.label}</span>
+        <span>{label}</span>
 
         {/* Retry hint for not-installed state */}
         {config.clickable && (

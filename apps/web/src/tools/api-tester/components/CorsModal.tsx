@@ -1,127 +1,185 @@
 /**
  * CorsModal - Modal shown when CORS error is detected
+ * 
+ * Features:
+ * - Explains why CORS errors occur and why extension is needed
+ * - Option to remember choice for the domain
+ * - i18n support
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { AlertCircle, Zap, ExternalLink, X } from 'lucide-react';
+import { AlertTriangle, Zap, ExternalLink, X, Info, Check } from 'lucide-react';
+import { useI18n } from '@/hooks/useI18nHooks';
 import type { ExtensionStatus } from '../types';
 
 interface CorsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onRetryWithExtension: () => void;
+  onRetryWithExtension: (rememberChoice: boolean) => void;
   extensionStatus: ExtensionStatus;
+  targetUrl?: string;
 }
 
 // Chrome Web Store URL for the extension (placeholder)
 const EXTENSION_STORE_URL = 'https://chromewebstore.google.com';
+
+/**
+ * Extract origin from URL for display
+ */
+const getOriginFromUrl = (url?: string): string | null => {
+  if (!url) return null;
+  try {
+    return new URL(url).origin;
+  } catch {
+    return null;
+  }
+};
 
 export const CorsModal: React.FC<CorsModalProps> = ({
   isOpen,
   onClose,
   onRetryWithExtension,
   extensionStatus,
+  targetUrl,
 }) => {
+  const { t } = useI18n();
+  const [rememberChoice, setRememberChoice] = useState(true);
+
   if (!isOpen) return null;
 
   const isExtensionAvailable = extensionStatus === 'connected' || extensionStatus === 'permission-required';
+  const origin = getOriginFromUrl(targetUrl);
+
+  const handleRetry = () => {
+    onRetryWithExtension(rememberChoice);
+  };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/50"
-        onClick={onClose}
-      />
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      {/* Overlay */}
+      <div className="fixed inset-0 bg-black/50 dark:bg-black/70" />
 
       {/* Modal */}
-      <div className={cn(
-        'relative w-full max-w-md mx-4 p-6 rounded-xl shadow-xl',
-        'bg-white dark:bg-gray-800'
-      )}>
-        {/* Close button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-        >
-          <X className="w-5 h-5" />
-        </button>
+      <div
+        className="relative w-full max-w-md bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-5 h-5 text-amber-500" />
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+              {t('tool.apiTester.corsErrorTitle')}
+            </h2>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+          >
+            <X className="w-5 h-5 text-gray-400" />
+          </button>
+        </div>
 
-        {/* Icon */}
-        <div className="flex justify-center mb-4">
-          <div className="w-12 h-12 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center">
-            <AlertCircle className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
+        {/* Content */}
+        <div className="px-6 py-4 space-y-4">
+          {/* Main description */}
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            {t('tool.apiTester.corsErrorDescription')}
+          </p>
+
+          {/* Explanation box */}
+          <div className="flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
+            <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="text-sm text-blue-800 dark:text-blue-200">
+                {t('tool.apiTester.corsErrorExplanation')}
+              </p>
+              <details className="mt-2 text-sm">
+                <summary className="text-blue-600 dark:text-blue-400 cursor-pointer hover:underline font-medium">
+                  {t('tool.apiTester.corsWhyExtension')}
+                </summary>
+                <p className="mt-2 text-xs text-blue-700 dark:text-blue-300">
+                  {t('tool.apiTester.corsWhyExtensionDesc')}
+                </p>
+              </details>
+            </div>
+          </div>
+
+          {/* Remember choice checkbox */}
+          {isExtensionAvailable && origin && (
+            <label className="flex items-start gap-3 p-3 rounded-md bg-gray-50 dark:bg-gray-700/50 cursor-pointer group">
+              <div className="relative flex items-center justify-center mt-0.5">
+                <input
+                  type="checkbox"
+                  checked={rememberChoice}
+                  onChange={(e) => setRememberChoice(e.target.checked)}
+                  className="sr-only"
+                />
+                <div className={cn(
+                  'w-4 h-4 rounded border-2 flex items-center justify-center transition-colors',
+                  rememberChoice
+                    ? 'bg-blue-600 border-blue-600'
+                    : 'border-gray-300 dark:border-gray-600 group-hover:border-blue-400'
+                )}>
+                  {rememberChoice && <Check className="w-3 h-3 text-white" />}
+                </div>
+              </div>
+              <div className="flex-1">
+                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                  {t('tool.apiTester.corsRememberChoice')}
+                </span>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                  {t('tool.apiTester.corsRememberChoiceDesc').replace('{origin}', origin)}
+                </p>
+              </div>
+            </label>
+          )}
+
+          {/* Learn more link */}
+          <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+            <a
+              href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1"
+            >
+              {t('tool.apiTester.learnMoreCors')}
+              <ExternalLink className="w-3 h-3" />
+            </a>
           </div>
         </div>
 
-        {/* Title */}
-        <h3 className="text-lg font-semibold text-center text-gray-900 dark:text-gray-100 mb-2">
-          CORS Error Detected
-        </h3>
-
-        {/* Description */}
-        <p className="text-sm text-center text-gray-600 dark:text-gray-400 mb-6">
-          This request was blocked by the browser's CORS policy.
-          {isExtensionAvailable ? (
-            <> Would you like to retry using the Chrome Extension to bypass CORS?</>
-          ) : (
-            <> Install the Chrome Extension to bypass CORS restrictions.</>
-          )}
-        </p>
-
-        {/* Actions */}
-        <div className="flex flex-col gap-3">
+        {/* Footer */}
+        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
+          >
+            {t('common.cancel')}
+          </button>
           {isExtensionAvailable ? (
             <button
-              onClick={onRetryWithExtension}
-              className={cn(
-                'flex items-center justify-center gap-2 w-full px-4 py-2.5',
-                'bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium',
-                'transition-colors'
-              )}
+              onClick={handleRetry}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 rounded-md transition-colors"
             >
               <Zap className="w-4 h-4" />
-              Retry with Extension
+              {t('tool.apiTester.corsRetryWithExtension')}
             </button>
           ) : (
             <a
               href={EXTENSION_STORE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className={cn(
-                'flex items-center justify-center gap-2 w-full px-4 py-2.5',
-                'bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium',
-                'transition-colors'
-              )}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 rounded-md transition-colors"
             >
-              Install Chrome Extension
+              {t('tool.apiTester.corsInstallExtension')}
               <ExternalLink className="w-4 h-4" />
             </a>
           )}
-          <button
-            onClick={onClose}
-            className={cn(
-              'w-full px-4 py-2.5 rounded-lg font-medium',
-              'text-gray-700 dark:text-gray-300',
-              'hover:bg-gray-100 dark:hover:bg-gray-700',
-              'transition-colors'
-            )}
-          >
-            Cancel
-          </button>
-        </div>
-
-        {/* Learn more link */}
-        <div className="mt-4 text-center">
-          <a
-            href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
-          >
-            Learn more about CORS
-          </a>
         </div>
       </div>
     </div>

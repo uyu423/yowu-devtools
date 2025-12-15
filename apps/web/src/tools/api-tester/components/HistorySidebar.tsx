@@ -5,6 +5,7 @@
 import React, { useState, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { Search, Star, Trash2, Clock, MoreVertical, X, Edit2, Check, PanelRightClose, PanelRightOpen } from 'lucide-react';
+import { useI18n } from '@/hooks/useI18nHooks';
 import type { HistoryItem, HttpMethod } from '../types';
 import { getStatusColor } from '../types';
 
@@ -68,6 +69,7 @@ export const HistorySidebar: React.FC<HistorySidebarProps> = ({
   isOpen = true,
   onToggle,
 }) => {
+  const { t } = useI18n();
   const [searchTerm, setSearchTerm] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
@@ -227,7 +229,7 @@ export const HistorySidebar: React.FC<HistorySidebarProps> = ({
               className="w-full px-3 py-1.5 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
             >
               <Edit2 className="w-4 h-4" />
-              Rename
+              {t('tool.apiTester.rename')}
             </button>
             <button
               onClick={() => {
@@ -237,7 +239,7 @@ export const HistorySidebar: React.FC<HistorySidebarProps> = ({
               className="w-full px-3 py-1.5 text-left text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
             >
               <Trash2 className="w-4 h-4" />
-              Delete
+              {t('tool.apiTester.delete')}
             </button>
           </div>
         )}
@@ -257,7 +259,7 @@ export const HistorySidebar: React.FC<HistorySidebarProps> = ({
                 'p-2 rounded-lg transition-colors',
                 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
               )}
-              title="Show History"
+              title={t('tool.apiTester.showHistory')}
             >
               <PanelRightOpen className="w-5 h-5" />
             </button>
@@ -271,14 +273,14 @@ export const HistorySidebar: React.FC<HistorySidebarProps> = ({
     <div className="flex flex-col h-full w-96 border-l border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-        <h3 className="font-semibold text-gray-900 dark:text-gray-100">History</h3>
+        <h3 className="font-semibold text-gray-900 dark:text-gray-100">{t('tool.apiTester.history')}</h3>
         <div className="flex items-center gap-2">
           {history.length > 0 && (
             <button
               onClick={onClear}
               className="text-xs text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400"
             >
-              Clear All
+              {t('tool.apiTester.clearHistory')}
             </button>
           )}
           {onToggle && (
@@ -288,7 +290,7 @@ export const HistorySidebar: React.FC<HistorySidebarProps> = ({
                 'p-1.5 rounded-lg transition-colors',
                 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
               )}
-              title="Hide History"
+              title={t('tool.apiTester.hideHistory')}
             >
               <PanelRightClose className="w-4 h-4" />
             </button>
@@ -304,7 +306,7 @@ export const HistorySidebar: React.FC<HistorySidebarProps> = ({
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search history..."
+            placeholder={t('tool.apiTester.searchHistory')}
             className={cn(
               'w-full pl-8 pr-3 py-1.5 text-sm rounded-lg',
               'bg-gray-100 dark:bg-gray-800',
@@ -323,7 +325,7 @@ export const HistorySidebar: React.FC<HistorySidebarProps> = ({
         {favoriteItems.length > 0 && (
           <div className="py-2">
             <div className="px-4 py-1 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-              Favorites
+              {t('tool.apiTester.favorites')}
             </div>
             {favoriteItems.map((item) => (
               <HistoryItemComponent key={item.id} item={item} isFavorite={true} />
@@ -336,7 +338,7 @@ export const HistorySidebar: React.FC<HistorySidebarProps> = ({
           <div className="py-2">
             {favoriteItems.length > 0 && (
               <div className="px-4 py-1 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                Recent
+                {t('tool.apiTester.recent')}
               </div>
             )}
             {regularItems.map((item) => (
@@ -350,7 +352,7 @@ export const HistorySidebar: React.FC<HistorySidebarProps> = ({
           <div className="flex flex-col items-center justify-center h-full text-gray-400 dark:text-gray-500 py-8">
             <Clock className="w-8 h-8 mb-2" />
             <span className="text-sm">
-              {searchTerm ? 'No matching requests' : 'No requests yet'}
+              {searchTerm ? t('tool.apiTester.noMatchingRequests') : t('tool.apiTester.noHistory')}
             </span>
           </div>
         )}

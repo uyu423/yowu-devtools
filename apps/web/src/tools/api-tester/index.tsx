@@ -32,7 +32,7 @@ import {
   CollapsibleSection,
   CorsModal,
 } from './components';
-import { useRequestExecutor, useApiHistory } from './hooks';
+import { useRequestExecutor, useApiHistory, useCorsAllowlist } from './hooks';
 
 const DEFAULT_STATE: ApiTesterState = {
   method: 'GET',
@@ -90,6 +90,8 @@ const ApiTesterTool: React.FC = () => {
 
   const { history, favorites, addHistory, removeHistory, clearHistory, toggleFavorite, renameHistory } =
     useApiHistory();
+
+  const { isAllowed: isCorsAllowed, addOrigin: addCorsOrigin } = useCorsAllowlist();
 
   // UI state
   const [showHistory, setShowHistory] = useState(true); // Default expanded
@@ -166,21 +168,35 @@ const ApiTesterTool: React.FC = () => {
     return result;
   }, [executeRequest, addHistory]);
 
-  // Handle send request
+  // Handle send request with automatic CORS bypass for allowed origins
   const handleSend = useCallback(async () => {
     if (!state.url.trim()) return;
     setPendingCorsRetry(false);
-    await executeWithAutoMode(state, false);
-  }, [state, executeWithAutoMode]);
+    
+    // Check if this origin is in the CORS allowlist
+    const shouldUseExtension = isCorsAllowed(state.url) && extensionStatus === 'connected';
+    
+    if (shouldUseExtension) {
+      console.log('[API Tester] Origin in CORS allowlist, using extension automatically');
+    }
+    
+    await executeWithAutoMode(state, shouldUseExtension);
+  }, [state, executeWithAutoMode, isCorsAllowed, extensionStatus]);
 
   // Handle retry with extension (from modal)
-  const handleRetryWithExtension = useCallback(async () => {
-    console.log('[API Tester] Retrying with extension...');
+  const handleRetryWithExtension = useCallback(async (rememberChoice: boolean) => {
+    console.log('[API Tester] Retrying with extension, remember:', rememberChoice);
     setCorsModalOpen(false);
     setPendingCorsRetry(true);
+    
+    // Add to allowlist if user wants to remember
+    if (rememberChoice && state.url) {
+      addCorsOrigin(state.url);
+    }
+    
     clearResponse();
     await executeWithAutoMode(state, true);
-  }, [state, executeWithAutoMode, clearResponse]);
+  }, [state, executeWithAutoMode, clearResponse, addCorsOrigin]);
 
   // Handle history item select
   const handleHistorySelect = useCallback(
@@ -353,6 +369,7 @@ const ApiTesterTool: React.FC = () => {
         onClose={() => setCorsModalOpen(false)}
         onRetryWithExtension={handleRetryWithExtension}
         extensionStatus={extensionStatus}
+        targetUrl={state.url}
       />
 
       <ShareModal {...shareModalProps} />
