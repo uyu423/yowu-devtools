@@ -102,6 +102,7 @@ export const jaJP = {
     allTools: 'すべてのツール',
     noToolsLoaded: 'ツールが読み込めません',
     moreComingSoon: 'もっと追加予定...',
+    suggestFeature: '機能をリクエスト',
     removeFromFavorites: 'お気に入りから削除',
     addToFavorites: 'お気に入りに追加',
     lightMode: 'ライトモード',

@@ -104,6 +104,7 @@ export const esES = {
     allTools: 'Todas las herramientas',
     noToolsLoaded: 'No se pudieron cargar herramientas',
     moreComingSoon: 'Más próximamente...',
+    suggestFeature: 'Sugerir una función',
     removeFromFavorites: 'Quitar de favoritos',
     addToFavorites: 'Añadir a favoritos',
     lightMode: 'Modo claro',

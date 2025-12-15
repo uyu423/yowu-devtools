@@ -102,6 +102,7 @@ export const koKR = {
     allTools: '모든 도구',
     noToolsLoaded: '도구를 불러올 수 없습니다',
     moreComingSoon: '곧 더 많은 도구가 추가됩니다...',
+    suggestFeature: '기능 제안하기',
     removeFromFavorites: '즐겨찾기에서 제거',
     addToFavorites: '즐겨찾기에 추가',
     lightMode: '라이트 모드',

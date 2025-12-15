@@ -100,6 +100,7 @@ export const enUS = {
     allTools: 'All Tools',
     noToolsLoaded: 'No tools loaded',
     moreComingSoon: 'More coming soon...',
+    suggestFeature: 'Suggest a feature',
     removeFromFavorites: 'Remove from favorites',
     addToFavorites: 'Add to favorites',
     lightMode: 'Light Mode',

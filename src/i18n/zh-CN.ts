@@ -100,6 +100,7 @@ export const zhCN = {
     allTools: '所有工具',
     noToolsLoaded: '无法加载工具',
     moreComingSoon: '更多即将推出...',
+    suggestFeature: '建议功能',
     removeFromFavorites: '从收藏夹移除',
     addToFavorites: '添加到收藏夹',
     lightMode: '浅色模式',
