@@ -2,6 +2,7 @@ import React, { useRef, useState, useCallback } from 'react';
 import { Upload, File } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { useI18n } from '@/hooks/useI18nHooks';
 
 interface FileInputProps {
   onFileLoad: (content: string, fileName: string) => void;
@@ -22,6 +23,7 @@ export const FileInput: React.FC<FileInputProps> = ({
   className,
   disabled = false,
 }) => {
+  const { t } = useI18n();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -30,7 +32,7 @@ export const FileInput: React.FC<FileInputProps> = ({
     async (file: File) => {
       // Check file size
       if (file.size > maxSize) {
-        toast.error(`File is too large. Maximum size is ${(maxSize / 1024 / 1024).toFixed(0)}MB`);
+        toast.error(t('common.fileTooLarge').replace('{size}', (maxSize / 1024 / 1024).toFixed(0)));
         return;
       }
 
@@ -38,15 +40,15 @@ export const FileInput: React.FC<FileInputProps> = ({
       try {
         const content = await file.text();
         onFileLoad(content, file.name);
-        toast.success(`File "${file.name}" loaded successfully`);
+        toast.success(t('common.fileLoadedSuccess').replace('{name}', file.name));
       } catch (error) {
         console.error('Error reading file:', error);
-        toast.error('Failed to read file');
+        toast.error(t('common.fileReadFailed'));
       } finally {
         setIsLoading(false);
       }
     },
-    [onFileLoad, maxSize]
+    [onFileLoad, maxSize, t]
   );
 
   const handleFileSelect = useCallback(
@@ -122,16 +124,16 @@ export const FileInput: React.FC<FileInputProps> = ({
         {isLoading ? (
           <div className="flex flex-col items-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-blue-400 mb-2" />
-            <span className="text-sm text-gray-600 dark:text-gray-400">Loading file...</span>
+            <span className="text-sm text-gray-600 dark:text-gray-400">{t('common.loadingFile')}</span>
           </div>
         ) : (
           <>
             <Upload className="w-8 h-8 text-gray-400 dark:text-gray-500 mb-2" />
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Drop a file here or click to browse
+              {t('common.dropFileOrClick')}
             </span>
             <span className="text-xs text-gray-500 dark:text-gray-400">
-              {accept ? `Accepted: ${accept}` : 'All text files'} • Max {maxSize / 1024 / 1024}MB
+              {accept ? `${t('common.accepted')}: ${accept}` : t('common.allTextFiles')} • {t('common.max')} {maxSize / 1024 / 1024}MB
             </span>
           </>
         )}
@@ -168,13 +170,14 @@ export const FileInputButton: React.FC<FileInputButtonProps> = ({
   disabled = false,
   children,
 }) => {
+  const { t } = useI18n();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const readFile = useCallback(
     async (file: File) => {
       if (file.size > maxSize) {
-        toast.error(`File is too large. Maximum size is ${(maxSize / 1024 / 1024).toFixed(0)}MB`);
+        toast.error(t('common.fileTooLarge').replace('{size}', (maxSize / 1024 / 1024).toFixed(0)));
         return;
       }
 
@@ -182,15 +185,15 @@ export const FileInputButton: React.FC<FileInputButtonProps> = ({
       try {
         const content = await file.text();
         onFileLoad(content, file.name);
-        toast.success(`File "${file.name}" loaded successfully`);
+        toast.success(t('common.fileLoadedSuccess').replace('{name}', file.name));
       } catch (error) {
         console.error('Error reading file:', error);
-        toast.error('Failed to read file');
+        toast.error(t('common.fileReadFailed'));
       } finally {
         setIsLoading(false);
       }
     },
-    [onFileLoad, maxSize]
+    [onFileLoad, maxSize, t]
   );
 
   const handleFileInputChange = useCallback(
@@ -218,13 +221,13 @@ export const FileInputButton: React.FC<FileInputButtonProps> = ({
         {isLoading ? (
           <span className="flex items-center gap-2">
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current" />
-            Loading...
+            {t('common.loading')}...
           </span>
         ) : (
           children || (
             <span className="flex items-center gap-2">
               <File className="w-4 h-4" />
-              Choose File
+              {t('common.chooseFile')}
             </span>
           )
         )}
