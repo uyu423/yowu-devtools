@@ -14,6 +14,9 @@
 :root {
   font-family: 'NanumSquareNeo', Inter, system-ui, Avenir, Helvetica, Arial,
     sans-serif;
+  line-height: 1.75; /* comfortable line spacing for CJK languages */
+  word-break: keep-all; /* CJK languages: break at word boundaries */
+  overflow-wrap: break-word; /* break long words if necessary */
 }
 
 .child-fields-container {
