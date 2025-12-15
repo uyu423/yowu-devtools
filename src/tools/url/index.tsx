@@ -10,6 +10,7 @@ import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useTitle } from '@/hooks/useTitle';
+import { useI18n } from '@/hooks/useI18nHooks';
 import { copyToClipboard } from '@/lib/clipboard';
 import { isMobileDevice } from '@/lib/utils';
 import { ShareModal } from '@/components/common/ShareModal';
@@ -27,7 +28,8 @@ const DEFAULT_STATE: UrlToolState = {
 };
 
 const UrlTool: React.FC = () => {
-  useTitle('URL Encoder');
+  const { t } = useI18n();
+  useTitle(t('tool.url.title'));
   // URL tool state contains: input (string), mode, plusForSpace
   // All fields are necessary for sharing - input may be large but required
   const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
@@ -72,8 +74,8 @@ const UrlTool: React.FC = () => {
   return (
     <div className="flex flex-col h-full p-4 md:p-6 max-w-5xl mx-auto">
       <ToolHeader
-        title="URL Encode/Decode"
-        description="Safely transform query params or path segments."
+        title={t('tool.url.title')}
+        description={t('tool.url.description')}
         onReset={resetState}
         onShare={async () => {
           if (isMobile) {
@@ -92,14 +94,14 @@ const UrlTool: React.FC = () => {
         }}
         includedFields={shareInfo.includedFields}
         excludedFields={shareInfo.excludedFields}
-        toolName="URL Encoder"
+        toolName={t('tool.url.title')}
       />
       <div className="flex-1 flex flex-col gap-6">
         <EditorPanel
-          title="Input"
+          title={t('common.input')}
           value={state.input}
           onChange={(val) => updateState({ input: val })}
-          placeholder="Type or paste content here..."
+          placeholder={t('tool.url.inputPlaceholder')}
           className="h-40 lg:h-48"
           status={conversion.error ? 'error' : 'default'}
         />
@@ -118,7 +120,7 @@ const UrlTool: React.FC = () => {
                   updateState({ mode: mode as UrlToolState['mode'] })
                 }
               >
-                {mode === 'encode' ? 'Encode' : 'Decode'}
+                {mode === 'encode' ? t('common.encode') : t('common.decode')}
               </button>
             ))}
           </div>
@@ -130,8 +132,8 @@ const UrlTool: React.FC = () => {
               checked={state.plusForSpace}
               onChange={(e) => updateState({ plusForSpace: e.target.checked })}
             />
-            <OptionLabel tooltip="Encode spaces as '+' like HTML forms instead of the default '%20'. This is useful when working with query strings and form data where '+' is the standard representation for spaces.">
-              Use + for spaces
+            <OptionLabel tooltip={t('tool.url.useSpacePlusTooltip')}>
+              {t('tool.url.useSpacePlus')}
             </OptionLabel>
           </label>
 
@@ -141,27 +143,27 @@ const UrlTool: React.FC = () => {
             disabled={!conversion.result}
           >
             <RefreshCw className="h-4 w-4" />
-            Input/Output Swap
+            {t('tool.url.inputOutputSwap')}
           </button>
         </ActionBar>
 
         {conversion.error && (
-          <ErrorBanner message="Decoding failed" details={conversion.error} />
+          <ErrorBanner message={t('tool.url.decodingFailed')} details={conversion.error} />
         )}
 
         <div className="flex flex-col">
           <div className="flex items-center justify-between px-3 py-1.5 border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-900 shrink-0 rounded-t-md border border-b-0">
             <span className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-              Result
+              {t('common.result')}
             </span>
             <button
               onClick={() =>
                 conversion.result &&
-                copyToClipboard(conversion.result, 'Copied result.')
+                copyToClipboard(conversion.result, t('common.copiedResult'))
               }
               disabled={!conversion.result}
               className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              title="Copy Result"
+              title={t('common.copy')}
             >
               <Copy className="w-4 h-4" />
             </button>
@@ -170,7 +172,7 @@ const UrlTool: React.FC = () => {
             title=""
             value={conversion.result}
             readOnly
-            placeholder="Result will appear here..."
+            placeholder={t('tool.url.resultPlaceholder')}
             className="h-40 lg:h-48 rounded-t-none"
             status={conversion.error ? 'error' : 'success'}
           />

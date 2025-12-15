@@ -1,10 +1,22 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  useCallback,
+} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, X, Star, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { tools } from '@/tools';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useRecentTools } from '@/hooks/useRecentTools';
+import { useI18n } from '@/hooks/useI18nHooks';
+import { buildLocalePath } from '@/lib/i18nUtils';
+
+// Helper to convert tool id to i18n key (url-parser → urlParser)
+const toI18nToolId = (id: string) =>
+  id.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
 
 interface CommandPaletteProps {
   isOpen: boolean;
@@ -12,7 +24,7 @@ interface CommandPaletteProps {
 }
 
 interface SearchResult {
-  tool: typeof tools[0];
+  tool: (typeof tools)[0];
   matchScore: number;
   matchType: 'title' | 'keyword' | 'description';
 }
@@ -24,16 +36,16 @@ interface SearchResult {
 function fuzzyMatch(query: string, text: string): number {
   const queryLower = query.toLowerCase();
   const textLower = text.toLowerCase();
-  
+
   // Exact match
   if (textLower === queryLower) return 100;
-  
+
   // Starts with query
   if (textLower.startsWith(queryLower)) return 80;
-  
+
   // Contains query
   if (textLower.includes(queryLower)) return 60;
-  
+
   // Check if all characters in query appear in order in text
   let queryIndex = 0;
   for (let i = 0; i < textLower.length && queryIndex < queryLower.length; i++) {
@@ -42,37 +54,55 @@ function fuzzyMatch(query: string, text: string): number {
     }
   }
   if (queryIndex === queryLower.length) return 40;
-  
+
   return 0;
 }
 
-export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose }) => {
+export const CommandPalette: React.FC<CommandPaletteProps> = ({
+  isOpen,
+  onClose,
+}) => {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const { favorites, toggleFavorite, isFavorite } = useFavorites();
   const { recentTools } = useRecentTools();
+  const { locale, t } = useI18n();
+
+  // Helper function to build locale-aware path
+  const getLocalePath = useCallback(
+    (path: string) => buildLocalePath(locale, path),
+    [locale]
+  );
 
   // Search results
   const results = useMemo<SearchResult[]>(() => {
     if (!query.trim()) {
       // No query: show recent tools first, then favorites, then all tools
-      const recentToolIds = new Set(recentTools.map(rt => rt.toolId));
+      const recentToolIds = new Set(recentTools.map((rt) => rt.toolId));
       const favoriteIds = new Set(favorites);
-      
+
       const recent = tools
-        .filter(tool => recentToolIds.has(tool.id))
-        .map(tool => ({ tool, matchScore: 100, matchType: 'title' as const }));
-      
+        .filter((tool) => recentToolIds.has(tool.id))
+        .map((tool) => ({
+          tool,
+          matchScore: 100,
+          matchType: 'title' as const,
+        }));
+
       const favorite = tools
-        .filter(tool => favoriteIds.has(tool.id) && !recentToolIds.has(tool.id))
-        .map(tool => ({ tool, matchScore: 90, matchType: 'title' as const }));
-      
+        .filter(
+          (tool) => favoriteIds.has(tool.id) && !recentToolIds.has(tool.id)
+        )
+        .map((tool) => ({ tool, matchScore: 90, matchType: 'title' as const }));
+
       const others = tools
-        .filter(tool => !recentToolIds.has(tool.id) && !favoriteIds.has(tool.id))
-        .map(tool => ({ tool, matchScore: 0, matchType: 'title' as const }));
-      
+        .filter(
+          (tool) => !recentToolIds.has(tool.id) && !favoriteIds.has(tool.id)
+        )
+        .map((tool) => ({ tool, matchScore: 0, matchType: 'title' as const }));
+
       return [...recent, ...favorite, ...others];
     }
 
@@ -153,7 +183,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
 
       if (e.key === 'ArrowDown') {
         e.preventDefault();
-        setSelectedIndex((prev) => (prev < results.length - 1 ? prev + 1 : prev));
+        setSelectedIndex((prev) =>
+          prev < results.length - 1 ? prev + 1 : prev
+        );
         return;
       }
 
@@ -167,7 +199,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
         e.preventDefault();
         const selected = results[selectedIndex];
         if (selected) {
-          navigate(selected.tool.path);
+          navigate(getLocalePath(selected.tool.path));
           onClose();
         }
         return;
@@ -176,12 +208,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, results, selectedIndex, navigate, onClose]);
+  }, [isOpen, results, selectedIndex, navigate, onClose, getLocalePath]);
 
   if (!isOpen) return null;
 
-  const handleToolClick = (tool: typeof tools[0]) => {
-    navigate(tool.path);
+  const handleToolClick = (tool: (typeof tools)[0]) => {
+    navigate(getLocalePath(tool.path));
     onClose();
   };
 
@@ -191,7 +223,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
   };
 
   const isRecentTool = (toolId: string) => {
-    return recentTools.some(rt => rt.toolId === toolId);
+    return recentTools.some((rt) => rt.toolId === toolId);
   };
 
   return (
@@ -215,7 +247,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search tools..."
+            placeholder={t('commandPalette.searchTools')}
             className="flex-1 bg-transparent border-none outline-none text-gray-900 dark:text-white placeholder-gray-400 text-lg"
           />
           <button
@@ -230,7 +262,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
         <div className="max-h-[60vh] overflow-y-auto">
           {results.length === 0 ? (
             <div className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
-              No results found
+              {t('commandPalette.noResults')}
             </div>
           ) : (
             <div className="py-2">
@@ -260,18 +292,18 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
                           {tool.title}
                         </span>
                         {isRecent && (
-                          <span title="Recent">
+                          <span title={t('commandPalette.recent')}>
                             <Clock className="w-3.5 h-3.5 text-gray-400" />
                           </span>
                         )}
                         {isFav && (
-                          <span title="Favorite">
+                          <span title={t('commandPalette.favorites')}>
                             <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
                           </span>
                         )}
                       </div>
                       <div className="text-sm text-gray-500 dark:text-gray-400 truncate">
-                        {tool.description}
+                        {t(`tool.${toI18nToolId(tool.id)}.description`)}
                       </div>
                     </div>
                     <button
@@ -280,7 +312,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
                         'ml-2 p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors',
                         isFav && 'bg-yellow-50 dark:bg-yellow-900/20'
                       )}
-                      title={isFav ? 'Remove from favorites' : 'Add to favorites'}
+                      title={
+                        isFav
+                          ? t('commandPalette.removeFromFavorites')
+                          : t('commandPalette.addToFavorites')
+                      }
                     >
                       <Star
                         className={cn(
@@ -302,19 +338,18 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
             <kbd className="px-1.5 py-0.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded">
               ↑↓
             </kbd>{' '}
-            Navigate{' '}
+            {t('commandPalette.navigate')}{' '}
             <kbd className="px-1.5 py-0.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded">
               Enter
             </kbd>{' '}
-            Select{' '}
+            {t('commandPalette.select')}{' '}
             <kbd className="px-1.5 py-0.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded">
               Esc
             </kbd>{' '}
-            Close
+            {t('commandPalette.close')}
           </span>
         </div>
       </div>
     </div>
   );
 };
-

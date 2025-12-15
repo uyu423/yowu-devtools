@@ -1,12 +1,12 @@
 # tools.yowu.dev
 
-An open toolbox for developers who would rather keep sensitive snippets on their own machines. Too many “free” web converters quietly ship data to unknown backends, so this project keeps every transformation inside the browser, publishes every line of code, and documents the UX decisions in the open. The goal is simple: make the common chores (JSON inspection, cron sanity checks, quick diffs, etc.) pleasant **and** trustworthy.
+An open toolbox for developers who would rather keep sensitive snippets on their own machines. Too many "free" web converters quietly ship data to unknown backends, so this project keeps every transformation inside the browser, publishes every line of code, and documents the UX decisions in the open. The goal is simple: make the common chores (JSON inspection, cron sanity checks, quick diffs, etc.) pleasant **and** trustworthy.
 
 ## Why it exists
 
-- **Transparent processing** – no servers, no trackers, and an auditable codebase. If a tool claims to only prettify JSON, you should be able to confirm that’s all it does.
+- **Transparent processing** – no servers, no trackers, and an auditable codebase. If a tool claims to only prettify JSON, you should be able to confirm that's all it does.
 - **Shareable but private by default** – nothing leaves the tab unless you explicitly create a share link; even then the payload stays compressed inside the URL fragment.
-- **Composable workspace** – a single layout, persistent state per tool, and theme controls so you’re not juggling a dozen shady tabs during a debugging session.
+- **Composable workspace** – a single layout, persistent state per tool, and theme controls so you're not juggling a dozen shady tabs during a debugging session.
 
 ## Highlights
 
@@ -24,10 +24,14 @@ An open toolbox for developers who would rather keep sensitive snippets on their
 - **Enhanced Share** (v1.2.0): Improved sharing with Web Share API support and privacy warnings.
 - **PWA Polish** (v1.2.0): Extended shortcuts for all tools and screenshots support.
 - **Version Display** (v1.2.0): App version shown in sidebar footer.
-- **New Tools** (v1.2.0): Hash Generator, UUID/ULID Generator, and URL Parser added.
+- **New Tools** (v1.2.0): Hash Generator, UUID Generator, and URL Parser added.
 - **Hash/HMAC Enhancement** (v1.2.1): File hash support, Base64URL encoding, HMAC key encoding options, random key generation, and verification section.
 - **Regex Tester** (v1.2.1): Test and visualize regular expressions with match highlighting, capture groups, and replacement preview.
 - **Web Share API Improvement** (v1.2.1): Enhanced share message formatting with professional layout and better privacy messaging.
+- **i18n Support** (v1.3.0): Multi-language support with 5 languages (English, Korean, Japanese, Chinese, Spanish).
+- **Language-specific URLs** (v1.3.0): Locale-prefixed routes (`/ko-KR/json`, `/ja-JP/diff`, etc.) for SEO optimization.
+- **NanumSquareNeo Font** (v1.3.0): Beautiful Korean-optimized variable font for better CJK readability.
+- **UI/UX Improvements** (v1.3.0): Various enhancements including improved tool layouts and localized cron descriptions.
 
 ## Release Notes
 
@@ -36,6 +40,7 @@ See [RELEASE_NOTES.md](./RELEASE_NOTES.md) for detailed release notes.
 ## Reporting Issues
 
 This project does not collect any logs or analytics. If you encounter a bug or error, please report it by opening a [GitHub Issue](https://github.com/uyu423/yowu-devtools/issues). Include as much detail as possible:
+
 - Steps to reproduce the issue
 - Expected behavior
 - Actual behavior
@@ -58,8 +63,9 @@ npm run preview
 ```
 src/
   components/   shared layout + primitives (ToolHeader, ActionBar, etc.)
-  hooks/        tool state, title, theme helpers
-  lib/          clipboard + misc utilities + web workers
+  hooks/        tool state, title, theme, i18n helpers
+  i18n/         translation files for each locale (en-US, ko-KR, ja-JP, zh-CN, es-ES)
+  lib/          clipboard + misc utilities + i18n utils
   tools/        each self-contained feature (json, url, base64, jwt, ...)
   workers/      web workers for heavy processing (optional)
 ```
@@ -77,3 +83,5 @@ Pushes to `main` trigger `.github/workflows/deploy.yml`, which builds `dist/` an
 - Each tool page includes dedicated meta tags (title, description, Open Graph, Twitter Card)
 - `sitemap.xml` and `robots.txt` are auto-generated for search engine optimization
 - `404.html` handles SPA routing for direct URL access
+- **i18n routing** (v1.3.0): Language-prefixed URLs (`/ko-KR/json`, `/ja-JP/diff`, etc.) with locale-specific HTML files
+- **Language detection**: URL → localStorage → browser language → `en-US` fallback

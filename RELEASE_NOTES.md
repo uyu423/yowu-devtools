@@ -1,5 +1,81 @@
 # Release Notes
 
+## v1.3.0 (December 2025) - i18n Internationalization
+
+**New Features:**
+
+- ✨ **Multi-language Support**: Full internationalization support
+
+  - Supported languages: English (en-US), Korean (ko-KR), Japanese (ja-JP), Chinese (zh-CN), Spanish (es-ES)
+  - Language selection dropdown in sidebar (above theme toggle)
+  - Automatic language detection: URL → localStorage → browser language → en-US fallback
+  - Language-specific URLs: `/{locale}/{tool}` (e.g., `/ko-KR/json`)
+  - All UI strings referenced from i18n resources (no hardcoded strings)
+  - Type-safe translations with `satisfies I18nResource`
+
+- 🎨 **NanumSquareNeo Font**: Beautiful Korean-optimized variable font
+  - Variable font support (weight 300-900)
+  - Better readability for CJK characters
+
+**Enhancements:**
+
+- 🌐 **i18n Infrastructure**:
+
+  - Custom React Context-based i18n implementation
+  - i18n resource files: `src/i18n/{locale}.ts`
+  - Namespace structure: `common.*`, `sidebar.*`, `commandPalette.*`, `homepage.*`, `pwa.*`, `tool.{slug}.*`, `meta.{slug}.*`
+  - Type-safe translation keys (TypeScript `satisfies` keyword)
+  - Missing key fallback to en-US
+
+- 🔗 **URL/Routing**:
+
+  - Language prefix in URLs: `/{locale}/{tool}`
+  - Maintain current tool when changing language
+  - Preserve URL fragments (share payload) when changing language
+  - Sidebar, HomePage, CommandPalette all use locale-aware navigation
+
+- 🏗️ **Build System**:
+
+  - Generate language-specific HTML files for each tool and locale combination
+  - Language-specific meta tags (title, description, Open Graph, Twitter Card)
+  - Extended sitemap.xml with language-specific URLs
+  - Each HTML has proper `<html lang="{locale}">` attribute
+
+- 💾 **Storage**:
+  - Language preference saved to localStorage (`yowu.devtools.locale`)
+  - Restore language preference on app reload
+  - Language selection persists across sessions
+
+**UI/UX Improvements:**
+
+- 🔐 **Hash Generator**: Default algorithm changed to SHA-256
+- 📱 **PWA Install Prompt**: Updated color scheme to blue theme
+- 🆔 **UUID Generator**:
+  - Simplified title (UUID/ULID → UUID)
+  - Improved UI with type descriptions and "Copy All" button
+- 📝 **YAML Converter**: Left/right panels now have consistent heights
+- 📊 **Text Diff**: Copy icon moved to right side for better UX
+- 🔑 **JWT Encoder**: Default algorithm changed to "None"
+- 🔤 **Regex Tester**: Pattern descriptions now support i18n (47 patterns)
+- 📅 **Cron Parser**: Human-readable descriptions now localized via cronstrue
+- ⭐ **GitHub Stars Badge**: Added to main page footer
+
+**Improvements:**
+
+- 🌍 Better accessibility for international users
+- 🔍 Improved SEO with language-specific pages
+- 📱 Consistent UI experience across all languages
+- 🎨 Language selector UI in sidebar
+
+**Technical:**
+
+- Custom React Context-based i18n implementation (no external library)
+- Extended `vite-plugin-generate-routes.ts` for language-specific HTML generation
+- `useI18n` hook with `t()` function and `setLocale()` method
+- `buildLocalePath()` utility for locale-aware URL construction
+- i18n utilities: `getLocaleFromUrl`, `getStoredLocale`, `getBestMatchLocale`
+- Build-time type checking ensures translation key consistency
+
 ## v1.2.1 (December 2025) - Regex & Hash Enhancement
 
 **New Features:**

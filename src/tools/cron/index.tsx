@@ -7,9 +7,16 @@ import { ErrorBanner } from '@/components/common/ErrorBanner';
 import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
 import { useTitle } from '@/hooks/useTitle';
+import { useI18n } from '@/hooks/useI18nHooks';
 import { format, formatDistanceToNow } from 'date-fns';
+import { enUS as enUSLocale, ko, ja, zhCN, es } from 'date-fns/locale';
 import CronExpressionParser, { type CronExpressionOptions } from 'cron-parser';
 import cronstrue from 'cronstrue';
+// cronstrue locales
+import 'cronstrue/locales/ko';
+import 'cronstrue/locales/ja';
+import 'cronstrue/locales/zh_CN';
+import 'cronstrue/locales/es';
 import { isMobileDevice } from '@/lib/utils';
 import { ShareModal } from '@/components/common/ShareModal';
 
@@ -27,12 +34,37 @@ const DEFAULT_STATE: CronToolState = {
   nextCount: 10,
 };
 
+// Map our locale codes to cronstrue locale codes
+const CRONSTRUE_LOCALE_MAP: Record<string, string> = {
+  'en-US': 'en',
+  'ko-KR': 'ko',
+  'ja-JP': 'ja',
+  'zh-CN': 'zh_CN',
+  'es-ES': 'es',
+};
+
+// Map our locale codes to date-fns locale objects
+const DATE_FNS_LOCALE_MAP: Record<string, typeof enUSLocale> = {
+  'en-US': enUSLocale,
+  'ko-KR': ko,
+  'ja-JP': ja,
+  'zh-CN': zhCN,
+  'es-ES': es,
+};
+
 const CronTool: React.FC = () => {
-  useTitle('Cron Parser');
+  const { t, locale } = useI18n();
+  useTitle(t('tool.cron.title'));
   // Cron tool state is small (expression string, boolean flags, small numbers)
   // No filter needed - all fields are necessary and small
-  const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
-    useToolState<CronToolState>('cron', DEFAULT_STATE);
+  const {
+    state,
+    updateState,
+    resetState,
+    copyShareLink,
+    shareViaWebShare,
+    getShareStateInfo,
+  } = useToolState<CronToolState>('cron', DEFAULT_STATE);
   const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
   const shareInfo = getShareStateInfo();
   const isMobile = isMobileDevice();
@@ -42,7 +74,7 @@ const CronTool: React.FC = () => {
       return {
         description: '',
         nextRuns: [] as Date[],
-        error: 'Please enter a cron expression.',
+        error: t('tool.cron.pleaseEnterCron'),
       };
     }
 
@@ -51,7 +83,9 @@ const CronTool: React.FC = () => {
       const expected = state.hasSeconds ? 6 : 5;
       if (parts.length !== expected) {
         throw new Error(
-          `Expected ${expected} fields but received ${parts.length}.`
+          t('tool.cron.expectedFields')
+            .replace('{n}', String(expected))
+            .replace('{m}', String(parts.length))
         );
       }
       const options: CronExpressionOptions = {
@@ -63,21 +97,30 @@ const CronTool: React.FC = () => {
       for (let i = 0; i < state.nextCount; i++) {
         runs.push(expression.next().toDate());
       }
+      const cronstrueLocale = CRONSTRUE_LOCALE_MAP[locale] || 'en';
       const description = cronstrue.toString(state.expression, {
         use24HourTimeFormat: true,
         throwExceptionOnParseError: true,
+        locale: cronstrueLocale,
       });
       return { description, nextRuns: runs, error: '' };
     } catch (error) {
       return { description: '', nextRuns: [], error: (error as Error).message };
     }
-  }, [state.expression, state.hasSeconds, state.nextCount, state.timezone]);
+  }, [
+    state.expression,
+    state.hasSeconds,
+    state.nextCount,
+    state.timezone,
+    t,
+    locale,
+  ]);
 
   return (
     <div className="flex flex-col h-full p-4 md:p-6 max-w-3xl mx-auto">
       <ToolHeader
-        title="Cron Parser"
-        description="Explain cron expressions and preview upcoming runs."
+        title={t('tool.cron.title')}
+        description={t('tool.cron.description')}
         onReset={resetState}
         onShare={async () => {
           if (isMobile) {
@@ -91,7 +134,7 @@ const CronTool: React.FC = () => {
       <div className="flex-1 flex flex-col gap-6">
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Cron Expression
+            {t('tool.cron.cronExpression')}
           </label>
           <input
             type="text"
@@ -107,13 +150,13 @@ const CronTool: React.FC = () => {
                 checked={state.hasSeconds}
                 onChange={(e) => updateState({ hasSeconds: e.target.checked })}
               />
-              <OptionLabel tooltip="Switch to the 6-field cron format that includes a leading seconds column. Standard cron uses 5 fields (minute, hour, day, month, weekday), but some systems support a 6-field format with seconds for more granular scheduling.">
-                Include seconds field
+              <OptionLabel tooltip={t('tool.cron.secondsTooltip')}>
+                {t('tool.cron.includeSeconds')}
               </OptionLabel>
             </label>
             <label className="inline-flex items-center gap-2">
-              <OptionLabel tooltip="Choose whether upcoming runs are calculated in your local timezone or UTC. Local timezone uses your browser's timezone settings, while UTC provides consistent results regardless of location.">
-                Timezone
+              <OptionLabel tooltip={t('tool.cron.timezoneTooltip')}>
+                {t('tool.cron.timezone')}
               </OptionLabel>
               <select
                 className="rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-2 py-1 text-sm"
@@ -124,13 +167,13 @@ const CronTool: React.FC = () => {
                   })
                 }
               >
-                <option value="local">Local</option>
-                <option value="utc">UTC</option>
+                <option value="local">{t('tool.time.local')}</option>
+                <option value="utc">{t('tool.time.utc')}</option>
               </select>
             </label>
             <label className="inline-flex items-center gap-2">
-              <OptionLabel tooltip="Set how many future executions to generate in the schedule table. This helps you preview when the cron job will run next, making it easier to verify your schedule.">
-                Next runs
+              <OptionLabel tooltip={t('tool.cron.nextRunsTooltip')}>
+                {t('tool.cron.nextRuns')}
               </OptionLabel>
               <select
                 className="rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-2 py-1 text-sm"
@@ -139,8 +182,8 @@ const CronTool: React.FC = () => {
                   updateState({ nextCount: Number(e.target.value) as 10 | 20 })
                 }
               >
-                <option value={10}>10 items</option>
-                <option value={20}>20 items</option>
+                <option value={10}>{t('tool.cron.items10')}</option>
+                <option value={20}>{t('tool.cron.items20')}</option>
               </select>
             </label>
           </div>
@@ -148,7 +191,7 @@ const CronTool: React.FC = () => {
 
         {cronResult.error && (
           <ErrorBanner
-            message="Cron parsing error"
+            message={t('tool.cron.cronParsingError')}
             details={cronResult.error}
           />
         )}
@@ -156,7 +199,7 @@ const CronTool: React.FC = () => {
         {!cronResult.error && cronResult.description && (
           <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800 rounded-lg p-4">
             <h3 className="text-sm font-medium text-blue-900 dark:text-blue-300 uppercase tracking-wider mb-1">
-              Human readable
+              {t('tool.cron.humanReadable')}
             </h3>
             <p className="text-lg text-blue-800 dark:text-blue-200 font-semibold">
               {cronResult.description}
@@ -167,9 +210,11 @@ const CronTool: React.FC = () => {
         {!cronResult.error && cronResult.nextRuns.length > 0 && (
           <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-800">
             <div className="bg-gray-50 dark:bg-gray-700 px-4 py-2 border-b border-gray-200 dark:border-gray-600 text-sm font-medium text-gray-700 dark:text-gray-300 flex justify-between">
-              <span>Next Scheduled Dates</span>
+              <span>{t('tool.cron.nextScheduledDates')}</span>
               <span className="text-xs text-gray-500 dark:text-gray-400">
-                {state.timezone === 'utc' ? 'UTC timezone' : 'Local timezone'}
+                {state.timezone === 'utc'
+                  ? t('tool.time.utcTimezone')
+                  : t('tool.time.localTimezone')}
               </span>
             </div>
             <ul className="divide-y divide-gray-100 dark:divide-gray-700">
@@ -182,7 +227,10 @@ const CronTool: React.FC = () => {
                     {format(date, 'yyyy-MM-dd HH:mm:ss')}
                   </span>
                   <span className="text-gray-400 dark:text-gray-500">
-                    {formatDistanceToNow(date, { addSuffix: true })}
+                    {formatDistanceToNow(date, {
+                      addSuffix: true,
+                      locale: DATE_FNS_LOCALE_MAP[locale] || enUSLocale,
+                    })}
                   </span>
                 </li>
               ))}
@@ -199,7 +247,7 @@ const CronTool: React.FC = () => {
         }}
         includedFields={shareInfo.includedFields}
         excludedFields={shareInfo.excludedFields}
-        toolName="Cron Parser"
+        toolName={t('tool.cron.title')}
       />
     </div>
   );

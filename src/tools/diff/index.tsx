@@ -12,6 +12,7 @@ import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useTitle } from '@/hooks/useTitle';
+import { useI18n } from '@/hooks/useI18nHooks';
 import { useWebWorker, shouldUseWorkerForText } from '@/hooks/useWebWorker';
 import { copyToClipboard } from '@/lib/clipboard';
 import { isMobileDevice } from '@/lib/utils';
@@ -36,7 +37,8 @@ const DEFAULT_STATE: DiffToolState = {
 };
 
 const DiffTool: React.FC = () => {
-  useTitle('Text Diff');
+  const { t } = useI18n();
+  useTitle(t('tool.diff.title'));
   // Diff tool state contains: left (string), right (string), view, ignoreWhitespace, ignoreCase
   // All fields are necessary for sharing - input strings may be large but required
   const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
@@ -142,8 +144,8 @@ const DiffTool: React.FC = () => {
   return (
     <div className="flex flex-col h-full p-4 md:p-6 max-w-[90rem] mx-auto">
       <ToolHeader
-        title="Text Diff"
-        description="Spot differences between two text blocks instantly."
+        title={t('tool.diff.title')}
+        description={t('tool.diff.description')}
         onReset={() => resetState()}
         onShare={async () => {
           if (isMobile) {
@@ -158,7 +160,7 @@ const DiffTool: React.FC = () => {
         <div className="grid gap-4 lg:grid-cols-2">
           <div className="flex flex-col">
             <EditorPanel
-              title="Original"
+              title={t('tool.diff.original')}
               value={state.left}
               onChange={(val) => updateState({ left: val })}
               className="h-60"
@@ -176,7 +178,7 @@ const DiffTool: React.FC = () => {
           </div>
           <div className="flex flex-col">
             <EditorPanel
-              title="Modified"
+              title={t('tool.diff.modified')}
               value={state.right}
               onChange={(val) => updateState({ right: val })}
               className="h-60"
@@ -206,7 +208,7 @@ const DiffTool: React.FC = () => {
                 }`}
                 onClick={() => updateState({ view })}
               >
-                {view === 'split' ? 'Split View' : 'Unified View'}
+                {view === 'split' ? t('tool.diff.splitView') : t('tool.diff.unifiedView')}
               </button>
             ))}
           </div>
@@ -221,8 +223,8 @@ const DiffTool: React.FC = () => {
                   updateState({ ignoreWhitespace: e.target.checked })
                 }
               />
-              <OptionLabel tooltip="Treat changes that only add or remove whitespace (spaces, tabs, newlines) as no-ops. This helps focus on actual content changes rather than formatting differences.">
-                Ignore Whitespace
+              <OptionLabel tooltip={t('tool.diff.ignoreWhitespaceTooltip')}>
+                {t('tool.diff.ignoreWhitespace')}
               </OptionLabel>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
@@ -232,8 +234,8 @@ const DiffTool: React.FC = () => {
                 checked={state.ignoreCase}
                 onChange={(e) => updateState({ ignoreCase: e.target.checked })}
               />
-              <OptionLabel tooltip="Compare both inputs case-insensitively. When enabled, 'Hello' and 'hello' will be treated as identical, making the diff focus on other differences.">
-                Ignore Case
+              <OptionLabel tooltip={t('tool.diff.ignoreCaseTooltip')}>
+                {t('tool.diff.ignoreCase')}
               </OptionLabel>
             </label>
             <FileDownload
@@ -243,7 +245,7 @@ const DiffTool: React.FC = () => {
               disabled={!hasDiff}
               className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             >
-              Download Unified
+              {t('tool.diff.downloadUnified')}
             </FileDownload>
           </div>
         </ActionBar>
@@ -251,47 +253,47 @@ const DiffTool: React.FC = () => {
         <div className="rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 shadow-inner">
           <div className="flex items-center justify-between border-b dark:border-gray-700 px-4 py-2 text-sm text-gray-600 dark:text-gray-400">
             <span className="font-semibold text-gray-800 dark:text-white">
-              Diff Result
+              {t('tool.diff.diffResult')}
             </span>
+            <div className="space-x-4 text-xs uppercase tracking-wide">
+              <span className="text-green-600 dark:text-green-400">
+                {t('tool.diff.addedChars').replace('{n}', String(stats.added))}
+              </span>
+              <span className="text-red-600 dark:text-red-400">
+                {t('tool.diff.removedChars').replace('{n}', String(stats.removed))}
+              </span>
+            </div>
             <button
               onClick={() =>
                 hasDiff &&
-                copyToClipboard(unifiedExport, 'Copied unified diff output.')
+                copyToClipboard(unifiedExport, t('tool.diff.copiedUnifiedDiff'))
               }
               disabled={!hasDiff}
               className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              title="Copy Unified Diff"
+              title={t('common.copy')}
             >
               <Copy className="w-4 h-4" />
             </button>
-            <div className="space-x-4 text-xs uppercase tracking-wide">
-              <span className="text-green-600 dark:text-green-400">
-                +{stats.added} chars
-              </span>
-              <span className="text-red-600 dark:text-red-400">
-                -{stats.removed} chars
-              </span>
-            </div>
           </div>
 
           {isProcessing && (
             <div className="p-4">
               <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 dark:border-gray-600 border-t-blue-600 dark:border-t-blue-400"></div>
-                Calculating diff for large text...
+                {t('tool.diff.calculatingDiff')}
               </div>
             </div>
           )}
           {!isProcessing && !hasDiff && (
             <p className="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
-              Both inputs are identical.
+              {t('tool.diff.bothIdentical')}
             </p>
           )}
 
           {hasDiff && state.view === 'split' && (
             <div className="grid gap-0 border-t lg:grid-cols-2">
-              <DiffPane label="Original" type="left" diffs={diffs} />
-              <DiffPane label="Modified" type="right" diffs={diffs} />
+              <DiffPane label={t('tool.diff.original')} type="left" diffs={diffs} />
+              <DiffPane label={t('tool.diff.modified')} type="right" diffs={diffs} />
             </div>
           )}
 
@@ -311,7 +313,7 @@ const DiffTool: React.FC = () => {
         }}
         includedFields={shareInfo.includedFields}
         excludedFields={shareInfo.excludedFields}
-        toolName="Text Diff"
+        toolName={t('tool.diff.title')}
       />
     </div>
   );

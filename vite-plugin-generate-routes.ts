@@ -1,6 +1,11 @@
 import type { Plugin } from 'vite';
 import fs from 'fs';
 import path from 'path';
+import {
+  SUPPORTED_LOCALES,
+  DEFAULT_LOCALE,
+  type LocaleCode,
+} from './src/lib/constants';
 
 // 도구 정보 타입
 interface ToolInfo {
@@ -280,7 +285,7 @@ const tools: ToolInfo[] = [
   {
     id: 'uuid',
     path: '/uuid',
-    title: 'UUID/ULID Generator',
+    title: 'UUID Generator',
     description: 'Generate UUID v4, UUID v7, and ULID identifiers',
     seoDescription:
       'Free online UUID and ULID generator. Generate UUID v4 (random), UUID v7 (timestamp-based), and ULID identifiers. Batch generation up to 100 IDs. All processing happens in your browser.',
@@ -416,9 +421,16 @@ export function generateRoutes(): Plugin {
 
       const indexHtml = fs.readFileSync(indexHtmlPath, 'utf-8');
 
-      // 각 도구별 HTML 생성 함수
-      function generateToolHtml(tool: ToolInfo, baseHtml: string): string {
-        const toolUrl = `https://tools.yowu.dev${tool.path}`;
+      // 각 도구별 HTML 생성 함수 (locale 지원)
+      function generateToolHtml(
+        tool: ToolInfo,
+        baseHtml: string,
+        locale: LocaleCode = DEFAULT_LOCALE
+      ): string {
+        // URL 경로 생성 (en-US는 prefix 없음, 다른 locale은 prefix 추가)
+        const toolPath =
+          locale === DEFAULT_LOCALE ? tool.path : `/${locale}${tool.path}`;
+        const toolUrl = `https://tools.yowu.dev${toolPath}`;
         const keywordsStr = tool.keywords.join(', ');
 
         // 구조화된 데이터 (JSON-LD) 생성
@@ -440,6 +452,7 @@ export function generateRoutes(): Plugin {
             '@type': 'Person',
             name: 'yowu',
           },
+          inLanguage: locale,
         };
 
         // SEO 최적화된 title 생성 (50-60자 권장)
@@ -450,6 +463,9 @@ export function generateRoutes(): Plugin {
           tool.seoDescription.length > 160
             ? tool.seoDescription.substring(0, 157) + '...'
             : tool.seoDescription;
+
+        // HTML lang 속성용 locale 코드 (BCP 47)
+        const htmlLang = locale.toLowerCase().replace('_', '-');
 
         // 메타 태그 생성
         const metaTags = `
@@ -464,6 +480,7 @@ export function generateRoutes(): Plugin {
     <meta property="og:image" content="https://tools.yowu.dev/opengraph.png" />
     <meta property="og:image:alt" content="${tool.title} | Yowu's DevTools" />
     <meta property="og:site_name" content="Yowu's DevTools" />
+    <meta property="og:locale" content="${htmlLang}" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="${seoTitle}" />
     <meta name="twitter:description" content="${optimizedDescription}" />
@@ -477,7 +494,7 @@ export function generateRoutes(): Plugin {
   `;
 
         // 기존 head 태그에 메타 태그 추가
-        const modifiedHtml = baseHtml.replace(
+        let modifiedHtml = baseHtml.replace(
           /<head>([\s\S]*?)<\/head>/i,
           (_match, headContent) => {
             // 기존 title과 meta description, 구조화된 데이터 제거 (있는 경우)
@@ -512,24 +529,121 @@ export function generateRoutes(): Plugin {
           }
         );
 
+        // HTML lang 속성 추가/업데이트
+        modifiedHtml = modifiedHtml.replace(
+          /<html([^>]*)>/i,
+          (_match, attrs) => {
+            // 기존 lang 속성 제거
+            const cleanedAttrs = attrs.replace(/\s+lang=["'][^"']*["']/gi, '');
+            return `<html lang="${htmlLang}"${cleanedAttrs}>`;
+          }
+        );
+
         return modifiedHtml;
       }
 
-      // 각 도구 경로에 대해 디렉토리 생성 및 HTML 파일 복사
-      tools.forEach((tool) => {
-        const toolDir = path.join(distDir, tool.path.slice(1)); // '/json' -> 'json'
+      // 홈 페이지 HTML 생성 함수
+      function generateHomeHtml(
+        baseHtml: string,
+        locale: LocaleCode = DEFAULT_LOCALE
+      ): string {
+        const homePath = locale === DEFAULT_LOCALE ? '/' : `/${locale}`;
+        const homeUrl = `https://tools.yowu.dev${homePath}`;
+        const htmlLang = locale.toLowerCase().replace('_', '-');
 
-        // 디렉토리 생성
-        if (!fs.existsSync(toolDir)) {
-          fs.mkdirSync(toolDir, { recursive: true });
+        const metaTags = `
+    <title>Yowu's DevTools | Developer Tools</title>
+    <meta name="description" content="A privacy-first toolbox for developers. JSON formatting, password generation, hash calculation, UUID creation, and more. All processing happens in your browser." />
+    <link rel="canonical" href="${homeUrl}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="${homeUrl}" />
+    <meta property="og:title" content="Yowu's DevTools | Developer Tools" />
+    <meta property="og:description" content="A privacy-first toolbox for developers. All processing happens in your browser." />
+    <meta property="og:image" content="https://tools.yowu.dev/opengraph.png" />
+    <meta property="og:locale" content="${htmlLang}" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Yowu's DevTools | Developer Tools" />
+    <meta name="twitter:description" content="A privacy-first toolbox for developers. All processing happens in your browser." />
+    <meta name="twitter:image" content="https://tools.yowu.dev/opengraph.png" />
+  `;
+
+        let modifiedHtml = baseHtml.replace(
+          /<head>([\s\S]*?)<\/head>/i,
+          (_match, headContent) => {
+            const cleanedHead = headContent
+              .replace(/<title>.*?<\/title>/gi, '')
+              .replace(/<meta\s+name=["']description["'][^>]*>/gi, '')
+              .replace(/<link\s+rel=["']canonical["'][^>]*>/gi, '')
+              .replace(/<meta\s+property=["']og:[^>]*>/gi, '')
+              .replace(/<meta\s+name=["']twitter:[^>]*>/gi, '');
+            return `<head>${metaTags.trim()}${cleanedHead}</head>`;
+          }
+        );
+
+        // HTML lang 속성 추가/업데이트
+        modifiedHtml = modifiedHtml.replace(
+          /<html([^>]*)>/i,
+          (_match, attrs) => {
+            const cleanedAttrs = attrs.replace(/\s+lang=["'][^"']*["']/gi, '');
+            return `<html lang="${htmlLang}"${cleanedAttrs}>`;
+          }
+        );
+
+        return modifiedHtml;
+      }
+
+      // 각 locale과 tool 조합에 대해 HTML 파일 생성
+      SUPPORTED_LOCALES.forEach((localeInfo) => {
+        const locale = localeInfo.code;
+
+        // 홈 페이지 생성
+        if (locale === DEFAULT_LOCALE) {
+          // en-US는 루트에 생성 (기존 호환성)
+          const homeHtml = generateHomeHtml(indexHtml, locale);
+          fs.writeFileSync(path.join(distDir, 'index.html'), homeHtml, 'utf-8');
+          console.log(`✅ Generated: /index.html (${locale})`);
+        } else {
+          // 다른 locale은 /{locale}/index.html 생성
+          const localeDir = path.join(distDir, locale);
+          if (!fs.existsSync(localeDir)) {
+            fs.mkdirSync(localeDir, { recursive: true });
+          }
+          const homeHtml = generateHomeHtml(indexHtml, locale);
+          fs.writeFileSync(
+            path.join(localeDir, 'index.html'),
+            homeHtml,
+            'utf-8'
+          );
+          console.log(`✅ Generated: /${locale}/index.html`);
         }
 
-        // HTML 파일 생성
-        const toolHtml = generateToolHtml(tool, indexHtml);
-        const toolHtmlPath = path.join(toolDir, 'index.html');
-        fs.writeFileSync(toolHtmlPath, toolHtml, 'utf-8');
+        // 각 도구에 대해 HTML 생성
+        tools.forEach((tool) => {
+          let toolDir: string;
+          let toolPath: string;
 
-        console.log(`✅ Generated: ${tool.path}/index.html`);
+          if (locale === DEFAULT_LOCALE) {
+            // en-US는 기존 경로 유지 (하위 호환성)
+            toolDir = path.join(distDir, tool.path.slice(1)); // '/json' -> 'json'
+            toolPath = tool.path;
+          } else {
+            // 다른 locale은 /{locale}/{tool} 경로
+            toolDir = path.join(distDir, locale, tool.path.slice(1));
+            toolPath = `/${locale}${tool.path}`;
+          }
+
+          // 디렉토리 생성
+          if (!fs.existsSync(toolDir)) {
+            fs.mkdirSync(toolDir, { recursive: true });
+          }
+
+          // HTML 파일 생성
+          const toolHtml = generateToolHtml(tool, indexHtml, locale);
+          const toolHtmlPath = path.join(toolDir, 'index.html');
+          fs.writeFileSync(toolHtmlPath, toolHtml, 'utf-8');
+
+          console.log(`✅ Generated: ${toolPath}/index.html`);
+        });
       });
 
       // 404.html 생성 (SPA 라우팅 지원)
@@ -543,8 +657,19 @@ export function generateRoutes(): Plugin {
       //
       // SEO를 위해 각 경로의 HTML 파일은 유지하되,
       // 404.html에서는 알려진 경로를 해당 경로의 index.html로 리다이렉트합니다.
-      const knownPaths = ['/', ...tools.map((tool) => tool.path)];
-      const knownPathsStr = JSON.stringify(knownPaths);
+      // 알려진 경로 목록 (모든 locale 포함)
+      const knownPaths = [
+        '/',
+        ...SUPPORTED_LOCALES.map((loc) =>
+          loc.code === DEFAULT_LOCALE ? '/' : `/${loc.code}`
+        ),
+        ...tools.map((tool) => tool.path),
+        ...SUPPORTED_LOCALES.flatMap((loc) =>
+          loc.code === DEFAULT_LOCALE
+            ? []
+            : tools.map((tool) => `/${loc.code}${tool.path}`)
+        ),
+      ];
 
       const redirectScript = `<!DOCTYPE html>
 <html>
@@ -554,8 +679,8 @@ export function generateRoutes(): Plugin {
   <script>
     (function() {
       // GitHub Pages 404.html 리다이렉트
-      // 알려진 경로 목록
-      var knownPaths = ${knownPathsStr};
+      // 알려진 경로 목록 (모든 locale 포함)
+      var knownPaths = ${JSON.stringify(knownPaths)};
       
       var path = window.location.pathname;
       var search = window.location.search;
@@ -597,25 +722,41 @@ export function generateRoutes(): Plugin {
       fs.writeFileSync(path.join(distDir, '404.html'), redirectScript, 'utf-8');
       console.log('✅ Generated: 404.html');
 
-      // sitemap.xml 생성
-      const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://tools.yowu.dev/</loc>
-    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+      // sitemap.xml 생성 (모든 locale 포함)
+      const sitemapUrls: string[] = [];
+      const lastmod = new Date().toISOString().split('T')[0];
+
+      // 홈 페이지 (모든 locale)
+      SUPPORTED_LOCALES.forEach((localeInfo) => {
+        const locale = localeInfo.code;
+        const homePath = locale === DEFAULT_LOCALE ? '/' : `/${locale}`;
+        sitemapUrls.push(`  <url>
+    <loc>https://tools.yowu.dev${homePath}</loc>
+    <lastmod>${lastmod}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
-  </url>
-${tools
-  .map(
-    (tool) => `  <url>
-    <loc>https://tools.yowu.dev${tool.path}</loc>
-    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+  </url>`);
+      });
+
+      // 각 도구 (모든 locale)
+      SUPPORTED_LOCALES.forEach((localeInfo) => {
+        const locale = localeInfo.code;
+        tools.forEach((tool) => {
+          const toolPath =
+            locale === DEFAULT_LOCALE ? tool.path : `/${locale}${tool.path}`;
+          sitemapUrls.push(`  <url>
+    <loc>https://tools.yowu.dev${toolPath}</loc>
+    <lastmod>${lastmod}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-  </url>`
-  )
-  .join('\n')}
+  </url>`);
+        });
+      });
+
+      const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+${sitemapUrls.join('\n')}
 </urlset>`;
 
       fs.writeFileSync(path.join(distDir, 'sitemap.xml'), sitemap, 'utf-8');

@@ -9,6 +9,7 @@ import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useTitle } from '@/hooks/useTitle';
+import { useI18n } from '@/hooks/useI18nHooks';
 import { copyToClipboard } from '@/lib/clipboard';
 import { toast } from 'sonner';
 import { isMobileDevice } from '@/lib/utils';
@@ -34,7 +35,7 @@ const DEFAULT_STATE: HashToolState = {
   mode: 'hash',
   inputType: 'text',
   text: '',
-  algorithm: 'MD5',
+  algorithm: 'SHA-256',
   outputEncoding: 'hex',
   hmacKeyEncoding: 'raw',
   saveHmacKey: false,
@@ -82,7 +83,8 @@ const base64ToArrayBuffer = (base64: string): ArrayBuffer => {
 
 
 const HashTool: React.FC = () => {
-  useTitle('Hash Generator');
+  const { t } = useI18n();
+  useTitle(t('tool.hash.title'));
   
   // HMAC 키는 기본적으로 공유 링크에 포함하지 않음
   const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } = useToolState<HashToolState>(
@@ -142,7 +144,7 @@ const HashTool: React.FC = () => {
   // Generate random HMAC key
   const generateRandomKey = React.useCallback(async () => {
     if (!isWebCryptoSupported) {
-      toast.error('WebCrypto API is not supported in this browser.');
+      toast.error(t('tool.hash.webCryptoNotSupported'));
       return;
     }
 
@@ -154,11 +156,11 @@ const HashTool: React.FC = () => {
       // Convert to hex string
       const hexKey = arrayBufferToHex(randomBytes.buffer);
       updateState({ hmacKeyText: hexKey, hmacKeyEncoding: 'hex' });
-      toast.success('Random key generated');
+      toast.success(t('tool.hash.randomKeyGenerated'));
     } catch {
-      toast.error('Failed to generate random key');
+      toast.error(t('tool.hash.failedToGenerateKey'));
     }
-  }, [isWebCryptoSupported, updateState]);
+  }, [isWebCryptoSupported, updateState, t]);
 
   // Check if algorithm uses WebCrypto API (SHA-256, SHA-512) or crypto-js (MD5, SHA-1)
   const usesWebCrypto = React.useMemo(() => {
@@ -242,12 +244,12 @@ const HashTool: React.FC = () => {
 
       // Use WebCrypto API for SHA-256 and SHA-512
       if (!isWebCryptoSupported) {
-        throw new Error('WebCrypto API is not supported in this browser.');
+        throw new Error(t('tool.hash.webCryptoNotSupported'));
       }
 
       const timeoutPromise = new Promise<never>((_, reject) => {
         setTimeout(() => {
-          reject(new Error('Processing timeout: The operation took longer than 10 seconds and was cancelled.'));
+          reject(new Error(t('tool.hash.processingTimeout')));
         }, 10_000);
       });
 
@@ -308,7 +310,7 @@ const HashTool: React.FC = () => {
         return arrayBufferToBase64(hashBuffer);
       }
     },
-    [state.mode, state.algorithm, state.outputEncoding, state.hmacKeyEncoding, debouncedHmacKey, isWebCryptoSupported]
+    [state.mode, state.algorithm, state.outputEncoding, state.hmacKeyEncoding, debouncedHmacKey, isWebCryptoSupported, t]
   );
 
   // Helper function to convert WordArray to ArrayBuffer
@@ -354,7 +356,7 @@ const HashTool: React.FC = () => {
         const result = await calculateHashFromBuffer(data);
         setHashResult(result);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to calculate hash');
+        setError(err instanceof Error ? err.message : t('tool.hash.failedToCalculateHash'));
         setHashResult('');
       } finally {
         setIsCalculating(false);
@@ -362,7 +364,7 @@ const HashTool: React.FC = () => {
     };
 
     calculateHash();
-  }, [debouncedText, state.inputType, calculateHashFromBuffer, usesWebCrypto]);
+  }, [debouncedText, state.inputType, calculateHashFromBuffer, usesWebCrypto, t]);
 
   // Calculate hash for file
   const calculateFileHash = React.useCallback(
@@ -395,13 +397,13 @@ const HashTool: React.FC = () => {
           setHashResult(result);
         }
       } catch (error) {
-        setError(error instanceof Error ? error.message : 'Failed to calculate file hash');
+        setError(error instanceof Error ? error.message : t('tool.hash.failedToCalculateFileHash'));
         setHashResult('');
       } finally {
         setIsCalculating(false);
       }
     },
-    [calculateHashFromBuffer, usesWebCrypto]
+    [calculateHashFromBuffer, usesWebCrypto, t]
   );
 
   // Handle file selection
@@ -441,8 +443,7 @@ const HashTool: React.FC = () => {
 
   const handleCopy = async () => {
     if (hashResult) {
-      await copyToClipboard(hashResult);
-      toast.success('Hash copied to clipboard');
+      await copyToClipboard(hashResult, t('common.copiedToClipboard'));
     }
   };
 
@@ -458,12 +459,12 @@ const HashTool: React.FC = () => {
   return (
     <div className="flex flex-col h-full p-4 md:p-6 max-w-5xl mx-auto">
       <ToolHeader
-        title="Hash Generator"
-        description="Calculate hash values and HMAC signatures for text or files"
+        title={t('tool.hash.title')}
+        description={t('tool.hash.description')}
         onReset={handleReset}
         onShare={async () => {
           if (state.inputType === 'file') {
-            toast.error('File sharing is not supported. Please switch to text mode to share your hash calculation.');
+            toast.error(t('tool.hash.fileSharingNotSupported'));
             return;
           }
           if (isMobile) {
@@ -478,9 +479,9 @@ const HashTool: React.FC = () => {
 
       {/* Mode Selection */}
       <div className="mb-4">
-        <OptionLabel tooltip="Select between regular hash calculation or HMAC (Hash-based Message Authentication Code)">
+        <OptionLabel tooltip={t('tool.hash.modeTooltip')}>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Mode
+            {t('tool.hash.mode')}
           </label>
         </OptionLabel>
         <div className="flex gap-2">
@@ -515,9 +516,9 @@ const HashTool: React.FC = () => {
 
       {/* Input Type Selection */}
       <div className="mb-4">
-        <OptionLabel tooltip="Select input type: text string or file">
+        <OptionLabel tooltip={t('tool.hash.inputTypeTooltip')}>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Input Type
+            {t('tool.hash.inputType')}
           </label>
         </OptionLabel>
         <div className="flex gap-2">
@@ -535,7 +536,7 @@ const HashTool: React.FC = () => {
                 : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
             )}
           >
-            Text
+            {t('tool.hash.text')}
           </button>
           <button
             type="button"
@@ -551,7 +552,7 @@ const HashTool: React.FC = () => {
             )}
           >
             <File className="w-4 h-4 inline mr-2" />
-            File
+            {t('tool.hash.file')}
           </button>
         </div>
       </div>
@@ -562,7 +563,7 @@ const HashTool: React.FC = () => {
           <EditorPanel
             value={state.text || ''}
             onChange={(value) => updateState({ text: value })}
-            placeholder="Enter text to hash..."
+            placeholder={t('tool.hash.enterTextPlaceholder')}
             mode="text"
             readOnly={false}
           />
@@ -605,19 +606,19 @@ const HashTool: React.FC = () => {
             >
               <File className="w-8 h-8 mx-auto mb-2 text-gray-400 dark:text-gray-500" />
               <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Drop a file here or click to browse
+                {t('tool.hash.dropFileHere')}
               </div>
               <div className="text-xs text-gray-500 dark:text-gray-400">
-                Max 100MB
+                {t('tool.hash.maxFileSize')}
               </div>
             </label>
           </div>
           {fileMetadata && (
             <div className="mt-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
               <div className="text-sm text-gray-700 dark:text-gray-300">
-                <div><strong>File:</strong> {fileMetadata.name}</div>
-                <div><strong>Size:</strong> {(fileMetadata.size / 1024).toFixed(2)} KB</div>
-                <div><strong>Modified:</strong> {new Date(fileMetadata.lastModified).toLocaleString()}</div>
+                <div><strong>{t('tool.hash.fileName')}:</strong> {fileMetadata.name}</div>
+                <div><strong>{t('tool.hash.fileSize')}:</strong> {(fileMetadata.size / 1024).toFixed(2)} KB</div>
+                <div><strong>{t('tool.hash.modified')}:</strong> {new Date(fileMetadata.lastModified).toLocaleString()}</div>
               </div>
             </div>
           )}
@@ -628,9 +629,9 @@ const HashTool: React.FC = () => {
       <div className="mb-4 space-y-4">
         {/* Algorithm */}
         <div>
-          <OptionLabel tooltip="Select hash algorithm. SHA-256 is recommended for most use cases, SHA-512 provides longer hash output.">
+          <OptionLabel tooltip={t('tool.hash.algorithmTooltip')}>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Algorithm
+              {t('tool.hash.algorithm')}
             </label>
           </OptionLabel>
           <select
@@ -651,9 +652,9 @@ const HashTool: React.FC = () => {
 
         {/* Output Encoding */}
         <div>
-          <OptionLabel tooltip="Select output encoding format. Hex is human-readable, Base64 is compact, Base64URL is URL-safe.">
+          <OptionLabel tooltip={t('tool.hash.outputEncodingTooltip')}>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Output Encoding
+              {t('tool.hash.outputEncoding')}
             </label>
           </OptionLabel>
           <select
@@ -676,19 +677,19 @@ const HashTool: React.FC = () => {
           <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-md">
             <div>
               <div className="flex items-center justify-between mb-2">
-                <OptionLabel tooltip="HMAC key encoding format. Raw text is UTF-8 encoded, Hex and Base64 are binary formats.">
+                <OptionLabel tooltip={t('tool.hash.keyEncodingTooltip')}>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Key Encoding
+                    {t('tool.hash.keyEncoding')}
                   </label>
                 </OptionLabel>
                 <button
                   type="button"
                   onClick={generateRandomKey}
                   className="flex items-center gap-1 px-2 py-1 text-xs text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
-                  title="Generate random key"
+                  title={t('tool.hash.generateRandomKey')}
                 >
                   <RefreshCw className="w-3 h-3" />
-                  Generate Random
+                  {t('tool.hash.generateRandom')}
                 </button>
               </div>
               <select
@@ -700,20 +701,20 @@ const HashTool: React.FC = () => {
                 }
                 className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="raw">Raw Text (UTF-8)</option>
+                <option value="raw">{t('tool.hash.rawTextUtf8')}</option>
                 <option value="hex">Hex</option>
                 <option value="base64">Base64</option>
               </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                HMAC Key
+                {t('tool.hash.hmacKey')}
               </label>
               <input
                 type="text"
                 value={state.hmacKeyText || ''}
                 onChange={(e) => updateState({ hmacKeyText: e.target.value })}
-                placeholder="Enter HMAC key..."
+                placeholder={t('tool.hash.enterHmacKeyPlaceholder')}
                 className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -726,12 +727,12 @@ const HashTool: React.FC = () => {
                   className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                 />
                 <span className="text-sm text-gray-700 dark:text-gray-300">
-                  Save key in share links
+                  {t('tool.hash.saveKeyInShareLinks')}
                 </span>
               </label>
               {state.saveHmacKey && (
                 <p className="mt-1 text-xs text-red-600 dark:text-red-400">
-                  ⚠️ Warning: Saving HMAC keys in share links may expose sensitive information.
+                  {t('tool.hash.saveKeyWarning')}
                 </p>
               )}
             </div>
@@ -743,22 +744,22 @@ const HashTool: React.FC = () => {
       <div className="mb-4 flex-1 min-h-0">
         <div className="flex items-center justify-between mb-2">
           <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            Hash Result {isCalculating && <span className="text-gray-500 font-normal">(Calculating...)</span>}
+            {t('tool.hash.hashResult')} {isCalculating && <span className="text-gray-500 font-normal">({t('tool.hash.calculating')})</span>}
           </label>
           <button
             onClick={handleCopy}
             disabled={!hashResult || isCalculating}
             className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            title="Copy hash"
+            title={t('common.copy')}
           >
             <Copy className="w-4 h-4" />
           </button>
         </div>
         <div className="flex-1 min-h-0">
           <EditorPanel
-            value={hashResult || (isCalculating ? 'Calculating...' : '')}
+            value={hashResult || (isCalculating ? t('tool.hash.calculating') : '')}
             onChange={() => {}} // Read-only
-            placeholder="Hash result will appear here..."
+            placeholder={t('tool.hash.resultPlaceholder')}
             mode="text"
             readOnly={true}
           />
@@ -767,11 +768,11 @@ const HashTool: React.FC = () => {
         {/* Security Note */}
         <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            <strong className="text-gray-700 dark:text-gray-300">Note:</strong> For checksum verification only. Not suitable for security purposes.
+            <strong className="text-gray-700 dark:text-gray-300">{t('tool.hash.note')}:</strong> {t('tool.hash.securityNote')}
           </p>
           {(state.algorithm === 'MD5' || state.algorithm === 'SHA-1') && (
             <p className="mt-2 text-xs text-yellow-600 dark:text-yellow-400">
-              <strong>⚠️ Security Warning:</strong> {state.algorithm} is cryptographically broken and should not be used for security purposes. Use SHA-256 or SHA-512 for secure applications.
+              <strong>{t('tool.hash.securityWarning')}:</strong> {t('tool.hash.algorithmWarning').replace('{algorithm}', state.algorithm)}
             </p>
           )}
         </div>
@@ -780,9 +781,9 @@ const HashTool: React.FC = () => {
       {/* HMAC Verification Section */}
       {state.mode === 'hmac' && (
         <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-md">
-          <OptionLabel tooltip="Enter expected MAC to verify against calculated HMAC">
+          <OptionLabel tooltip={t('tool.hash.verificationTooltip')}>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Verification
+              {t('tool.hash.verification')}
             </label>
           </OptionLabel>
           <div className="space-y-2">
@@ -790,19 +791,19 @@ const HashTool: React.FC = () => {
               type="text"
               value={state.expectedMac || ''}
               onChange={(e) => updateState({ expectedMac: e.target.value })}
-              placeholder="Enter expected MAC to verify..."
+              placeholder={t('tool.hash.enterExpectedMacPlaceholder')}
               className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {verificationResult === 'match' && (
               <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
                 <CheckCircle2 className="w-4 h-4" />
-                <span className="text-sm font-medium">Match: MAC verification successful</span>
+                <span className="text-sm font-medium">{t('tool.hash.verificationSuccess')}</span>
               </div>
             )}
             {verificationResult === 'mismatch' && (
               <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
                 <XCircle className="w-4 h-4" />
-                <span className="text-sm font-medium">Mismatch: MAC verification failed</span>
+                <span className="text-sm font-medium">{t('tool.hash.verificationFailed')}</span>
               </div>
             )}
           </div>
@@ -818,7 +819,7 @@ const HashTool: React.FC = () => {
         }}
         includedFields={shareInfo.includedFields}
         excludedFields={shareInfo.excludedFields}
-        toolName="Hash Generator"
+        toolName={t('tool.hash.title')}
       />
     </div>
   );

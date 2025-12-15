@@ -6,6 +6,7 @@ import {
 } from 'lz-string';
 import { toast } from 'sonner';
 import { getToolById } from '../tools';
+import { useI18n } from './useI18nHooks';
 
 const STORAGE_PREFIX = 'yowu-devtools:v1:tool:';
 
@@ -39,7 +40,8 @@ function getInitialState<T>(
   const params = new URLSearchParams(search);
   const payload = params.get('d');
   if (payload) {
-    const decoded = decodePayload<T>(payload, toolId);
+    // Don't show error toast during initialization - will be handled by useEffect if needed
+    const decoded = decodePayload<T>(payload, toolId, '');
     if (decoded) {
       return { ...cloneState(defaultState), ...decoded };
     }
@@ -71,6 +73,7 @@ export function useToolState<T extends object>(
     shareStateFilter?: (state: T) => Partial<T>;
   }
 ) {
+  const { t } = useI18n();
   const location = useLocation();
   const [state, setState] = useState<T>(() =>
     getInitialState(toolId, defaultState, location.search)
@@ -82,7 +85,7 @@ export function useToolState<T extends object>(
     const params = new URLSearchParams(location.search);
     const payload = params.get('d');
     if (payload) {
-      const decoded = decodePayload<T>(payload, toolId);
+      const decoded = decodePayload<T>(payload, toolId, t('common.sharedUrlInvalid'));
       if (decoded) {
         setState({ ...cloneState(defaultState), ...decoded });
         return;
@@ -104,7 +107,7 @@ export function useToolState<T extends object>(
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.search, toolId]);
+  }, [location.search, toolId, t]);
 
   const setAndPersist = useCallback(
     (updater: T | ((prev: T) => T)) => {
@@ -152,14 +155,14 @@ export function useToolState<T extends object>(
     try {
       const shareUrl = generateShareUrl();
       await navigator.clipboard?.writeText(shareUrl);
-      toast.success('Share link copied.');
+      toast.success(t('common.shareLinkCopied'));
       return shareUrl;
     } catch (error) {
       console.error(error);
-      toast.error('Unable to copy share link.');
+      toast.error(t('common.unableToCopyShareLink'));
       return null;
     }
-  }, [generateShareUrl]);
+  }, [generateShareUrl, t]);
 
   // Share via Web Share API (mobile)
   const shareViaWebShare = useCallback(async () => {
@@ -178,12 +181,12 @@ export function useToolState<T extends object>(
           title: shareTitle,
           text: shareText,
         });
-        toast.success('Shared successfully.');
+        toast.success(t('common.sharedSuccessfully'));
         return shareUrl;
       } else {
         // Fallback to clipboard if Web Share API not available
         await navigator.clipboard?.writeText(shareUrl);
-        toast.success('Share link copied.');
+        toast.success(t('common.shareLinkCopied'));
         return shareUrl;
       }
     } catch (error) {
@@ -192,10 +195,10 @@ export function useToolState<T extends object>(
         return null;
       }
       console.error(error);
-      toast.error('Unable to share.');
+      toast.error(t('common.unableToShare'));
       return null;
     }
-  }, [generateShareUrl, toolId]);
+  }, [generateShareUrl, toolId, t]);
 
   // Legacy shareState function (kept for backward compatibility, but deprecated)
   // Use copyShareLink (PC) or shareViaWebShare (mobile) instead
@@ -252,7 +255,7 @@ export function useToolState<T extends object>(
   } as const;
 }
 
-function decodePayload<T>(encoded: string, toolId: string) {
+function decodePayload<T>(encoded: string, toolId: string, errorMessage?: string) {
   try {
     const json = decompressFromEncodedURIComponent(encoded);
     if (!json) return null;
@@ -261,7 +264,10 @@ function decodePayload<T>(encoded: string, toolId: string) {
     return payload.state as Partial<T>;
   } catch (error) {
     console.error('Failed to decode shared payload', error);
-    toast.error('Shared URL is invalid. Restoring default state.');
+    // Only show toast if errorMessage is provided and not empty
+    if (errorMessage) {
+      toast.error(errorMessage);
+    }
     return null;
   }
 }

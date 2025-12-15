@@ -10,6 +10,7 @@ import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useTitle } from '@/hooks/useTitle';
+import { useI18n } from '@/hooks/useI18nHooks';
 import { copyToClipboard } from '@/lib/clipboard';
 import { isMobileDevice } from '@/lib/utils';
 import { ShareModal } from '@/components/common/ShareModal';
@@ -48,7 +49,8 @@ interface ParseResult {
 }
 
 const QueryStringTool: React.FC = () => {
-  useTitle('URL Parser');
+  const { t } = useI18n();
+  useTitle(t('tool.urlParser.title'));
   const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
     useToolState<QueryStringToolState>('url-parser', DEFAULT_STATE);
   const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
@@ -75,16 +77,14 @@ const QueryStringTool: React.FC = () => {
         inputWithoutFragment = input.substring(0, hashIndex);
       }
 
-      // Check if input looks like a full URL (starts with http:// or https://, or contains domain pattern)
+      // Check if input looks like a full URL
       const isFullUrl =
         inputWithoutFragment.match(/^https?:\/\//i) ||
         (inputWithoutFragment.match(/^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.[a-zA-Z]{2,}/) &&
           !inputWithoutFragment.startsWith('?'));
 
       if (isFullUrl) {
-        // Try to parse as URL
         try {
-          // Add protocol if missing
           let urlToParse = inputWithoutFragment;
           if (!urlToParse.match(/^https?:\/\//i)) {
             urlToParse = `https://${urlToParse}`;
@@ -97,15 +97,11 @@ const QueryStringTool: React.FC = () => {
             path: url.pathname,
             fragment,
           };
-
-          // Extract query string from URL
-          queryString = url.search.substring(1); // Remove leading '?'
+          queryString = url.search.substring(1);
         } catch {
-          // URL parsing failed, try to extract query string manually
           if (inputWithoutFragment.includes('?')) {
             const urlParts = inputWithoutFragment.split('?');
             queryString = urlParts.slice(1).join('?');
-            // Try to extract domain and path from first part
             const firstPart = urlParts[0];
             if (firstPart.match(/^https?:\/\//i)) {
               try {
@@ -116,14 +112,11 @@ const QueryStringTool: React.FC = () => {
                   path: url.pathname,
                   fragment,
                 };
-              } catch {
-                // Ignore
-              }
+              } catch { /* ignore */ }
             }
           }
         }
       } else {
-        // Not a full URL, treat as query string only
         if (inputWithoutFragment.startsWith('?')) {
           queryString = inputWithoutFragment.substring(1);
         } else if (inputWithoutFragment.includes('?')) {
@@ -134,34 +127,30 @@ const QueryStringTool: React.FC = () => {
         }
       }
 
-      // If it starts with '&', remove it
       if (queryString.startsWith('&')) {
         queryString = queryString.substring(1);
       }
 
-      // If no query string and no URL info, show error
       if (!queryString && !urlInfo) {
         return {
           params: [],
           queryString: '',
           urlInfo: null,
-          error: 'No query string found. Please enter a URL with query parameters or a query string.',
+          error: t('tool.urlParser.noQueryStringFound'),
         };
       }
 
-      // Parse query string
       const params: ParsedParam[] = [];
       const pairs = queryString.split('&');
 
       for (const pair of pairs) {
-        if (!pair) continue; // Skip empty pairs
+        if (!pair) continue;
 
         const equalIndex = pair.indexOf('=');
         let key: string;
         let rawValue: string;
 
         if (equalIndex === -1) {
-          // No '=' found, treat as key with empty value
           key = pair;
           rawValue = '';
         } else {
@@ -169,19 +158,16 @@ const QueryStringTool: React.FC = () => {
           rawValue = pair.substring(equalIndex + 1);
         }
 
-        // Decode the key and value
         let decodedKey: string;
         let decodedValue: string;
         try {
           decodedKey = decodeURIComponent(key);
           decodedValue = decodeURIComponent(rawValue);
         } catch {
-          // If decoding fails, use raw values
           decodedKey = key;
           decodedValue = rawValue;
         }
 
-        // Check if value was encoded
         const isEncoded = rawValue !== decodedValue || rawValue.includes('%');
 
         params.push({
@@ -196,34 +182,34 @@ const QueryStringTool: React.FC = () => {
         params,
         queryString,
         urlInfo,
-        error: params.length === 0 && !urlInfo ? 'No parameters found in query string.' : null,
+        error: params.length === 0 && !urlInfo ? t('tool.urlParser.noParamsFound') : null,
       };
     } catch (error) {
       return {
         params: [],
         queryString: '',
         urlInfo: null,
-        error: `Failed to parse query string: ${(error as Error).message}`,
+        error: `${t('tool.urlParser.failedToParse')}: ${(error as Error).message}`,
       };
     }
-  }, [debouncedInput]);
+  }, [debouncedInput, t]);
 
   const handleCopyParam = (param: ParsedParam) => {
     const value = state.showDecoded ? param.decodedValue : param.rawValue;
     const text = `${param.key}=${value}`;
-    copyToClipboard(text, `Copied "${param.key}" parameter.`);
+    copyToClipboard(text, t('tool.urlParser.copiedParam').replace('{key}', param.key));
   };
 
   const handleCopyAll = () => {
     if (!parseResult.queryString) return;
-    copyToClipboard(parseResult.queryString, 'Copied query string.');
+    copyToClipboard(parseResult.queryString, t('tool.urlParser.copiedQueryString'));
   };
 
   return (
     <div className="flex flex-col h-full p-4 md:p-6 max-w-5xl mx-auto">
       <ToolHeader
-        title="URL Parser"
-        description="Parse and visualize URL components including protocol, host, path, fragment, and query parameters."
+        title={t('tool.urlParser.title')}
+        description={t('tool.urlParser.description')}
         onReset={resetState}
         onShare={async () => {
           if (isMobile) {
@@ -242,15 +228,15 @@ const QueryStringTool: React.FC = () => {
         }}
         includedFields={shareInfo.includedFields}
         excludedFields={shareInfo.excludedFields}
-        toolName="URL Parser"
+        toolName={t('tool.urlParser.title')}
       />
 
       <div className="flex-1 flex flex-col gap-6">
         <EditorPanel
-          title="URL or Query String"
+          title={t('tool.urlParser.urlOrQueryString')}
           value={state.input}
           onChange={(val) => updateState({ input: val })}
-          placeholder="Enter a URL or query string (e.g., https://example.com/search?q=laptop&category=electronics#results or ?arr[]=value1&key=value)..."
+          placeholder={t('tool.urlParser.inputPlaceholder')}
           className="h-40 lg:h-48"
           status={parseResult.error ? 'error' : 'default'}
         />
@@ -263,8 +249,8 @@ const QueryStringTool: React.FC = () => {
               checked={state.showDecoded}
               onChange={(e) => updateState({ showDecoded: e.target.checked })}
             />
-            <OptionLabel tooltip="Show decoded (human-readable) values. When enabled, URL-encoded characters like %20 will be displayed as spaces.">
-              Show decoded values
+            <OptionLabel tooltip={t('tool.urlParser.showDecodedTooltip')}>
+              {t('tool.urlParser.showDecodedValues')}
             </OptionLabel>
           </label>
 
@@ -275,21 +261,21 @@ const QueryStringTool: React.FC = () => {
               checked={state.showRaw}
               onChange={(e) => updateState({ showRaw: e.target.checked })}
             />
-            <OptionLabel tooltip="Show raw (encoded) values. When enabled, the original URL-encoded values will be displayed alongside decoded values for comparison.">
-              Show raw values
+            <OptionLabel tooltip={t('tool.urlParser.showRawTooltip')}>
+              {t('tool.urlParser.showRawValues')}
             </OptionLabel>
           </label>
         </ActionBar>
 
         {parseResult.error && (
-          <ErrorBanner message="Parsing failed" details={parseResult.error} />
+          <ErrorBanner message={t('tool.urlParser.parsingFailed')} details={parseResult.error} />
         )}
 
         {!parseResult.error && parseResult.urlInfo && (
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between px-3 py-1.5 border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-900 shrink-0 rounded-t-md border">
               <span className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                URL Information
+                {t('tool.urlParser.urlInformation')}
               </span>
             </div>
             <div className="border dark:border-gray-700 rounded-b-md bg-white dark:bg-gray-800 overflow-hidden">
@@ -297,17 +283,15 @@ const QueryStringTool: React.FC = () => {
                 {parseResult.urlInfo.protocol && (
                   <div className="flex items-start gap-3">
                     <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider min-w-[80px]">
-                      Protocol:
+                      {t('tool.urlParser.protocol')}:
                     </span>
                     <span className="text-sm font-mono text-gray-900 dark:text-gray-100 break-all">
                       {parseResult.urlInfo.protocol}
                     </span>
                     <button
-                      onClick={() =>
-                        copyToClipboard(parseResult.urlInfo!.protocol!, 'Copied protocol.')
-                      }
+                      onClick={() => copyToClipboard(parseResult.urlInfo!.protocol!, t('tool.urlParser.copiedProtocol'))}
                       className="p-1 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors ml-auto"
-                      title="Copy Protocol"
+                      title={t('common.copy')}
                     >
                       <Copy className="w-4 h-4" />
                     </button>
@@ -316,17 +300,15 @@ const QueryStringTool: React.FC = () => {
                 {parseResult.urlInfo.host && (
                   <div className="flex items-start gap-3">
                     <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider min-w-[80px]">
-                      Host:
+                      {t('tool.urlParser.host')}:
                     </span>
                     <span className="text-sm font-mono text-gray-900 dark:text-gray-100 break-all">
                       {parseResult.urlInfo.host}
                     </span>
                     <button
-                      onClick={() =>
-                        copyToClipboard(parseResult.urlInfo!.host!, 'Copied host.')
-                      }
+                      onClick={() => copyToClipboard(parseResult.urlInfo!.host!, t('tool.urlParser.copiedHost'))}
                       className="p-1 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors ml-auto"
-                      title="Copy Host"
+                      title={t('common.copy')}
                     >
                       <Copy className="w-4 h-4" />
                     </button>
@@ -335,17 +317,15 @@ const QueryStringTool: React.FC = () => {
                 {parseResult.urlInfo.path && (
                   <div className="flex items-start gap-3">
                     <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider min-w-[80px]">
-                      Path:
+                      {t('tool.urlParser.path')}:
                     </span>
                     <span className="text-sm font-mono text-gray-900 dark:text-gray-100 break-all">
                       {parseResult.urlInfo.path || <span className="text-gray-400 dark:text-gray-500 italic">/</span>}
                     </span>
                     <button
-                      onClick={() =>
-                        copyToClipboard(parseResult.urlInfo!.path || '/', 'Copied path.')
-                      }
+                      onClick={() => copyToClipboard(parseResult.urlInfo!.path || '/', t('tool.urlParser.copiedPath'))}
                       className="p-1 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors ml-auto"
-                      title="Copy Path"
+                      title={t('common.copy')}
                     >
                       <Copy className="w-4 h-4" />
                     </button>
@@ -354,17 +334,15 @@ const QueryStringTool: React.FC = () => {
                 {parseResult.urlInfo.fragment && (
                   <div className="flex items-start gap-3">
                     <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider min-w-[80px]">
-                      Fragment:
+                      {t('tool.urlParser.fragment')}:
                     </span>
                     <span className="text-sm font-mono text-gray-900 dark:text-gray-100 break-all">
                       {parseResult.urlInfo.fragment}
                     </span>
                     <button
-                      onClick={() =>
-                        copyToClipboard(parseResult.urlInfo!.fragment!, 'Copied fragment.')
-                      }
+                      onClick={() => copyToClipboard(parseResult.urlInfo!.fragment!, t('tool.urlParser.copiedFragment'))}
                       className="p-1 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors ml-auto"
-                      title="Copy Fragment"
+                      title={t('common.copy')}
                     >
                       <Copy className="w-4 h-4" />
                     </button>
@@ -380,14 +358,14 @@ const QueryStringTool: React.FC = () => {
             <div className="flex items-center justify-between px-3 py-1.5 border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-900 shrink-0 rounded-t-md border">
               <div className="flex items-center gap-2">
                 <span className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                  Parameters ({parseResult.params.length})
+                  {t('tool.urlParser.parameters')} ({parseResult.params.length})
                 </span>
               </div>
               <button
                 onClick={handleCopyAll}
                 disabled={!parseResult.queryString}
                 className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                title="Copy Query String"
+                title={t('tool.urlParser.copyQueryString')}
               >
                 <Copy className="w-4 h-4" />
               </button>
@@ -399,44 +377,37 @@ const QueryStringTool: React.FC = () => {
                   <thead className="bg-gray-50 dark:bg-gray-900 border-b dark:border-gray-700">
                     <tr>
                       <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                        Key
+                        {t('tool.urlParser.key')}
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                        Value
+                        {t('tool.urlParser.value')}
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 w-24">
-                        Actions
+                        {t('tool.urlParser.actions')}
                       </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                     {parseResult.params.map((param, index) => (
-                      <tr
-                        key={`${param.key}-${index}`}
-                        className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
-                      >
+                      <tr key={`${param.key}-${index}`} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                         <td className="px-4 py-3 text-sm font-mono text-gray-900 dark:text-gray-100">
-                          {param.key || <span className="text-gray-400 dark:text-gray-500 italic">(empty)</span>}
+                          {param.key || <span className="text-gray-400 dark:text-gray-500 italic">({t('tool.urlParser.empty')})</span>}
                         </td>
                         <td className="px-4 py-3 text-sm">
                           <div className="flex flex-col gap-1">
                             {state.showDecoded && (
                               <div className="font-mono text-gray-900 dark:text-gray-100 break-all">
-                                {param.decodedValue || (
-                                  <span className="text-gray-400 dark:text-gray-500 italic">(empty)</span>
-                                )}
+                                {param.decodedValue || <span className="text-gray-400 dark:text-gray-500 italic">({t('tool.urlParser.empty')})</span>}
                               </div>
                             )}
                             {state.showRaw && (
                               <div className="font-mono text-gray-600 dark:text-gray-400 text-xs break-all">
-                                Raw: {param.rawValue || (
-                                  <span className="text-gray-400 dark:text-gray-500 italic">(empty)</span>
-                                )}
+                                Raw: {param.rawValue || <span className="text-gray-400 dark:text-gray-500 italic">({t('tool.urlParser.empty')})</span>}
                               </div>
                             )}
                             {param.isEncoded && (
                               <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">
-                                Encoded
+                                {t('tool.urlParser.encoded')}
                               </span>
                             )}
                           </div>
@@ -445,7 +416,7 @@ const QueryStringTool: React.FC = () => {
                           <button
                             onClick={() => handleCopyParam(param)}
                             className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
-                            title={`Copy ${param.key}`}
+                            title={t('common.copy')}
                           >
                             <Copy className="w-4 h-4" />
                           </button>
@@ -461,8 +432,8 @@ const QueryStringTool: React.FC = () => {
 
         {!parseResult.error && parseResult.params.length === 0 && !parseResult.urlInfo && debouncedInput.trim() && (
           <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-            <p>No query parameters found.</p>
-            <p className="text-sm mt-2">Enter a URL with query parameters or a query string.</p>
+            <p>{t('tool.urlParser.noQueryParamsFound')}</p>
+            <p className="text-sm mt-2">{t('tool.urlParser.enterUrlWithParams')}</p>
           </div>
         )}
       </div>
@@ -473,7 +444,7 @@ const QueryStringTool: React.FC = () => {
 export const queryStringTool: ToolDefinition<QueryStringToolState> = {
   id: 'url-parser',
   title: 'URL Parser',
-  description: 'Parse and visualize URL components including protocol, host, path, fragment, and query parameters',
+  description: 'Parse and visualize URL components',
   keywords: ['url parser', 'query string parser', 'url analyzer', 'query params', 'url parameters', 'url decoder', 'url components'],
   category: 'parser',
   path: '/url-parser',
@@ -481,4 +452,3 @@ export const queryStringTool: ToolDefinition<QueryStringToolState> = {
   defaultState: DEFAULT_STATE,
   Component: QueryStringTool,
 };
-

@@ -8,6 +8,7 @@ import { OptionLabel } from '@/components/ui/OptionLabel';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { useToolState } from '@/hooks/useToolState';
 import { useTitle } from '@/hooks/useTitle';
+import { useI18n } from '@/hooks/useI18nHooks';
 import { format, formatISO } from 'date-fns';
 import { format as formatTz } from 'date-fns-tz';
 import { copyToClipboard } from '@/lib/clipboard';
@@ -33,38 +34,42 @@ const TimeFormatItem: React.FC<{
   label: string;
   value: string;
   tooltip?: string;
-}> = ({ label, value, tooltip }) => (
-  <div className="group flex items-center justify-between gap-3 py-2 px-3 rounded-md hover:bg-blue-100/50 dark:hover:bg-blue-800/20 transition-colors">
-    <div className="flex-1 min-w-0">
-      {tooltip ? (
-        <Tooltip content={tooltip}>
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-help">
+}> = ({ label, value, tooltip }) => {
+  const { t } = useI18n();
+  return (
+    <div className="group flex items-center justify-between gap-3 py-2 px-3 rounded-md hover:bg-blue-100/50 dark:hover:bg-blue-800/20 transition-colors">
+      <div className="flex-1 min-w-0">
+        {tooltip ? (
+          <Tooltip content={tooltip}>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-help">
+              {label}
+            </span>
+          </Tooltip>
+        ) : (
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
             {label}
           </span>
-        </Tooltip>
-      ) : (
-        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-          {label}
-        </span>
-      )}
-      <div className="mt-1 font-mono text-xs text-gray-600 dark:text-gray-400 break-all">
-        {value}
+        )}
+        <div className="mt-1 font-mono text-xs text-gray-600 dark:text-gray-400 break-all">
+          {value}
+        </div>
       </div>
+      {value !== '-' && (
+        <button
+          onClick={() => copyToClipboard(value, t('common.copiedToClipboard'))}
+          className="opacity-0 group-hover:opacity-100 p-1.5 rounded hover:bg-blue-200 dark:hover:bg-blue-700 transition-all flex-shrink-0"
+          title={t('common.copy')}
+        >
+          <Copy className="w-3.5 h-3.5 text-gray-600 dark:text-gray-400" />
+        </button>
+      )}
     </div>
-    {value !== '-' && (
-      <button
-        onClick={() => copyToClipboard(value, `Copied ${label}`)}
-        className="opacity-0 group-hover:opacity-100 p-1.5 rounded hover:bg-blue-200 dark:hover:bg-blue-700 transition-all flex-shrink-0"
-        title={`Copy ${label}`}
-      >
-        <Copy className="w-3.5 h-3.5 text-gray-600 dark:text-gray-400" />
-      </button>
-    )}
-  </div>
-);
+  );
+};
 
 const TimeTool: React.FC = () => {
-  useTitle('Time Converter');
+  const { t } = useI18n();
+  useTitle(t('tool.time.title'));
   // Time tool state contains: epochInput (string), epochUnit, isoInput (string), timezone
   // All fields are necessary for sharing - no filter needed
   const { state, setState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
@@ -94,7 +99,7 @@ const TimeTool: React.FC = () => {
   }, [state.isoInput, state.epochInput, state.epochUnit]);
 
   const handleEpochChange = (value: string) => {
-    const { iso, error } = convertEpoch(value, state.epochUnit, state.timezone);
+    const { iso, error } = convertEpoch(value, state.epochUnit, state.timezone, t);
     setEpochError(error);
     if (!error && iso !== undefined) {
       setIsoError(null);
@@ -105,7 +110,7 @@ const TimeTool: React.FC = () => {
   };
 
   const handleIsoChange = (value: string) => {
-    const { epoch, error } = convertIso(value, state.epochUnit);
+    const { epoch, error } = convertIso(value, state.epochUnit, t);
     setIsoError(error);
     if (!error && epoch !== undefined) {
       setEpochError(null);
@@ -116,7 +121,7 @@ const TimeTool: React.FC = () => {
   };
 
   const handleUnitChange = (unit: 'ms' | 's') => {
-    const { iso, error } = convertEpoch(state.epochInput, unit, state.timezone);
+    const { iso, error } = convertEpoch(state.epochInput, unit, state.timezone, t);
     setEpochError(error);
     setState((prev) => ({
       ...prev,
@@ -129,7 +134,8 @@ const TimeTool: React.FC = () => {
     const { iso, error } = convertEpoch(
       state.epochInput,
       state.epochUnit,
-      timezone
+      timezone,
+      t
     );
     setEpochError(error);
     setState((prev) => ({ ...prev, timezone, isoInput: iso ?? prev.isoInput }));
@@ -215,8 +221,8 @@ const TimeTool: React.FC = () => {
   return (
     <div className="flex flex-col h-full p-4 md:p-6 max-w-3xl mx-auto">
       <ToolHeader
-        title="Epoch / ISO Converter"
-        description="Switch between epoch timestamps and ISO8601 strings."
+        title={t('tool.time.title')}
+        description={t('tool.time.description')}
         onReset={resetState}
         onShare={async () => {
           if (isMobile) {
@@ -230,10 +236,10 @@ const TimeTool: React.FC = () => {
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm space-y-4">
           <div className="flex justify-between items-center flex-wrap gap-3">
             <OptionLabel
-              tooltip="Epoch timestamp represents the number of seconds or milliseconds that have elapsed since January 1, 1970 (Unix epoch) in UTC. This is a common way to represent dates in programming."
+              tooltip={t('tool.time.epochTooltip')}
               className="text-sm font-medium text-gray-700 dark:text-gray-300"
             >
-              Epoch Timestamp
+              {t('tool.time.epochTimestamp')}
             </OptionLabel>
             <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
               {(['ms', 's'] as const).map((unit) => (
@@ -251,11 +257,11 @@ const TimeTool: React.FC = () => {
                   <OptionLabel
                     tooltip={
                       unit === 'ms'
-                        ? 'Interpret the epoch value as milliseconds since 1970-01-01 UTC. This is the JavaScript Date format (e.g., 1704067200000).'
-                        : 'Interpret the epoch value as seconds since 1970-01-01 UTC. This is the Unix timestamp format (e.g., 1704067200).'
+                        ? t('tool.time.msTooltip')
+                        : t('tool.time.secTooltip')
                     }
                   >
-                    {unit === 'ms' ? 'milliseconds' : 'seconds'}
+                    {unit === 'ms' ? t('tool.time.milliseconds') : t('tool.time.seconds')}
                   </OptionLabel>
                 </label>
               ))}
@@ -270,10 +276,10 @@ const TimeTool: React.FC = () => {
                 ? 'border-red-300 dark:border-red-700'
                 : 'border-gray-300 dark:border-gray-600'
             }`}
-            placeholder="e.g. 1704067200000"
+            placeholder={t('tool.time.epochPlaceholder')}
           />
           {epochError && (
-            <ErrorBanner message="Epoch input error" details={epochError} />
+            <ErrorBanner message={t('tool.time.epochInputError')} details={epochError} />
           )}
         </div>
 
@@ -282,17 +288,17 @@ const TimeTool: React.FC = () => {
             className="px-4 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors border border-gray-200 dark:border-gray-700"
             onClick={handleSetNow}
           >
-            Set to Now
+            {t('tool.time.setToNow')}
           </button>
         </div>
 
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm space-y-4">
           <div className="flex justify-between items-center flex-wrap gap-3">
             <OptionLabel
-              tooltip="ISO 8601 is an international standard for date and time representation. The format is YYYY-MM-DDTHH:mm:ss.sssZ, where 'Z' indicates UTC timezone. This format is widely used in APIs and databases."
+              tooltip={t('tool.time.isoTooltip')}
               className="text-sm font-medium text-gray-700 dark:text-gray-300"
             >
-              ISO 8601 Date
+              {t('tool.time.isoDate')}
             </OptionLabel>
             <div className="flex items-center gap-2 text-sm">
               {(['local', 'utc'] as const).map((tz) => (
@@ -300,8 +306,8 @@ const TimeTool: React.FC = () => {
                   key={tz}
                   content={
                     tz === 'local'
-                      ? "Display ISO conversions relative to your local timezone. The time will be adjusted based on your browser's timezone settings."
-                      : 'Display ISO conversions relative to UTC (Coordinated Universal Time). This is the standard timezone used in programming and avoids daylight saving time complications.'
+                      ? t('tool.time.localTooltip')
+                      : t('tool.time.utcTooltip')
                   }
                 >
                   <button
@@ -312,7 +318,7 @@ const TimeTool: React.FC = () => {
                         : 'border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
                     }`}
                   >
-                    {tz === 'local' ? 'Local' : 'UTC'}
+                    {tz === 'local' ? t('tool.time.local') : t('tool.time.utc')}
                   </button>
                 </Tooltip>
               ))}
@@ -327,10 +333,10 @@ const TimeTool: React.FC = () => {
                 ? 'border-red-300 dark:border-red-700'
                 : 'border-gray-300 dark:border-gray-600'
             }`}
-            placeholder="e.g. 2024-01-01T00:00:00.000Z"
+            placeholder={t('tool.time.isoPlaceholder')}
           />
           {isoError && (
-            <ErrorBanner message="ISO input error" details={isoError} />
+            <ErrorBanner message={t('tool.time.isoInputError')} details={isoError} />
           )}
         </div>
 
@@ -338,82 +344,74 @@ const TimeTool: React.FC = () => {
           {/* Basic Formats Section */}
           <div className="px-4 py-3 bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700">
             <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-              Basic Formats
+              {t('tool.time.basicFormats')}
             </h3>
           </div>
           <div className="p-4 space-y-1">
             <TimeFormatItem
-              label="Local Time"
+              label={t('tool.time.localTime')}
               value={
                 derivedDate
                   ? format(derivedDate, 'yyyy-MM-dd HH:mm:ss.SSS xxx')
                   : '-'
               }
-              tooltip="Local time in your browser's timezone"
             />
             <TimeFormatItem
-              label="UTC"
+              label={t('tool.time.utc')}
               value={derivedDate ? derivedDate.toISOString() : '-'}
-              tooltip="Coordinated Universal Time (UTC) - standard time reference"
             />
             <TimeFormatItem
-              label="Unix (seconds)"
+              label={t('tool.time.unixSeconds')}
               value={
                 derivedDate
                   ? Math.floor(derivedDate.getTime() / 1000).toString()
                   : '-'
               }
-              tooltip="Unix timestamp in seconds since January 1, 1970 UTC"
             />
             <TimeFormatItem
-              label="Unix (milliseconds)"
+              label={t('tool.time.unixMilliseconds')}
               value={derivedDate ? derivedDate.getTime().toString() : '-'}
-              tooltip="Unix timestamp in milliseconds since January 1, 1970 UTC"
             />
           </div>
 
           {/* Standard Formats Section */}
           <div className="px-4 py-3 bg-gray-50 dark:bg-gray-900/50 border-t border-b border-gray-200 dark:border-gray-700">
             <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-              Standard Formats
+              {t('tool.time.standardFormats')}
             </h3>
           </div>
           <div className="p-4 space-y-1">
             <TimeFormatItem
               label="RFC 2822"
               value={derivedDate ? formatRFC2822(derivedDate) : '-'}
-              tooltip="RFC 2822 format commonly used in email headers"
             />
             <TimeFormatItem
               label="RFC 3339"
               value={derivedDate ? formatRFC3339(derivedDate) : '-'}
-              tooltip="RFC 3339 format (subset of ISO 8601)"
             />
             <TimeFormatItem
               label="ISO 8601"
               value={derivedDate ? formatISO(derivedDate) : '-'}
-              tooltip="ISO 8601 international standard date and time format"
             />
           </div>
 
           {/* Human Readable Formats Section */}
           <div className="px-4 py-3 bg-gray-50 dark:bg-gray-900/50 border-t border-b border-gray-200 dark:border-gray-700">
             <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-              Human Readable
+              {t('tool.time.humanReadable')}
             </h3>
           </div>
           <div className="p-4 space-y-1">
             <TimeFormatItem
-              label="Human Readable (Global)"
+              label={t('tool.time.humanReadableGlobal')}
               value={
                 derivedDate
                   ? format(derivedDate, 'MMMM dd, yyyy, hh:mm:ss a')
                   : '-'
               }
-              tooltip="Easy-to-read format with month name and AM/PM"
             />
             <TimeFormatItem
-              label="Human Readable (Korea)"
+              label={t('tool.time.humanReadableKorea')}
               value={
                 derivedDate
                   ? (() => {
@@ -441,26 +439,24 @@ const TimeTool: React.FC = () => {
                     })()
                   : '-'
               }
-              tooltip="한국 표준시(KST) 기준의 한국어 형식 날짜 및 시간"
             />
             <TimeFormatItem
-              label="Day of Week"
+              label={t('tool.time.dayOfWeek')}
               value={
                 derivedDate ? format(derivedDate, 'EEEE, MMMM dd, yyyy') : '-'
               }
-              tooltip="Full day name with date"
             />
           </div>
 
           {/* Timezone Formats Section */}
           <div className="px-4 py-3 bg-gray-50 dark:bg-gray-900/50 border-t border-b border-gray-200 dark:border-gray-700">
             <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-              Timezone Formats
+              {t('tool.time.timezoneFormats')}
             </h3>
           </div>
           <div className="p-4 space-y-1">
             <TimeFormatItem
-              label={`US Eastern (${
+              label={`${t('tool.time.usEastern')} (${
                 derivedDate
                   ? getTimezoneAbbr(derivedDate, 'America/New_York')
                   : 'EST/EDT'
@@ -474,10 +470,9 @@ const TimeTool: React.FC = () => {
                     )} ${getTimezoneAbbr(derivedDate, 'America/New_York')}`
                   : '-'
               }
-              tooltip="US Eastern Time (America/New_York)"
             />
             <TimeFormatItem
-              label={`US Pacific (${
+              label={`${t('tool.time.usPacific')} (${
                 derivedDate
                   ? getTimezoneAbbr(derivedDate, 'America/Los_Angeles')
                   : 'PST/PDT'
@@ -491,10 +486,9 @@ const TimeTool: React.FC = () => {
                     )} ${getTimezoneAbbr(derivedDate, 'America/Los_Angeles')}`
                   : '-'
               }
-              tooltip="US Pacific Time (America/Los_Angeles)"
             />
             <TimeFormatItem
-              label={`UK (${
+              label={`${t('tool.time.uk')} (${
                 derivedDate
                   ? getTimezoneAbbr(derivedDate, 'Europe/London')
                   : 'GMT/BST'
@@ -508,10 +502,9 @@ const TimeTool: React.FC = () => {
                     )} ${getTimezoneAbbr(derivedDate, 'Europe/London')}`
                   : '-'
               }
-              tooltip="UK Time (Europe/London)"
             />
             <TimeFormatItem
-              label={`Korea/Japan (${
+              label={`${t('tool.time.koreaJapan')} (${
                 derivedDate
                   ? getTimezoneAbbr(derivedDate, 'Asia/Seoul')
                   : 'KST/JST'
@@ -525,10 +518,9 @@ const TimeTool: React.FC = () => {
                     )} ${getTimezoneAbbr(derivedDate, 'Asia/Seoul')}`
                   : '-'
               }
-              tooltip="Korea Standard Time / Japan Standard Time (GMT+9)"
             />
             <TimeFormatItem
-              label={`China (${
+              label={`${t('tool.time.china')} (${
                 derivedDate
                   ? getTimezoneAbbr(derivedDate, 'Asia/Shanghai')
                   : 'CST'
@@ -542,7 +534,6 @@ const TimeTool: React.FC = () => {
                     )} ${getTimezoneAbbr(derivedDate, 'Asia/Shanghai')}`
                   : '-'
               }
-              tooltip="China Standard Time (Asia/Shanghai)"
             />
           </div>
         </div>
@@ -556,7 +547,7 @@ const TimeTool: React.FC = () => {
         }}
         includedFields={shareInfo.includedFields}
         excludedFields={shareInfo.excludedFields}
-        toolName="Time Converter"
+        toolName={t('tool.time.title')}
       />
     </div>
   );
@@ -565,32 +556,33 @@ const TimeTool: React.FC = () => {
 function convertEpoch(
   value: string,
   unit: 'ms' | 's',
-  timezone: 'local' | 'utc'
+  timezone: 'local' | 'utc',
+  t: (key: string) => string
 ) {
   const trimmed = value.trim();
   if (!trimmed) return { iso: '', error: null };
   if (!/^[-]?\d+(\.\d+)?$/.test(trimmed)) {
-    return { iso: '', error: 'Please enter a numeric value.' };
+    return { iso: '', error: t('tool.time.pleaseEnterNumeric') };
   }
   const numeric = Number(trimmed);
   if (!Number.isFinite(numeric)) {
-    return { iso: '', error: 'Number is out of range.' };
+    return { iso: '', error: t('tool.time.numberOutOfRange') };
   }
   const ms = unit === 's' ? numeric * 1000 : numeric;
   const date = new Date(ms);
   if (Number.isNaN(date.getTime())) {
-    return { iso: '', error: 'Epoch value is invalid.' };
+    return { iso: '', error: t('tool.time.epochValueInvalid') };
   }
   const iso = timezone === 'utc' ? date.toISOString() : formatISO(date);
   return { iso, error: null };
 }
 
-function convertIso(value: string, unit: 'ms' | 's') {
+function convertIso(value: string, unit: 'ms' | 's', t: (key: string) => string) {
   const trimmed = value.trim();
   if (!trimmed) return { epoch: '', error: null };
   const date = new Date(trimmed);
   if (Number.isNaN(date.getTime())) {
-    return { epoch: '', error: 'ISO 8601 format is invalid.' };
+    return { epoch: '', error: t('tool.time.isoFormatInvalid') };
   }
   const ms = date.getTime();
   const epoch = unit === 's' ? Math.floor(ms / 1000).toString() : ms.toString();
