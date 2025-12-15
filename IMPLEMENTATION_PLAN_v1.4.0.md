@@ -14,9 +14,9 @@
 
 ---
 
-## Phase 1: Monorepo 구조 전환 (2-3일)
+## Phase 1: Monorepo 구조 전환 ✅ (완료: 2024-12-16)
 
-### 1.1 패키지 매니저 전환 (npm → pnpm)
+### 1.1 패키지 매니저 전환 (npm → pnpm) ✅
 
 **작업 내용**:
 1. pnpm 설치
@@ -24,37 +24,46 @@
 3. `package-lock.json` → `pnpm-lock.yaml` 전환
 
 **체크리스트**:
-- [ ] pnpm 설치 및 설정
-- [ ] 기존 스크립트 동작 확인
+- [x] pnpm 설치 및 설정 (v10.25.0)
+- [x] 기존 스크립트 동작 확인
 
-### 1.2 디렉토리 구조 재구성
+### 1.2 디렉토리 구조 재구성 ✅
 
-**목표 구조**:
+**구현된 구조**:
 ```
 yowu-devtools/
 ├── apps/
-│   ├── web/                 # 기존 웹앱
-│   └── extension/           # Chrome Extension
+│   ├── web/                 # 기존 웹앱 (@yowu-devtools/web)
+│   └── extension/           # Chrome Extension (Phase 2에서 생성)
 ├── packages/
-│   └── shared/              # 공유 타입/유틸
-├── package.json             # Root
+│   └── shared/              # 공유 타입/유틸 (@yowu-devtools/shared)
+├── package.json             # Root (Turborepo 스크립트)
 ├── pnpm-workspace.yaml
-└── turbo.json
+├── turbo.json
+├── tsconfig.base.json
+└── .npmrc                   # pnpm 설정 (shamefully-hoist)
 ```
 
 **체크리스트**:
-- [ ] apps/web으로 기존 코드 이동
-- [ ] packages/shared 생성 (공유 타입 정의)
-- [ ] 경로 참조 수정
-- [ ] GitHub Actions 워크플로우 수정
-- [ ] 빌드 테스트 통과
+- [x] apps/web으로 기존 코드 이동
+- [x] packages/shared 생성 (공유 타입 정의)
+- [x] 경로 참조 수정 (vite-plugin-generate-routes.ts 등)
+- [x] GitHub Actions 워크플로우 수정 (pnpm + monorepo)
+- [x] 빌드 테스트 통과
 
-### 1.3 Turborepo 설정
+### 1.3 Turborepo 설정 ✅
 
 **체크리스트**:
-- [ ] turbo.json 생성
-- [ ] 루트 스크립트 설정 (dev, build, lint)
-- [ ] 빌드 캐싱 동작 확인
+- [x] turbo.json 생성
+- [x] 루트 스크립트 설정 (dev, build, lint)
+- [x] 빌드 캐싱 동작 확인
+
+### 1.4 추가 작업 사항
+
+- [x] `.npmrc` 추가 (`shamefully-hoist=true` - pnpm 호환성)
+- [x] `workbox-window` 명시적 의존성 추가 (PWA 빌드)
+- [x] `.gitignore`에 `.turbo` 추가
+- [x] 개발 서버 및 브라우저 동작 확인
 
 ---
 
