@@ -3,7 +3,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 /**
  * Options for useLocalStorage hook
  */
-interface UseLocalStorageOptions<T> {
+interface UseLocalStorageOptions {
   /**
    * Custom event name for cross-component synchronization within the same tab.
    * If provided, a custom event will be dispatched when the value changes.
@@ -32,8 +32,11 @@ interface UseLocalStorageOptions<T> {
 export function useLocalStorage<T>(
   key: string,
   initialValue: T,
-  options?: UseLocalStorageOptions<T>
+  options?: UseLocalStorageOptions
 ) {
+  // Extract syncEventName for stable dependency reference
+  const syncEventName = options?.syncEventName;
+
   // Use ref to track if this instance triggered the change
   // to avoid infinite loops when syncing
   const isLocalUpdate = useRef(false);
@@ -75,9 +78,9 @@ export function useLocalStorage<T>(
           localStorage.setItem(key, JSON.stringify(valueToStore));
 
           // Dispatch custom event for same-tab synchronization
-          if (options?.syncEventName) {
+          if (syncEventName) {
             window.dispatchEvent(
-              new CustomEvent(options.syncEventName, { detail: valueToStore })
+              new CustomEvent(syncEventName, { detail: valueToStore })
             );
           }
         }
@@ -90,7 +93,7 @@ export function useLocalStorage<T>(
         console.error(`Failed to save to localStorage key "${key}":`, error);
       }
     },
-    [key, storedValue, options?.syncEventName]
+    [key, storedValue, syncEventName]
   );
 
   // Remove from localStorage
@@ -99,16 +102,16 @@ export function useLocalStorage<T>(
       setStoredValue(initialValue);
       if (typeof window !== 'undefined') {
         localStorage.removeItem(key);
-        if (options?.syncEventName) {
+        if (syncEventName) {
           window.dispatchEvent(
-            new CustomEvent(options.syncEventName, { detail: initialValue })
+            new CustomEvent(syncEventName, { detail: initialValue })
           );
         }
       }
     } catch (error) {
       console.error(`Failed to remove localStorage key "${key}":`, error);
     }
-  }, [key, initialValue, options?.syncEventName]);
+  }, [key, initialValue, syncEventName]);
 
   // Listen for changes from other tabs (storage event)
   // and from other components in the same tab (custom event)
@@ -134,18 +137,17 @@ export function useLocalStorage<T>(
     window.addEventListener('storage', handleStorageChange);
 
     // Listen for same-tab changes from other components
-    if (options?.syncEventName) {
-      window.addEventListener(options.syncEventName, handleCustomEvent);
+    if (syncEventName) {
+      window.addEventListener(syncEventName, handleCustomEvent);
     }
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
-      if (options?.syncEventName) {
-        window.removeEventListener(options.syncEventName, handleCustomEvent);
+      if (syncEventName) {
+        window.removeEventListener(syncEventName, handleCustomEvent);
       }
     };
-  }, [key, options?.syncEventName, readFromStorage]);
+  }, [key, syncEventName, readFromStorage]);
 
   return [storedValue, setValue, removeValue] as const;
 }
-
