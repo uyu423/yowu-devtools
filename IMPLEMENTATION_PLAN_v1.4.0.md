@@ -369,6 +369,26 @@ apps/web/src/tools/api-tester/
 - [x] 기본 상태 펼침으로 변경
 - [x] 너비 384px로 확장
 
+### 4.6 추가 UX 개선 ✅ (완료: 2024-12-17)
+
+**Resizable Panels**:
+- [x] Request Builder와 Response Viewer 간 수평 리사이즈 기능
+- [x] 패널 너비 localStorage에 저장
+
+**Open in Viewer**:
+- [x] JSON Response → JSON Viewer로 바로 전송 버튼
+- [x] YAML Response → YAML Converter로 바로 전송 버튼
+- [x] 로딩 상태 인디케이터 (큰 데이터 처리 시)
+- [x] React Router state로 빠른 데이터 전달
+
+**History Sidebar State**:
+- [x] 사이드바 열림/닫힘 상태 localStorage에 저장
+
+**JSON Viewer URL Links**:
+- [x] Tree 뷰에서 URL 문자열 클릭 가능한 링크로 표시
+- [x] ExternalLink 아이콘으로 URL임을 시각적으로 표시
+- [x] 커스텀 JsonTreeView 컴포넌트로 react-json-view-lite 대체
+
 ---
 
 ## Phase 5: 테스트 및 검증 (2-3일)

@@ -44,6 +44,10 @@ Major release introducing the **API Tester** tool and migrating to a **pnpm + Tu
 - 🔧 **Extension Status Badge**: Visual indicator of extension connection
 - 🔧 **CORS Modal**: Clear guidance on CORS restrictions and solutions
 - 🌐 **i18n**: Full internationalization support for API Tester (5 languages)
+- 🔀 **Resizable Panels in API Tester**: Drag to resize request/response panels horizontally
+- 📤 **Open in Viewer**: Send JSON/YAML responses directly to JSON Viewer or YAML Converter
+- 💾 **History Sidebar State Persistence**: Remember open/closed state of history sidebar
+- 🔗 **Clickable URLs in JSON Viewer Tree**: URL strings in tree view are now clickable links
 
 ### Technical
 
