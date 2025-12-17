@@ -4,6 +4,41 @@ RELEASE_NOTES.md must be written in English.
 
 # Release Notes
 
+## Extension v1.0.1 (December 2025) - API Tester Enhancement
+
+The first feature release of **Yowu DevTools Companion** Chrome Extension, enhancing the API Tester tool with CORS bypass and cookie handling capabilities.
+
+**New Features:**
+
+- ✨ **CORS Bypass**: Execute cross-origin API requests that would otherwise be blocked by browser security policies
+  - Requests executed in extension context, bypassing CORS restrictions
+  - Automatic header modification via `declarativeNetRequest` API
+
+- ✨ **Include Cookies Option**: Optionally include browser cookies in API requests
+  - Toggle "Include Cookies" checkbox in API Tester (Extension mode only)
+  - Uses `credentials: 'include'` for automatic cookie handling
+  - i18n support for tooltip (all 5 languages)
+
+- ✨ **Permission Management**: Granular host permission control
+  - Explicit permission grant per domain
+  - Permission caching in localStorage
+
+- ✨ **Error Details View**: Detailed error information for debugging
+  - Collapsible "Show Details" section in response area
+  - Includes: error code, message, request URL, method, headers
+
+**Bug Fixes:**
+
+- 🔧 Fixed "Invalid name" error when sending requests with empty header keys
+
+**Technical:**
+
+- Manifest V3 with Service Worker architecture
+- Permissions: `storage`, `cookies`, `declarativeNetRequest`
+- See `apps/extension/CHANGELOG.md` for full details
+
+---
+
 ## v1.3.4 (December 2025) - JSON Viewer & Share UX Improvements
 
 **New Features:**

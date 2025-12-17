@@ -45,18 +45,6 @@ This allows users to test APIs that have restrictive CORS policies which would o
 - No user data is collected, stored, or transmitted
 - This is a common requirement for API testing tools to function properly
 
-### storage
-
-**Why this permission is required:**
-
-This permission is used to store user preferences and settings locally within the browser.
-
-**Key points:**
-
-- All data is stored locally on the user's device
-- No data is synced to external servers
-- Used for storing extension configuration only
-
 ## Data Handling
 
 ### What data we collect
@@ -85,4 +73,4 @@ For questions about this privacy policy, please visit: https://tools.yowu.dev
 
 ---
 
-Last updated: 2024-12-17
+Last updated: 2025-12-17
