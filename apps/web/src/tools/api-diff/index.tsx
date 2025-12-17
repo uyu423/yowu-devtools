@@ -17,7 +17,7 @@ import type { ToolDefinition } from '../types';
 import type { ApiDiffState, HttpMethod, KeyValuePair, ResponseTab } from './types';
 import { DEFAULT_STATE, createEmptyKeyValue } from './constants';
 import { TopSharedPanel, SidePanel, ResultBanner, HistorySidebar } from './components';
-import { compareResponses } from './utils';
+import { compareResponses, sanitizePathAndParams } from './utils';
 import { useDomainPresets, useApiDiffExecutor, useHistory } from './hooks';
 import { CorsModal } from '../api-tester/components';
 import { useCorsAllowlist } from '../api-tester/hooks';
@@ -82,6 +82,7 @@ const ApiDiffTool: React.FC = () => {
         body,
         domainA,
         domainB,
+        includeCookies,
       }) => ({
         method,
         path,
@@ -90,6 +91,7 @@ const ApiDiffTool: React.FC = () => {
         body,
         domainA,
         domainB,
+        includeCookies,
       }),
     });
 
@@ -154,14 +156,24 @@ const ApiDiffTool: React.FC = () => {
       return;
     }
 
+    // Sanitize path: extract query params from path and merge with existing params
+    const { sanitizedPath, mergedParams } = sanitizePathAndParams(state.path, state.params);
+    
+    // Update state if path was sanitized (has query params in path)
+    let requestState = state;
+    if (sanitizedPath !== state.path) {
+      updateState({ path: sanitizedPath, params: mergedParams });
+      requestState = { ...state, path: sanitizedPath, params: mergedParams };
+    }
+
     // Reset CORS retry state
     setPendingCorsRetry(false);
 
     // Check if domains are in CORS allowlist - use extension automatically
     const shouldUseExtension =
       forceExtension ||
-      (isCorsAllowed(state.domainA) && extensionStatus === 'connected') ||
-      (isCorsAllowed(state.domainB) && extensionStatus === 'connected');
+      (isCorsAllowed(requestState.domainA) && extensionStatus === 'connected') ||
+      (isCorsAllowed(requestState.domainB) && extensionStatus === 'connected');
 
     // Set executing state
     updateState({
@@ -171,14 +183,14 @@ const ApiDiffTool: React.FC = () => {
     });
 
     try {
-      const { responseA, responseB } = await executeRequests(state, shouldUseExtension);
+      const { responseA, responseB } = await executeRequests(requestState, shouldUseExtension);
       updateState({
         isExecuting: false,
         responseA,
         responseB,
       });
       // Add to history on success
-      addHistoryItem(state);
+      addHistoryItem(requestState);
     } catch (error) {
       console.error('Request execution failed:', error);
       updateState({ isExecuting: false });

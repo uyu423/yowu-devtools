@@ -22,7 +22,7 @@ import { copyToClipboard } from '@/lib/clipboard';
 
 import type { ApiTesterState, HttpMethod, HistoryItem } from './types';
 import { COMMON_HEADERS, COMMON_CONTENT_TYPES, BODY_SUPPORTED_METHODS } from './types';
-import { createKeyValueItem, toCurlCommand, parseUrlParams } from './utils';
+import { createKeyValueItem, toCurlCommand, parseUrlParams, sanitizeUrlAndParams } from './utils';
 import {
   MethodSelector,
   UrlInput,
@@ -74,7 +74,7 @@ const ApiTesterTool: React.FC = () => {
   const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
     useToolState<ApiTesterState>('api-tester', DEFAULT_STATE, {
       // Only include essential fields for API request reproduction
-      shareStateFilter: ({ method, url, queryParams, headers, body }) => {
+      shareStateFilter: ({ method, url, queryParams, headers, body, includeCookies }) => {
         // Filter enabled items only for queryParams and headers
         const enabledQueryParams = queryParams.filter((p) => p.enabled && p.key);
         const enabledHeaders = headers.filter((h) => h.enabled && h.key);
@@ -83,6 +83,7 @@ const ApiTesterTool: React.FC = () => {
         const shareState: Record<string, unknown> = {
           method,
           url,
+          includeCookies,
         };
 
         // Only include queryParams if there are enabled items
@@ -272,15 +273,25 @@ const ApiTesterTool: React.FC = () => {
     if (!state.url.trim()) return;
     setPendingCorsRetry(false);
     
+    // Sanitize URL: extract query params from URL and merge with existing params
+    const { sanitizedUrl, mergedParams } = sanitizeUrlAndParams(state.url, state.queryParams);
+    
+    // Update state if URL was sanitized (has query params in URL)
+    let requestState = state;
+    if (sanitizedUrl !== state.url) {
+      updateState({ url: sanitizedUrl, queryParams: mergedParams });
+      requestState = { ...state, url: sanitizedUrl, queryParams: mergedParams };
+    }
+    
     // Check if this origin is in the CORS allowlist
-    const shouldUseExtension = isCorsAllowed(state.url) && extensionStatus === 'connected';
+    const shouldUseExtension = isCorsAllowed(requestState.url) && extensionStatus === 'connected';
     
     if (shouldUseExtension) {
       console.log('[API Tester] Origin in CORS allowlist, using extension automatically');
     }
     
-    await executeWithAutoMode(state, shouldUseExtension);
-  }, [state, executeWithAutoMode, isCorsAllowed, extensionStatus]);
+    await executeWithAutoMode(requestState, shouldUseExtension);
+  }, [state, executeWithAutoMode, isCorsAllowed, extensionStatus, updateState]);
 
   // Handle retry with extension (from modal)
   const handleRetryWithExtension = useCallback(async (rememberChoice: boolean) => {
@@ -368,7 +379,7 @@ const ApiTesterTool: React.FC = () => {
       body: bodyStr,
       domainA: targetDomain === 'A' ? domain : '',
       domainB: targetDomain === 'B' ? domain : '',
-      includeCookies: false,
+      includeCookies: state.includeCookies, // Pass the current includeCookies setting
       // Response state (not persisted)
       responseA: null,
       responseB: null,

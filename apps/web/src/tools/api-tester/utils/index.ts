@@ -69,6 +69,68 @@ export const getBaseUrl = (url: string): string => {
 };
 
 /**
+ * Sanitize URL and merge query parameters
+ * - Extract query params from URL
+ * - Merge with existing queryParams (URL params take precedence for same keys)
+ * - Return sanitized URL without query string and merged params
+ */
+export const sanitizeUrlAndParams = (
+  url: string,
+  existingParams: KeyValueItem[]
+): { sanitizedUrl: string; mergedParams: KeyValueItem[] } => {
+  try {
+    const urlObj = new URL(url);
+    const baseUrl = `${urlObj.protocol}//${urlObj.host}${urlObj.pathname}`;
+    
+    // If no query params in URL, return as-is
+    if (!urlObj.search) {
+      return { sanitizedUrl: url, mergedParams: existingParams };
+    }
+    
+    // Extract params from URL
+    const urlParams = new Map<string, string>();
+    urlObj.searchParams.forEach((value, key) => {
+      urlParams.set(key, value);
+    });
+    
+    // Build merged params list
+    const mergedParams: KeyValueItem[] = [];
+    const processedKeys = new Set<string>();
+    
+    // First, update existing params with URL values (if key matches)
+    existingParams.forEach((param) => {
+      if (param.key && urlParams.has(param.key)) {
+        // Key exists in URL - use URL value
+        mergedParams.push({
+          ...param,
+          value: urlParams.get(param.key)!,
+          enabled: true,
+        });
+        processedKeys.add(param.key);
+      } else {
+        // Keep existing param as-is
+        mergedParams.push(param);
+        if (param.key) {
+          processedKeys.add(param.key);
+        }
+      }
+    });
+    
+    // Add new params from URL that don't exist in existing params
+    urlParams.forEach((value, key) => {
+      if (!processedKeys.has(key)) {
+        mergedParams.push(createKeyValueItem(key, value, true));
+      }
+    });
+    
+    return { sanitizedUrl: baseUrl, mergedParams };
+  } catch {
+    // If URL parsing fails, return as-is
+    return { sanitizedUrl: url, mergedParams: existingParams };
+  }
+};
+
+/**
  * Convert state to cURL command
  */
 export const toCurlCommand = (state: ApiTesterState, platform: 'unix' | 'windows' = 'unix'): string => {

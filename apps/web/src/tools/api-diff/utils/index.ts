@@ -8,4 +8,4 @@ export {
 
 export { buildUrl, generateCurl } from './curl';
 
-export { parsePathWithQuery } from './url';
+export { parsePathWithQuery, sanitizePathAndParams } from './url';
