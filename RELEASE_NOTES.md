@@ -4,6 +4,55 @@ RELEASE_NOTES.md must be written in English.
 
 # Release Notes
 
+## v1.4.0 (December 2025) - API Tester & Monorepo Architecture
+
+Major release introducing the **API Tester** tool and migrating to a **pnpm + Turborepo monorepo** architecture.
+
+### New Features
+
+- ✨ **API Tester Tool**: Full-featured HTTP client for testing APIs
+
+  - Support for all HTTP methods (GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS)
+  - Request builder with query params, headers, and body
+  - Multiple body types: none, JSON, form-data, x-www-form-urlencoded, raw
+  - Response viewer with syntax highlighting
+  - HTTP status code with status text display (e.g., "200 OK", "404 Not Found")
+  - **Direct Mode**: Standard fetch requests (subject to CORS)
+  - **Extension Mode**: CORS bypass via Chrome Extension
+
+- ✨ **Chrome Extension Integration**
+
+  - Companion extension for CORS bypass
+  - Permission management per domain
+  - "Include Cookies" option for authenticated requests
+  - Extension install button when not detected
+  - Detailed error view for debugging
+
+- ✨ **Copy as cURL**: Export requests as cURL commands
+
+### Architecture
+
+- 📦 **Monorepo Migration**: Migrated from single-package to pnpm + Turborepo monorepo
+  - `apps/web`: Main web application
+  - `apps/extension`: Chrome Extension
+  - `packages/shared`: Shared types and utilities
+  - Turborepo for efficient build caching
+
+### Enhancements
+
+- 🔧 **Response Viewer**: Show HTTP status text alongside status code
+- 🔧 **Extension Status Badge**: Visual indicator of extension connection
+- 🔧 **CORS Modal**: Clear guidance on CORS restrictions and solutions
+- 🌐 **i18n**: Full internationalization support for API Tester (5 languages)
+
+### Technical
+
+- Uses `http-status-codes` library for HTTP status text
+- Extension uses Manifest V3 with Service Worker
+- Shared types between web and extension via `packages/shared`
+
+---
+
 ## Extension v1.0.1 (December 2025) - API Tester Enhancement
 
 The first feature release of **Yowu DevTools Companion** Chrome Extension, enhancing the API Tester tool with CORS bypass and cookie handling capabilities.
@@ -11,15 +60,18 @@ The first feature release of **Yowu DevTools Companion** Chrome Extension, enhan
 **New Features:**
 
 - ✨ **CORS Bypass**: Execute cross-origin API requests that would otherwise be blocked by browser security policies
+
   - Requests executed in extension context, bypassing CORS restrictions
   - Automatic header modification via `declarativeNetRequest` API
 
 - ✨ **Include Cookies Option**: Optionally include browser cookies in API requests
+
   - Toggle "Include Cookies" checkbox in API Tester (Extension mode only)
   - Uses `credentials: 'include'` for automatic cookie handling
   - i18n support for tooltip (all 5 languages)
 
 - ✨ **Permission Management**: Granular host permission control
+
   - Explicit permission grant per domain
   - Permission caching in localStorage
 
@@ -44,6 +96,7 @@ The first feature release of **Yowu DevTools Companion** Chrome Extension, enhan
 **New Features:**
 
 - ✨ **JSON Viewer Fullscreen Mode**:
+
   - Added fullscreen toggle button next to the copy button
   - Right panel expands to full width for better viewing of large JSON
   - Press ESC or click toggle again to exit fullscreen
@@ -55,11 +108,13 @@ The first feature release of **Yowu DevTools Companion** Chrome Extension, enhan
 **Enhancements:**
 
 - 🔧 **Share Modal on Web**:
+
   - Web browser now shows confirmation modal before copying share link (same as mobile)
   - Modal displays what data will be included in the shared URL
   - Different button text: "Copy Link" (web) vs "Generate Share Link" (mobile)
 
 - 🎨 **Sidebar Design Improvements**:
+
   - "More coming soon" badge is now center-aligned
   - Added "Suggest a feature" link below the badge
   - Links to [GitHub Issues](https://github.com/uyu423/yowu-devtools/issues) for feature requests

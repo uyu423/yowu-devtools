@@ -6,8 +6,8 @@
 
 ## 1. 프로젝트 현황
 
-- **상태**: Phase 9 완료
-- **현재 버전**: v1.3.3 (2025-12-15)
+- **상태**: Phase 10 완료
+- **현재 버전**: v1.4.0 (2025-12-17)
 - **주요 변경점**:
   - Phase 3: 모든 도구 기능 구현 완료 (JSON, URL, Base64, Time, YAML, Diff, Cron)
   - Phase 4: CI/CD 및 배포 설정 완료
@@ -18,6 +18,7 @@
   - Phase 8.5 (v1.3.1): ✅ 코드 품질 개선, JWT Encoder 버그 수정, 리팩토링 완료
   - Phase 9 (v1.3.2): ✅ Cron Parser 고도화 - 다중 스펙 지원, 래퍼 정규화, 필드별 하이라이트 완료
   - Phase 9.5 (v1.3.3): ✅ PWA 업데이트 알림 수정, SEO sitemap priority 최적화 완료
+  - Phase 10 (v1.4.0): ✅ **API Tester 도구 추가**, **pnpm + Turborepo 모노레포 구조 전환**, Chrome Extension companion v1.0.1
 
 ---
 
@@ -929,3 +930,83 @@ v1.3.2는 Cron Parser의 대대적인 고도화로, 여러 cron 방언(UNIX, Qua
 - [Quartz CronTrigger Tutorial](https://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/crontrigger.html)
 - [Kubernetes CronJob](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/)
 - [Jenkins Pipeline Syntax](https://www.jenkins.io/doc/book/pipeline/syntax/)
+
+---
+
+### Phase 10: v1.4.0 API Tester & Monorepo (December 2025) ✅ **완료**
+
+v1.4.0은 **API Tester** 도구 추가와 **pnpm + Turborepo 모노레포 구조**로의 전환을 포함하는 대규모 릴리스입니다.
+
+#### 10.1 모노레포 구조 전환 ✅ **완료**
+
+- [x] **pnpm + Turborepo 도입**:
+  - [x] `pnpm-workspace.yaml` 설정
+  - [x] `turbo.json` 빌드 파이프라인 설정
+  - [x] 패키지 구조 분리:
+    - `apps/web`: 메인 웹 애플리케이션
+    - `apps/extension`: Chrome Extension
+    - `packages/shared`: 공유 타입 및 유틸리티
+
+- [x] **빌드 시스템 통합**:
+  - [x] Turborepo 캐싱 설정
+  - [x] 패키지간 의존성 관리
+  - [x] 통합 빌드/린트 명령어
+
+#### 10.2 API Tester 도구 구현 ✅ **완료**
+
+- [x] **기본 기능**:
+  - [x] HTTP 메서드 지원 (GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS)
+  - [x] URL 입력 및 Query Params 빌더
+  - [x] Headers 빌더
+  - [x] Body 타입 지원 (none, JSON, form-data, x-www-form-urlencoded, raw)
+  - [x] Response Viewer (syntax highlighting)
+
+- [x] **CORS 처리**:
+  - [x] Direct 모드: 표준 fetch (CORS 제한)
+  - [x] Extension 모드: Chrome Extension 통해 CORS bypass
+  - [x] CORS 에러 안내 모달
+
+- [x] **응답 표시 개선**:
+  - [x] HTTP Status Code + Status Text 표시 (예: "200 OK")
+  - [x] `http-status-codes` 라이브러리 사용
+  - [x] 응답 시간, 헤더, 바디 표시
+
+- [x] **cURL 내보내기**:
+  - [x] "Copy as cURL" 기능
+  - [x] 모든 옵션 포함 (headers, body, method)
+
+#### 10.3 Chrome Extension v1.0.1 ✅ **완료**
+
+- [x] **Extension 기능**:
+  - [x] CORS bypass (declarativeNetRequest API)
+  - [x] 도메인별 권한 관리
+  - [x] Include Cookies 옵션 (`credentials: 'include'`)
+  - [x] 에러 상세 정보 반환
+
+- [x] **Web 연동**:
+  - [x] Extension 상태 표시 (Connected/Not Connected)
+  - [x] Extension 미설치 시 설치 버튼
+  - [x] 에러 상세 보기 (collapsible)
+
+- [x] **문서화**:
+  - [x] `apps/extension/CHANGELOG.md`
+  - [x] `apps/extension/PRIVACY_POLICY.md`
+
+#### 10.4 i18n 지원 ✅ **완료**
+
+- [x] **API Tester 번역 키 추가**:
+  - [x] 모든 UI 문자열 i18n 적용
+  - [x] 5개 언어 지원 (en-US, ko-KR, ja-JP, zh-CN, es-ES)
+  - [x] 기술 용어는 영문 유지 (예: "via extension")
+
+#### 10.5 빌드 및 배포 ✅ **완료**
+
+- [x] **빌드 검증**:
+  - [x] `npm run build` 성공
+  - [x] `npm run lint` 통과
+  - [x] Extension 빌드 분리 (`npm run build:extension`)
+
+- [x] **문서 업데이트**:
+  - [x] `RELEASE_NOTES.md` v1.4.0 섹션 추가
+  - [x] `IMPLEMENTATION_PLAN.md` Phase 10 추가
+  - [x] Extension 관련 문서 업데이트
