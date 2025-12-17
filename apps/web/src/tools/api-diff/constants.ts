@@ -27,6 +27,9 @@ export const DEFAULT_STATE: ApiDiffState = {
   domainA: '',
   domainB: '',
 
+  // Options
+  includeCookies: false,
+
   // Response state
   responseA: null,
   responseB: null,

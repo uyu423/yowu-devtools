@@ -5,6 +5,7 @@ export const esES = {
   common: {
     copy: 'Copiar',
     copied: '¡Copiado!',
+    copyFailed: 'Error al copiar',
     paste: 'Pegar',
     clear: 'Borrar',
     reset: 'Restablecer',
@@ -12,7 +13,11 @@ export const esES = {
     error: 'Error',
     loading: 'Cargando',
     download: 'Descargar',
+    downloaded: '¡Descargado!',
+    downloadJson: 'Descargar JSON',
     upload: 'Subir',
+    export: 'Exportar',
+    import: 'Importar',
     save: 'Guardar',
     cancel: 'Cancelar',
     confirm: 'Confirmar',
@@ -376,7 +381,8 @@ export const esES = {
       tokenQuestion: '? - Sin valor específico (marcador de posición)',
       tokenL: 'L - Último día del mes/semana',
       tokenW: 'W - Día laborable más cercano',
-      tokenHash: '# - N-ésimo día de la semana del mes (ej: 2#1 = primer lunes)',
+      tokenHash:
+        '# - N-ésimo día de la semana del mes (ej: 2#1 = primer lunes)',
       tokenH: 'H - Valor basado en hash para distribución de carga',
       // Copy formats
       copyIso: 'Copiar como ISO',
@@ -456,7 +462,7 @@ export const esES = {
       failedToCalculateFileHash: 'Error al calcular hash del archivo',
     },
     uuid: {
-      title: 'Generador de UUID',
+      title: 'UUID Generator',
       description: 'Genera identificadores UUID v4, UUID v7 y ULID',
       type: 'Tipo',
       count: 'Cantidad',
@@ -872,7 +878,7 @@ export const esES = {
       raw: 'Raw',
     },
     stringLength: {
-      title: 'Calculadora de longitud de cadena',
+      title: 'String Length',
       description:
         'Calcula el número de caracteres, palabras, líneas y bytes del texto.',
       inputPlaceholder: 'Ingresa texto o arrastra un archivo aquí...',
@@ -892,7 +898,8 @@ export const esES = {
       urlLoadFailed: 'Error al cargar desde URL.',
       sampleLoaded: 'Texto de ejemplo cargado.',
       corsWarningTitle: 'Restricciones CORS',
-      corsWarningDescription: 'Algunos sitios web pueden bloquear solicitudes de otros dominios. Si la carga falla, intenta descargar el archivo manualmente.',
+      corsWarningDescription:
+        'Algunos sitios web pueden bloquear solicitudes de otros dominios. Si la carga falla, intenta descargar el archivo manualmente.',
       loadButton: 'Cargar',
     },
     jwtEncoder: {
@@ -934,11 +941,13 @@ export const esES = {
       method: 'Método',
       url: 'URL',
       urlDecodeInDisplay: 'Decodificar URL en visualización',
-      urlDecodeTooltip: 'Decodificar valores codificados en URL para mejor legibilidad',
+      urlDecodeTooltip:
+        'Decodificar valores codificados en URL para mejor legibilidad',
       cookieDecode: 'Decodificar cookie',
       cookieDecodeTooltip: 'Decodificar valores de cookie codificados en URL',
       hideSensitiveValues: 'Ocultar valores sensibles',
-      hideSensitiveTooltip: 'Enmascarar encabezados Authorization y otros datos sensibles',
+      hideSensitiveTooltip:
+        'Enmascarar encabezados Authorization y otros datos sensibles',
       emptyState: 'Pega un comando cURL para analizar y visualizar',
       noQueryParams: 'Sin parámetros de consulta',
       noHeaders: 'Sin encabezados',
@@ -978,7 +987,8 @@ export const esES = {
     },
     apiTester: {
       title: 'API Tester',
-      description: 'Prueba APIs REST con constructor de solicitudes y bypass de CORS.',
+      description:
+        'Prueba APIs REST con constructor de solicitudes y bypass de CORS.',
       urlPlaceholder: 'https://api.example.com/v1/users',
       send: 'Enviar',
       cancel: 'Cancelar',
@@ -1002,23 +1012,34 @@ export const esES = {
       extensionConnected: 'CORS Bypass Listo',
       extensionNotConnected: 'No conectado',
       installExtension: 'Instalar extensión',
-      installExtensionTooltip: 'Instala la extensión para evitar restricciones CORS. No es necesario si la API permite solicitudes de origen cruzado.',
+      installExtensionTooltip:
+        'Instala la extensión para evitar restricciones CORS. No es necesario si la API permite solicitudes de origen cruzado.',
       extensionPermissionRequired: 'Permiso requerido',
       extensionChecking: 'Verificando...',
       extensionTooltipChecking: 'Verificando conexión de extensión...',
-      extensionTooltipNotConnected: 'Extensión no detectada. Instala la extensión CORS Helper para evitar restricciones CORS. Haz clic para reintentar.',
-      extensionTooltipPermissionRequired: 'Extensión detectada pero necesita permiso para este dominio. Haz clic en el icono de la extensión y permite el acceso.',
-      extensionTooltipConnected: '¡Extensión conectada! Las restricciones CORS se evitarán automáticamente cuando sea necesario.',
+      extensionTooltipNotConnected:
+        'Extensión no detectada. Instala la extensión CORS Helper para evitar restricciones CORS. Haz clic para reintentar.',
+      extensionTooltipPermissionRequired:
+        'Extensión detectada pero necesita permiso para este dominio. Haz clic en el icono de la extensión y permite el acceso.',
+      extensionTooltipConnected:
+        '¡Extensión conectada! Las restricciones CORS se evitarán automáticamente cuando sea necesario.',
       retryWithExtension: 'Reintentar con extensión',
       corsErrorTitle: 'Error de CORS Detectado',
-      corsErrorDescription: 'Esta solicitud fue bloqueada por la política CORS del navegador.',
-      corsErrorExplanation: 'Los navegadores bloquean solicitudes a diferentes dominios por seguridad. Las APIs deben permitir explícitamente solicitudes de origen cruzado, pero muchas no lo hacen cuando se accede desde aplicaciones web.',
+      corsErrorDescription:
+        'Esta solicitud fue bloqueada por la política CORS del navegador.',
+      corsErrorExplanation:
+        'Los navegadores bloquean solicitudes a diferentes dominios por seguridad. Las APIs deben permitir explícitamente solicitudes de origen cruzado, pero muchas no lo hacen cuando se accede desde aplicaciones web.',
       corsWhyExtension: '¿Por qué usar una extensión?',
-      corsWhyExtensionDesc: 'La extensión del navegador puede evitar restricciones CORS haciendo solicitudes desde el contexto de la extensión, que no está sujeto a las mismas reglas de seguridad que las páginas web.',
+      corsWhyExtensionDesc:
+        'La extensión del navegador puede evitar restricciones CORS haciendo solicitudes desde el contexto de la extensión, que no está sujeto a las mismas reglas de seguridad que las páginas web.',
       corsRetryWithExtension: 'Reintentar con extensión',
       corsInstallExtension: 'Instalar extensión de Chrome',
       corsRememberChoice: 'Recordar para este dominio',
       corsRememberChoiceDesc: 'Usar extensión automáticamente para {origin}',
+      sendToApiDiff: 'Enviar a API Diff',
+      setAsDomainA: 'Establecer como Domain A',
+      setAsDomainB: 'Establecer como Domain B',
+      sentToApiDiff: 'Enviado a API Diff como Domain {domain}',
       learnMoreCors: 'Más información sobre CORS',
       corsAllowedOrigins: 'Dominios permitidos',
       corsManageAllowlist: 'Gestionar',
@@ -1050,10 +1071,12 @@ export const esES = {
       viaMethod: 'vía {method}',
       // Error messages
       errorTimeout: 'Tiempo de espera agotado después de {ms}ms',
-      errorCors: 'La solicitud falló. Esto puede deberse a restricciones de CORS. Prueba usando el modo Extension.',
+      errorCors:
+        'La solicitud falló. Esto puede deberse a restricciones de CORS. Prueba usando el modo Extension.',
       errorNetwork: 'Error de red',
       errorUnknown: 'Ocurrió un error desconocido',
-      errorPermissionDenied: 'Permiso denegado para {origin}. Por favor, concede el permiso e inténtalo de nuevo.',
+      errorPermissionDenied:
+        'Permiso denegado para {origin}. Por favor, concede el permiso e inténtalo de nuevo.',
       errorExtension: 'La solicitud de Extension falló',
       rename: 'Renombrar',
       openInJsonViewer: 'Abrir en JSON Viewer',
@@ -1063,17 +1086,20 @@ export const esES = {
       requestName: 'Nombre de solicitud',
       timeoutError: 'Tiempo de espera agotado después de {ms}ms',
       networkError: 'Error de red',
-      permissionDenied: 'Permiso denegado para {origin}. Otorga permiso e intenta de nuevo.',
+      permissionDenied:
+        'Permiso denegado para {origin}. Otorga permiso e intenta de nuevo.',
       // Include Cookies option
       includeCookies: 'Incluir Cookies',
-      includeCookiesTooltip: 'Incluir las cookies del navegador en la solicitud. Cuando está habilitado, las cookies almacenadas en el navegador para el dominio de destino se enviarán automáticamente con la solicitud.',
+      includeCookiesTooltip:
+        'Incluir las cookies del navegador en la solicitud. Cuando está habilitado, las cookies almacenadas en el navegador para el dominio de destino se enviarán automáticamente con la solicitud.',
       // Error details
       showErrorDetails: 'Mostrar Detalles',
       hideErrorDetails: 'Ocultar Detalles',
     },
     apiDiff: {
-      title: 'Comparación de API',
+      title: 'API Response Diff',
       description: 'Comparar respuestas de API de dos dominios',
+      domains: 'Dominios',
       domainA: 'Dominio A',
       domainB: 'Dominio B',
       execute: 'Ejecutar',
@@ -1081,11 +1107,24 @@ export const esES = {
       reset: 'Restablecer',
       responsesIdentical: 'Las respuestas son idénticas',
       responsesDifferent: 'Las respuestas son diferentes',
+      compareInTextDiff: 'Comparar en Text Diff',
       path: 'Ruta',
       valueA: 'Valor A',
       valueB: 'Valor B',
       noResponseYet: 'Sin respuesta aún',
-      notValidJson: 'La respuesta no es JSON válido. Ver la pestaña Raw para ver el contenido.',
+      notValidJson:
+        'La respuesta no es JSON válido. Ver la pestaña Raw para ver el contenido.',
+      viaExtension: 'vía Extensión',
+      viaDirect: 'vía Directa',
+      viewTree: 'Árbol',
+      viewPretty: 'Formateado',
+      viewRaw: 'Sin formato',
+      showDetails: 'Mostrar detalles',
+      hideDetails: 'Ocultar detalles',
+      status: 'Estado',
+      includeCookies: 'Incluir Cookies',
+      includeCookiesTooltip:
+        'Incluir cookies del navegador al realizar solicitudes a través de la extensión. Las cookies de la sesión actual del navegador se enviarán con la solicitud.',
       parameters: 'Parámetros',
       headers: 'Encabezados',
       body: 'Cuerpo (JSON)',
@@ -1111,6 +1150,27 @@ export const esES = {
         fillBothFields: 'Por favor complete título y dominio',
         importSuccess: 'Importados {{count}} presets',
         importFailed: 'Error al importar presets',
+      },
+      validation: {
+        pathRequired: 'Por favor ingrese una ruta',
+        domainsRequired: 'Por favor ingrese ambos dominios',
+      },
+      extensionConnected: 'Extensión conectada',
+      extensionChecking: 'Verificando extensión...',
+      extensionNotConnected:
+        'Extensión no conectada (usando solicitud directa)',
+      usingExtension: 'Usando extensión',
+      history: {
+        title: 'Historial',
+        empty: 'Sin historial',
+        recentRequests: 'Solicitudes recientes',
+        clearAll: 'Limpiar todo',
+        confirmClear: 'Clic para confirmar',
+        loaded: 'Configuración cargada del historial',
+        search: 'Buscar historial...',
+        show: 'Mostrar historial',
+        hide: 'Ocultar historial',
+        noMatch: 'No hay historial coincidente',
       },
     },
   },
@@ -1186,7 +1246,7 @@ export const esES = {
         'Codificador JWT online gratuito. Crea JSON Web Tokens con header y payload personalizados.',
     },
     stringLength: {
-      title: 'Calculadora de longitud de cadena',
+      title: 'String Length',
       description:
         'Calculadora de longitud de cadena online gratuita. Cuenta caracteres, palabras, líneas y bytes (UTF-8) de texto o archivos. Soporta carga de archivos y URL.',
     },
@@ -1206,7 +1266,7 @@ export const esES = {
       },
     },
     apiDiff: {
-      title: 'Comparación de API',
+      title: 'API Response Diff',
       description:
         'Compare respuestas de API de dos dominios lado a lado con resaltado de diferencias.',
     },

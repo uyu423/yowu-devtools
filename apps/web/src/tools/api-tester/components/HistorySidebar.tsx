@@ -1,10 +1,11 @@
 /**
- * HistorySidebar - Right sidebar showing request history and favorites
+ * HistorySidebar - Overlay sidebar showing request history and favorites
+ * Slides in from the right edge without affecting main layout
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { Search, Star, Trash2, Clock, MoreVertical, X, Edit2, Check, PanelRightClose, PanelRightOpen } from 'lucide-react';
+import { Search, Star, Trash2, Clock, MoreVertical, X, Edit2, Check, PanelRightClose, History } from 'lucide-react';
 import { useI18n } from '@/hooks/useI18nHooks';
 import type { HistoryItem, HttpMethod } from '../types';
 import { getStatusColor } from '../types';
@@ -17,8 +18,8 @@ interface HistorySidebarProps {
   onDelete: (id: string) => void;
   onClear: () => void;
   onRename: (id: string, name: string) => void;
-  isOpen?: boolean;
-  onToggle?: () => void;
+  isOpen: boolean;
+  onToggle: () => void;
 }
 
 const METHOD_COLORS: Record<HttpMethod, string> = {
@@ -66,7 +67,7 @@ export const HistorySidebar: React.FC<HistorySidebarProps> = ({
   onDelete,
   onClear,
   onRename,
-  isOpen = true,
+  isOpen,
   onToggle,
 }) => {
   const { t } = useI18n();
@@ -74,6 +75,33 @@ export const HistorySidebar: React.FC<HistorySidebarProps> = ({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
   const [contextMenuId, setContextMenuId] = useState<string | null>(null);
+  const [confirmClear, setConfirmClear] = useState(false);
+
+  // Reset confirm state after timeout
+  useEffect(() => {
+    if (confirmClear) {
+      const timeout = setTimeout(() => setConfirmClear(false), 3000);
+      return () => clearTimeout(timeout);
+    }
+  }, [confirmClear]);
+
+  // Close context menu when clicking outside
+  useEffect(() => {
+    if (contextMenuId) {
+      const handleClickOutside = () => setContextMenuId(null);
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [contextMenuId]);
+
+  const handleClear = () => {
+    if (confirmClear) {
+      onClear();
+      setConfirmClear(false);
+    } else {
+      setConfirmClear(true);
+    }
+  };
 
   // Filter history by search
   const filteredHistory = useMemo(() => {
@@ -247,43 +275,80 @@ export const HistorySidebar: React.FC<HistorySidebarProps> = ({
     );
   };
 
-  // Collapsed state - show only toggle button
+  // Collapsed state - show floating toggle button on right edge
   if (!isOpen) {
     return (
-      <div className="flex flex-col h-full border-l border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
-        <div className="px-2 py-3 border-b border-gray-200 dark:border-gray-700">
-          {onToggle && (
-            <button
-              onClick={onToggle}
-              className={cn(
-                'p-2 rounded-lg transition-colors',
-                'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
-              )}
-              title={t('tool.apiTester.showHistory')}
-            >
-              <PanelRightOpen className="w-5 h-5" />
-            </button>
-          )}
-        </div>
-      </div>
+      <button
+        onClick={onToggle}
+        className={cn(
+          'fixed right-0 top-1/2 -translate-y-1/2 z-40',
+          'flex items-center gap-1.5 px-2 py-3',
+          'bg-white dark:bg-gray-800 border border-r-0 border-gray-200 dark:border-gray-700',
+          'rounded-l-lg shadow-lg',
+          'text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400',
+          'transition-colors'
+        )}
+        title={t('tool.apiTester.showHistory')}
+      >
+        <History className="w-4 h-4" />
+        <span className="text-xs font-medium writing-mode-vertical">
+          {t('tool.apiTester.history')}
+        </span>
+        {history.length > 0 && (
+          <span className="ml-0.5 px-1 py-0.5 text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded">
+            {history.length}
+          </span>
+        )}
+      </button>
     );
   }
 
   return (
-    <div className="flex flex-col h-full w-96 border-l border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-        <h3 className="font-semibold text-gray-900 dark:text-gray-100">{t('tool.apiTester.history')}</h3>
-        <div className="flex items-center gap-2">
-          {history.length > 0 && (
-            <button
-              onClick={onClear}
-              className="text-xs text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400"
-            >
-              {t('tool.apiTester.clearHistory')}
-            </button>
-          )}
-          {onToggle && (
+    <>
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 bg-black/20 dark:bg-black/40 z-40"
+        onClick={onToggle}
+      />
+
+      {/* Sidebar */}
+      <div
+        className={cn(
+          'fixed right-0 top-0 h-full w-96 z-50',
+          'flex flex-col',
+          'bg-white dark:bg-gray-900',
+          'border-l border-gray-200 dark:border-gray-700',
+          'shadow-xl',
+          'animate-slide-in-right'
+        )}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center gap-2">
+            <History className="w-4 h-4 text-gray-500" />
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+              {t('tool.apiTester.history')}
+            </h3>
+            {history.length > 0 && (
+              <span className="px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded">
+                {history.length}
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            {history.length > 0 && (
+              <button
+                onClick={handleClear}
+                className={cn(
+                  'text-xs px-2 py-1 rounded transition-colors',
+                  confirmClear
+                    ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
+                    : 'text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400'
+                )}
+              >
+                {confirmClear ? t('common.confirmDelete') : t('tool.apiTester.clearHistory')}
+              </button>
+            )}
             <button
               onClick={onToggle}
               className={cn(
@@ -294,70 +359,79 @@ export const HistorySidebar: React.FC<HistorySidebarProps> = ({
             >
               <PanelRightClose className="w-4 h-4" />
             </button>
+          </div>
+        </div>
+
+        {/* Search */}
+        <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder={t('tool.apiTester.searchHistory')}
+              className={cn(
+                'w-full pl-9 pr-8 py-2 text-sm rounded-lg',
+                'bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700',
+                'text-gray-900 dark:text-gray-100',
+                'placeholder:text-gray-400 dark:placeholder:text-gray-500',
+                'focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400'
+              )}
+            />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-auto">
+          {/* Favorites section */}
+          {favoriteItems.length > 0 && (
+            <div className="py-2">
+              <div className="px-4 py-1 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase flex items-center gap-1">
+                <Star className="w-3 h-3" />
+                {t('tool.apiTester.favorites')}
+              </div>
+              {favoriteItems.map((item) => (
+                <HistoryItemComponent key={item.id} item={item} isFavorite={true} />
+              ))}
+            </div>
+          )}
+
+          {/* Regular history */}
+          {regularItems.length > 0 && (
+            <div className="py-2">
+              {favoriteItems.length > 0 && (
+                <div className="px-4 py-1 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  {t('tool.apiTester.recent')}
+                </div>
+              )}
+              {regularItems.map((item) => (
+                <HistoryItemComponent key={item.id} item={item} isFavorite={false} />
+              ))}
+            </div>
+          )}
+
+          {/* Empty state */}
+          {filteredHistory.length === 0 && (
+            <div className="flex flex-col items-center justify-center h-full text-gray-400 dark:text-gray-500 py-8">
+              <Clock className="w-8 h-8 mb-2" />
+              <span className="text-sm">
+                {searchTerm ? t('tool.apiTester.noMatchingRequests') : t('tool.apiTester.noHistory')}
+              </span>
+            </div>
           )}
         </div>
       </div>
-
-      {/* Search */}
-      <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
-        <div className="relative">
-          <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder={t('tool.apiTester.searchHistory')}
-            className={cn(
-              'w-full pl-8 pr-3 py-1.5 text-sm rounded-lg',
-              'bg-gray-100 dark:bg-gray-800',
-              'border border-transparent focus:border-blue-500 dark:focus:border-blue-400',
-              'text-gray-900 dark:text-gray-100',
-              'placeholder:text-gray-400 dark:placeholder:text-gray-500',
-              'focus:outline-none'
-            )}
-          />
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 overflow-auto">
-        {/* Favorites section */}
-        {favoriteItems.length > 0 && (
-          <div className="py-2">
-            <div className="px-4 py-1 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-              {t('tool.apiTester.favorites')}
-            </div>
-            {favoriteItems.map((item) => (
-              <HistoryItemComponent key={item.id} item={item} isFavorite={true} />
-            ))}
-          </div>
-        )}
-
-        {/* Regular history */}
-        {regularItems.length > 0 && (
-          <div className="py-2">
-            {favoriteItems.length > 0 && (
-              <div className="px-4 py-1 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                {t('tool.apiTester.recent')}
-              </div>
-            )}
-            {regularItems.map((item) => (
-              <HistoryItemComponent key={item.id} item={item} isFavorite={false} />
-            ))}
-          </div>
-        )}
-
-        {/* Empty state */}
-        {filteredHistory.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full text-gray-400 dark:text-gray-500 py-8">
-            <Clock className="w-8 h-8 mb-2" />
-            <span className="text-sm">
-              {searchTerm ? t('tool.apiTester.noMatchingRequests') : t('tool.apiTester.noHistory')}
-            </span>
-          </div>
-        )}
-      </div>
-    </div>
+    </>
   );
 };
 

@@ -1,247 +1,173 @@
 /**
- * API Response Diff Tool - Comparison Utilities
+ * JSON Comparison Utilities for API Response Diff
  */
 
-import type { ResponseSide, DifferentField, ComparisonResult } from '../types';
+import type { DifferentField, ComparisonResult, ResponseSide } from '../types';
 
 /**
- * Deep equality comparison ignoring key order
- * Objects are compared by sorted keys, arrays are compared by order
+ * Deep equality check ignoring object key order
+ * Arrays are compared by order
  */
-export function deepEqualIgnoringKeyOrder(a: unknown, b: unknown): boolean {
+export const deepEqualIgnoringKeyOrder = (a: unknown, b: unknown): boolean => {
+  // Same reference or both null/undefined
   if (a === b) return true;
-  if (a == null || b == null) return false;
+
+  // Type check
   if (typeof a !== typeof b) return false;
 
+  // Handle null
+  if (a === null || b === null) return a === b;
+
+  // Primitives
+  if (typeof a !== 'object') return a === b;
+
+  // Arrays - order matters
   if (Array.isArray(a) && Array.isArray(b)) {
     if (a.length !== b.length) return false;
-    for (let i = 0; i < a.length; i++) {
-      if (!deepEqualIgnoringKeyOrder(a[i], b[i])) return false;
-    }
-    return true;
+    return a.every((item, index) => deepEqualIgnoringKeyOrder(item, b[index]));
   }
 
-  if (
-    typeof a === 'object' &&
-    typeof b === 'object' &&
-    !Array.isArray(a) &&
-    !Array.isArray(b)
-  ) {
-    const aObj = a as Record<string, unknown>;
-    const bObj = b as Record<string, unknown>;
-    const aKeys = Object.keys(aObj).sort();
-    const bKeys = Object.keys(bObj).sort();
+  // One is array, other is not
+  if (Array.isArray(a) !== Array.isArray(b)) return false;
 
-    if (aKeys.length !== bKeys.length) return false;
+  // Objects - key order doesn't matter
+  const objA = a as Record<string, unknown>;
+  const objB = b as Record<string, unknown>;
 
-    for (const key of aKeys) {
-      if (!bKeys.includes(key)) return false;
-      if (!deepEqualIgnoringKeyOrder(aObj[key], bObj[key])) return false;
-    }
-    return true;
-  }
+  const keysA = Object.keys(objA).sort();
+  const keysB = Object.keys(objB).sort();
 
-  return false;
-}
+  // Different number of keys
+  if (keysA.length !== keysB.length) return false;
+
+  // Check all keys exist and values match
+  return keysA.every((key) => keysB.includes(key) && deepEqualIgnoringKeyOrder(objA[key], objB[key]));
+};
 
 /**
- * Find different fields between two objects recursively
+ * Find all fields that differ between two JSON objects
+ * Returns array of paths with their values from both sides
  */
-export function findDifferentFields(
+export const findDifferentFields = (
   a: unknown,
   b: unknown,
   path: string = ''
-): DifferentField[] {
+): DifferentField[] => {
   const differences: DifferentField[] = [];
 
-  // Both null/undefined
-  if (a == null && b == null) {
-    return differences;
-  }
+  // Same value - no difference
+  if (deepEqualIgnoringKeyOrder(a, b)) return differences;
 
-  // One is null/undefined
-  if (a == null || b == null) {
-    differences.push({
-      path: path || 'root',
-      valueA: a,
-      valueB: b,
-    });
-    return differences;
-  }
-
-  // Different types
-  if (typeof a !== typeof b) {
-    differences.push({
-      path: path || 'root',
-      valueA: a,
-      valueB: b,
-    });
+  // Different types or one is null
+  if (
+    typeof a !== typeof b ||
+    a === null ||
+    b === null ||
+    typeof a !== 'object' ||
+    typeof b !== 'object'
+  ) {
+    differences.push({ path: path || '(root)', valueA: a, valueB: b });
     return differences;
   }
 
   // Arrays
   if (Array.isArray(a) && Array.isArray(b)) {
-    const maxLength = Math.max(a.length, b.length);
-    for (let i = 0; i < maxLength; i++) {
-      const subPath = path ? `${path}[${i}]` : `[${i}]`;
+    const maxLen = Math.max(a.length, b.length);
+    for (let i = 0; i < maxLen; i++) {
+      const itemPath = path ? `${path}[${i}]` : `[${i}]`;
       if (i >= a.length) {
-        differences.push({
-          path: subPath,
-          valueA: undefined,
-          valueB: b[i],
-        });
+        differences.push({ path: itemPath, valueA: undefined, valueB: b[i] });
       } else if (i >= b.length) {
-        differences.push({
-          path: subPath,
-          valueA: a[i],
-          valueB: undefined,
-        });
+        differences.push({ path: itemPath, valueA: a[i], valueB: undefined });
       } else {
-        // For primitive types, compare directly
-        if (typeof a[i] !== 'object' || a[i] === null) {
-          if (a[i] !== b[i]) {
-            differences.push({
-              path: subPath,
-              valueA: a[i],
-              valueB: b[i],
-            });
-          }
-        } else {
-          // For objects/arrays, recurse
-          differences.push(...findDifferentFields(a[i], b[i], subPath));
-        }
+        differences.push(...findDifferentFields(a[i], b[i], itemPath));
       }
     }
     return differences;
   }
 
   // Objects
-  if (
-    typeof a === 'object' &&
-    typeof b === 'object' &&
-    !Array.isArray(a) &&
-    !Array.isArray(b)
-  ) {
-    const aObj = a as Record<string, unknown>;
-    const bObj = b as Record<string, unknown>;
-    const allKeys = new Set([...Object.keys(aObj), ...Object.keys(bObj)]);
+  const objA = a as Record<string, unknown>;
+  const objB = b as Record<string, unknown>;
+  const allKeys = new Set([...Object.keys(objA), ...Object.keys(objB)]);
 
-    for (const key of allKeys) {
-      const subPath = path ? `${path}.${key}` : key;
+  for (const key of allKeys) {
+    const keyPath = path ? `${path}.${key}` : key;
+    const hasA = key in objA;
+    const hasB = key in objB;
 
-      if (!(key in aObj)) {
-        // A doesn't have this key (B only)
-        differences.push({
-          path: subPath,
-          valueA: undefined,
-          valueB: bObj[key],
-        });
-      } else if (!(key in bObj)) {
-        // B doesn't have this key (A only)
-        differences.push({
-          path: subPath,
-          valueA: aObj[key],
-          valueB: undefined,
-        });
-      } else {
-        // Both have the key
-        const valA = aObj[key];
-        const valB = bObj[key];
-
-        // Primitive types - direct comparison
-        if (
-          valA === null ||
-          valB === null ||
-          typeof valA !== 'object' ||
-          typeof valB !== 'object'
-        ) {
-          if (valA !== valB) {
-            differences.push({
-              path: subPath,
-              valueA: valA,
-              valueB: valB,
-            });
-          }
-        } else {
-          // Objects/arrays - recurse
-          differences.push(...findDifferentFields(valA, valB, subPath));
-        }
-      }
+    if (!hasA) {
+      differences.push({ path: keyPath, valueA: undefined, valueB: objB[key] });
+    } else if (!hasB) {
+      differences.push({ path: keyPath, valueA: objA[key], valueB: undefined });
+    } else {
+      differences.push(...findDifferentFields(objA[key], objB[key], keyPath));
     }
-    return differences;
-  }
-
-  // Primitive types - different values
-  if (a !== b) {
-    differences.push({
-      path: path || 'root',
-      valueA: a,
-      valueB: b,
-    });
   }
 
   return differences;
-}
+};
 
 /**
- * Compare two responses and return comparison result
+ * Compare two API responses and return comparison result
  */
-export function compareResponses(
-  a: ResponseSide | null,
-  b: ResponseSide | null
-): ComparisonResult {
-  if (!a || !b) {
-    return {
-      isSame: false,
-      statusSame: false,
-      bodySame: false,
-      statusA: a?.status ?? null,
-      statusB: b?.status ?? null,
-      differentFields: [],
-    };
+export const compareResponses = (
+  responseA: ResponseSide | null,
+  responseB: ResponseSide | null
+): ComparisonResult | null => {
+  // Both responses must exist
+  if (!responseA || !responseB) {
+    return null;
   }
 
-  const statusSame = a.status === b.status;
-  const statusA = a.status;
-  const statusB = b.status;
+  // Status comparison
+  const statusSame = responseA.status === responseB.status;
 
-  // Compare bodies only if both are valid JSON
+  // Body comparison (only if both are valid JSON)
   let bodySame = false;
   let differentFields: DifferentField[] = [];
 
-  if (a.parsedJson !== undefined && b.parsedJson !== undefined) {
-    bodySame = deepEqualIgnoringKeyOrder(a.parsedJson, b.parsedJson);
+  if (responseA.parsedJson !== undefined && responseB.parsedJson !== undefined) {
+    bodySame = deepEqualIgnoringKeyOrder(responseA.parsedJson, responseB.parsedJson);
     if (!bodySame) {
-      differentFields = findDifferentFields(a.parsedJson, b.parsedJson);
+      differentFields = findDifferentFields(responseA.parsedJson, responseB.parsedJson);
+    }
+  } else if (responseA.rawBody !== null && responseB.rawBody !== null) {
+    // Compare raw bodies if not JSON
+    bodySame = responseA.rawBody === responseB.rawBody;
+    if (!bodySame) {
+      differentFields = [{ path: '(raw)', valueA: responseA.rawBody, valueB: responseB.rawBody }];
     }
   }
 
-  const isSame = statusSame && bodySame;
-
   return {
-    isSame,
+    isSame: statusSame && bodySame,
     statusSame,
     bodySame,
-    statusA,
-    statusB,
+    statusA: responseA.status,
+    statusB: responseB.status,
     differentFields,
   };
-}
+};
+
+/**
+ * Get set of different field paths for highlighting in JSON viewer
+ */
+export const getDifferentFieldPaths = (differentFields: DifferentField[]): Set<string> => {
+  const paths = new Set<string>();
+  differentFields.forEach((field) => {
+    paths.add(field.path);
+  });
+  return paths;
+};
 
 /**
  * Format value for display in diff table
  */
-export function formatValue(value: unknown): string {
-  if (value === null) return 'null';
+export const formatDiffValue = (value: unknown): string => {
   if (value === undefined) return '(missing)';
+  if (value === null) return 'null';
   if (typeof value === 'string') return `"${value}"`;
-  if (typeof value === 'object') {
-    try {
-      return JSON.stringify(value, null, 2);
-    } catch {
-      return String(value);
-    }
-  }
+  if (typeof value === 'object') return JSON.stringify(value);
   return String(value);
-}
-
+};

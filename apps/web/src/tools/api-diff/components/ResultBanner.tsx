@@ -2,34 +2,51 @@
  * Result Banner - 비교 결과 배너 및 Diff 테이블
  */
 
-import React, { useState, useRef, useEffect } from 'react';
-import { CheckCircle, AlertTriangle, GripHorizontal } from 'lucide-react';
-import type { ComparisonResult, DifferentField } from '../types';
-import { formatValue } from '../utils';
 import {
-  DIFF_TABLE_MIN_HEIGHT,
-  DIFF_TABLE_MAX_HEIGHT,
+  AlertTriangle,
+  CheckCircle,
+  GitCompare,
+  GripHorizontal,
+} from 'lucide-react';
+import type { ComparisonResult, DifferentField } from '../types';
+import {
   DIFF_TABLE_DEFAULT_HEIGHT,
+  DIFF_TABLE_MAX_HEIGHT,
+  DIFF_TABLE_MIN_HEIGHT,
   STORAGE_KEY_DIFF_TABLE_HEIGHT,
 } from '../constants';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+
 import { cn } from '@/lib/utils';
+import { formatDiffValue } from '../utils';
+import { useI18n } from '@/hooks/useI18nHooks';
+import { useNavigate } from 'react-router-dom';
 
 interface ResultBannerProps {
   comparison: ComparisonResult | null;
   hasResponses: boolean;
+  rawBodyA?: string | null;
+  rawBodyB?: string | null;
 }
 
 export const ResultBanner: React.FC<ResultBannerProps> = ({
   comparison,
   hasResponses,
+  rawBodyA,
+  rawBodyB,
 }) => {
+  const { t } = useI18n();
+  const navigate = useNavigate();
   const [tableHeight, setTableHeight] = useState<number>(() => {
     if (typeof window === 'undefined') return DIFF_TABLE_DEFAULT_HEIGHT;
     const saved = localStorage.getItem(STORAGE_KEY_DIFF_TABLE_HEIGHT);
     if (saved) {
       const parsed = parseInt(saved, 10);
       if (!isNaN(parsed)) {
-        return Math.min(Math.max(parsed, DIFF_TABLE_MIN_HEIGHT), DIFF_TABLE_MAX_HEIGHT);
+        return Math.min(
+          Math.max(parsed, DIFF_TABLE_MIN_HEIGHT),
+          DIFF_TABLE_MAX_HEIGHT
+        );
       }
     }
     return DIFF_TABLE_DEFAULT_HEIGHT;
@@ -78,6 +95,28 @@ export const ResultBanner: React.FC<ResultBannerProps> = ({
     };
   }, [isDragging]);
 
+  // Navigate to Text Diff with response bodies
+  const handleCompareInTextDiff = useCallback(() => {
+    // Format JSON for better readability
+    const formatJson = (raw: string | null | undefined): string => {
+      if (!raw) return '';
+      try {
+        const parsed = JSON.parse(raw);
+        return JSON.stringify(parsed, null, 2);
+      } catch {
+        return raw;
+      }
+    };
+
+    // Pass state directly for useToolState to merge with default state
+    navigate('/diff', {
+      state: {
+        left: formatJson(rawBodyA),
+        right: formatJson(rawBodyB),
+      },
+    });
+  }, [rawBodyA, rawBodyB, navigate]);
+
   if (!hasResponses) return null;
   if (!comparison) return null;
 
@@ -86,7 +125,9 @@ export const ResultBanner: React.FC<ResultBannerProps> = ({
       <div className="mb-4 p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg">
         <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400">
           <CheckCircle className="w-5 h-5" />
-          <span className="font-medium">Responses are identical</span>
+          <span className="font-medium">
+            {t('tool.apiDiff.responsesIdentical')}
+          </span>
         </div>
       </div>
     );
@@ -94,14 +135,35 @@ export const ResultBanner: React.FC<ResultBannerProps> = ({
 
   return (
     <div className="mb-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-      <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400 mb-3">
-        <AlertTriangle className="w-5 h-5" />
-        <span className="font-medium">Responses are different</span>
-        {!comparison.statusSame && (
-          <span className="text-sm ml-2">
-            (Status: A={comparison.statusA || 'Error'}, B=
-            {comparison.statusB || 'Error'})
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
+          <AlertTriangle className="w-5 h-5" />
+          <span className="font-medium">
+            {t('tool.apiDiff.responsesDifferent')}
           </span>
+          {!comparison.statusSame && (
+            <span className="text-sm ml-2">
+              ({t('tool.apiDiff.status')}: A=
+              {comparison.statusA || t('common.error')}, B=
+              {comparison.statusB || t('common.error')})
+            </span>
+          )}
+        </div>
+
+        {/* Compare in Text Diff button */}
+        {(rawBodyA || rawBodyB) && (
+          <button
+            onClick={handleCompareInTextDiff}
+            className={cn(
+              'flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg',
+              'bg-amber-100 dark:bg-amber-800/40 text-amber-700 dark:text-amber-300',
+              'hover:bg-amber-200 dark:hover:bg-amber-800/60',
+              'transition-colors'
+            )}
+          >
+            <GitCompare className="w-4 h-4" />
+            <span>{t('tool.apiDiff.compareInTextDiff')}</span>
+          </button>
         )}
       </div>
 
@@ -116,13 +178,13 @@ export const ResultBanner: React.FC<ResultBannerProps> = ({
               <thead className="sticky top-0 bg-amber-100 dark:bg-amber-900/40">
                 <tr>
                   <th className="text-left py-2 px-3 font-medium text-amber-800 dark:text-amber-300 border-b border-amber-200 dark:border-amber-800">
-                    Path
+                    {t('tool.apiDiff.path')}
                   </th>
                   <th className="text-left py-2 px-3 font-medium text-amber-800 dark:text-amber-300 border-b border-amber-200 dark:border-amber-800">
-                    Value A
+                    {t('tool.apiDiff.valueA')}
                   </th>
                   <th className="text-left py-2 px-3 font-medium text-amber-800 dark:text-amber-300 border-b border-amber-200 dark:border-amber-800">
-                    Value B
+                    {t('tool.apiDiff.valueB')}
                   </th>
                 </tr>
               </thead>
@@ -153,8 +215,8 @@ export const ResultBanner: React.FC<ResultBannerProps> = ({
 
 // Diff Row Component
 const DiffRow: React.FC<{ field: DifferentField }> = ({ field }) => {
-  const valueAStr = formatValue(field.valueA);
-  const valueBStr = formatValue(field.valueB);
+  const valueAStr = formatDiffValue(field.valueA);
+  const valueBStr = formatDiffValue(field.valueB);
 
   return (
     <tr className="border-b border-amber-100 dark:border-amber-900/40 hover:bg-amber-50/50 dark:hover:bg-amber-900/20">
@@ -186,4 +248,3 @@ const DiffRow: React.FC<{ field: DifferentField }> = ({ field }) => {
 };
 
 export default ResultBanner;
-

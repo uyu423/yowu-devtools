@@ -189,3 +189,23 @@ input[type='radio']:checked::after {
 .dark [data-sonner-toast] [data-icon] {
   color: rgb(243 244 246) !important; /* gray-100 */
 }
+
+/* Slide-in animation from right */
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.2s ease-out;
+}
+
+/* Vertical writing mode for sidebar toggle button */
+.writing-mode-vertical {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}

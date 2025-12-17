@@ -5,8 +5,9 @@
  * A powerful API testing tool with CORS bypass support via Chrome Extension.
  */
 
-import React, { useState, useCallback, useEffect } from 'react';
-import { Globe, Check, Terminal, Cookie, HelpCircle } from 'lucide-react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { Globe, Check, Terminal, Cookie, HelpCircle, GitCompare, ChevronDown } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import type { ToolDefinition } from '@/tools/types';
 import { ToolHeader } from '@/components/common/ToolHeader';
@@ -57,6 +58,7 @@ const DEFAULT_STATE: ApiTesterState = {
 
 const ApiTesterTool: React.FC = () => {
   const { t } = useI18n();
+  const navigate = useNavigate();
   useTitle(t('tool.apiTester.title'));
 
   // Check for stored cURL parse result on mount
@@ -141,20 +143,14 @@ const ApiTesterTool: React.FC = () => {
   const { isAllowed: isCorsAllowed, addOrigin: addCorsOrigin } = useCorsAllowlist();
 
   // UI state
-  const [showHistory, setShowHistory] = useState<boolean>(() => {
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('yowu-devtools:v1:ui:api-tester:history-sidebar-open');
-      if (stored !== null) {
-        return stored === 'true';
-      }
-    }
-    return true; // Default expanded
-  });
+  const [showHistory, setShowHistory] = useState(false);
   const [curlCopied, setCurlCopied] = useState(false);
   const [queryExpanded, setQueryExpanded] = useState(true);
   const [headersExpanded, setHeadersExpanded] = useState(false);
   const [corsModalOpen, setCorsModalOpen] = useState(false);
   const [pendingCorsRetry, setPendingCorsRetry] = useState(false);
+  const [apiDiffDropdownOpen, setApiDiffDropdownOpen] = useState(false);
+  const apiDiffDropdownRef = useRef<HTMLDivElement>(null);
 
   // Apply stored cURL parse result on mount
   useEffect(() => {
@@ -162,13 +158,6 @@ const ApiTesterTool: React.FC = () => {
       updateState(initialStateFromCurl);
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Save history sidebar state to localStorage
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('yowu-devtools:v1:ui:api-tester:history-sidebar-open', showHistory.toString());
-    }
-  }, [showHistory]);
 
   // Check if response has CORS error (only for direct/cors mode requests)
   const hasCorsError = response?.error?.code === 'CORS_ERROR' && response?.method === 'cors';
@@ -332,15 +321,91 @@ const ApiTesterTool: React.FC = () => {
     setTimeout(() => setCurlCopied(false), 2000);
   }, [state]);
 
+  // Send to API Diff
+  const handleSendToApiDiff = useCallback((targetDomain: 'A' | 'B') => {
+    setApiDiffDropdownOpen(false);
+    
+    // Extract domain and path from URL
+    let domain = '';
+    let path = '';
+    
+    try {
+      const urlObj = new URL(state.url);
+      domain = urlObj.origin;
+      path = urlObj.pathname + urlObj.search;
+    } catch {
+      // If URL parsing fails, use the whole URL as path
+      path = state.url;
+    }
+    
+    // Convert headers to key-value pairs format (with new IDs to avoid conflicts)
+    const headers = state.headers
+      .filter((h) => h.enabled && h.key)
+      .map((h) => ({ id: crypto.randomUUID(), key: h.key, value: h.value }));
+    
+    // Convert query params to key-value pairs format (with new IDs to avoid conflicts)
+    const params = state.queryParams
+      .filter((p) => p.enabled && p.key)
+      .map((p) => ({ id: crypto.randomUUID(), key: p.key, value: p.value }));
+    
+    // Build body string
+    let bodyStr = '';
+    if (state.body.kind === 'text' || state.body.kind === 'json') {
+      bodyStr = state.body.text || '';
+    } else if (state.body.kind === 'urlencoded') {
+      const enabledItems = state.body.items.filter((i) => i.enabled && i.key);
+      bodyStr = enabledItems.map((i) => `${encodeURIComponent(i.key)}=${encodeURIComponent(i.value)}`).join('&');
+    }
+    
+    // Build state data for API Diff (matching ApiDiffState structure)
+    // Use location.state to pass data directly to useToolState
+    const apiDiffState = {
+      tool: 'api-diff', // Tool identifier for useToolState validation
+      method: state.method,
+      path,
+      params: params.length > 0 ? params : [{ id: crypto.randomUUID(), key: '', value: '' }],
+      headers: headers.length > 0 ? headers : [{ id: crypto.randomUUID(), key: '', value: '' }],
+      body: bodyStr,
+      domainA: targetDomain === 'A' ? domain : '',
+      domainB: targetDomain === 'B' ? domain : '',
+      includeCookies: false,
+      // Response state (not persisted)
+      responseA: null,
+      responseB: null,
+      isExecuting: false,
+      // UI state
+      activeTabA: 'body',
+      activeTabB: 'body',
+    };
+    
+    // Navigate to API Diff with state
+    navigate('/api-diff', { state: apiDiffState });
+    toast.success(t('tool.apiTester.sentToApiDiff').replace('{domain}', targetDomain));
+  }, [state, navigate, t]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (apiDiffDropdownRef.current && !apiDiffDropdownRef.current.contains(e.target as Node)) {
+        setApiDiffDropdownOpen(false);
+      }
+    };
+    
+    if (apiDiffDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [apiDiffDropdownOpen]);
+
   // Count active query params and headers
   const activeQueryCount = state.queryParams.filter((p) => p.key && p.enabled).length;
   const activeHeaderCount = state.headers.filter((h) => h.key && h.enabled).length;
   const supportsBody = BODY_SUPPORTED_METHODS.includes(state.method);
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full p-4 md:p-6 max-w-[90rem] mx-auto">
       {/* Header */}
-      <div className="flex-shrink-0 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+      <div className="flex-shrink-0 pb-3 border-b border-gray-200 dark:border-gray-700">
         <ToolHeader
           title={t('tool.apiTester.title')}
           description={t('tool.apiTester.description')}
@@ -349,55 +414,55 @@ const ApiTesterTool: React.FC = () => {
         />
       </div>
 
-      <div className="flex flex-1 overflow-hidden">
-        {/* Main content */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          {/* URL bar */}
-          <div className="flex-shrink-0 px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-            <div className="flex items-center gap-2">
-              <MethodSelector value={state.method} onChange={handleMethodChange} disabled={isLoading} />
-              <UrlInput
-                value={state.url}
-                onChange={handleUrlChange}
-                onPaste={handleUrlPaste}
-                placeholder="https://api.example.com/v1/users"
-                disabled={isLoading}
-              />
-              <SendButton
-                onClick={handleSend}
-                onCancel={cancelRequest}
-                isLoading={isLoading}
-                mode={state.selectedMode}
-                disabled={!state.url.trim()}
-              />
-            </div>
+      {/* Main content - full width */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* URL bar */}
+        <div className="flex-shrink-0 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 -mx-4 md:-mx-6 px-4 md:px-6">
+          <div className="flex items-center gap-2">
+            <MethodSelector value={state.method} onChange={handleMethodChange} disabled={isLoading} />
+            <UrlInput
+              value={state.url}
+              onChange={handleUrlChange}
+              onPaste={handleUrlPaste}
+              placeholder="https://api.example.com/v1/users"
+              disabled={isLoading}
+            />
+            <SendButton
+              onClick={handleSend}
+              onCancel={cancelRequest}
+              isLoading={isLoading}
+              mode={state.selectedMode}
+              disabled={!state.url.trim()}
+            />
+          </div>
 
-            {/* Extension status, Include Cookies, and Copy as cURL */}
-            <div className="flex items-center justify-between mt-2">
-              <div className="flex items-center gap-4">
-                <ExtensionStatus status={extensionStatus} onRetry={checkExtension} />
-                
-                {/* Include Cookies checkbox - only show when extension is available */}
-                {extensionStatus === 'connected' && (
-                  <div className="flex items-center gap-1.5">
-                    <label className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={state.includeCookies}
-                        onChange={(e) => updateState({ includeCookies: e.target.checked })}
-                        className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-0"
-                        disabled={isLoading}
-                      />
-                      <Cookie className="w-4 h-4" />
-                      <span>{t('tool.apiTester.includeCookies')}</span>
-                    </label>
-                    <Tooltip content={t('tool.apiTester.includeCookiesTooltip')} position="bottom">
-                      <HelpCircle className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 cursor-help" />
-                    </Tooltip>
-                  </div>
-                )}
-              </div>
+          {/* Extension status, Include Cookies, and Copy as cURL */}
+          <div className="flex items-center justify-between mt-2">
+            <div className="flex items-center gap-4">
+              <ExtensionStatus status={extensionStatus} onRetry={checkExtension} />
               
+              {/* Include Cookies checkbox - only show when extension is available */}
+              {extensionStatus === 'connected' && (
+                <div className="flex items-center gap-1.5">
+                  <label className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={state.includeCookies}
+                      onChange={(e) => updateState({ includeCookies: e.target.checked })}
+                      className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-0"
+                      disabled={isLoading}
+                    />
+                    <Cookie className="w-4 h-4" />
+                    <span>{t('tool.apiTester.includeCookies')}</span>
+                  </label>
+                  <Tooltip content={t('tool.apiTester.includeCookiesTooltip')} position="bottom">
+                    <HelpCircle className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 cursor-help" />
+                  </Tooltip>
+                </div>
+              )}
+            </div>
+            
+            <div className="flex items-center gap-2">
               <button
                 onClick={handleCopyCurl}
                 className={cn(
@@ -418,89 +483,138 @@ const ApiTesterTool: React.FC = () => {
                   </>
                 )}
               </button>
+              
+              {/* Send to API Diff dropdown */}
+              <div className="relative" ref={apiDiffDropdownRef}>
+                <button
+                  onClick={() => setApiDiffDropdownOpen(!apiDiffDropdownOpen)}
+                  disabled={!state.url.trim()}
+                  className={cn(
+                    'flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg',
+                    'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700',
+                    'transition-colors',
+                    !state.url.trim() && 'opacity-50 cursor-not-allowed'
+                  )}
+                >
+                  <GitCompare className="w-4 h-4" />
+                  <span>{t('tool.apiTester.sendToApiDiff')}</span>
+                  <ChevronDown className={cn('w-3 h-3 transition-transform', apiDiffDropdownOpen && 'rotate-180')} />
+                </button>
+                
+                {apiDiffDropdownOpen && (
+                  <div className={cn(
+                    'absolute right-0 top-full mt-1 z-50',
+                    'bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700',
+                    'py-1 min-w-40'
+                  )}>
+                    <button
+                      onClick={() => handleSendToApiDiff('A')}
+                      className={cn(
+                        'w-full px-3 py-2 text-left text-sm',
+                        'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700',
+                        'flex items-center gap-2'
+                      )}
+                    >
+                      <span className="w-5 h-5 flex items-center justify-center rounded bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 text-xs font-semibold">A</span>
+                      {t('tool.apiTester.setAsDomainA')}
+                    </button>
+                    <button
+                      onClick={() => handleSendToApiDiff('B')}
+                      className={cn(
+                        'w-full px-3 py-2 text-left text-sm',
+                        'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700',
+                        'flex items-center gap-2'
+                      )}
+                    >
+                      <span className="w-5 h-5 flex items-center justify-center rounded bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 text-xs font-semibold">B</span>
+                      {t('tool.apiTester.setAsDomainB')}
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-
-          {/* Request/Response split - Resizable */}
-          <ResizablePanels
-            leftPanel={
-              <div className="flex flex-col overflow-hidden border-r border-gray-200 dark:border-gray-700 h-full">
-                <div className="flex-1 overflow-auto">
-                  {/* Query Parameters Section */}
-                  <CollapsibleSection
-                    title="Query Parameters"
-                    count={activeQueryCount}
-                    isOpen={queryExpanded}
-                    onToggle={() => setQueryExpanded(!queryExpanded)}
-                  >
-                    <KeyValueEditor
-                      items={state.queryParams}
-                      onChange={(queryParams) => updateState({ queryParams })}
-                      keyPlaceholder="Parameter"
-                      valuePlaceholder="Value"
-                      disabled={isLoading}
-                    />
-                  </CollapsibleSection>
-
-                  {/* Headers Section */}
-                  <CollapsibleSection
-                    title="Headers"
-                    count={activeHeaderCount}
-                    isOpen={headersExpanded}
-                    onToggle={() => setHeadersExpanded(!headersExpanded)}
-                  >
-                    <KeyValueEditor
-                      items={state.headers}
-                      onChange={(headers) => updateState({ headers })}
-                      keyPlaceholder="Header"
-                      valuePlaceholder="Value"
-                      keyAutocomplete={COMMON_HEADERS}
-                      valueAutocomplete={COMMON_CONTENT_TYPES}
-                      disabled={isLoading}
-                    />
-                  </CollapsibleSection>
-
-                  {/* Body Section - only for methods that support it */}
-                  {supportsBody && (
-                    <div className="border-b border-gray-200 dark:border-gray-700 p-4">
-                      <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                        Request Body
-                      </h3>
-                      <BodyEditor
-                        body={state.body}
-                        onChange={(body) => updateState({ body })}
-                        disabled={isLoading}
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
-            }
-            rightPanel={
-              <div className="flex flex-col overflow-hidden bg-white dark:bg-gray-900 h-full">
-                <ResponseViewer response={response} isLoading={isLoading} />
-              </div>
-            }
-            initialLeftWidth={50}
-            minLeftWidth={25}
-            maxLeftWidth={75}
-            storageKey="api-tester:request-response-split"
-          />
         </div>
 
-        {/* History sidebar */}
-        <HistorySidebar
-          history={history}
-          favorites={favorites}
-          onSelect={handleHistorySelect}
-          onToggleFavorite={toggleFavorite}
-          onDelete={removeHistory}
-          onClear={clearHistory}
-          onRename={renameHistory}
-          isOpen={showHistory}
-          onToggle={() => setShowHistory(!showHistory)}
+        {/* Request/Response split - Resizable */}
+        <ResizablePanels
+          leftPanel={
+            <div className="flex flex-col overflow-hidden border-r border-gray-200 dark:border-gray-700 h-full">
+              <div className="flex-1 overflow-auto">
+                {/* Query Parameters Section */}
+                <CollapsibleSection
+                  title="Query Parameters"
+                  count={activeQueryCount}
+                  isOpen={queryExpanded}
+                  onToggle={() => setQueryExpanded(!queryExpanded)}
+                >
+                  <KeyValueEditor
+                    items={state.queryParams}
+                    onChange={(queryParams) => updateState({ queryParams })}
+                    keyPlaceholder="Parameter"
+                    valuePlaceholder="Value"
+                    disabled={isLoading}
+                  />
+                </CollapsibleSection>
+
+                {/* Headers Section */}
+                <CollapsibleSection
+                  title="Headers"
+                  count={activeHeaderCount}
+                  isOpen={headersExpanded}
+                  onToggle={() => setHeadersExpanded(!headersExpanded)}
+                >
+                  <KeyValueEditor
+                    items={state.headers}
+                    onChange={(headers) => updateState({ headers })}
+                    keyPlaceholder="Header"
+                    valuePlaceholder="Value"
+                    keyAutocomplete={COMMON_HEADERS}
+                    valueAutocomplete={COMMON_CONTENT_TYPES}
+                    disabled={isLoading}
+                  />
+                </CollapsibleSection>
+
+                {/* Body Section - only for methods that support it */}
+                {supportsBody && (
+                  <div className="border-b border-gray-200 dark:border-gray-700 p-4">
+                    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                      Request Body
+                    </h3>
+                    <BodyEditor
+                      body={state.body}
+                      onChange={(body) => updateState({ body })}
+                      disabled={isLoading}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+          }
+          rightPanel={
+            <div className="flex flex-col overflow-hidden bg-white dark:bg-gray-900 h-full">
+              <ResponseViewer response={response} isLoading={isLoading} />
+            </div>
+          }
+          initialLeftWidth={50}
+          minLeftWidth={25}
+          maxLeftWidth={75}
+          storageKey="api-tester:request-response-split"
         />
       </div>
+
+      {/* History sidebar - Overlay */}
+      <HistorySidebar
+        history={history}
+        favorites={favorites}
+        onSelect={handleHistorySelect}
+        onToggleFavorite={toggleFavorite}
+        onDelete={removeHistory}
+        onClear={clearHistory}
+        onRename={renameHistory}
+        isOpen={showHistory}
+        onToggle={() => setShowHistory(!showHistory)}
+      />
 
       {/* CORS Error Modal */}
       <CorsModal

@@ -3,7 +3,7 @@
  */
 
 import React, { useCallback, useState, useMemo } from 'react';
-import { Play, Square, List } from 'lucide-react';
+import { Play, Square, List, Cookie, HelpCircle } from 'lucide-react';
 import type { HttpMethod, KeyValuePair, DomainPreset } from '../types';
 import { BODY_SUPPORTED_METHODS } from '../types';
 import { HTTP_METHODS } from '../constants';
@@ -14,6 +14,9 @@ import { cn } from '@/lib/utils';
 import { useI18n } from '@/hooks/useI18nHooks';
 import CodeMirror from '@uiw/react-codemirror';
 import { json } from '@codemirror/lang-json';
+import { ExtensionStatus } from '@/tools/api-tester/components';
+import type { ExtensionStatus as ExtensionStatusType } from '@/tools/api-tester/types';
+import { Tooltip } from '@/components/ui/Tooltip';
 
 interface TopSharedPanelProps {
   // Domains
@@ -34,6 +37,9 @@ interface TopSharedPanelProps {
   onHeadersChange: (headers: KeyValuePair[]) => void;
   onBodyChange: (body: string) => void;
   onExecute: () => void;
+  // Options
+  includeCookies: boolean;
+  onIncludeCookiesChange: (value: boolean) => void;
   // Presets
   presets: DomainPreset[];
   onAddPreset: (title: string, domain: string) => DomainPreset;
@@ -41,6 +47,9 @@ interface TopSharedPanelProps {
   onClearAllPresets: () => void;
   onExportPresets: () => void;
   onImportPresets: (file: File) => Promise<{ success: boolean; count: number; error?: string }>;
+  // Extension status
+  extensionStatus: ExtensionStatusType;
+  onCheckExtension: () => void;
 }
 
 export const TopSharedPanel: React.FC<TopSharedPanelProps> = ({
@@ -60,12 +69,16 @@ export const TopSharedPanel: React.FC<TopSharedPanelProps> = ({
   onHeadersChange,
   onBodyChange,
   onExecute,
+  includeCookies,
+  onIncludeCookiesChange,
   presets,
   onAddPreset,
   onRemovePreset,
   onClearAllPresets,
   onExportPresets,
   onImportPresets,
+  extensionStatus,
+  onCheckExtension,
 }) => {
   const { t } = useI18n();
   const showBody = BODY_SUPPORTED_METHODS.includes(method);
@@ -97,7 +110,7 @@ export const TopSharedPanel: React.FC<TopSharedPanelProps> = ({
       if (queryParams.length > 0) {
         // Merge with existing params (query params take precedence)
         const existingParams = params.filter(
-          (p) => p.key.trim() && !queryParams.find((qp) => qp.key === p.key)
+          (p) => p.key.trim() && !queryParams.find((qp: KeyValuePair) => qp.key === p.key)
         );
         onParamsChange([...existingParams, ...queryParams]);
       }
@@ -132,8 +145,47 @@ export const TopSharedPanel: React.FC<TopSharedPanelProps> = ({
   // CodeMirror extensions
   const extensions = useMemo(() => [json()], []);
 
+  // Count valid parameters (non-empty key or value)
+  const validParamsCount = useMemo(() => {
+    return params.filter((p) => p.key.trim() || p.value.trim()).length;
+  }, [params]);
+
+  // Count valid headers (non-empty key or value)
+  const validHeadersCount = useMemo(() => {
+    return headers.filter((h) => h.key.trim() || h.value.trim()).length;
+  }, [headers]);
+
   return (
     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-4">
+      {/* Domains Header with Extension Status and Include Cookies */}
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          {t('tool.apiDiff.domains')}
+        </span>
+        <div className="flex items-center gap-4">
+          {/* Include Cookies checkbox - only show when extension is available */}
+          {extensionStatus === 'connected' && (
+            <div className="flex items-center gap-1.5">
+              <label className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={includeCookies}
+                  onChange={(e) => onIncludeCookiesChange(e.target.checked)}
+                  className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-0"
+                  disabled={isExecuting}
+                />
+                <Cookie className="w-4 h-4" />
+                <span>{t('tool.apiDiff.includeCookies')}</span>
+              </label>
+              <Tooltip content={t('tool.apiDiff.includeCookiesTooltip')} position="bottom">
+                <HelpCircle className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 cursor-help" />
+              </Tooltip>
+            </div>
+          )}
+          <ExtensionStatus status={extensionStatus} onRetry={onCheckExtension} />
+        </div>
+      </div>
+
       {/* Domains - Side by Side */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Domain A */}
@@ -235,6 +287,11 @@ export const TopSharedPanel: React.FC<TopSharedPanelProps> = ({
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             {t('tool.apiDiff.parameters')}
+            {validParamsCount > 0 && (
+              <span className="ml-1 text-gray-500 dark:text-gray-400">
+                ({validParamsCount})
+              </span>
+            )}
           </label>
           <KeyValueEditor
             items={params}
@@ -248,6 +305,11 @@ export const TopSharedPanel: React.FC<TopSharedPanelProps> = ({
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             {t('tool.apiDiff.headers')}
+            {validHeadersCount > 0 && (
+              <span className="ml-1 text-gray-500 dark:text-gray-400">
+                ({validHeadersCount})
+              </span>
+            )}
           </label>
           <KeyValueEditor
             items={headers}

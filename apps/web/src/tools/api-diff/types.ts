@@ -37,6 +37,12 @@ export interface TestConfig {
   domainB: string;
 }
 
+export interface ResponseError {
+  code: 'CORS_ERROR' | 'TIMEOUT' | 'NETWORK_ERROR' | 'PERMISSION_DENIED' | 'UNKNOWN';
+  message: string;
+  details?: string;
+}
+
 export interface ResponseSide {
   ok: boolean;
   status: number | null;
@@ -45,7 +51,8 @@ export interface ResponseSide {
   headers: Record<string, string>;
   rawBody: string | null;
   parsedJson?: unknown;
-  error?: string;
+  error?: ResponseError;
+  method?: 'direct' | 'extension'; // How the request was made
 }
 
 export interface HistoryItem {
@@ -79,6 +86,10 @@ export interface ApiDiffState {
   body: string;
   domainA: string;
   domainB: string;
+
+  // Options
+  /** Include browser cookies in extension mode requests */
+  includeCookies: boolean;
 
   // Response state (not persisted)
   responseA: ResponseSide | null;

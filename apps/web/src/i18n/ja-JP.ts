@@ -5,6 +5,7 @@ export const jaJP = {
   common: {
     copy: 'コピー',
     copied: 'コピー済み',
+    copyFailed: 'コピーに失敗しました',
     paste: '貼り付け',
     clear: 'クリア',
     reset: 'リセット',
@@ -12,7 +13,11 @@ export const jaJP = {
     error: 'エラー',
     loading: '読み込み中',
     download: 'ダウンロード',
+    downloaded: 'ダウンロード完了!',
+    downloadJson: 'JSONをダウンロード',
     upload: 'アップロード',
+    export: 'エクスポート',
+    import: 'インポート',
     save: '保存',
     cancel: 'キャンセル',
     confirm: '確認',
@@ -826,9 +831,10 @@ export const jaJP = {
       raw: 'Raw',
     },
     stringLength: {
-      title: '文字列長計算機',
+      title: 'String Length',
       description: 'テキストの文字、単語、行、バイト数を計算します。',
-      inputPlaceholder: 'テキストを入力するか、ファイルをドロップしてください...',
+      inputPlaceholder:
+        'テキストを入力するか、ファイルをドロップしてください...',
       characters: '文字数',
       charactersNoSpaces: '文字数（空白除く）',
       words: '単語数',
@@ -845,7 +851,8 @@ export const jaJP = {
       urlLoadFailed: 'URLからの読み込みに失敗しました。',
       sampleLoaded: 'サンプルテキストを読み込みました。',
       corsWarningTitle: 'CORS制限',
-      corsWarningDescription: '一部のウェブサイトは他のドメインからのリクエストをブロックする場合があります。読み込みに失敗した場合は、ファイルを直接ダウンロードしてください。',
+      corsWarningDescription:
+        '一部のウェブサイトは他のドメインからのリクエストをブロックする場合があります。読み込みに失敗した場合は、ファイルを直接ダウンロードしてください。',
       loadButton: '読み込み',
     },
     jwtEncoder: {
@@ -904,7 +911,8 @@ export const jaJP = {
       followRedirects: 'リダイレクトに従う',
       insecureTLSBrowser: '非セキュアTLS - ブラウザでサポートされていません',
       basicAuth: '基本認証',
-      unsupportedFileNote: 'サポートされていません - API Testerでファイルを選択',
+      unsupportedFileNote:
+        'サポートされていません - API Testerでファイルを選択',
       file: 'ファイル',
       // コピー関連キー
       copiedMethod: 'メソッドをクリップボードにコピーしました！',
@@ -931,7 +939,8 @@ export const jaJP = {
     },
     apiTester: {
       title: 'API Tester',
-      description: 'Request BuilderでREST APIをテストし、CORS回避をサポートします。',
+      description:
+        'Request BuilderでREST APIをテストし、CORS回避をサポートします。',
       urlPlaceholder: 'https://api.example.com/v1/users',
       send: '送信',
       cancel: 'キャンセル',
@@ -955,23 +964,34 @@ export const jaJP = {
       extensionConnected: 'CORS Bypass Ready',
       extensionNotConnected: 'Not Connected',
       installExtension: '拡張機能をインストール',
-      installExtensionTooltip: 'CORS制限をバイパスするには拡張機能をインストールしてください。APIがクロスオリジンリクエストを許可している場合はインストール不要です。',
+      installExtensionTooltip:
+        'CORS制限をバイパスするには拡張機能をインストールしてください。APIがクロスオリジンリクエストを許可している場合はインストール不要です。',
       extensionPermissionRequired: 'Permission Required',
       extensionChecking: 'Checking...',
       extensionTooltipChecking: '拡張機能の接続を確認しています...',
-      extensionTooltipNotConnected: '拡張機能が検出されませんでした。CORS制限をバイパスするには拡張機能をインストールしてください。クリックで再確認。',
-      extensionTooltipPermissionRequired: '拡張機能は検出されましたが、このドメインへの権限が必要です。拡張機能アイコンをクリックしてアクセスを許可してください。',
-      extensionTooltipConnected: '拡張機能が接続されました！必要に応じてCORS制限が自動的にバイパスされます。',
+      extensionTooltipNotConnected:
+        '拡張機能が検出されませんでした。CORS制限をバイパスするには拡張機能をインストールしてください。クリックで再確認。',
+      extensionTooltipPermissionRequired:
+        '拡張機能は検出されましたが、このドメインへの権限が必要です。拡張機能アイコンをクリックしてアクセスを許可してください。',
+      extensionTooltipConnected:
+        '拡張機能が接続されました！必要に応じてCORS制限が自動的にバイパスされます。',
       retryWithExtension: '拡張機能で再試行',
       corsErrorTitle: 'CORSエラーが検出されました',
-      corsErrorDescription: 'このリクエストはブラウザのCORSポリシーによってブロックされました。',
-      corsErrorExplanation: 'ブラウザはセキュリティのため、異なるドメインへのリクエストをブロックします。APIはクロスオリジンリクエストを明示的に許可する必要がありますが、Webアプリからアクセスする際に多くのAPIはこれを許可していません。',
+      corsErrorDescription:
+        'このリクエストはブラウザのCORSポリシーによってブロックされました。',
+      corsErrorExplanation:
+        'ブラウザはセキュリティのため、異なるドメインへのリクエストをブロックします。APIはクロスオリジンリクエストを明示的に許可する必要がありますが、Webアプリからアクセスする際に多くのAPIはこれを許可していません。',
       corsWhyExtension: 'なぜ拡張機能を使用するのですか？',
-      corsWhyExtensionDesc: 'ブラウザ拡張機能は、拡張機能コンテキストからリクエストを行うことでCORS制限をバイパスできます。これはWebページと同じセキュリティルールの対象外です。',
+      corsWhyExtensionDesc:
+        'ブラウザ拡張機能は、拡張機能コンテキストからリクエストを行うことでCORS制限をバイパスできます。これはWebページと同じセキュリティルールの対象外です。',
       corsRetryWithExtension: '拡張機能で再試行',
       corsInstallExtension: 'Chrome拡張機能をインストール',
       corsRememberChoice: 'このドメインを記憶',
       corsRememberChoiceDesc: '{origin}に対して自動的に拡張機能を使用',
+      sendToApiDiff: 'API Diffに送信',
+      setAsDomainA: 'Domain Aとして設定',
+      setAsDomainB: 'Domain Bとして設定',
+      sentToApiDiff: 'API DiffのDomain {domain}に送信されました',
       learnMoreCors: 'CORSについて詳しく',
       corsAllowedOrigins: '許可されたドメイン',
       corsManageAllowlist: '管理',
@@ -1003,10 +1023,12 @@ export const jaJP = {
       viaMethod: 'via {method}',
       // Error messages
       errorTimeout: '{ms}ms後にリクエストがタイムアウトしました',
-      errorCors: 'リクエストが失敗しました。CORS制限による可能性があります。Extensionモードをお試しください。',
+      errorCors:
+        'リクエストが失敗しました。CORS制限による可能性があります。Extensionモードをお試しください。',
       errorNetwork: 'ネットワークエラー',
       errorUnknown: '不明なエラーが発生しました',
-      errorPermissionDenied: '{origin}の権限が拒否されました。権限を付与してから再試行してください。',
+      errorPermissionDenied:
+        '{origin}の権限が拒否されました。権限を付与してから再試行してください。',
       errorExtension: 'Extensionリクエストが失敗しました',
       rename: '名前を変更',
       openInJsonViewer: 'JSON Viewerで開く',
@@ -1016,17 +1038,20 @@ export const jaJP = {
       requestName: 'リクエスト名',
       timeoutError: '{ms}ms後にリクエストタイムアウト',
       networkError: 'ネットワークエラー',
-      permissionDenied: '{origin}への権限が拒否されました。権限を付与して再試行してください。',
+      permissionDenied:
+        '{origin}への権限が拒否されました。権限を付与して再試行してください。',
       // Include Cookies option
       includeCookies: 'クッキーを含める',
-      includeCookiesTooltip: 'リクエストにブラウザのクッキーを含めます。有効にすると、対象ドメインに保存されているブラウザクッキーがリクエストと一緒に自動的に送信されます。',
+      includeCookiesTooltip:
+        'リクエストにブラウザのクッキーを含めます。有効にすると、対象ドメインに保存されているブラウザクッキーがリクエストと一緒に自動的に送信されます。',
       // Error details
       showErrorDetails: '詳細を表示',
       hideErrorDetails: '詳細を隠す',
     },
     apiDiff: {
-      title: 'API レスポンス比較',
+      title: 'API Response Diff',
       description: '2つのドメインからのAPIレスポンスを比較',
+      domains: 'ドメイン',
       domainA: 'ドメイン A',
       domainB: 'ドメイン B',
       execute: '実行',
@@ -1034,11 +1059,24 @@ export const jaJP = {
       reset: 'リセット',
       responsesIdentical: 'レスポンスは同一です',
       responsesDifferent: 'レスポンスが異なります',
+      compareInTextDiff: 'Text Diffで比較',
       path: 'パス',
       valueA: '値 A',
       valueB: '値 B',
       noResponseYet: 'まだレスポンスがありません',
-      notValidJson: 'レスポンスは有効なJSONではありません。Rawタブで内容を確認してください。',
+      notValidJson:
+        'レスポンスは有効なJSONではありません。Rawタブで内容を確認してください。',
+      viaExtension: '拡張機能経由',
+      viaDirect: '直接リクエスト',
+      viewTree: 'ツリー',
+      viewPretty: '整形',
+      viewRaw: '生データ',
+      showDetails: '詳細を表示',
+      hideDetails: '詳細を非表示',
+      status: 'ステータス',
+      includeCookies: 'Cookieを含める',
+      includeCookiesTooltip:
+        '拡張機能経由のリクエスト時にブラウザのCookieを含めます。現在のブラウザセッションのCookieがリクエストと共に送信されます。',
       parameters: 'パラメータ',
       headers: 'ヘッダー',
       body: 'ボディ (JSON)',
@@ -1064,6 +1102,26 @@ export const jaJP = {
         fillBothFields: 'タイトルとドメインの両方を入力してください',
         importSuccess: '{{count}}件のプリセットをインポートしました',
         importFailed: 'プリセットのインポートに失敗しました',
+      },
+      validation: {
+        pathRequired: 'パスを入力してください',
+        domainsRequired: '両方のドメインを入力してください',
+      },
+      extensionConnected: '拡張機能接続済み',
+      extensionChecking: '拡張機能を確認中...',
+      extensionNotConnected: '拡張機能未接続（直接リクエスト使用）',
+      usingExtension: '拡張機能を使用中',
+      history: {
+        title: '履歴',
+        empty: '履歴がありません',
+        recentRequests: '最近のリクエスト',
+        clearAll: 'すべて削除',
+        confirmClear: 'クリックして確認',
+        loaded: '履歴から設定を読み込みました',
+        search: '履歴を検索...',
+        show: '履歴を表示',
+        hide: '履歴を非表示',
+        noMatch: '一致する履歴がありません',
       },
     },
   },
@@ -1139,7 +1197,7 @@ export const jaJP = {
         '無料オンラインJWTエンコーダ。カスタムHeaderとPayloadでJSON Web Tokenを作成します。',
     },
     stringLength: {
-      title: '文字列長計算機',
+      title: 'String Length',
       description:
         '無料オンライン文字列長計算機。テキストやファイルの文字、単語、行、バイト（UTF-8）数を計算します。ファイルアップロードとURLロードをサポート。',
     },
@@ -1159,7 +1217,7 @@ export const jaJP = {
       },
     },
     apiDiff: {
-      title: 'API レスポンス比較',
+      title: 'API Response Diff',
       description:
         '2つのドメインからのAPIレスポンスを並べて比較し、差分をハイライトします。',
     },

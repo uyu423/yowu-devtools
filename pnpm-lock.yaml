@@ -96,6 +96,9 @@ importers:
       react-dom:
         specifier: ^19.2.0
         version: 19.2.3(react@19.2.3)
+      react-json-tree:
+        specifier: ^0.20.0
+        version: 0.20.0(@types/react@19.2.7)(react@19.2.3)
       react-json-view-lite:
         specifier: ^2.5.0
         version: 2.5.0(react@19.2.3)
@@ -1443,6 +1446,9 @@ packages:
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==, tarball: https://artifactory.navercorp.com:443/artifactory/api/npm/npm-naver/@types/json-schema/-/json-schema-7.0.15.tgz}
 
+  '@types/lodash@4.17.21':
+    resolution: {integrity: sha512-FOvQ0YPD5NOfPgMzJihoT+Za5pdkDJWcbpuj1DjaKZIr/gxodQjY/uWEFlTNqW2ugXHUiL8lRQgw63dzKHZdeQ==, tarball: https://artifactory.navercorp.com:443/artifactory/api/npm/npm-naver/@types/lodash/-/lodash-4.17.21.tgz}
+
   '@types/node@24.10.4':
     resolution: {integrity: sha512-vnDVpYPMzs4wunl27jHrfmwojOGKya0xyM3sH+UE5iv5uPS6vX7UIoh6m+vQc5LGBq52HBKPIn/zcSZVzeDEZg==, tarball: https://artifactory.navercorp.com:443/artifactory/api/npm/npm-naver/@types/node/-/node-24.10.4.tgz}
 
@@ -1778,6 +1784,13 @@ packages:
 
   color-name@1.1.4:
     resolution: {integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==, tarball: https://artifactory.navercorp.com:443/artifactory/api/npm/npm-naver/color-name/-/color-name-1.1.4.tgz}
+
+  color-string@1.9.1:
+    resolution: {integrity: sha512-shrVawQFojnZv6xM40anx4CkoDP+fZsw/ZerEMsW/pyzsRbElpsL/DBVW7q3ExxwusdNXI3lXpuhEZkzs8p5Eg==, tarball: https://artifactory.navercorp.com:443/artifactory/api/npm/npm-naver/color-string/-/color-string-1.9.1.tgz}
+
+  color@4.2.3:
+    resolution: {integrity: sha512-1rXeuUUiGGrykh+CeBdu5Ie7OJwinCgQY0bc7GCRxy5xVHy+moaqkpL/jqQq0MtQOeYcrqEz4abc5f0KtU7W4A==, tarball: https://artifactory.navercorp.com:443/artifactory/api/npm/npm-naver/color/-/color-4.2.3.tgz}
+    engines: {node: '>=12.5.0'}
 
   commander@2.20.3:
     resolution: {integrity: sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==, tarball: https://artifactory.navercorp.com:443/artifactory/api/npm/npm-naver/commander/-/commander-2.20.3.tgz}
@@ -2299,6 +2312,9 @@ packages:
     resolution: {integrity: sha512-DDfANUiiG2wC1qawP66qlTugJeL5HyzMpfr8lLK+jMQirGzNod0B12cFB/9q838Ru27sBwfw78/rdoU7RERz6A==, tarball: https://artifactory.navercorp.com:443/artifactory/api/npm/npm-naver/is-array-buffer/-/is-array-buffer-3.0.5.tgz}
     engines: {node: '>= 0.4'}
 
+  is-arrayish@0.3.4:
+    resolution: {integrity: sha512-m6UrgzFVUYawGBh1dUsWR5M2Clqic9RVXC/9f8ceNlv2IcO9j9J/z8UoCLPqtsPBFNzEpfR3xftohbfqDx8EQA==, tarball: https://artifactory.navercorp.com:443/artifactory/api/npm/npm-naver/is-arrayish/-/is-arrayish-0.3.4.tgz}
+
   is-async-function@2.1.1:
     resolution: {integrity: sha512-9dgM/cZBnNvjzaMYHVoxxfPj2QXt22Ev7SuuPrs+xav0ukGB0S6d4ydZdEiM48kLx5kDV+QBPrpVnFyefL8kkQ==, tarball: https://artifactory.navercorp.com:443/artifactory/api/npm/npm-naver/is-async-function/-/is-async-function-2.1.1.tgz}
     engines: {node: '>= 0.4'}
@@ -2509,6 +2525,9 @@ packages:
   locate-path@6.0.0:
     resolution: {integrity: sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==, tarball: https://artifactory.navercorp.com:443/artifactory/api/npm/npm-naver/locate-path/-/locate-path-6.0.0.tgz}
     engines: {node: '>=10'}
+
+  lodash-es@4.17.22:
+    resolution: {integrity: sha512-XEawp1t0gxSi9x01glktRZ5HDy0HXqrM0x5pXQM98EaI0NxO6jVM7omDOxsuEo5UIASAnm2bRp1Jt/e0a2XU8Q==, tarball: https://artifactory.navercorp.com:443/artifactory/api/npm/npm-naver/lodash-es/-/lodash-es-4.17.22.tgz}
 
   lodash.debounce@4.0.8:
     resolution: {integrity: sha512-FT1yDzDYEoYWhnSGnpE/4Kj1fLZkDFyqRb7fNt6FdYOSxlUWAtp42Eh6Wb0rGIv/m9Bgo7x4GhQbm5Ys4SG5ow==, tarball: https://artifactory.navercorp.com:443/artifactory/api/npm/npm-naver/lodash.debounce/-/lodash.debounce-4.0.8.tgz}
@@ -2778,6 +2797,9 @@ packages:
   randombytes@2.1.0:
     resolution: {integrity: sha512-vYl3iOX+4CKUWuxGi9Ukhie6fsqXqS9FE2Zaic4tNFD2N2QQaXOMFbuKK4QmDHC0JO6B1Zp41J0LpT0oR68amQ==, tarball: https://artifactory.navercorp.com:443/artifactory/api/npm/npm-naver/randombytes/-/randombytes-2.1.0.tgz}
 
+  react-base16-styling@0.10.0:
+    resolution: {integrity: sha512-H1k2eFB6M45OaiRru3PBXkuCcn2qNmx+gzLb4a9IPMR7tMH8oBRXU5jGbPDYG1Hz+82d88ED0vjR8BmqU3pQdg==, tarball: https://artifactory.navercorp.com:443/artifactory/api/npm/npm-naver/react-base16-styling/-/react-base16-styling-0.10.0.tgz}
+
   react-dom@19.2.3:
     resolution: {integrity: sha512-yELu4WmLPw5Mr/lmeEpox5rw3RETacE++JgHqQzd2dg+YbJuat3jH4ingc+WPZhxaoFzdv9y33G+F7Nl5O0GBg==, tarball: https://artifactory.navercorp.com:443/artifactory/api/npm/npm-naver/react-dom/-/react-dom-19.2.3.tgz}
     peerDependencies:
@@ -2785,6 +2807,12 @@ packages:
 
   react-is@17.0.2:
     resolution: {integrity: sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==, tarball: https://artifactory.navercorp.com:443/artifactory/api/npm/npm-naver/react-is/-/react-is-17.0.2.tgz}
+
+  react-json-tree@0.20.0:
+    resolution: {integrity: sha512-h+f9fUNAxzBx1rbrgUF7+zSWKGHDtt2VPYLErIuB0JyKGnWgFMM21ksqQyb3EXwXNnoMW2rdE5kuAaubgGOx2Q==, tarball: https://artifactory.navercorp.com:443/artifactory/api/npm/npm-naver/react-json-tree/-/react-json-tree-0.20.0.tgz}
+    peerDependencies:
+      '@types/react': ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   react-json-view-lite@2.5.0:
     resolution: {integrity: sha512-tk7o7QG9oYyELWHL8xiMQ8x4WzjCzbWNyig3uexmkLb54r8jO0yH3WCWx8UZS0c49eSA4QUmG5caiRJ8fAn58g==, tarball: https://artifactory.navercorp.com:443/artifactory/api/npm/npm-naver/react-json-view-lite/-/react-json-view-lite-2.5.0.tgz}
@@ -2969,6 +2997,9 @@ packages:
   signal-exit@4.1.0:
     resolution: {integrity: sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw==, tarball: https://artifactory.navercorp.com:443/artifactory/api/npm/npm-naver/signal-exit/-/signal-exit-4.1.0.tgz}
     engines: {node: '>=14'}
+
+  simple-swizzle@0.2.4:
+    resolution: {integrity: sha512-nAu1WFPQSMNr2Zn9PGSZK9AGn4t/y97lEm+MXTtUDwfP0ksAIX4nO+6ruD9Jwut4C49SB1Ws+fbXsm/yScWOHw==, tarball: https://artifactory.navercorp.com:443/artifactory/api/npm/npm-naver/simple-swizzle/-/simple-swizzle-0.2.4.tgz}
 
   smob@1.5.0:
     resolution: {integrity: sha512-g6T+p7QO8npa+/hNx9ohv1E5pVCmWrVCUzUXJyLdMmftX6ER0oiWY/w9knEonLpnOp6b6FenKnMfR8gqwWdwig==, tarball: https://artifactory.navercorp.com:443/artifactory/api/npm/npm-naver/smob/-/smob-1.5.0.tgz}
@@ -4843,6 +4874,8 @@ snapshots:
 
   '@types/json-schema@7.0.15': {}
 
+  '@types/lodash@4.17.21': {}
+
   '@types/node@24.10.4':
     dependencies:
       undici-types: 7.16.0
@@ -5339,6 +5372,16 @@ snapshots:
       color-name: 1.1.4
 
   color-name@1.1.4: {}
+
+  color-string@1.9.1:
+    dependencies:
+      color-name: 1.1.4
+      simple-swizzle: 0.2.4
+
+  color@4.2.3:
+    dependencies:
+      color-convert: 2.0.1
+      color-string: 1.9.1
 
   commander@2.20.3: {}
 
@@ -5978,6 +6021,8 @@ snapshots:
       call-bound: 1.0.4
       get-intrinsic: 1.3.0
 
+  is-arrayish@0.3.4: {}
+
   is-async-function@2.1.1:
     dependencies:
       async-function: 1.0.0
@@ -6186,6 +6231,8 @@ snapshots:
   locate-path@6.0.0:
     dependencies:
       p-locate: 5.0.0
+
+  lodash-es@4.17.22: {}
 
   lodash.debounce@4.0.8: {}
 
@@ -6414,12 +6461,26 @@ snapshots:
     dependencies:
       safe-buffer: 5.2.1
 
+  react-base16-styling@0.10.0:
+    dependencies:
+      '@types/lodash': 4.17.21
+      color: 4.2.3
+      csstype: 3.2.3
+      lodash-es: 4.17.22
+
   react-dom@19.2.3(react@19.2.3):
     dependencies:
       react: 19.2.3
       scheduler: 0.27.0
 
   react-is@17.0.2: {}
+
+  react-json-tree@0.20.0(@types/react@19.2.7)(react@19.2.3):
+    dependencies:
+      '@types/lodash': 4.17.21
+      '@types/react': 19.2.7
+      react: 19.2.3
+      react-base16-styling: 0.10.0
 
   react-json-view-lite@2.5.0(react@19.2.3):
     dependencies:
@@ -6644,6 +6705,10 @@ snapshots:
   siginfo@2.0.0: {}
 
   signal-exit@4.1.0: {}
+
+  simple-swizzle@0.2.4:
+    dependencies:
+      is-arrayish: 0.3.4
 
   smob@1.5.0: {}
 

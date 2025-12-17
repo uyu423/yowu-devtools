@@ -4,22 +4,37 @@
  * Compare API responses from two domains
  */
 
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import { GitCompare } from 'lucide-react';
+import { toast } from 'sonner';
 import { useToolState } from '@/hooks/useToolState';
+import { useShareModal } from '@/hooks/useShareModal';
 import { useTitle } from '@/hooks/useTitle';
 import { useI18n } from '@/hooks/useI18nHooks';
 import { ToolHeader } from '@/components/common/ToolHeader';
+import { ShareModal } from '@/components/common/ShareModal';
 import type { ToolDefinition } from '../types';
 import type { ApiDiffState, HttpMethod, KeyValuePair, ResponseTab } from './types';
 import { DEFAULT_STATE, createEmptyKeyValue } from './constants';
-import { TopSharedPanel, SidePanel, ResultBanner } from './components';
+import { TopSharedPanel, SidePanel, ResultBanner, HistorySidebar } from './components';
 import { compareResponses } from './utils';
-import { useDomainPresets } from './hooks';
+import { useDomainPresets, useApiDiffExecutor, useHistory } from './hooks';
+import { CorsModal } from '../api-tester/components';
+import { useCorsAllowlist } from '../api-tester/hooks';
+
+// Note: Data transfer from API Tester is handled via location.state in useToolState
 
 const ApiDiffTool: React.FC = () => {
   const { t } = useI18n();
   useTitle(t('tool.apiDiff.title'));
+
+  // History sidebar visibility state
+  const [showHistory, setShowHistory] = useState(false);
+
+  // Toggle history sidebar
+  const handleToggleHistory = useCallback(() => {
+    setShowHistory((prev) => !prev);
+  }, []);
 
   // Domain presets
   const {
@@ -31,7 +46,33 @@ const ApiDiffTool: React.FC = () => {
     importPresets,
   } = useDomainPresets();
 
-  const { state, updateState, copyShareLink } =
+  // API executor
+  const {
+    isLoading,
+    executeRequests,
+    cancelRequests,
+    extensionStatus,
+    checkExtension,
+  } = useApiDiffExecutor();
+
+  // CORS allowlist
+  const { isAllowed: isCorsAllowed, addOrigin: addCorsOrigin } = useCorsAllowlist();
+
+  // CORS modal state
+  const [corsModalOpen, setCorsModalOpen] = useState(false);
+  const [pendingCorsRetry, setPendingCorsRetry] = useState(false);
+  const pendingCorsUrlRef = useRef<string | null>(null);
+
+  // History
+  const {
+    items: historyItems,
+    addItem: addHistoryItem,
+    deleteItem: deleteHistoryItem,
+    clearAll: clearAllHistory,
+    loadItem: loadHistoryItem,
+  } = useHistory();
+
+  const { state, updateState, copyShareLink, shareViaWebShare, getShareStateInfo } =
     useToolState<ApiDiffState>('api-diff', DEFAULT_STATE, {
       shareStateFilter: ({
         method,
@@ -52,63 +93,122 @@ const ApiDiffTool: React.FC = () => {
       }),
     });
 
+  const { handleShare, shareModalProps } = useShareModal({
+    copyShareLink,
+    shareViaWebShare,
+    getShareStateInfo,
+    toolName: t('tool.apiDiff.title'),
+  });
+
   // Comparison result
   const comparison = useMemo(() => {
     if (!state.responseA && !state.responseB) return null;
     return compareResponses(state.responseA, state.responseB);
   }, [state.responseA, state.responseB]);
 
-  // Handle execute (placeholder - will be implemented with Extension)
-  const handleExecute = useCallback(() => {
-    if (state.isExecuting) {
+  // Check if response has CORS error (only for direct mode requests)
+  const hasCorsError =
+    (state.responseA?.error?.code === 'CORS_ERROR' && state.responseA?.method === 'direct') ||
+    (state.responseB?.error?.code === 'CORS_ERROR' && state.responseB?.method === 'direct');
+
+  // Determine which URL had CORS error
+  const corsErrorUrl = useMemo(() => {
+    if (state.responseA?.error?.code === 'CORS_ERROR') {
+      return state.domainA;
+    }
+    if (state.responseB?.error?.code === 'CORS_ERROR') {
+      return state.domainB;
+    }
+    return null;
+  }, [state.responseA, state.responseB, state.domainA, state.domainB]);
+
+  // Show CORS modal when CORS error detected
+  const prevHasCorsError = useRef(false);
+  useEffect(() => {
+    // Only show modal when CORS error transitions from false to true
+    if (hasCorsError && !prevHasCorsError.current && !pendingCorsRetry) {
+      pendingCorsUrlRef.current = corsErrorUrl;
+      // Use setTimeout to avoid synchronous setState
+      const timeoutId = setTimeout(() => setCorsModalOpen(true), 0);
+      return () => clearTimeout(timeoutId);
+    }
+    prevHasCorsError.current = hasCorsError;
+  }, [hasCorsError, corsErrorUrl, pendingCorsRetry]);
+
+  // Handle execute with automatic CORS bypass for allowed origins
+  const handleExecute = useCallback(async (forceExtension = false) => {
+    if (isLoading) {
       // Cancel
+      cancelRequests();
       updateState({ isExecuting: false });
       return;
     }
 
     // Validation
     if (!state.path.trim()) {
-      alert('Please enter a path');
+      toast.error(t('tool.apiDiff.validation.pathRequired'));
       return;
     }
     if (!state.domainA.trim() || !state.domainB.trim()) {
-      alert('Please enter both domains');
+      toast.error(t('tool.apiDiff.validation.domainsRequired'));
       return;
     }
 
-    // For now, just set executing state (actual request will be implemented later)
+    // Reset CORS retry state
+    setPendingCorsRetry(false);
+
+    // Check if domains are in CORS allowlist - use extension automatically
+    const shouldUseExtension =
+      forceExtension ||
+      (isCorsAllowed(state.domainA) && extensionStatus === 'connected') ||
+      (isCorsAllowed(state.domainB) && extensionStatus === 'connected');
+
+    // Set executing state
     updateState({
       isExecuting: true,
       responseA: null,
       responseB: null,
     });
 
-    // Simulate request completion after 1 second (placeholder)
-    setTimeout(() => {
+    try {
+      const { responseA, responseB } = await executeRequests(state, shouldUseExtension);
       updateState({
         isExecuting: false,
-        // Mock responses for UI testing
-        responseA: {
-          ok: true,
-          status: 200,
-          elapsedMs: 150,
-          sizeBytes: 1024,
-          headers: { 'content-type': 'application/json' },
-          rawBody: '{"message": "Hello from A", "data": {"id": 1, "name": "Test"}}',
-          parsedJson: { message: 'Hello from A', data: { id: 1, name: 'Test' } },
-        },
-        responseB: {
-          ok: true,
-          status: 200,
-          elapsedMs: 180,
-          sizeBytes: 1048,
-          headers: { 'content-type': 'application/json' },
-          rawBody: '{"message": "Hello from B", "data": {"id": 1, "name": "Test Modified"}}',
-          parsedJson: { message: 'Hello from B', data: { id: 1, name: 'Test Modified' } },
-        },
+        responseA,
+        responseB,
       });
-    }, 1000);
-  }, [state.isExecuting, state.path, state.domainA, state.domainB, updateState]);
+      // Add to history on success
+      addHistoryItem(state);
+    } catch (error) {
+      console.error('Request execution failed:', error);
+      updateState({ isExecuting: false });
+      toast.error(error instanceof Error ? error.message : 'Request failed');
+    }
+  }, [isLoading, state, cancelRequests, executeRequests, updateState, addHistoryItem, t, isCorsAllowed, extensionStatus]);
+
+  // Handle retry with extension (from CORS modal)
+  const handleRetryWithExtension = useCallback(
+    async (rememberChoice: boolean) => {
+      setCorsModalOpen(false);
+      setPendingCorsRetry(true);
+
+      // Clear previous responses
+      updateState({
+        responseA: null,
+        responseB: null,
+      });
+
+      // Add to CORS allowlist if user chose to remember
+      if (rememberChoice) {
+        addCorsOrigin(state.domainA);
+        addCorsOrigin(state.domainB);
+      }
+
+      // Retry with extension
+      handleExecute(true);
+    },
+    [state.domainA, state.domainB, updateState, addCorsOrigin, handleExecute]
+  );
 
   // Handle reset
   const handleReset = useCallback(() => {
@@ -118,6 +218,33 @@ const ApiDiffTool: React.FC = () => {
       headers: [createEmptyKeyValue()],
     });
   }, [updateState]);
+
+  // Handle history item select
+  const handleHistorySelect = useCallback(
+    (item: import('./types').HistoryItem) => {
+      const loadedState = loadHistoryItem(item);
+      if (loadedState) {
+        updateState({
+          ...loadedState,
+          // Ensure params and headers have at least one empty row
+          params:
+            loadedState.params && loadedState.params.length > 0
+              ? loadedState.params
+              : [createEmptyKeyValue()],
+          headers:
+            loadedState.headers && loadedState.headers.length > 0
+              ? loadedState.headers
+              : [createEmptyKeyValue()],
+          // Reset response state
+          responseA: null,
+          responseB: null,
+          isExecuting: false,
+        });
+        toast.success(t('tool.apiDiff.history.loaded'));
+      }
+    },
+    [loadHistoryItem, updateState, t]
+  );
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -183,17 +310,12 @@ const ApiDiffTool: React.FC = () => {
         title={t('tool.apiDiff.title')}
         description={t('tool.apiDiff.description')}
         onReset={handleReset}
-        onShare={copyShareLink}
+        onShare={handleShare}
       />
+      <ShareModal {...shareModalProps} />
 
       {/* Content */}
       <div className="flex-1 space-y-4">
-        {/* Result Banner */}
-        <ResultBanner
-          comparison={comparison}
-          hasResponses={!!(state.responseA || state.responseB)}
-        />
-
         {/* Top Shared Panel (C영역) */}
         <TopSharedPanel
           domainA={state.domainA}
@@ -212,12 +334,24 @@ const ApiDiffTool: React.FC = () => {
           onHeadersChange={handleHeadersChange}
           onBodyChange={handleBodyChange}
           onExecute={handleExecute}
+          includeCookies={state.includeCookies}
+          onIncludeCookiesChange={(includeCookies) => updateState({ includeCookies })}
           presets={presets}
           onAddPreset={addPreset}
           onRemovePreset={removePreset}
           onClearAllPresets={clearAllPresets}
           onExportPresets={exportPresets}
           onImportPresets={importPresets}
+          extensionStatus={extensionStatus}
+          onCheckExtension={checkExtension}
+        />
+
+        {/* Result Banner - between input and response panels */}
+        <ResultBanner
+          comparison={comparison}
+          hasResponses={!!(state.responseA || state.responseB)}
+          rawBodyA={state.responseA?.rawBody}
+          rawBodyB={state.responseB?.rawBody}
         />
 
         {/* Side Panels (A/B 영역) */}
@@ -233,6 +367,7 @@ const ApiDiffTool: React.FC = () => {
             params={state.params}
             headers={state.headers}
             body={state.body}
+            differentFields={comparison?.differentFields}
           />
           <SidePanel
             side="B"
@@ -245,9 +380,29 @@ const ApiDiffTool: React.FC = () => {
             params={state.params}
             headers={state.headers}
             body={state.body}
+            differentFields={comparison?.differentFields}
           />
         </div>
       </div>
+
+      {/* History Sidebar - Overlay */}
+      <HistorySidebar
+        items={historyItems}
+        onSelect={handleHistorySelect}
+        onDelete={deleteHistoryItem}
+        onClearAll={clearAllHistory}
+        isOpen={showHistory}
+        onToggle={handleToggleHistory}
+      />
+
+      {/* CORS Error Modal */}
+      <CorsModal
+        isOpen={corsModalOpen}
+        onClose={() => setCorsModalOpen(false)}
+        onRetryWithExtension={handleRetryWithExtension}
+        extensionStatus={extensionStatus}
+        targetUrl={corsErrorUrl || undefined}
+      />
     </div>
   );
 };
