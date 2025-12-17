@@ -56,6 +56,91 @@ function isOriginAllowed(origin: string | undefined): boolean {
 }
 
 // =============================================================================
+// Dynamic Rule Management
+// =============================================================================
+
+/**
+ * Generate a unique rule ID from a domain string.
+ * Uses a simple hash function to convert domain to a positive integer.
+ * Rule IDs start from 1000 to avoid conflicts with any static rules.
+ */
+function getDomainRuleId(domain: string): number {
+  let hash = 0;
+  for (let i = 0; i < domain.length; i++) {
+    const char = domain.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  // Ensure positive number and add offset to avoid conflicts
+  return Math.abs(hash) % 100000 + 1000;
+}
+
+/**
+ * Add dynamic rule to modify headers for a specific domain.
+ * This rule only applies to requests targeting the specified domain.
+ */
+async function addDynamicRuleForDomain(origin: string): Promise<void> {
+  try {
+    const url = new URL(origin);
+    const domain = url.hostname;
+    const ruleId = getDomainRuleId(domain);
+
+    console.log('[Extension] Adding dynamic rule for domain:', domain, 'ruleId:', ruleId);
+
+    // Remove existing rule with same ID first (if any)
+    await chrome.declarativeNetRequest.updateDynamicRules({
+      removeRuleIds: [ruleId],
+      addRules: [
+        {
+          id: ruleId,
+          priority: 1,
+          action: {
+            type: chrome.declarativeNetRequest.RuleActionType.MODIFY_HEADERS,
+            requestHeaders: [
+              { header: 'origin', operation: chrome.declarativeNetRequest.HeaderOperation.REMOVE },
+              { header: 'sec-fetch-site', operation: chrome.declarativeNetRequest.HeaderOperation.SET, value: 'none' },
+              { header: 'sec-fetch-mode', operation: chrome.declarativeNetRequest.HeaderOperation.SET, value: 'cors' },
+            ],
+          },
+          condition: {
+            requestDomains: [domain],
+            resourceTypes: [
+              chrome.declarativeNetRequest.ResourceType.XMLHTTPREQUEST,
+              chrome.declarativeNetRequest.ResourceType.OTHER,
+            ],
+          },
+        },
+      ],
+    });
+
+    console.log('[Extension] Dynamic rule added successfully for:', domain);
+  } catch (err) {
+    console.error('[Extension] Failed to add dynamic rule:', err);
+  }
+}
+
+/**
+ * Remove dynamic rule for a specific domain.
+ */
+async function removeDynamicRuleForDomain(origin: string): Promise<void> {
+  try {
+    const url = new URL(origin);
+    const domain = url.hostname;
+    const ruleId = getDomainRuleId(domain);
+
+    console.log('[Extension] Removing dynamic rule for domain:', domain, 'ruleId:', ruleId);
+
+    await chrome.declarativeNetRequest.updateDynamicRules({
+      removeRuleIds: [ruleId],
+    });
+
+    console.log('[Extension] Dynamic rule removed successfully for:', domain);
+  } catch (err) {
+    console.error('[Extension] Failed to remove dynamic rule:', err);
+  }
+}
+
+// =============================================================================
 // Permission Management
 // =============================================================================
 
@@ -103,9 +188,16 @@ async function requestPermission(origin: string): Promise<boolean> {
     const patterns = getPermissionPatterns(origin);
     console.log('[Extension] Requesting permissions for patterns:', patterns);
     
-    return await chrome.permissions.request({
+    const granted = await chrome.permissions.request({
       origins: patterns,
     });
+
+    // If permission granted, add dynamic rule for CORS bypass
+    if (granted) {
+      await addDynamicRuleForDomain(origin);
+    }
+
+    return granted;
   } catch (err) {
     console.error('[Extension] Permission request failed:', err);
     return false;
@@ -115,9 +207,16 @@ async function requestPermission(origin: string): Promise<boolean> {
 async function revokePermission(origin: string): Promise<boolean> {
   try {
     const pattern = `${origin}/*`;
-    return await chrome.permissions.remove({
+    const revoked = await chrome.permissions.remove({
       origins: [pattern],
     });
+
+    // If permission revoked, remove dynamic rule
+    if (revoked) {
+      await removeDynamicRuleForDomain(origin);
+    }
+
+    return revoked;
   } catch {
     return false;
   }
@@ -504,6 +603,35 @@ chrome.action.onClicked.addListener(() => {
 // =============================================================================
 // Service Worker Lifecycle
 // =============================================================================
+
+/**
+ * Sync dynamic rules with granted permissions on startup.
+ * This ensures rules exist for all domains that have been granted permission.
+ */
+async function syncDynamicRulesWithPermissions(): Promise<void> {
+  try {
+    const origins = await getGrantedOrigins();
+    console.log('[Extension] Syncing dynamic rules for granted origins:', origins);
+
+    for (const origin of origins) {
+      // Skip wildcard patterns
+      if (origin.includes('*')) continue;
+      
+      try {
+        await addDynamicRuleForDomain(origin);
+      } catch (err) {
+        console.error('[Extension] Failed to add rule for:', origin, err);
+      }
+    }
+
+    console.log('[Extension] Dynamic rules sync completed');
+  } catch (err) {
+    console.error('[Extension] Failed to sync dynamic rules:', err);
+  }
+}
+
+// Sync rules on startup
+syncDynamicRulesWithPermissions();
 
 console.log('[Extension] Yowu DevTools Companion v' + PROTOCOL_VERSION + ' initialized');
 

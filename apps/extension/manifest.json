@@ -23,19 +23,9 @@
     "default_title": "Yowu DevTools Companion - Click for settings"
   },
 
-  "permissions": ["storage", "declarativeNetRequest", "cookies"],
+  "permissions": ["storage", "cookies", "declarativeNetRequest"],
 
   "optional_host_permissions": ["http://*/*", "https://*/*"],
-
-  "declarative_net_request": {
-    "rule_resources": [
-      {
-        "id": "ruleset_remove_origin",
-        "enabled": true,
-        "path": "rules/remove-origin.json"
-      }
-    ]
-  },
 
   "background": {
     "service_worker": "src/service-worker.ts",

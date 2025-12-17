@@ -37,12 +37,11 @@ Specifically, it:
 - Removes the Origin header from requests
 - Modifies Sec-Fetch-Site and Sec-Fetch-Mode headers
 
-This allows users to test APIs that have restrictive CORS policies which would otherwise reject requests based on Origin header checks. Many API servers are configured to only accept requests from specific origins, and this modification enables developers to test these APIs directly from the browser.
-
 **Key points:**
 
-- Header modifications only apply to API requests initiated by the user through the extension
-- No user data is collected, stored, or transmitted
+- Header modifications are applied using **dynamic rules** that are created only when a user grants permission for a specific domain
+- Rules are automatically removed when permission is revoked
+- **No rules are applied to other websites** - only domains explicitly approved by the user are affected
 - This is a common requirement for API testing tools to function properly
 
 ## Data Handling
