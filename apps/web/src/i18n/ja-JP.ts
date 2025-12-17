@@ -1039,10 +1039,43 @@ export const jaJP = {
       description:
         '無料オンライン文字列長計算機。テキストやファイルの文字、単語、行、バイト（UTF-8）数を計算します。ファイルアップロードとURLロードをサポート。',
     },
+    curl: {
+      title: 'cURL Parser',
+      description: 'cURLコマンドを解析して視覚化します',
+      pasteHint: 'cURLコマンドを貼り付け',
+      placeholder: 'curl -X POST https://api.example.com/v1/users -H "Content-Type: application/json" -d \'{"name":"John"}\'',
+      parse: '解析',
+      parseSuccess: 'cURLコマンドが正常に解析されました',
+      openInApiTester: 'API Testerで開く',
+      requestSummary: 'リクエスト概要',
+      queryParams: 'クエリパラメータ',
+      headers: 'ヘッダー',
+      cookies: 'クッキー',
+      body: 'ボディ',
+      options: 'cURLオプション',
+      warnings: '警告',
+    },
     apiTester: {
       title: 'API Tester',
       description:
         '無料オンラインAPIテスター。すべてのHTTPメソッド、ヘッダー、ボディをサポートし、拡張機能でCORS回避が可能です。',
+      curlPaste: {
+        applied: 'cURLが解析されて適用されました',
+        failed: 'cURL解析に失敗しました',
+        pasteAsUrl: 'URLとして貼り付け',
+        undo: '元に戻す',
+      },
+    },
+  },
+  curl: {
+    warning: {
+      unsupportedFile: 'ファイルベースのオプションはサポートされていません。内容を直接貼り付けてください。',
+      shellExpansion: 'シェル展開が検出されました。変数置換はサポートされていません。',
+      configFile: '設定ファイルはサポートされていません。コマンドを直接貼り付けてください。',
+      variableSubstitution: '変数置換はサポートされていません。',
+      insecureTLS: '非セキュアTLS (-k)はブラウザでサポートされていません。ローカルテストにはExtensionモードを使用してください。',
+      unsupportedCookieFile: 'クッキーファイルはサポートされていません。クッキー文字列を直接貼り付けてください。',
+      unsupportedDataFile: 'データファイルはサポートされていません。データを直接貼り付けてください。',
     },
   },
 } as const satisfies I18nResource;

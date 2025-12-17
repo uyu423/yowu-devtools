@@ -970,10 +970,43 @@ export const zhCN = {
       description:
         '免费在线字符串长度计算器。计算文本或文件的字符、单词、行和字节（UTF-8）数。支持文件上传和URL加载。',
     },
+    curl: {
+      title: 'cURL Parser',
+      description: '解析和可视化cURL命令',
+      pasteHint: '粘贴cURL命令',
+      placeholder: 'curl -X POST https://api.example.com/v1/users -H "Content-Type: application/json" -d \'{"name":"John"}\'',
+      parse: '解析',
+      parseSuccess: 'cURL命令已成功解析',
+      openInApiTester: '在API Tester中打开',
+      requestSummary: '请求摘要',
+      queryParams: '查询参数',
+      headers: '请求头',
+      cookies: 'Cookie',
+      body: '请求体',
+      options: 'cURL选项',
+      warnings: '警告',
+    },
     apiTester: {
       title: 'API Tester',
       description:
         '免费在线API测试工具。支持所有HTTP方法、请求头、请求体，通过扩展实现CORS绕过。',
+      curlPaste: {
+        applied: 'cURL已解析并应用',
+        failed: 'cURL解析失败',
+        pasteAsUrl: '作为URL粘贴',
+        undo: '撤销',
+      },
+    },
+  },
+  curl: {
+    warning: {
+      unsupportedFile: '不支持基于文件的选项。请直接粘贴内容。',
+      shellExpansion: '检测到Shell扩展。不支持变量替换。',
+      configFile: '不支持配置文件。请直接粘贴命令。',
+      variableSubstitution: '不支持变量替换。',
+      insecureTLS: '不安全的TLS (-k)在浏览器中不受支持。本地测试请使用Extension模式。',
+      unsupportedCookieFile: '不支持Cookie文件。请直接粘贴Cookie字符串。',
+      unsupportedDataFile: '不支持数据文件。请直接粘贴数据。',
     },
   },
 } as const satisfies I18nResource;

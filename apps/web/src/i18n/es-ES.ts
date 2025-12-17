@@ -1086,10 +1086,43 @@ export const esES = {
       description:
         'Calculadora de longitud de cadena online gratuita. Cuenta caracteres, palabras, líneas y bytes (UTF-8) de texto o archivos. Soporta carga de archivos y URL.',
     },
+    curl: {
+      title: 'cURL Parser',
+      description: 'Analizar y visualizar comandos cURL',
+      pasteHint: 'Pegar comando cURL',
+      placeholder: 'curl -X POST https://api.example.com/v1/users -H "Content-Type: application/json" -d \'{"name":"John"}\'',
+      parse: 'Analizar',
+      parseSuccess: 'Comando cURL analizado correctamente',
+      openInApiTester: 'Abrir en API Tester',
+      requestSummary: 'Resumen de solicitud',
+      queryParams: 'Parámetros de consulta',
+      headers: 'Encabezados',
+      cookies: 'Cookies',
+      body: 'Cuerpo',
+      options: 'Opciones cURL',
+      warnings: 'Advertencias',
+    },
     apiTester: {
       title: 'API Tester',
       description:
         'Probador de API online gratuito. Construye y envía solicitudes HTTP con soporte para todos los métodos, encabezados, cuerpo y bypass de CORS mediante extensión.',
+      curlPaste: {
+        applied: 'cURL analizado y aplicado',
+        failed: 'Error al analizar cURL',
+        pasteAsUrl: 'Pegar como URL',
+        undo: 'Deshacer',
+      },
+    },
+  },
+  curl: {
+    warning: {
+      unsupportedFile: 'Las opciones basadas en archivos no son compatibles. Por favor, pegue el contenido directamente.',
+      shellExpansion: 'Expansión de shell detectada. La sustitución de variables no es compatible.',
+      configFile: 'El archivo de configuración no es compatible. Por favor, pegue el comando directamente.',
+      variableSubstitution: 'La sustitución de variables no es compatible.',
+      insecureTLS: 'TLS inseguro (-k) no es compatible en el navegador. Use el modo Extension para pruebas locales.',
+      unsupportedCookieFile: 'El archivo de cookies no es compatible. Por favor, pegue la cadena de cookies directamente.',
+      unsupportedDataFile: 'El archivo de datos no es compatible. Por favor, pegue los datos directamente.',
     },
   },
 } as const satisfies I18nResource;

@@ -1045,10 +1045,43 @@ export const koKR = {
       description:
         '무료 온라인 문자열 길이 계산기. 텍스트의 문자 수, 단어 수, 줄 수, 바이트 수를 계산합니다.',
     },
+    curl: {
+      title: 'cURL Parser',
+      description: 'cURL 명령어를 파싱하고 시각화합니다',
+      pasteHint: 'cURL 명령어 붙여넣기',
+      placeholder: 'curl -X POST https://api.example.com/v1/users -H "Content-Type: application/json" -d \'{"name":"John"}\'',
+      parse: '파싱',
+      parseSuccess: 'cURL 명령어가 성공적으로 파싱되었습니다',
+      openInApiTester: 'API Tester에서 열기',
+      requestSummary: '요청 요약',
+      queryParams: '쿼리 파라미터',
+      headers: '헤더',
+      cookies: '쿠키',
+      body: '바디',
+      options: 'cURL 옵션',
+      warnings: '경고',
+    },
     apiTester: {
       title: 'API Tester',
       description:
         '무료 온라인 API 테스터. 모든 HTTP 메서드, 헤더, 바디를 지원하고 확장 프로그램을 통해 CORS 우회가 가능합니다.',
+      curlPaste: {
+        applied: 'cURL이 파싱되어 적용되었습니다',
+        failed: 'cURL 파싱 실패',
+        pasteAsUrl: 'URL로 붙여넣기',
+        undo: '실행 취소',
+      },
+    },
+  },
+  curl: {
+    warning: {
+      unsupportedFile: '파일 기반 옵션은 지원되지 않습니다. 내용을 직접 붙여넣어주세요.',
+      shellExpansion: '쉘 확장이 감지되었습니다. 변수 치환은 지원되지 않습니다.',
+      configFile: '설정 파일은 지원되지 않습니다. 명령어를 직접 붙여넣어주세요.',
+      variableSubstitution: '변수 치환은 지원되지 않습니다.',
+      insecureTLS: '비보안 TLS (-k)는 브라우저에서 지원되지 않습니다. 로컬 테스트는 Extension 모드를 사용하세요.',
+      unsupportedCookieFile: '쿠키 파일은 지원되지 않습니다. 쿠키 문자열을 직접 붙여넣어주세요.',
+      unsupportedDataFile: '데이터 파일은 지원되지 않습니다. 데이터를 직접 붙여넣어주세요.',
     },
   },
 } as const satisfies I18nResource;
