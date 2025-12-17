@@ -21,6 +21,7 @@
 개발자들이 API 테스트를 위해 cURL 커맨드를 복사하여 사용하는 경우가 많습니다. 하지만 기존 API Tester에서는 cURL 커맨드를 수동으로 파싱하여 폼에 입력해야 하는 불편함이 있었습니다.
 
 **사용자 시나리오**:
+
 1. 개발자가 브라우저 DevTools나 Postman에서 cURL 커맨드를 복사
 2. cURL 커맨드를 구조화하여 확인하고 싶음
 3. API Tester에서 동일한 요청을 재현하고 싶음
@@ -29,10 +30,12 @@
 ### 0.2 v1.4.1 목표
 
 1. **신규 Tool: cURL Parser 추가**
+
    - 사용자가 복사한 `curl ...` 커맨드를 붙여넣으면 요청 요소(URL/메서드/헤더/쿠키/바디/옵션)를 구조화해 보여줌
    - 파싱 결과를 API Tester로 즉시 열기 기능 제공
 
 2. **API Tester 고도화: cURL 붙여넣기 지원**
+
    - URL 입력창에 `curl ...`을 붙여넣으면 자동 파싱 → 폼 자동 채움
    - 일반 URL 붙여넣기는 기존대로 동작
 
@@ -47,12 +50,14 @@
 ### 1.1 In Scope
 
 - ✨ **신규 Tool: cURL Parser**
+
   - cURL 커맨드 파싱 및 구조화 표시
   - "Open in API Tester" 연동 기능
   - URL 인코딩/디코딩 표시 옵션
   - Cookie 상세 파싱
 
 - 🔧 **API Tester 고도화**
+
   - URL 입력창에서 cURL 붙여넣기 지원
   - 자동 파싱 및 폼 자동 채움
 
@@ -133,16 +138,19 @@
 섹션을 접기/펼치기로 제공 (모바일 고려)
 
 **1. Request Summary**
+
 - Method
 - URL (원본/디코드 표시 토글)
 - "Open in API Tester" 버튼
 - "Copy as JSON" (요청 모델 export, 선택)
 
 **2. Query Params**
+
 - key/value 테이블 + enable 토글 (기본 true)
 - decode 표시/encode export 옵션 반영
 
 **3. Headers**
+
 - key/value 테이블
 - 헤더 그룹 분리 (권장):
   - General (Accept 등)
@@ -151,6 +159,7 @@
 - 민감 헤더 마스킹 표시 (옵션에 따라)
 
 **4. Cookies (상세 파싱)**
+
 - 소스: `-b/--cookie` 또는 `-H 'cookie: ...'`
 - "Cookie string" 원문 표시 + 파싱된 key/value 테이블
 - 지원:
@@ -160,6 +169,7 @@
   - `-b cookiefile.txt` 형태는 "파일 기반"으로 간주 → **지원 불가 경고 + 수동 붙여넣기 안내**
 
 **5. Body**
+
 - Body type 추론:
   - JSON (헤더/내용 기반)
   - raw text
@@ -169,10 +179,12 @@
 - 파일 첨부 (`-F file=@path`)는 "로컬 파일 경로"만 존재 → **지원 불가 경고 + API Tester에서 파일 다시 선택 안내**
 
 **6. cURL Options**
+
 - `--compressed`, `--location`, `--insecure`, `--http2`, `--resolve` 등
 - v1.4.1에서는 "표시 + 일부만 API Tester에 맵핑" (아래 매핑 규칙 참조)
 
 **7. Parse Warnings / Unsupported**
+
 - 지원 불가/부분 지원 케이스를 목록으로 명확히 표시
 - 예: `--data @file`, `-K config`, 변수 `$TOKEN`, `$(...)`, 복잡한 quoting 등
 
@@ -181,24 +193,30 @@
 #### 4.2.1 최소 지원 (필수)
 
 **URL**
+
 - 마지막 URL 토큰 또는 `curl 'https://...'` 형태
 
 **Method**
+
 - `-X/--request`
 - Body가 존재하고 `-X`가 없으면 기본 `POST`로 추론 (단, `-G`가 있으면 GET 우선)
 
 **Headers**
+
 - `-H/--header` 반복 지원
 
 **Cookies**
+
 - `-b/--cookie` (string 형태만)
 - `-H "Cookie: ..."`도 인식
 
 **Body**
+
 - `-d/--data`, `--data-raw`, `--data-binary`, `--data-urlencode`
 - `-F/--form` (텍스트 필드만 완전 지원, 파일은 부분 지원/경고)
 
 **기타 옵션 (표시만)**
+
 - `-L/--location` (redirect)
 - `--compressed`
 - `-k/--insecure`
@@ -217,28 +235,39 @@ type CurlParseResult = {
   original: string;
   normalized: string; // 라인 컨티뉴 제거, 토큰 정리된 형태 (선택)
   request: {
-    method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS";
-    url: string;              // raw
-    urlDecoded?: string;      // display용
+    method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'HEAD' | 'OPTIONS';
+    url: string; // raw
+    urlDecoded?: string; // display용
     query: Array<{ key: string; value: string; enabled: boolean }>;
-    headers: Array<{ key: string; value: string; enabled: boolean; sensitive?: boolean }>;
+    headers: Array<{
+      key: string;
+      value: string;
+      enabled: boolean;
+      sensitive?: boolean;
+    }>;
     cookies?: {
       raw: string;
       items: Array<{ key: string; value: string; sensitive?: boolean }>;
-      source: "cookie-flag" | "cookie-header";
+      source: 'cookie-flag' | 'cookie-header';
     };
     body?: {
-      kind: "none" | "text" | "json" | "urlencoded" | "multipart";
+      kind: 'none' | 'text' | 'json' | 'urlencoded' | 'multipart';
       text?: string; // raw/json
       urlencodedItems?: Array<{ key: string; value: string }>;
       multipartItems?: Array<
-        | { kind: "field"; key: string; value: string }
-        | { kind: "file"; key: string; filename?: string; path?: string; note: "unsupported-file-path" }
+        | { kind: 'field'; key: string; value: string }
+        | {
+            kind: 'file';
+            key: string;
+            filename?: string;
+            path?: string;
+            note: 'unsupported-file-path';
+          }
       >;
     };
     options: {
-      followRedirects?: boolean;   // -L
-      insecureTLS?: boolean;       // -k
+      followRedirects?: boolean; // -L
+      insecureTLS?: boolean; // -k
       compressed?: boolean;
       basicAuth?: { user: string; password: string }; // -u (가능한 경우)
     };
@@ -257,10 +286,12 @@ type CurlParseResult = {
 #### 4.4.2 데이터 전달 방식
 
 **권장: 앱 내부 상태 전달**
+
 - 예: store/context 사용 + fallback으로 sessionStorage
 - URL에 민감 데이터가 남지 않음
 
 **대안: 기존 share payload 포맷 재사용**
+
 - "민감정보 제외" 기본 적용
 
 #### 4.4.3 민감정보 정책
@@ -296,6 +327,7 @@ type CurlParseResult = {
 `CurlParseResult.request` → API Tester form state 로 매핑
 
 **필수 매핑**
+
 - `method` → method
 - `url/query` → URL + query table
 - `headers` (쿠키 포함) → headers table
@@ -306,6 +338,7 @@ type CurlParseResult = {
   - `multipart` → Body (multipart) (file은 미지원/placeholder)
 
 **옵션 매핑 (가능한 것만)**
+
 - `followRedirects` (-L) → "Follow redirects" 옵션
 - `insecureTLS` (-k) → (브라우저 fetch는 TLS 검증 비활성화 불가)
   - **적용 불가 경고** + "Extension 모드/로컬 환경에서만 의미" 안내
@@ -331,6 +364,7 @@ type CurlParseResult = {
 ### 6.2 신규 문자열 키 추가 범위 (예시)
 
 **cURL Parser 관련**:
+
 - `tool.curl.title`
 - `tool.curl.pasteHint`
 - `tool.curl.openInApiTester`
@@ -346,12 +380,14 @@ type CurlParseResult = {
 - `tool.curl.warnings`
 
 **경고 메시지**:
+
 - `curl.warning.unsupportedFile`
 - `curl.warning.shellExpansion`
 - `curl.warning.configFile`
 - `curl.warning.variableSubstitution`
 
 **API Tester cURL 붙여넣기 관련**:
+
 - `api.curlPaste.applied`
 - `api.curlPaste.failed`
 - `api.curlPaste.pasteAsUrl`
@@ -424,20 +460,24 @@ type CurlParseResult = {
 ### 9.2 코드 구조
 
 **공유 유틸리티**:
+
 - `src/lib/curl/parseCurl.ts` (core 파싱 로직)
 - `src/lib/curl/types.ts` (타입 정의)
 
 **cURL Parser Tool**:
+
 - `src/tools/curl-parser/index.tsx` (UI 컴포넌트)
 - `src/tools/curl-parser/types.ts` (도구별 타입)
 
 **API Tester 통합**:
+
 - `src/tools/api-tester/pasteHandler.ts` (cURL 붙여넣기 핸들러)
 - 기존 API Tester 컴포넌트에 통합
 
 ### 9.3 데이터 전달 방식
 
 **cURL Parser → API Tester**:
+
 - 권장: 앱 내부 상태 전달 (store/context)
 - Fallback: sessionStorage
 - URL fragment 공유는 민감정보 제외 기본 적용
@@ -451,12 +491,14 @@ type CurlParseResult = {
 ### 9.5 경고 처리
 
 **지원 불가 케이스**:
+
 - `--data @file`: 파일 경로만 표시, 수동 입력 유도
 - `-K config`: 설정 파일 경고, 수동 입력 유도
 - `$TOKEN`, `$(...)`: 쉘 변수 경고, 원문 그대로 처리
 - `-F file=@path`: 파일 경로 경고, API Tester에서 다시 선택 안내
 
 **부분 지원 케이스**:
+
 - `-k/--insecure`: 표시만, 브라우저에서는 적용 불가 안내
 - `--resolve`: 표시만, API Tester에서 수동 설정 안내
 
@@ -502,4 +544,3 @@ type CurlParseResult = {
 
 **문서 버전**: 1.0  
 **최종 수정일**: 2025-01-XX
-

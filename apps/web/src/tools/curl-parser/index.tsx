@@ -70,10 +70,10 @@ const CurlParserTool: React.FC = () => {
       setParseResult(result);
       setParseError(null);
     } catch (error) {
-      setParseError(error instanceof Error ? error.message : 'Failed to parse cURL command');
+      setParseError(error instanceof Error ? error.message : t('tool.curl.parseFailed'));
       setParseResult(null);
     }
-  }, [state.input]);
+  }, [state.input, t]);
 
   // Auto-parse on input change (debounced)
   React.useEffect(() => {
@@ -155,7 +155,7 @@ const CurlParserTool: React.FC = () => {
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
               <span className="text-sm text-gray-700 dark:text-gray-300">
-                URL Decode in display
+                {t('tool.curl.urlDecodeInDisplay')}
               </span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
@@ -173,7 +173,7 @@ const CurlParserTool: React.FC = () => {
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
               <span className="text-sm text-gray-700 dark:text-gray-300">
-                Cookie decode
+                {t('tool.curl.cookieDecode')}
               </span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
@@ -191,7 +191,7 @@ const CurlParserTool: React.FC = () => {
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
               <span className="text-sm text-gray-700 dark:text-gray-300">
-                Hide sensitive values
+                {t('tool.curl.hideSensitiveValues')}
               </span>
             </label>
           </div>
@@ -218,7 +218,7 @@ const CurlParserTool: React.FC = () => {
                 ) : (
                   <span className="text-gray-500">▶</span>
                 )}
-                <span>Request Summary</span>
+                <span>{t('tool.curl.requestSummary')}</span>
               </button>
               {requestSummaryOpen && (
                 <div className="px-4 pb-4">
@@ -243,7 +243,7 @@ const CurlParserTool: React.FC = () => {
                   ) : (
                     <span className="text-gray-500">▶</span>
                   )}
-                  <span>Query Parameters ({parseResult.request.query.length})</span>
+                  <span>{t('tool.curl.queryParams')} ({parseResult.request.query.length})</span>
                 </button>
                 {queryParamsOpen && (
                   <div className="px-4 pb-4">
@@ -268,7 +268,7 @@ const CurlParserTool: React.FC = () => {
                   ) : (
                     <span className="text-gray-500">▶</span>
                   )}
-                  <span>Headers ({parseResult.request.headers.length})</span>
+                  <span>{t('tool.curl.headers')} ({parseResult.request.headers.length})</span>
                 </button>
                 {headersOpen && (
                   <div className="px-4 pb-4">
@@ -293,7 +293,7 @@ const CurlParserTool: React.FC = () => {
                   ) : (
                     <span className="text-gray-500">▶</span>
                   )}
-                  <span>Cookies ({parseResult.request.cookies.items.length})</span>
+                  <span>{t('tool.curl.cookies')} ({parseResult.request.cookies.items.length})</span>
                 </button>
                 {cookiesOpen && (
                   <div className="px-4 pb-4">
@@ -319,7 +319,7 @@ const CurlParserTool: React.FC = () => {
                   ) : (
                     <span className="text-gray-500">▶</span>
                   )}
-                  <span>Body ({parseResult.request.body.kind})</span>
+                  <span>{t('tool.curl.body')} ({parseResult.request.body.kind})</span>
                 </button>
                 {bodyOpen && (
                   <div className="px-4 pb-4">
@@ -344,17 +344,17 @@ const CurlParserTool: React.FC = () => {
                   ) : (
                     <span className="text-gray-500">▶</span>
                   )}
-                  <span>cURL Options</span>
+                  <span>{t('tool.curl.options')}</span>
                 </button>
                 {optionsOpen && (
                   <div className="px-4 pb-4">
                     <div className="space-y-2 text-sm">
                       {parseResult.request.options.followRedirects && (
-                        <div className="text-gray-700 dark:text-gray-300">-L (Follow redirects)</div>
+                        <div className="text-gray-700 dark:text-gray-300">-L ({t('tool.curl.followRedirects')})</div>
                       )}
                       {parseResult.request.options.insecureTLS && (
                         <div className="text-yellow-600 dark:text-yellow-400">
-                          -k (Insecure TLS - not supported in browser)
+                          -k ({t('tool.curl.insecureTLSBrowser')})
                         </div>
                       )}
                       {parseResult.request.options.compressed && (
@@ -362,7 +362,7 @@ const CurlParserTool: React.FC = () => {
                       )}
                       {parseResult.request.options.basicAuth && (
                         <div className="text-gray-700 dark:text-gray-300">
-                          -u (Basic Auth: {parseResult.request.options.basicAuth.user})
+                          -u ({t('tool.curl.basicAuth')}: {parseResult.request.options.basicAuth.user})
                         </div>
                       )}
                     </div>
@@ -383,7 +383,7 @@ const CurlParserTool: React.FC = () => {
                   ) : (
                     <span className="text-gray-500">▶</span>
                   )}
-                  <span>Warnings ({parseResult.warnings.length})</span>
+                  <span>{t('tool.curl.warnings')} ({parseResult.warnings.length})</span>
                 </button>
                 {warningsOpen && (
                   <div className="px-4 pb-4">

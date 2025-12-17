@@ -19,11 +19,13 @@
 ### 1.1 타입 정의
 
 **작업 내용**:
+
 1. `src/lib/curl/types.ts` 생성
 2. `CurlParseResult` 타입 정의
 3. 관련 유틸리티 타입 정의
 
 **체크리스트**:
+
 - [ ] `CurlParseResult` 타입 정의
 - [ ] `CurlRequest` 타입 정의
 - [ ] `CurlBody` 타입 정의
@@ -33,6 +35,7 @@
 ### 1.2 토큰화 로직 구현
 
 **작업 내용**:
+
 1. `src/lib/curl/tokenizer.ts` 생성
 2. 쉘-like 토큰화 로직 구현
 3. 따옴표 처리 (단일/이중)
@@ -40,6 +43,7 @@
 5. 라인 컨티뉴에이션 (`\`+개행) 처리
 
 **체크리스트**:
+
 - [ ] 기본 토큰화 로직 구현
 - [ ] 단일 따옴표 처리
 - [ ] 이중 따옴표 처리
@@ -50,6 +54,7 @@
 ### 1.3 cURL 파싱 로직 구현
 
 **작업 내용**:
+
 1. `src/lib/curl/parseCurl.ts` 생성
 2. URL 추출 로직
 3. Method 추출 로직 (`-X/--request`)
@@ -59,6 +64,7 @@
 7. Options 파싱 (`-L`, `-k`, `--compressed`, `-u`)
 
 **체크리스트**:
+
 - [ ] URL 추출 (마지막 토큰 또는 `curl 'https://...'` 형태)
 - [ ] Method 추출 (`-X/--request`)
 - [ ] Method 추론 (Body 존재 시 POST, `-G` 있으면 GET)
@@ -80,11 +86,13 @@
 ### 1.4 경고 및 에러 처리
 
 **작업 내용**:
+
 1. 지원 불가 케이스 감지
 2. 경고 메시지 생성
 3. 에러 처리
 
 **체크리스트**:
+
 - [ ] `--data @file` 감지 및 경고
 - [ ] `-K config` 감지 및 경고
 - [ ] `$TOKEN`, `$(...)` 감지 및 경고 (쉘 변수)
@@ -95,11 +103,13 @@
 ### 1.5 정규화 및 유틸리티 함수
 
 **작업 내용**:
+
 1. `normalizeCurl` 함수 구현 (라인 컨티뉴 제거, 토큰 정리)
 2. URL 디코딩/인코딩 유틸리티
 3. Cookie 디코딩 유틸리티
 
 **체크리스트**:
+
 - [ ] `normalizeCurl` 함수 구현
 - [ ] URL 디코딩 함수
 - [ ] URL 인코딩 함수
@@ -112,11 +122,13 @@
 ### 2.1 도구 기본 구조 생성
 
 **작업 내용**:
+
 1. `src/tools/curl-parser/index.tsx` 생성
 2. 도구 정의 및 등록
 3. 기본 레이아웃 구성
 
 **체크리스트**:
+
 - [ ] `src/tools/curl-parser/index.tsx` 생성
 - [ ] 도구 타입 정의 (`CurlParserState`)
 - [ ] 기본 상태 정의 (`DEFAULT_STATE`)
@@ -126,11 +138,13 @@
 ### 2.2 입력 영역 UI
 
 **작업 내용**:
+
 1. 멀티라인 textarea 구현
 2. Parse/Clear/Copy normalized 버튼 추가
 3. 입력 debounce 처리
 
 **체크리스트**:
+
 - [ ] 멀티라인 textarea 구현
 - [ ] Placeholder 텍스트 (i18n)
 - [ ] Parse 버튼 추가
@@ -142,10 +156,12 @@
 ### 2.3 표시 옵션 UI
 
 **작업 내용**:
+
 1. 표시 옵션 토글 UI 구현
 2. 옵션 상태 관리
 
 **체크리스트**:
+
 - [ ] "URL Decode in display" 토글 (기본 ON)
 - [ ] "URL Encode on export" 토글 (기본 OFF)
 - [ ] "Cookie decode" 토글 (기본 ON)
@@ -156,6 +172,7 @@
 ### 2.4 출력 패널 UI
 
 **작업 내용**:
+
 1. Request Summary 섹션
 2. Query Params 섹션
 3. Headers 섹션
@@ -165,6 +182,7 @@
 7. Parse Warnings 섹션
 
 **체크리스트**:
+
 - [ ] Request Summary 섹션 (Method, URL, 버튼)
 - [ ] "Open in API Tester" 버튼
 - [ ] "Copy as JSON" 버튼 (옵션)
@@ -181,10 +199,12 @@
 ### 2.5 민감정보 마스킹 로직
 
 **작업 내용**:
+
 1. 민감 헤더 감지 로직
 2. 마스킹 표시 로직 (앞 6글자 + `…`)
 
 **체크리스트**:
+
 - [ ] 민감 헤더 감지 (Cookie, Authorization 등)
 - [ ] 마스킹 표시 로직 구현
 - [ ] "Hide sensitive values" 옵션 반영
@@ -193,11 +213,13 @@
 ### 2.6 "Open in API Tester" 연동
 
 **작업 내용**:
+
 1. 데이터 전달 로직 구현
 2. 라우팅 처리 (i18n prefix 유지)
 3. API Tester 폼 자동 채움 연동
 
 **체크리스트**:
+
 - [ ] 파싱 결과를 API Tester form state로 변환
 - [ ] 앱 내부 상태 전달 (store/context 또는 sessionStorage)
 - [ ] 라우팅 처리 (`/{locale}/curl` → `/{locale}/api`)
@@ -207,11 +229,13 @@
 ### 2.7 LocalStorage 및 URL 공유
 
 **작업 내용**:
+
 1. `useToolState` 훅 통합
 2. LocalStorage 저장 (민감정보 제외)
 3. URL 공유 기능 (민감정보 제외 기본)
 
 **체크리스트**:
+
 - [ ] `useToolState` 훅 통합
 - [ ] LocalStorage 저장 (마지막 입력 + 표시 옵션만)
 - [ ] 민감정보 저장 제외 (기본)
@@ -221,10 +245,12 @@
 ### 2.8 SEO 최적화
 
 **작업 내용**:
+
 1. `vite-plugin-generate-routes.ts`에 도구 정보 추가
 2. SEO 메타 태그 설정
 
 **체크리스트**:
+
 - [ ] `vite-plugin-generate-routes.ts`에 cURL Parser 추가
 - [ ] SEO description 작성 (150-160자)
 - [ ] Keywords 설정 (5-10개)
@@ -239,10 +265,12 @@
 ### 3.1 cURL 감지 로직
 
 **작업 내용**:
+
 1. URL 입력창 paste 이벤트 핸들러 추가
 2. cURL 커맨드 감지 로직 구현
 
 **체크리스트**:
+
 - [ ] URL 입력창 paste 이벤트 핸들러 추가
 - [ ] cURL 감지 로직 (`trimStart()` 기준)
 - [ ] `curl ` 로 시작하는 경우 감지
@@ -252,11 +280,13 @@
 ### 3.2 파싱 및 폼 채움 로직
 
 **작업 내용**:
+
 1. cURL 파싱 실행
 2. 파싱 결과를 API Tester form state로 변환
 3. 폼 자동 채움
 
 **체크리스트**:
+
 - [ ] cURL 파싱 실행 (`parseCurl` 함수 호출)
 - [ ] 파싱 결과를 API Tester form state로 변환
 - [ ] Method 설정
@@ -270,11 +300,13 @@
 ### 3.3 에러 처리 및 UX
 
 **작업 내용**:
+
 1. 파싱 실패 시 에러 처리
 2. "Paste as URL" 대안 제공
 3. Toast 알림
 
 **체크리스트**:
+
 - [ ] 파싱 실패 시 에러 메시지 표시
 - [ ] "Paste as URL" 버튼 제공
 - [ ] Toast 알림 ("cURL parsed and applied")
@@ -283,10 +315,12 @@
 ### 3.4 i18n 통합
 
 **작업 내용**:
+
 1. i18n 리소스에 키 추가
 2. UI 텍스트 i18n 적용
 
 **체크리스트**:
+
 - [ ] `api.curlPaste.applied` 키 추가 (모든 로케일)
 - [ ] `api.curlPaste.failed` 키 추가 (모든 로케일)
 - [ ] `api.curlPaste.pasteAsUrl` 키 추가 (모든 로케일)
@@ -300,10 +334,12 @@
 ### 4.1 cURL Parser 관련 키 추가
 
 **작업 내용**:
+
 1. 모든 로케일 파일에 cURL Parser 키 추가
 2. 번역 작성
 
 **체크리스트**:
+
 - [ ] `en-US.ts`에 키 추가 (소스 오브 트루스)
 - [ ] `ko-KR.ts`에 번역 추가
 - [ ] `ja-JP.ts`에 번역 추가
@@ -312,6 +348,7 @@
 - [ ] 번역이 확정되지 않은 언어는 en-US 값 복사 + TODO 태그
 
 **추가할 키 목록**:
+
 - `tool.curl.*` (제목, 설명, placeholder 등)
 - `curl.warning.*` (경고 메시지)
 - `api.curlPaste.*` (API Tester 붙여넣기 관련)
@@ -319,6 +356,7 @@
 ### 4.2 번역 품질 확인
 
 **체크리스트**:
+
 - [ ] 모든 키가 모든 로케일에 존재하는지 확인
 - [ ] 번역 키 누락 검증 (빌드/테스트 단계)
 
@@ -329,6 +367,7 @@
 ### 5.1 기능 테스트
 
 **체크리스트**:
+
 - [ ] cURL Parser 기본 파싱 테스트
 - [ ] API Tester cURL 붙여넣기 테스트
 - [ ] 민감정보 마스킹 테스트
@@ -340,6 +379,7 @@
 ### 5.2 수용 기준 (AC) 검증
 
 **체크리스트**:
+
 - [ ] `curl https://example.com` → GET + URL 정상 추출
 - [ ] `-X POST -H ... -d '{"a":1}'` → method/headers/json body 정상
 - [ ] `-H 'Cookie: a=b; c=d'` 또는 `-b 'a=b; c=d'` → cookie 테이블 정상 파싱
@@ -353,6 +393,7 @@
 ### 5.3 빌드 및 린트 검증
 
 **체크리스트**:
+
 - [ ] `npm run lint` 통과
 - [ ] `npm run build` 통과
 - [ ] 타입 체크 오류 없음
@@ -366,6 +407,7 @@
 ### 6.1 릴리스 노트 작성
 
 **체크리스트**:
+
 - [ ] `RELEASE_NOTES.md`에 v1.4.1 섹션 추가
 - [ ] 신규 기능 설명
 - [ ] 주요 변경사항 정리
@@ -373,6 +415,7 @@
 ### 6.2 기타 문서 업데이트
 
 **체크리스트**:
+
 - [ ] `README.md`에 cURL Parser 도구 소개 추가
 - [ ] `TEST_CHECKLIST.md`에 테스트 케이스 추가
 - [ ] `AGENTS.md` 업데이트 (필요시)
@@ -421,4 +464,3 @@
 
 **문서 버전**: 1.0  
 **최종 수정일**: 2025-01-XX
-

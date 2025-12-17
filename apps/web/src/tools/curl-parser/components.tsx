@@ -4,6 +4,7 @@
 
 import React from 'react';
 import { ExternalLink, AlertTriangle } from 'lucide-react';
+import { useI18n } from '@/hooks/useI18nHooks';
 import type { CurlParseResult } from '@/lib/curl/types';
 import { decodeUrl, decodeCookie } from '@/lib/curl/parseCurl';
 
@@ -18,6 +19,7 @@ export const RequestSummary: React.FC<RequestSummaryProps> = ({
   onOpenInApiTester,
   urlDecoded = false,
 }) => {
+  const { t } = useI18n();
   const { request } = result;
   const displayUrl = urlDecoded && request.urlDecoded ? request.urlDecoded : request.url;
 
@@ -25,14 +27,14 @@ export const RequestSummary: React.FC<RequestSummaryProps> = ({
     <div className="space-y-3">
       <div className="flex items-center gap-4">
         <div>
-          <span className="text-xs text-gray-500 dark:text-gray-400">Method:</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400">{t('tool.curl.method')}:</span>
           <span className="ml-2 font-mono font-semibold text-blue-600 dark:text-blue-400">
             {request.method}
           </span>
         </div>
       </div>
       <div>
-        <span className="text-xs text-gray-500 dark:text-gray-400">URL:</span>
+        <span className="text-xs text-gray-500 dark:text-gray-400">{t('tool.curl.url')}:</span>
         <div className="mt-1 p-2 bg-gray-50 dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
           <code className="text-sm text-gray-900 dark:text-gray-100 break-all">
             {displayUrl}
@@ -44,7 +46,7 @@ export const RequestSummary: React.FC<RequestSummaryProps> = ({
         className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
       >
         <ExternalLink className="w-4 h-4" />
-        Open in API Tester
+        {t('tool.curl.openInApiTester')}
       </button>
     </div>
   );
@@ -59,9 +61,11 @@ export const QueryParamsView: React.FC<QueryParamsViewProps> = ({
   params,
   urlDecoded = false,
 }) => {
+  const { t } = useI18n();
+  
   if (params.length === 0) {
     return (
-      <p className="text-sm text-gray-500 dark:text-gray-400">No query parameters</p>
+      <p className="text-sm text-gray-500 dark:text-gray-400">{t('tool.curl.noQueryParams')}</p>
     );
   }
 
@@ -77,7 +81,7 @@ export const QueryParamsView: React.FC<QueryParamsViewProps> = ({
             {urlDecoded ? decodeUrl(param.value) : param.value}
           </code>
           {!param.enabled && (
-            <span className="text-xs text-gray-400 dark:text-gray-500">(disabled)</span>
+            <span className="text-xs text-gray-400 dark:text-gray-500">({t('tool.curl.disabled')})</span>
           )}
         </div>
       ))}
@@ -94,9 +98,11 @@ export const HeadersView: React.FC<HeadersViewProps> = ({
   headers,
   hideSensitive = false,
 }) => {
+  const { t } = useI18n();
+  
   if (headers.length === 0) {
     return (
-      <p className="text-sm text-gray-500 dark:text-gray-400">No headers</p>
+      <p className="text-sm text-gray-500 dark:text-gray-400">{t('tool.curl.noHeaders')}</p>
     );
   }
 
@@ -120,10 +126,10 @@ export const HeadersView: React.FC<HeadersViewProps> = ({
               {displayValue}
             </code>
             {header.sensitive && (
-              <span className="text-xs text-yellow-600 dark:text-yellow-400">(sensitive)</span>
+              <span className="text-xs text-yellow-600 dark:text-yellow-400">({t('tool.curl.sensitive')})</span>
             )}
             {!header.enabled && (
-              <span className="text-xs text-gray-400 dark:text-gray-500">(disabled)</span>
+              <span className="text-xs text-gray-400 dark:text-gray-500">({t('tool.curl.disabled')})</span>
             )}
           </div>
         );
@@ -143,6 +149,7 @@ export const CookiesView: React.FC<CookiesViewProps> = ({
   cookieDecode = false,
   hideSensitive = false,
 }) => {
+  const { t } = useI18n();
   const maskValue = (value: string): string => {
     if (value.length <= 6) return '***';
     return value.slice(0, 6) + '…';
@@ -151,7 +158,7 @@ export const CookiesView: React.FC<CookiesViewProps> = ({
   return (
     <div className="space-y-3">
       <div>
-        <span className="text-xs text-gray-500 dark:text-gray-400">Raw:</span>
+        <span className="text-xs text-gray-500 dark:text-gray-400">{t('tool.curl.raw')}:</span>
         <div className="mt-1 p-2 bg-gray-50 dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
           <code className="text-sm text-gray-900 dark:text-gray-100 break-all">
             {cookies.raw}
@@ -159,7 +166,7 @@ export const CookiesView: React.FC<CookiesViewProps> = ({
         </div>
       </div>
       <div>
-        <span className="text-xs text-gray-500 dark:text-gray-400">Parsed:</span>
+        <span className="text-xs text-gray-500 dark:text-gray-400">{t('tool.curl.parsed')}:</span>
         <div className="mt-1 space-y-1">
           {cookies.items.map((item, index) => {
             const displayValue =
@@ -176,7 +183,7 @@ export const CookiesView: React.FC<CookiesViewProps> = ({
                   {decodedValue}
                 </code>
                 {item.sensitive && (
-                  <span className="text-xs text-yellow-600 dark:text-yellow-400">(sensitive)</span>
+                  <span className="text-xs text-yellow-600 dark:text-yellow-400">({t('tool.curl.sensitive')})</span>
                 )}
               </div>
             );
@@ -192,8 +199,10 @@ interface BodyViewProps {
 }
 
 export const BodyView: React.FC<BodyViewProps> = ({ body }) => {
+  const { t } = useI18n();
+  
   if (body.kind === 'none') {
-    return <p className="text-sm text-gray-500 dark:text-gray-400">No body</p>;
+    return <p className="text-sm text-gray-500 dark:text-gray-400">{t('tool.curl.noBody')}</p>;
   }
 
   if (body.kind === 'json' || body.kind === 'text') {
@@ -245,7 +254,7 @@ export const BodyView: React.FC<BodyViewProps> = ({ body }) => {
               <div key={index} className="flex items-center gap-2 text-yellow-600 dark:text-yellow-400">
                 <AlertTriangle className="w-4 h-4" />
                 <span className="text-sm">
-                  File: {item.key} = @{item.path} (unsupported - select file in API Tester)
+                  {t('tool.curl.file')}: {item.key} = @{item.path} ({t('tool.curl.unsupportedFileNote')})
                 </span>
               </div>
             );
@@ -263,6 +272,8 @@ interface WarningsViewProps {
 }
 
 export const WarningsView: React.FC<WarningsViewProps> = ({ warnings }) => {
+  const { t } = useI18n();
+  
   if (warnings.length === 0) {
     return null;
   }
@@ -277,7 +288,7 @@ export const WarningsView: React.FC<WarningsViewProps> = ({ warnings }) => {
           <AlertTriangle className="w-4 h-4 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
           <div className="flex-1">
             <p className="text-sm text-yellow-800 dark:text-yellow-200">{warning.message}</p>
-            <p className="text-xs text-yellow-600 dark:text-yellow-400 mt-1">Code: {warning.code}</p>
+            <p className="text-xs text-yellow-600 dark:text-yellow-400 mt-1">{t('tool.curl.code')}: {warning.code}</p>
           </div>
         </div>
       ))}
