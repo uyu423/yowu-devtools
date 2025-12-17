@@ -146,14 +146,18 @@ function filterForbiddenHeaders(
   const result: Record<string, string> = {};
 
   for (const h of headers) {
-    if (!h.enabled) continue;
+    // Skip disabled headers or headers with empty/whitespace-only keys
+    if (!h.enabled || !h.key || !h.key.trim()) continue;
 
+    const headerKey = h.key.trim();
+    
+    // Skip forbidden headers
     const isForbidden = FORBIDDEN_HEADERS.some(
-      (forbidden) => forbidden.toLowerCase() === h.key.toLowerCase()
+      (forbidden) => forbidden.toLowerCase() === headerKey.toLowerCase()
     );
 
     if (!isForbidden) {
-      result[h.key] = h.value;
+      result[headerKey] = h.value;
     }
   }
 
