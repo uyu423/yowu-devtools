@@ -293,6 +293,7 @@ export const esES = {
       modified: 'Modificado',
       splitView: 'Vista dividida',
       unifiedView: 'Vista unificada',
+      hunkView: 'Vista Hunk',
       ignoreWhitespace: 'Ignorar espacios',
       ignoreCase: 'Ignorar mayúsculas',
       ignoreWhitespaceTooltip:
@@ -302,9 +303,15 @@ export const esES = {
       diffResult: 'Resultado del Diff',
       addedChars: '+{n} caracteres',
       removedChars: '-{n} caracteres',
+      addedLines: '+{n} líneas',
+      removedLines: '-{n} líneas',
       bothIdentical: 'Ambas entradas son idénticas.',
       calculatingDiff: 'Calculando diff para texto grande...',
       copiedUnifiedDiff: 'Salida unified diff copiada.',
+      contextLines: 'Contexto',
+      contextLinesTooltip:
+        'Número de líneas sin cambios que se muestran alrededor de cada cambio.',
+      expandCollapsed: 'Expandir {n} líneas ocultas',
     },
     cron: {
       title: 'Cron Parser',

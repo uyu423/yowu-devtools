@@ -284,6 +284,7 @@ export const enUS = {
       modified: 'Modified',
       splitView: 'Split View',
       unifiedView: 'Unified View',
+      hunkView: 'Hunk View',
       ignoreWhitespace: 'Ignore Whitespace',
       ignoreCase: 'Ignore Case',
       ignoreWhitespaceTooltip: 'Ignore changes that only involve whitespace.',
@@ -292,9 +293,15 @@ export const enUS = {
       diffResult: 'Diff Result',
       addedChars: '+{n} chars',
       removedChars: '-{n} chars',
+      addedLines: '+{n} lines',
+      removedLines: '-{n} lines',
       bothIdentical: 'Both inputs are identical.',
       calculatingDiff: 'Calculating diff for large text...',
       copiedUnifiedDiff: 'Unified diff output copied.',
+      contextLines: 'Context',
+      contextLinesTooltip:
+        'Number of unchanged lines to show around each change.',
+      expandCollapsed: 'Expand {n} hidden lines',
     },
     cron: {
       title: 'Cron Parser',
