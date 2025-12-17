@@ -1055,10 +1055,44 @@ export const enUS = {
       description:
         'Free online string length counter. Count characters, words, lines, and bytes in your text.',
     },
-    apiTester: {
+    curl: {
+      title: 'cURL Parser',
+      description: 'Parse and visualize cURL commands',
+      pasteHint: 'Paste cURL command',
+      placeholder: 'curl -X POST https://api.example.com/v1/users -H "Content-Type: application/json" -d \'{"name":"John"}\'',
+      parse: 'Parse',
+      parseSuccess: 'cURL command parsed successfully',
+      openInApiTester: 'Open in API Tester',
+      requestSummary: 'Request Summary',
+      queryParams: 'Query Parameters',
+      headers: 'Headers',
+      cookies: 'Cookies',
+      body: 'Body',
+      options: 'cURL Options',
+      warnings: 'Warnings',
+    },
+  },
+  curl: {
+    warning: {
+      unsupportedFile: 'File-based options are not supported. Please paste the content directly.',
+      shellExpansion: 'Shell expansion detected. Variable substitution is not supported.',
+      configFile: 'Config file not supported. Please paste command directly.',
+      variableSubstitution: 'Variable substitution is not supported.',
+      insecureTLS: 'Insecure TLS (-k) is not supported in browser. Use Extension mode for local testing.',
+      unsupportedCookieFile: 'Cookie file not supported. Please paste cookie string directly.',
+      unsupportedDataFile: 'Data file not supported. Please paste data directly.',
+    },
+  },
+  apiTester: {
       title: 'API Tester',
       description:
         'Free online API tester. Build and send HTTP requests with support for all methods, headers, body, and CORS bypass via extension.',
+      curlPaste: {
+        applied: 'cURL parsed and applied',
+        failed: 'cURL parse failed',
+        pasteAsUrl: 'Paste as URL',
+        undo: 'Undo',
+      },
     },
   },
 } as const;
