@@ -136,76 +136,6 @@ async function getGrantedOrigins(): Promise<string[]> {
   }
 }
 
-/**
- * Extract all possible domain patterns from a hostname
- * e.g., "api.sub.example.com" -> 
- *   ["api.sub.example.com", ".sub.example.com", ".example.com"]
- */
-function getDomainPatterns(hostname: string): string[] {
-  const patterns: string[] = [hostname];
-  const parts = hostname.split('.');
-  
-  // Generate parent domain patterns (with leading dot for wildcard matching)
-  // Skip the last two parts (e.g., "example.com") to avoid too broad patterns
-  for (let i = 1; i < parts.length - 1; i++) {
-    patterns.push('.' + parts.slice(i).join('.'));
-  }
-  
-  return patterns;
-}
-
-/**
- * Get cookies for a URL including parent domain cookies
- * This collects cookies from all matching domains (e.g., .example.com for *.example.com)
- */
-async function getCookiesForUrl(url: string): Promise<string | null> {
-  try {
-    const parsedUrl = new URL(url);
-    const hostname = parsedUrl.hostname;
-    const domainPatterns = getDomainPatterns(hostname);
-    
-    // Collect cookies from all domain patterns
-    const cookieMap = new Map<string, chrome.cookies.Cookie>();
-    
-    for (const domain of domainPatterns) {
-      try {
-        const domainCookies = await chrome.cookies.getAll({ domain });
-        for (const cookie of domainCookies) {
-          // Check if cookie applies to this URL
-          const cookieApplies = 
-            (hostname === cookie.domain || hostname.endsWith(cookie.domain)) &&
-            parsedUrl.pathname.startsWith(cookie.path) &&
-            (!cookie.secure || parsedUrl.protocol === 'https:');
-          
-          if (cookieApplies) {
-            cookieMap.set(cookie.name, cookie);
-          }
-        }
-      } catch {
-        // Ignore errors for individual domain patterns
-      }
-    }
-    
-    // Also try the URL-based approach as fallback
-    try {
-      const urlCookies = await chrome.cookies.getAll({ url });
-      for (const cookie of urlCookies) {
-        cookieMap.set(cookie.name, cookie);
-      }
-    } catch {
-      // Ignore errors
-    }
-    
-    const cookies = Array.from(cookieMap.values());
-    if (cookies.length === 0) return null;
-    
-    return cookies.map(cookie => `${cookie.name}=${cookie.value}`).join('; ');
-  } catch (error) {
-    console.warn('[Extension] Failed to get cookies:', error);
-    return null;
-  }
-}
-
 // =============================================================================
 // Request Executor
 // =============================================================================
@@ -318,23 +248,24 @@ async function executeRequest(spec: RequestSpec): Promise<ResponseSpec> {
     };
   }
 
-  // Get cookies for the target URL only if includeCookies option is enabled
+  // Check if includeCookies option is enabled
+  // Note: Cookie header cannot be set directly in fetch() - it's a "forbidden header"
+  // We use credentials: 'include' to let the browser handle cookies automatically
   const shouldIncludeCookies = spec.options.includeCookies === true;
-  const cookieValue = shouldIncludeCookies ? await getCookiesForUrl(spec.url) : null;
 
   // Create AbortController for timeout
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), spec.options.timeoutMs);
 
   try {
-    console.log('[Extension] Fetch:', method, spec.url, cookieValue ? '(with cookies)' : '(no cookies)');
+    console.log('[Extension] Fetch:', method, spec.url, shouldIncludeCookies ? '(with cookies)' : '(no cookies)');
     
     const response = await fetch(spec.url, {
       method,
       headers,
       body: method !== 'GET' && method !== 'HEAD' ? body : undefined,
       redirect: spec.options.redirect,
-      credentials: cookieValue ? 'include' : spec.options.credentials,
+      credentials: shouldIncludeCookies ? 'include' : spec.options.credentials,
       signal: controller.signal,
     });
     

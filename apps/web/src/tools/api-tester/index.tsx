@@ -6,11 +6,12 @@
  */
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { Globe, Check, Terminal, Cookie } from 'lucide-react';
+import { Globe, Check, Terminal, Cookie, HelpCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ToolDefinition } from '@/tools/types';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { ShareModal } from '@/components/common/ShareModal';
+import { Tooltip } from '@/components/ui/Tooltip';
 import { useToolState } from '@/hooks/useToolState';
 import { useShareModal } from '@/hooks/useShareModal';
 import { useTitle } from '@/hooks/useTitle';
@@ -299,17 +300,22 @@ const ApiTesterTool: React.FC = () => {
                 
                 {/* Include Cookies checkbox - only show when extension is available */}
                 {extensionStatus === 'connected' && (
-                  <label className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={state.includeCookies}
-                      onChange={(e) => updateState({ includeCookies: e.target.checked })}
-                      className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-0"
-                      disabled={isLoading}
-                    />
-                    <Cookie className="w-4 h-4" />
-                    <span>Include Cookies</span>
-                  </label>
+                  <div className="flex items-center gap-1.5">
+                    <label className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={state.includeCookies}
+                        onChange={(e) => updateState({ includeCookies: e.target.checked })}
+                        className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-0"
+                        disabled={isLoading}
+                      />
+                      <Cookie className="w-4 h-4" />
+                      <span>{t('tool.apiTester.includeCookies')}</span>
+                    </label>
+                    <Tooltip content={t('tool.apiTester.includeCookiesTooltip')} position="bottom">
+                      <HelpCircle className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 cursor-help" />
+                    </Tooltip>
+                  </div>
                 )}
               </div>
               

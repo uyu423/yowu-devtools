@@ -998,6 +998,9 @@ export const esES = {
       timeoutError: 'Tiempo de espera agotado después de {ms}ms',
       networkError: 'Error de red',
       permissionDenied: 'Permiso denegado para {origin}. Otorga permiso e intenta de nuevo.',
+      // Include Cookies option
+      includeCookies: 'Incluir Cookies',
+      includeCookiesTooltip: 'Incluir las cookies del navegador en la solicitud. Cuando está habilitado, las cookies almacenadas en el navegador para el dominio de destino se enviarán automáticamente con la solicitud.',
     },
   },
   meta: {

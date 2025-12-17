@@ -967,6 +967,9 @@ export const enUS = {
       timeoutError: 'Request timeout after {ms}ms',
       networkError: 'Network error',
       permissionDenied: 'Permission denied for {origin}. Please grant permission and try again.',
+      // Include Cookies option
+      includeCookies: 'Include Cookies',
+      includeCookiesTooltip: 'Include browser cookies in the request. When enabled, cookies stored in your browser for the target domain will be automatically sent with the request.',
     },
   },
   meta: {

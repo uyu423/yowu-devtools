@@ -951,6 +951,9 @@ export const jaJP = {
       timeoutError: '{ms}ms後にリクエストタイムアウト',
       networkError: 'ネットワークエラー',
       permissionDenied: '{origin}への権限が拒否されました。権限を付与して再試行してください。',
+      // Include Cookies option
+      includeCookies: 'クッキーを含める',
+      includeCookiesTooltip: 'リクエストにブラウザのクッキーを含めます。有効にすると、対象ドメインに保存されているブラウザクッキーがリクエストと一緒に自動的に送信されます。',
     },
   },
   meta: {

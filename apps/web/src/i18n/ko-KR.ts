@@ -944,6 +944,9 @@ export const koKR = {
       timeoutError: '{ms}ms 후 요청 시간 초과',
       networkError: '네트워크 오류',
       permissionDenied: '{origin}에 대한 권한이 거부되었습니다. 권한을 부여하고 다시 시도하세요.',
+      // Include Cookies option
+      includeCookies: '쿠키 포함',
+      includeCookiesTooltip: '요청에 브라우저 쿠키를 포함합니다. 활성화하면 대상 도메인에 저장된 브라우저 쿠키가 요청과 함께 자동으로 전송됩니다.',
     },
   },
   meta: {

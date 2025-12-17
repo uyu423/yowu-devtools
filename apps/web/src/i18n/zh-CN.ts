@@ -886,6 +886,9 @@ export const zhCN = {
       timeoutError: '请求在{ms}ms后超时',
       networkError: '网络错误',
       permissionDenied: '{origin}的权限被拒绝。请授予权限后重试。',
+      // Include Cookies option
+      includeCookies: '包含Cookie',
+      includeCookiesTooltip: '在请求中包含浏览器Cookie。启用后，存储在浏览器中的目标域Cookie将自动随请求发送。',
     },
   },
   meta: {
