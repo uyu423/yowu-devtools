@@ -5,7 +5,7 @@
  * Parse and visualize cURL commands.
  */
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Terminal } from 'lucide-react';
 import type { ToolDefinition } from '@/tools/types';
 import { ToolHeader } from '@/components/common/ToolHeader';
@@ -16,6 +16,14 @@ import { parseCurl } from '@/lib/curl/parseCurl';
 import type { CurlParseResult } from '@/lib/curl/types';
 import type { CurlParserState } from './types';
 import { DEFAULT_STATE } from './types';
+import {
+  RequestSummary,
+  QueryParamsView,
+  HeadersView,
+  CookiesView,
+  BodyView,
+  WarningsView,
+} from './components';
 
 const CurlParserTool: React.FC = () => {
   const { t } = useI18n();
@@ -35,6 +43,15 @@ const CurlParserTool: React.FC = () => {
 
   const [parseResult, setParseResult] = useState<CurlParseResult | null>(null);
   const [parseError, setParseError] = useState<string | null>(null);
+  
+  // UI state for collapsible sections
+  const [requestSummaryOpen, setRequestSummaryOpen] = useState(true);
+  const [queryParamsOpen, setQueryParamsOpen] = useState(true);
+  const [headersOpen, setHeadersOpen] = useState(false);
+  const [cookiesOpen, setCookiesOpen] = useState(false);
+  const [bodyOpen, setBodyOpen] = useState(false);
+  const [optionsOpen, setOptionsOpen] = useState(false);
+  const [warningsOpen, setWarningsOpen] = useState(true);
 
   // Parse cURL command
   const handleParse = useCallback(() => {
@@ -68,6 +85,11 @@ const CurlParserTool: React.FC = () => {
     setParseResult(null);
     setParseError(null);
   }, [resetState]);
+
+  const handleOpenInApiTester = useCallback(() => {
+    // TODO: Implement API Tester integration (Phase 2.6)
+    console.log('Open in API Tester', parseResult);
+  }, [parseResult]);
 
   return (
     <div className="flex flex-col h-full p-4 md:p-6 max-w-5xl mx-auto">
@@ -105,6 +127,66 @@ const CurlParserTool: React.FC = () => {
           </div>
         </div>
 
+        {/* Display Options */}
+        {parseResult && (
+          <div className="flex flex-wrap gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={state.displayOptions.urlDecodeInDisplay}
+                onChange={(e) =>
+                  updateState({
+                    displayOptions: {
+                      ...state.displayOptions,
+                      urlDecodeInDisplay: e.target.checked,
+                    },
+                  })
+                }
+                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              />
+              <span className="text-sm text-gray-700 dark:text-gray-300">
+                URL Decode in display
+              </span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={state.displayOptions.cookieDecode}
+                onChange={(e) =>
+                  updateState({
+                    displayOptions: {
+                      ...state.displayOptions,
+                      cookieDecode: e.target.checked,
+                    },
+                  })
+                }
+                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              />
+              <span className="text-sm text-gray-700 dark:text-gray-300">
+                Cookie decode
+              </span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={state.displayOptions.hideSensitiveValues}
+                onChange={(e) =>
+                  updateState({
+                    displayOptions: {
+                      ...state.displayOptions,
+                      hideSensitiveValues: e.target.checked,
+                    },
+                  })
+                }
+                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              />
+              <span className="text-sm text-gray-700 dark:text-gray-300">
+                Hide sensitive values
+              </span>
+            </label>
+          </div>
+        )}
+
         {/* Error display */}
         {parseError && (
           <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
@@ -114,10 +196,192 @@ const CurlParserTool: React.FC = () => {
 
         {/* Parse result */}
         {parseResult && (
-          <div className="mt-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              {t('tool.curl.parseSuccess')}
-            </p>
+          <div className="mt-4 space-y-2 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+            {/* Request Summary */}
+            <div className="border-b border-gray-200 dark:border-gray-700">
+              <button
+                onClick={() => setRequestSummaryOpen(!requestSummaryOpen)}
+                className="w-full flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+              >
+                {requestSummaryOpen ? (
+                  <span className="text-gray-500">▼</span>
+                ) : (
+                  <span className="text-gray-500">▶</span>
+                )}
+                <span>Request Summary</span>
+              </button>
+              {requestSummaryOpen && (
+                <div className="px-4 pb-4">
+                  <RequestSummary
+                    result={parseResult}
+                    onOpenInApiTester={handleOpenInApiTester}
+                    urlDecoded={state.displayOptions.urlDecodeInDisplay}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Query Params */}
+            {parseResult.request.query.length > 0 && (
+              <div className="border-b border-gray-200 dark:border-gray-700">
+                <button
+                  onClick={() => setQueryParamsOpen(!queryParamsOpen)}
+                  className="w-full flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                >
+                  {queryParamsOpen ? (
+                    <span className="text-gray-500">▼</span>
+                  ) : (
+                    <span className="text-gray-500">▶</span>
+                  )}
+                  <span>Query Parameters ({parseResult.request.query.length})</span>
+                </button>
+                {queryParamsOpen && (
+                  <div className="px-4 pb-4">
+                    <QueryParamsView
+                      params={parseResult.request.query}
+                      urlDecoded={state.displayOptions.urlDecodeInDisplay}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Headers */}
+            {parseResult.request.headers.length > 0 && (
+              <div className="border-b border-gray-200 dark:border-gray-700">
+                <button
+                  onClick={() => setHeadersOpen(!headersOpen)}
+                  className="w-full flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                >
+                  {headersOpen ? (
+                    <span className="text-gray-500">▼</span>
+                  ) : (
+                    <span className="text-gray-500">▶</span>
+                  )}
+                  <span>Headers ({parseResult.request.headers.length})</span>
+                </button>
+                {headersOpen && (
+                  <div className="px-4 pb-4">
+                    <HeadersView
+                      headers={parseResult.request.headers}
+                      hideSensitive={state.displayOptions.hideSensitiveValues}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Cookies */}
+            {parseResult.request.cookies && (
+              <div className="border-b border-gray-200 dark:border-gray-700">
+                <button
+                  onClick={() => setCookiesOpen(!cookiesOpen)}
+                  className="w-full flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                >
+                  {cookiesOpen ? (
+                    <span className="text-gray-500">▼</span>
+                  ) : (
+                    <span className="text-gray-500">▶</span>
+                  )}
+                  <span>Cookies ({parseResult.request.cookies.items.length})</span>
+                </button>
+                {cookiesOpen && (
+                  <div className="px-4 pb-4">
+                    <CookiesView
+                      cookies={parseResult.request.cookies}
+                      cookieDecode={state.displayOptions.cookieDecode}
+                      hideSensitive={state.displayOptions.hideSensitiveValues}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Body */}
+            {parseResult.request.body && parseResult.request.body.kind !== 'none' && (
+              <div className="border-b border-gray-200 dark:border-gray-700">
+                <button
+                  onClick={() => setBodyOpen(!bodyOpen)}
+                  className="w-full flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                >
+                  {bodyOpen ? (
+                    <span className="text-gray-500">▼</span>
+                  ) : (
+                    <span className="text-gray-500">▶</span>
+                  )}
+                  <span>Body ({parseResult.request.body.kind})</span>
+                </button>
+                {bodyOpen && (
+                  <div className="px-4 pb-4">
+                    <BodyView body={parseResult.request.body} />
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Options */}
+            {(parseResult.request.options.followRedirects !== undefined ||
+              parseResult.request.options.insecureTLS !== undefined ||
+              parseResult.request.options.compressed !== undefined ||
+              parseResult.request.options.basicAuth !== undefined) && (
+              <div className="border-b border-gray-200 dark:border-gray-700">
+                <button
+                  onClick={() => setOptionsOpen(!optionsOpen)}
+                  className="w-full flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                >
+                  {optionsOpen ? (
+                    <span className="text-gray-500">▼</span>
+                  ) : (
+                    <span className="text-gray-500">▶</span>
+                  )}
+                  <span>cURL Options</span>
+                </button>
+                {optionsOpen && (
+                  <div className="px-4 pb-4">
+                    <div className="space-y-2 text-sm">
+                      {parseResult.request.options.followRedirects && (
+                        <div className="text-gray-700 dark:text-gray-300">-L (Follow redirects)</div>
+                      )}
+                      {parseResult.request.options.insecureTLS && (
+                        <div className="text-yellow-600 dark:text-yellow-400">
+                          -k (Insecure TLS - not supported in browser)
+                        </div>
+                      )}
+                      {parseResult.request.options.compressed && (
+                        <div className="text-gray-700 dark:text-gray-300">--compressed</div>
+                      )}
+                      {parseResult.request.options.basicAuth && (
+                        <div className="text-gray-700 dark:text-gray-300">
+                          -u (Basic Auth: {parseResult.request.options.basicAuth.user})
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Warnings */}
+            {parseResult.warnings.length > 0 && (
+              <div>
+                <button
+                  onClick={() => setWarningsOpen(!warningsOpen)}
+                  className="w-full flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                >
+                  {warningsOpen ? (
+                    <span className="text-gray-500">▼</span>
+                  ) : (
+                    <span className="text-gray-500">▶</span>
+                  )}
+                  <span>Warnings ({parseResult.warnings.length})</span>
+                </button>
+                {warningsOpen && (
+                  <div className="px-4 pb-4">
+                    <WarningsView warnings={parseResult.warnings} />
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>
