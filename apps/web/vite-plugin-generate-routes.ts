@@ -491,6 +491,34 @@ const tools: ToolInfo[] = [
       'cURL command export',
     ],
   },
+  {
+    id: 'curl-parser',
+    path: '/curl',
+    title: 'cURL Parser',
+    description: 'Parse and visualize cURL commands',
+    seoDescription:
+      'Free online cURL parser and visualizer. Parse cURL commands to extract URL, method, headers, cookies, body, and options. Convert cURL to API Tester format instantly. All processing happens in your browser - no data sent to servers.',
+    keywords: [
+      'curl parser',
+      'curl command parser',
+      'curl visualizer',
+      'parse curl',
+      'curl to api',
+      'curl converter',
+      'curl command analyzer',
+      'http request parser',
+      'curl command viewer',
+    ],
+    features: [
+      'Parse cURL commands',
+      'Extract URL, method, headers, cookies',
+      'Parse request body (JSON, form-data, urlencoded)',
+      'Visualize cURL options',
+      'Open in API Tester',
+      'Sensitive data masking',
+      'Cookie string parsing',
+    ],
+  },
 ];
 
 export function generateRoutes(): Plugin {
