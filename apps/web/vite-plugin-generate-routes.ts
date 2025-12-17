@@ -519,6 +519,36 @@ const tools: ToolInfo[] = [
       'Cookie string parsing',
     ],
   },
+  {
+    id: 'api-diff',
+    path: '/api-diff',
+    title: 'API Response Diff',
+    description: 'Compare API responses from two domains',
+    seoDescription:
+      'Free online API response comparison tool. Compare JSON responses from two domains side-by-side with diff highlighting. Supports all HTTP methods, headers, and request bodies. CORS bypass via Chrome extension.',
+    keywords: [
+      'api diff',
+      'api comparison',
+      'json diff',
+      'api response compare',
+      'response comparison',
+      'api testing',
+      'json comparison tool',
+      'api differ',
+      'endpoint comparison',
+      'api response diff',
+    ],
+    features: [
+      'Compare responses from two domains',
+      'Side-by-side diff view',
+      'JSON response comparison',
+      'Status code comparison',
+      'Diff highlighting (yellow for different, red for missing)',
+      'cURL command generation',
+      'Request history',
+      'CORS bypass via extension',
+    ],
+  },
 ];
 
 export function generateRoutes(): Plugin {
