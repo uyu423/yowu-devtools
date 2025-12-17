@@ -53,7 +53,7 @@ export function convertToApiTesterState(result: CurlParseResult): Partial<ApiTes
           ),
         };
         break;
-      case 'multipart':
+      case 'multipart': {
         // Only include text fields (files are not supported)
         const textItems = (request.body.multipartItems || []).filter(
           (item) => item.kind === 'field'
@@ -72,6 +72,7 @@ export function convertToApiTesterState(result: CurlParseResult): Partial<ApiTes
           state.body = { kind: 'none' };
         }
         break;
+      }
     }
   } else {
     state.body = { kind: 'none' };

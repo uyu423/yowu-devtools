@@ -9,7 +9,6 @@ import type {
   CurlRequest,
   CurlBody,
   CurlHeader,
-  CurlCookies,
   CurlWarning,
   HttpMethod,
   BodyKind,
@@ -517,7 +516,6 @@ export function parseCurl(input: string): CurlParseResult {
       break;
     }
   }
-  }
   
   // Infer method if body exists and method not set
   if (hasBody && request.method === 'GET' && !hasGetFlag) {
@@ -557,4 +555,3 @@ export function parseCurl(input: string): CurlParseResult {
     warnings,
   };
 }
-

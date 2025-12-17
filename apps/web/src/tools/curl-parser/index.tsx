@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Terminal } from 'lucide-react';
 import type { ToolDefinition } from '@/tools/types';
 import { ToolHeader } from '@/components/common/ToolHeader';
@@ -31,7 +31,6 @@ import {
 const CurlParserTool: React.FC = () => {
   const { t, locale } = useI18n();
   const navigate = useNavigate();
-  const location = useLocation();
   useTitle(t('tool.curl.title'));
 
   const { state, updateState, resetState } = useToolState<CurlParserState>(

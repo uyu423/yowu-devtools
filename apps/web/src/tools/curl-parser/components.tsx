@@ -3,59 +3,9 @@
  */
 
 import React from 'react';
-import { ChevronDown, ChevronRight, ExternalLink, Copy, AlertTriangle } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { CollapsibleSection } from '@/tools/api-tester/components';
+import { ExternalLink, AlertTriangle } from 'lucide-react';
 import type { CurlParseResult } from '@/lib/curl/types';
 import { decodeUrl, decodeCookie } from '@/lib/curl/parseCurl';
-
-interface CollapsibleSectionProps {
-  title: string;
-  count?: number;
-  isOpen: boolean;
-  onToggle: () => void;
-  children: React.ReactNode;
-  className?: string;
-}
-
-const SimpleCollapsibleSection: React.FC<CollapsibleSectionProps> = ({
-  title,
-  count,
-  isOpen,
-  onToggle,
-  children,
-  className,
-}) => {
-  return (
-    <div className={cn('border-b border-gray-200 dark:border-gray-700', className)}>
-      <button
-        onClick={onToggle}
-        className={cn(
-          'w-full flex items-center gap-2 px-4 py-2.5',
-          'text-sm font-medium text-gray-700 dark:text-gray-300',
-          'hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors'
-        )}
-      >
-        {isOpen ? (
-          <ChevronDown className="w-4 h-4 text-gray-500" />
-        ) : (
-          <ChevronRight className="w-4 h-4 text-gray-500" />
-        )}
-        <span>{title}</span>
-        {count !== undefined && (
-          <span className="ml-1 text-xs text-gray-400 dark:text-gray-500">
-            ({count})
-          </span>
-        )}
-      </button>
-      {isOpen && (
-        <div className="px-4 pb-4">
-          {children}
-        </div>
-      )}
-    </div>
-  );
-};
 
 interface RequestSummaryProps {
   result: CurlParseResult;
