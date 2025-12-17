@@ -15,6 +15,7 @@ import { queryStringTool } from './query-string';
 import { regexTool } from './regex';
 import { stringLengthTool } from './string-length';
 import { apiTesterTool } from './api-tester';
+import { curlParserTool } from './curl-parser';
 
 export const tools: ToolDefinition[] = [
   jsonTool,
@@ -33,6 +34,7 @@ export const tools: ToolDefinition[] = [
   regexTool,
   stringLengthTool,
   apiTesterTool,
+  curlParserTool,
 ];
 
 export const getToolById = (id: string) => tools.find(t => t.id === id);
