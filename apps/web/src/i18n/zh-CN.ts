@@ -162,7 +162,7 @@ export const zhCN = {
   tool: {
     json: {
       title: 'JSON Pretty Viewer',
-      description: '即时格式化JSON并以树形结构浏览。',
+      description: '使用树形视图和语法高亮来格式化、验证和导航JSON。',
       inputTitle: 'JSON输入',
       inputPlaceholder: '{"key": "value"}',
       sortKeys: '排序Key',
@@ -191,7 +191,7 @@ export const zhCN = {
     },
     url: {
       title: 'URL Encode/Decode',
-      description: '安全转换查询参数或路径段。',
+      description: '编码特殊字符或即时解码百分比编码的URL。',
       inputPlaceholder: '输入或粘贴内容...',
       resultPlaceholder: '结果将显示在这里...',
       useSpacePlus: '空格使用+',
@@ -201,7 +201,7 @@ export const zhCN = {
     },
     base64: {
       title: 'Base64 Converter',
-      description: '编码或解码UTF-8文本，包括Base64URL。',
+      description: '将文本编码为Base64或解码Base64字符串，支持UTF-8和URL安全格式。',
       textInput: '文本输入',
       base64Input: 'Base64输入',
       textPlaceholder: '输入要编码的文本...',
@@ -214,7 +214,7 @@ export const zhCN = {
     },
     time: {
       title: 'Epoch / ISO Converter',
-      description: '在Epoch Timestamp和ISO8601字符串之间转换。',
+      description: '支持时区转换Unix时间戳和ISO 8601日期。',
       epochTimestamp: 'Epoch Timestamp',
       epochPlaceholder: '例如：1704067200000',
       isoDate: 'ISO 8601日期',
@@ -256,7 +256,7 @@ export const zhCN = {
     },
     yaml: {
       title: 'YAML ↔ JSON',
-      description: '双向转换并快速检查解析错误。',
+      description: '双向转换YAML和JSON格式，支持语法验证。',
       yamlInput: 'YAML输入',
       jsonInput: 'JSON输入',
       yamlOutput: 'YAML输出',
@@ -269,7 +269,7 @@ export const zhCN = {
     },
     diff: {
       title: 'Text Diff',
-      description: '即时发现两段文本之间的差异。',
+      description: '并排比较两段文本，高亮显示添加、删除和更改。',
       original: 'Original',
       modified: 'Modified',
       splitView: 'Split View',
@@ -294,7 +294,7 @@ export const zhCN = {
     },
     cron: {
       title: 'Cron Parser',
-      description: '解释Cron表达式并预览计划执行时间。',
+      description: '解析Cron表达式，用通俗语言解释，并预览下次执行时间。',
       cronExpression: 'Cron表达式',
       humanReadable: '易读说明',
       nextScheduledDates: '下次计划执行',
@@ -1050,6 +1050,11 @@ export const zhCN = {
     },
   },
   meta: {
+    home: {
+      title: "Yowu's DevTools",
+      description:
+        '隐私优先的开发者工具箱。JSON格式化、密码生成、哈希计算、UUID生成等。所有处理都在浏览器内完成。',
+    },
     json: {
       title: 'JSON Viewer',
       description:

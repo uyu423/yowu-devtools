@@ -165,7 +165,8 @@ export const jaJP = {
   tool: {
     json: {
       title: 'JSON Pretty Viewer',
-      description: 'JSONを即座にフォーマットし、ツリー構造で探索します。',
+      description:
+        'ツリービューと構文ハイライトでJSONをフォーマット、検証、ナビゲートします。',
       inputTitle: 'JSON入力',
       inputPlaceholder: '{"key": "value"}',
       sortKeys: 'Keyをソート',
@@ -196,7 +197,8 @@ export const jaJP = {
     },
     url: {
       title: 'URL Encode/Decode',
-      description: 'クエリパラメータやパスセグメントを安全に変換します。',
+      description:
+        '特殊文字をエンコードし、パーセントエンコードされたURLを即座にデコードします。',
       inputPlaceholder: '内容を入力または貼り付け...',
       resultPlaceholder: '結果がここに表示されます...',
       useSpacePlus: 'スペースに+を使用',
@@ -207,7 +209,8 @@ export const jaJP = {
     },
     base64: {
       title: 'Base64 Converter',
-      description: 'UTF-8テキストをBase64URL含めてEncode/Decodeします。',
+      description:
+        'UTF-8およびURLセーフサポートでテキストをBase64にエンコード、またはデコードします。',
       textInput: 'テキスト入力',
       base64Input: 'Base64入力',
       textPlaceholder: 'Encodeするテキストを入力...',
@@ -221,7 +224,8 @@ export const jaJP = {
     },
     time: {
       title: 'Epoch / ISO Converter',
-      description: 'Epoch TimestampとISO8601文字列を相互変換します。',
+      description:
+        'タイムゾーンサポートでUnixタイムスタンプとISO 8601日付を変換します。',
       epochTimestamp: 'Epoch Timestamp',
       epochPlaceholder: '例: 1704067200000',
       isoDate: 'ISO 8601日付',
@@ -264,7 +268,7 @@ export const jaJP = {
     },
     yaml: {
       title: 'YAML ↔ JSON',
-      description: '双方向変換とパースエラーを素早く確認します。',
+      description: '構文検証付きでYAMLとJSON形式を双方向に変換します。',
       yamlInput: 'YAML入力',
       jsonInput: 'JSON入力',
       yamlOutput: 'YAML出力',
@@ -277,7 +281,8 @@ export const jaJP = {
     },
     diff: {
       title: 'Text Diff',
-      description: '2つのテキストブロックの差異を即座に確認します。',
+      description:
+        '2つのテキストを並べて比較し、追加、削除、変更をハイライトします。',
       original: 'Original',
       modified: 'Modified',
       splitView: 'Split View',
@@ -302,7 +307,8 @@ export const jaJP = {
     },
     cron: {
       title: 'Cron Parser',
-      description: 'Cron式を説明し、予定された実行時間をプレビューします。',
+      description:
+        'Cron式を解析し、わかりやすい言葉で説明し、次の実行時間をプレビューします。',
       cronExpression: 'Cron式',
       humanReadable: '読みやすい説明',
       nextScheduledDates: '次の予定実行',
@@ -481,7 +487,8 @@ export const jaJP = {
     },
     password: {
       title: 'Password Generator',
-      description: 'カスタマイズ可能なオプションで安全なパスワードを生成します',
+      description:
+        'カスタム長さと文字ルールで暗号学的に安全なパスワードを生成します。',
       length: '長さ',
       characterTypes: '文字タイプ',
       exclusionOptions: '除外オプション',
@@ -509,7 +516,7 @@ export const jaJP = {
     urlParser: {
       title: 'URL Parser',
       description:
-        'Protocol、Host、Path、FragmentおよびQueryパラメータを含むURLコンポーネントを分析します。',
+        'URLをプロトコル、ホスト、パス、クエリパラメータ、フラグメントに分解します。',
       inputPlaceholder:
         'URLまたはQuery Stringを入力 (例: https://example.com/search?q=laptop)...',
       urlOrQueryString: 'URLまたはQuery String',
@@ -543,7 +550,7 @@ export const jaJP = {
     regex: {
       title: 'Regex Tester',
       description:
-        'マッチハイライトと置換プレビューで正規表現をテストし視覚化します',
+        'ライブマッチハイライト、グループキャプチャ、置換プレビューで正規表現パターンをテストします。',
       pattern: 'パターン',
       patternPlaceholder: '正規表現パターンを入力...',
       flags: 'Flags',
@@ -794,7 +801,7 @@ export const jaJP = {
     jwtDecoder: {
       title: 'JWT Decoder',
       description:
-        'JSON Web TokenをDecodeしてHeader、Payload、Signatureを確認します。',
+        'JWTをデコードしてヘッダー、ペイロード、有効期限を確認し、署名を検証します。',
       jwtToken: 'JWT Token',
       tokenPlaceholder:
         'JWT Tokenを貼り付け (例: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...)',
@@ -863,7 +870,8 @@ export const jaJP = {
     },
     jwtEncoder: {
       title: 'JWT Encoder',
-      description: 'HeaderとPayloadからJSON Web Tokenを作成します。',
+      description:
+        'カスタムヘッダー、ペイロード、HMACアルゴリズムで署名付きJWTを作成します。',
       headerJson: 'Header (JSON)',
       headerPlaceholder: '{"alg":"HS256","typ":"JWT"}',
       payloadJson: 'Payload (JSON)',
@@ -882,7 +890,8 @@ export const jaJP = {
     },
     curl: {
       title: 'cURL Parser',
-      description: 'cURLコマンドを解析して視覚化します',
+      description:
+        'cURLコマンドをメソッド、URL、ヘッダー、クッキー、ボディコンポーネントに解析します。',
       pasteHint: 'cURLコマンドを貼り付け',
       placeholder:
         'curl -X POST https://api.example.com/v1/users -H "Content-Type: application/json" -d \'{"name":"John"}\'',
@@ -946,7 +955,7 @@ export const jaJP = {
     apiTester: {
       title: 'API Tester',
       description:
-        'Request BuilderでREST APIをテストし、CORS回避をサポートします。',
+        'ヘッダー、ボディ付きでHTTPリクエストをビルドし、拡張機能でCORSをバイパスします。',
       urlPlaceholder: 'https://api.example.com/v1/users',
       send: '送信',
       cancel: 'キャンセル',
@@ -1056,7 +1065,8 @@ export const jaJP = {
     },
     apiDiff: {
       title: 'API Response Diff',
-      description: '2つのドメインからのAPIレスポンスを比較',
+      description:
+        '2つのAPIエンドポイントを同時に呼び出し、JSONレスポンスの差異をハイライトします。',
       domains: 'ドメイン',
       domainA: 'ドメイン A',
       domainB: 'ドメイン B',
@@ -1132,89 +1142,95 @@ export const jaJP = {
     },
   },
   meta: {
+    home: {
+      title: "Yowu's DevTools",
+      description:
+        '開発者のためのプライバシー優先ツールボックス。JSON整形、パスワード生成、ハッシュ計算、UUID作成など。すべての処理はブラウザ内で行われます。',
+    },
     json: {
       title: 'JSON Viewer',
       description:
-        '無料オンラインJSONビューア、フォーマッタ、バリデータ。シンタックスハイライト、ツリービュー、検索、コピー機能でJSONを整形します。',
+        '無料オンラインJSONビューア、フォーマッタ、バリデータ。シンタックスハイライト、折りたたみツリービュー、検索、ワンクリックコピー機能でJSONを整形します。',
     },
     url: {
       title: 'URL Encoder',
       description:
-        '無料オンラインURLエンコーダ・デコーダ。特殊文字やユニコードをサポートしてURL文字列をエンコード・デコードします。',
+        '無料オンラインURLエンコーダ・デコーダ。完全なUnicodeとUTF-8サポートで特殊文字をパーセントエンコード、またはURLをデコードします。',
     },
     base64: {
       title: 'Base64 Converter',
       description:
-        '無料オンラインBase64エンコーダ・デコーダ。URL安全なバリアントをサポートしてテキストをBase64に変換・復元します。',
+        '無料オンラインBase64エンコーダ・デコーダ。UTF-8およびURLセーフバリアントサポートでテキストをBase64にエンコード、またはデコードします。',
     },
     time: {
       title: 'Time Converter',
       description:
-        '無料オンラインEpoch Timestamp変換器。タイムゾーンサポート付きでUnix TimestampとISO 8601日付を変換します。',
+        '無料オンラインEpoch Timestamp変換器。タイムゾーンサポート付きでUnix Timestamp（秒/ミリ秒）をISO 8601日付に、またはその逆に変換します。',
     },
     yaml: {
       title: 'YAML Converter',
       description:
-        '無料オンラインYAML-JSON変換器。シンタックス検証付きでYAMLとJSON形式を変換します。',
+        '無料オンラインYAML-JSON変換器。シンタックス検証とエラー表示付きでYAMLとJSON形式を双方向に変換します。',
     },
     diff: {
       title: 'Text Diff',
       description:
-        '無料オンラインテキストDiffツール。2つのテキストブロックを比較し、分割または統合ビューで差異を視覚化します。',
+        '無料オンラインテキストDiffツール。2つのテキストブロックを並列または統合ビューで比較し、行単位および文字単位でハイライトします。',
     },
     cron: {
       title: 'Cron Parser',
       description:
-        '無料オンラインCron式パーサ。Cronスケジュールを説明し、次の実行時間をプレビューします。',
+        '無料オンラインCron式パーサ。複数の方言をサポートしてCronスケジュールをわかりやすい言葉で説明し、次の実行時間をプレビューします。',
     },
     hash: {
       title: 'Hash Generator',
       description:
-        '無料オンラインHash生成器。MD5、SHA-1、SHA-256、SHA-512 HashとHMAC署名を計算します。',
+        '無料オンラインHash生成器。テキストまたはファイルのMD5、SHA-1、SHA-256、SHA-512 Hashと、キーサポート付きHMAC署名を計算します。',
     },
     uuid: {
       title: 'UUID Generator',
       description:
-        '無料オンラインUUIDおよびULID生成器。UUID v4、UUID v7、ULID識別子を生成します。',
+        '無料オンラインUUIDおよびULID生成器。暗号学的に安全なUUID v4、タイムスタンプベースのUUID v7、ソート可能なULID識別子を生成します。',
     },
     password: {
       title: 'Password Generator',
       description:
-        '無料オンラインパスワード生成器。カスタマイズ可能な長さと文字オプションで安全なパスワードを作成します。',
+        '無料オンラインパスワード生成器。カスタム長さ、文字タイプ、除外ルールで暗号学的に安全なパスワードを作成します。',
     },
     urlParser: {
       title: 'URL Parser',
       description:
-        '無料オンラインURLパーサ。Protocol、Host、Path、QueryパラメータなどURLコンポーネントを分析します。',
+        '無料オンラインURLパーサ。デコードされた値の表示付きでURLをプロトコル、ホスト、パス、クエリパラメータ、フラグメントに分解します。',
     },
     regex: {
       title: 'Regex Tester',
       description:
-        '無料オンライン正規表現テスター。マッチハイライト付きで正規表現をテストし視覚化します。',
+        '無料オンライン正規表現テスター。ライブマッチハイライト、キャプチャグループ、置換プレビューで正規表現パターンをテストします。',
     },
     jwtDecoder: {
       title: 'JWT Decoder',
       description:
-        '無料オンラインJWTデコーダ。Signature検証付きでJSON Web Tokenをデコード・検査します。',
+        '無料オンラインJWTデコーダ。JSON Web Tokenをデコードしてヘッダー、ペイロード、有効期限を確認し、オプションでHMAC/RSA署名を検証します。',
     },
     jwtEncoder: {
       title: 'JWT Encoder',
       description:
-        '無料オンラインJWTエンコーダ。カスタムHeaderとPayloadでJSON Web Tokenを作成します。',
+        '無料オンラインJWTエンコーダ。カスタムヘッダー、ペイロード、HS256/HS384/HS512 HMACアルゴリズムで署名付きJSON Web Tokenを作成します。',
     },
     stringLength: {
       title: 'String Length',
       description:
-        '無料オンライン文字列長計算機。テキストやファイルの文字、単語、行、バイト（UTF-8）数を計算します。ファイルアップロードとURLロードをサポート。',
+        '無料オンライン文字列長計算機。ファイルアップロードサポート付きでテキストの文字数、単語数、行数、UTF-8バイト数を計算します。',
     },
     curl: {
       title: 'cURL Parser',
-      description: 'cURLコマンドを解析して視覚化します',
+      description:
+        '無料オンラインcURLコマンドパーサ。cURLをメソッド、URL、ヘッダー、クッキー、ボディコンポーネントに解析し、ワンクリックでAPI Testerにインポートします。',
     },
     apiTester: {
       title: 'API Tester',
       description:
-        '無料オンラインAPIテスター。すべてのHTTPメソッド、ヘッダー、ボディをサポートし、拡張機能でCORS回避が可能です。',
+        '無料オンラインAPIテスター。すべてのHTTPメソッド、ヘッダー、ボディタイプでリクエストをビルドし、ブラウザ拡張機能でCORS制限をバイパスします。',
       curlPaste: {
         applied: 'cURLが解析されて適用されました',
         failed: 'cURL解析に失敗しました',
@@ -1225,7 +1241,7 @@ export const jaJP = {
     apiDiff: {
       title: 'API Response Diff',
       description:
-        '2つのドメインからのAPIレスポンスを並べて比較し、差分をハイライトします。',
+        '無料オンラインAPIレスポンス比較ツール。2つのエンドポイントを同時に呼び出し、JSONレスポンスの差異を並列でハイライトします。',
     },
   },
 } as const satisfies I18nResource;

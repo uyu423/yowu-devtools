@@ -1,6 +1,12 @@
 import type { Plugin } from 'vite';
+// i18n 리소스 임포트 (빌드 시점에 사용)
+import { enUS } from './src/i18n/en-US';
+import { esES } from './src/i18n/es-ES';
 import fs from 'fs';
+import { jaJP } from './src/i18n/ja-JP';
+import { koKR } from './src/i18n/ko-KR';
 import path from 'path';
+import { zhCN } from './src/i18n/zh-CN';
 
 // Locale 타입 및 상수 정의 (src/lib/constants.ts와 동기화 필요)
 // Node.js 환경에서 직접 사용하기 위해 별도 정의
@@ -21,6 +27,46 @@ const SUPPORTED_LOCALES: LocaleInfo[] = [
 ];
 
 const DEFAULT_LOCALE: LocaleCode = 'en-US';
+
+// i18n 메타 정보 타입 (SEO용)
+interface I18nMetaInfo {
+  title: string;
+  description: string;
+}
+
+interface I18nMetaSection {
+  home: I18nMetaInfo;
+  [key: string]: I18nMetaInfo | Record<string, unknown>;
+}
+
+interface I18nResource {
+  meta: I18nMetaSection;
+}
+
+// Locale별 i18n 리소스 매핑
+const i18nResources: Record<LocaleCode, I18nResource> = {
+  'en-US': enUS as unknown as I18nResource,
+  'ko-KR': koKR as unknown as I18nResource,
+  'ja-JP': jaJP as unknown as I18nResource,
+  'zh-CN': zhCN as unknown as I18nResource,
+  'es-ES': esES as unknown as I18nResource,
+};
+
+// Tool ID -> i18n meta key 매핑 (ID와 key가 다른 경우만)
+const toolIdToI18nKey: Record<string, string> = {
+  'url-parser': 'urlParser',
+  'jwt-decoder': 'jwtDecoder',
+  'jwt-encoder': 'jwtEncoder',
+  'string-length': 'stringLength',
+  'curl-parser': 'curl',
+  'api-tester': 'apiTester',
+  'api-diff': 'apiDiff',
+};
+
+// Tool ID에서 i18n meta key 가져오기
+function getI18nMetaKey(toolId: string): string {
+  return toolIdToI18nKey[toolId] || toolId;
+}
 
 // package.json에서 버전 정보 읽기
 const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf-8'));
@@ -50,9 +96,9 @@ const tools: ToolInfo[] = [
     id: 'json',
     path: '/json',
     title: 'JSON Viewer',
-    description: 'Pretty print and traverse JSON',
+    description: 'Instantly format JSON and browse in a tree structure',
     seoDescription:
-      'Free online JSON viewer, formatter, and validator. Pretty print JSON with syntax highlighting, tree view, search, and copy features.',
+      'Free online JSON viewer, formatter, and validator. Format JSON with syntax highlighting, collapsible tree view, search, and one-click copy.',
     keywords: [
       'json viewer',
       'json formatter',
@@ -76,9 +122,9 @@ const tools: ToolInfo[] = [
     id: 'url',
     path: '/url',
     title: 'URL Encoder',
-    description: 'Encode/Decode URL strings',
+    description: 'Percent-encode or decode URL strings in real time',
     seoDescription:
-      'Free URL encoder and decoder tool. Encode special characters in URLs, decode URL-encoded strings, and handle query parameters safely.',
+      'Free online URL encoder and decoder. Percent-encode special characters or decode URLs with full Unicode and UTF-8 support.',
     keywords: [
       'url encoder',
       'url decoder',
@@ -99,10 +145,10 @@ const tools: ToolInfo[] = [
   {
     id: 'base64',
     path: '/base64',
-    title: 'Base64',
-    description: 'Base64 Encode/Decode',
+    title: 'Base64 Converter',
+    description: 'Encode text to Base64 or decode Base64 back to text',
     seoDescription:
-      'Free Base64 encoder and decoder. Convert text to Base64 and vice versa. Supports UTF-8 encoding and URL-safe Base64. All processing happens in your browser.',
+      'Free online Base64 encoder and decoder. Encode text to Base64 or decode Base64 strings with UTF-8 and URL-safe variant support.',
     keywords: [
       'base64 encoder',
       'base64 decoder',
@@ -125,9 +171,9 @@ const tools: ToolInfo[] = [
     id: 'time',
     path: '/time',
     title: 'Time Converter',
-    description: 'Epoch <-> ISO converter',
+    description: 'Convert epoch timestamps to ISO dates and vice versa',
     seoDescription:
-      'Free epoch timestamp converter. Convert Unix timestamps to human-readable dates and vice versa. Supports milliseconds, seconds, local time, and UTC.',
+      'Free online epoch timestamp converter. Convert Unix timestamps (seconds/milliseconds) to ISO 8601 dates and vice versa with timezone support.',
     keywords: [
       'epoch converter',
       'unix timestamp',
@@ -149,9 +195,9 @@ const tools: ToolInfo[] = [
     id: 'yaml',
     path: '/yaml',
     title: 'YAML Converter',
-    description: 'YAML <-> JSON converter',
+    description: 'Convert between YAML and JSON formats bidirectionally',
     seoDescription:
-      'Free YAML to JSON converter and vice versa. Convert between YAML and JSON formats instantly. Includes error detection with line numbers.',
+      'Free online YAML-JSON converter. Convert between YAML and JSON formats bidirectionally with syntax validation and error reporting.',
     keywords: [
       'yaml to json',
       'json to yaml',
@@ -173,9 +219,9 @@ const tools: ToolInfo[] = [
     id: 'diff',
     path: '/diff',
     title: 'Text Diff',
-    description: 'Compare two texts',
+    description: 'Compare two texts with line and character-level highlighting',
     seoDescription:
-      'Free text diff tool. Compare two text blocks side-by-side or in unified view. Highlight differences, ignore whitespace or case. Perfect for code reviews.',
+      'Free online text diff tool. Compare two text blocks side-by-side or in unified view with line-by-line and character-level highlighting.',
     keywords: [
       'text diff',
       'diff tool',
@@ -198,9 +244,9 @@ const tools: ToolInfo[] = [
     id: 'cron',
     path: '/cron',
     title: 'Cron Parser',
-    description: 'Cron expression explainer',
+    description: 'Explain cron expressions with next run times',
     seoDescription:
-      'Free cron expression parser and validator. Understand cron expressions with human-readable descriptions. View next execution times and validate cron syntax.',
+      'Free online cron expression parser. Explain cron schedules in plain English and preview next execution times with multiple dialect support.',
     keywords: [
       'cron parser',
       'cron expression',
@@ -223,9 +269,9 @@ const tools: ToolInfo[] = [
     id: 'jwt-decoder',
     path: '/jwt-decoder',
     title: 'JWT Decoder',
-    description: 'Decode JSON Web Tokens',
+    description: 'Decode JWTs and inspect header, payload, and signature',
     seoDescription:
-      'Free online JWT decoder. Decode JSON Web Tokens to view header, payload, and signature. Verify token signatures and check expiration. All processing happens in your browser.',
+      'Free online JWT decoder. Decode JSON Web Tokens to inspect header, payload, expiration, and optionally verify HMAC/RSA signatures.',
     keywords: [
       'jwt decoder',
       'jwt parser',
@@ -249,9 +295,9 @@ const tools: ToolInfo[] = [
     id: 'jwt-encoder',
     path: '/jwt-encoder',
     title: 'JWT Encoder',
-    description: 'Encode JSON Web Tokens',
+    description: 'Create signed JWTs from header and payload',
     seoDescription:
-      'Free online JWT encoder. Encode JSON Web Tokens from header and payload with HMAC signing. Generate secure JWT tokens. All processing happens in your browser.',
+      'Free online JWT encoder. Create signed JSON Web Tokens with custom header, payload, and HS256/HS384/HS512 HMAC algorithms.',
     keywords: [
       'jwt encoder',
       'jwt token',
@@ -274,10 +320,11 @@ const tools: ToolInfo[] = [
   {
     id: 'hash',
     path: '/hash',
-    title: 'Hash/Checksum Generator',
-    description: 'Calculate hash values and HMAC signatures',
+    title: 'Hash Generator',
+    description:
+      'Generate MD5, SHA-1, SHA-256, SHA-512 hashes and HMAC signatures',
     seoDescription:
-      'Free online hash and checksum generator. Calculate MD5, SHA-1, SHA-256, and SHA-512 hashes and HMAC signatures for text or files. Supports hex, Base64, and Base64URL encoding. All processing happens in your browser - no data sent to servers.',
+      'Free online hash generator. Calculate MD5, SHA-1, SHA-256, SHA-512 hashes for text or files, plus HMAC signatures with key support.',
     keywords: [
       'hash generator',
       'checksum calculator',
@@ -314,7 +361,7 @@ const tools: ToolInfo[] = [
     title: 'UUID Generator',
     description: 'Generate UUID v4, UUID v7, and ULID identifiers',
     seoDescription:
-      'Free online UUID and ULID generator. Generate UUID v4 (random), UUID v7 (timestamp-based), and ULID identifiers. Batch generation up to 100 IDs. All processing happens in your browser.',
+      'Free online UUID and ULID generator. Generate cryptographically random UUID v4, timestamp-based UUID v7, and sortable ULID identifiers.',
     keywords: [
       'uuid generator',
       'ulid generator',
@@ -341,9 +388,9 @@ const tools: ToolInfo[] = [
     id: 'password',
     path: '/password',
     title: 'Password Generator',
-    description: 'Generate secure passwords with customizable options',
+    description: 'Generate strong passwords with character and length options',
     seoDescription:
-      'Free online password generator. Create strong, secure passwords with customizable length, character types, and exclusion options. Password strength indicator included. All processing happens in your browser.',
+      'Free online password generator. Create cryptographically secure passwords with custom length, character types, and exclusion rules.',
     keywords: [
       'password generator',
       'secure password',
@@ -372,9 +419,9 @@ const tools: ToolInfo[] = [
     path: '/url-parser',
     title: 'URL Parser',
     description:
-      'Parse and visualize URL components including protocol, host, path, fragment, and query parameters',
+      'Break URLs into protocol, host, path, query, and fragment components',
     seoDescription:
-      'Free online URL parser. Parse and visualize URL components (protocol, host, path, fragment, query parameters) with decoding options. Client-side processing.',
+      'Free online URL parser. Break down URLs into protocol, host, path, query parameters, and fragment with decoded value display.',
     keywords: [
       'url parser',
       'url analyzer',
@@ -403,9 +450,10 @@ const tools: ToolInfo[] = [
     id: 'regex',
     path: '/regex',
     title: 'Regex Tester',
-    description: 'Test and visualize regular expressions',
+    description:
+      'Test regex patterns live with match and capture-group highlighting',
     seoDescription:
-      'Free online regex tester and visualizer. Test regular expressions with real-time match highlighting, capture groups, named groups, and replacement preview. Supports all JavaScript RegExp flags. All processing happens in your browser.',
+      'Free online regular expression tester. Test regex patterns with live match highlighting, capture groups, and replacement preview.',
     keywords: [
       'regex tester',
       'regular expression tester',
@@ -434,9 +482,9 @@ const tools: ToolInfo[] = [
     id: 'string-length',
     path: '/string-length',
     title: 'String Length Calculator',
-    description: 'Calculate character, word, line, and byte counts for text',
+    description: 'Count characters, words, lines, and bytes in text',
     seoDescription:
-      'Free online string length calculator. Count characters, words, lines, and bytes (UTF-8) for any text. Supports file upload. Unicode-aware counting. All processing happens in your browser.',
+      'Free online string length counter. Count characters, words, lines, and UTF-8 bytes in your text with file upload support.',
     keywords: [
       'string length',
       'character count',
@@ -464,9 +512,9 @@ const tools: ToolInfo[] = [
     id: 'api-tester',
     path: '/api-tester',
     title: 'API Tester',
-    description: 'Build and send HTTP requests with CORS bypass via extension',
+    description: 'Build HTTP requests and bypass CORS via browser extension',
     seoDescription:
-      'Free online API tester. Build and send HTTP requests with support for all methods, headers, body types. Bypass CORS restrictions using companion Chrome extension. View formatted responses.',
+      'Free online API tester. Build HTTP requests with all methods, headers, body types, and bypass CORS restrictions via browser extension.',
     keywords: [
       'api tester',
       'http client',
@@ -495,9 +543,9 @@ const tools: ToolInfo[] = [
     id: 'curl-parser',
     path: '/curl',
     title: 'cURL Parser',
-    description: 'Parse and visualize cURL commands',
+    description: 'Parse cURL commands into method, URL, headers, and body',
     seoDescription:
-      'Free online cURL parser and visualizer. Parse cURL commands to extract URL, method, headers, cookies, body, and options. Convert cURL to API Tester format instantly. All processing happens in your browser - no data sent to servers.',
+      'Free online cURL command parser. Parse cURL into method, URL, headers, cookies, and body components with one-click API Tester import.',
     keywords: [
       'curl parser',
       'curl command parser',
@@ -523,9 +571,9 @@ const tools: ToolInfo[] = [
     id: 'api-diff',
     path: '/api-diff',
     title: 'API Response Diff',
-    description: 'Compare API responses from two domains',
+    description: 'Call two endpoints simultaneously and compare JSON responses',
     seoDescription:
-      'Free online API response comparison tool. Compare JSON responses from two domains side-by-side with diff highlighting. Supports all HTTP methods, headers, and request bodies. CORS bypass via Chrome extension.',
+      'Free online API response comparison tool. Call two endpoints simultaneously and highlight JSON response differences side-by-side.',
     keywords: [
       'api diff',
       'api comparison',
@@ -578,15 +626,25 @@ export function generateRoutes(): Plugin {
         const toolUrl = `https://tools.yowu.dev${toolPath}`;
         const keywordsStr = tool.keywords.join(', ');
 
+        // i18n 리소스에서 locale별 SEO 정보 가져오기
+        const i18n = i18nResources[locale];
+        const i18nMetaKey = getI18nMetaKey(tool.id);
+        const toolMeta = i18n.meta[i18nMetaKey] as I18nMetaInfo | undefined;
+
+        // locale별 타이틀과 설명 (fallback: 영어)
+        const localizedTitle = toolMeta?.title || tool.title;
+        const localizedDescription =
+          toolMeta?.description || tool.seoDescription;
+
         // 구조화된 데이터 (JSON-LD) 생성
         const structuredData = {
           '@context': 'https://schema.org',
           '@type': 'WebApplication',
-          name: `${tool.title} | Yowu's DevTools`,
+          name: `${localizedTitle} | Yowu's DevTools`,
           url: toolUrl,
           applicationCategory: 'DeveloperApplication',
           operatingSystem: 'Web',
-          description: tool.seoDescription,
+          description: localizedDescription,
           offers: {
             '@type': 'Offer',
             price: '0',
@@ -601,13 +659,13 @@ export function generateRoutes(): Plugin {
         };
 
         // SEO 최적화된 title 생성 (50-60자 권장)
-        const seoTitle = `${tool.title} | Yowu's DevTools`;
+        const seoTitle = `${localizedTitle} | Yowu's DevTools`;
 
         // Description이 160자를 초과하면 자르기 (110-160자 권장)
         const optimizedDescription =
-          tool.seoDescription.length > 160
-            ? tool.seoDescription.substring(0, 157) + '...'
-            : tool.seoDescription;
+          localizedDescription.length > 160
+            ? localizedDescription.substring(0, 157) + '...'
+            : localizedDescription;
 
         // HTML lang 속성용 locale 코드 (BCP 47)
         const htmlLang = locale.toLowerCase().replace('_', '-');
@@ -623,14 +681,14 @@ export function generateRoutes(): Plugin {
     <meta property="og:title" content="${seoTitle}" />
     <meta property="og:description" content="${optimizedDescription}" />
     <meta property="og:image" content="https://tools.yowu.dev/opengraph.png" />
-    <meta property="og:image:alt" content="${tool.title} | Yowu's DevTools" />
+    <meta property="og:image:alt" content="${localizedTitle} | Yowu's DevTools" />
     <meta property="og:site_name" content="Yowu's DevTools" />
     <meta property="og:locale" content="${htmlLang}" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="${seoTitle}" />
     <meta name="twitter:description" content="${optimizedDescription}" />
     <meta name="twitter:image" content="https://tools.yowu.dev/opengraph.png" />
-    <meta name="twitter:image:alt" content="${tool.title} | Yowu's DevTools" />
+    <meta name="twitter:image:alt" content="${localizedTitle} | Yowu's DevTools" />
     <script type="application/ld+json">${JSON.stringify(
       structuredData,
       null,
@@ -696,19 +754,28 @@ export function generateRoutes(): Plugin {
         const homeUrl = `https://tools.yowu.dev${homePath}`;
         const htmlLang = locale.toLowerCase().replace('_', '-');
 
+        // i18n 리소스에서 locale별 홈 SEO 정보 가져오기
+        const i18n = i18nResources[locale];
+        const homeMeta = i18n.meta.home as {
+          title: string;
+          description: string;
+        };
+        const homeTitle = `${homeMeta.title} | Developer Tools`;
+        const homeDescription = homeMeta.description;
+
         const metaTags = `
-    <title>Yowu's DevTools | Developer Tools</title>
-    <meta name="description" content="A privacy-first toolbox for developers. JSON formatting, password generation, hash calculation, UUID creation, and more. All processing happens in your browser." />
+    <title>${homeTitle}</title>
+    <meta name="description" content="${homeDescription}" />
     <link rel="canonical" href="${homeUrl}" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="${homeUrl}" />
-    <meta property="og:title" content="Yowu's DevTools | Developer Tools" />
-    <meta property="og:description" content="A privacy-first toolbox for developers. All processing happens in your browser." />
+    <meta property="og:title" content="${homeTitle}" />
+    <meta property="og:description" content="${homeDescription}" />
     <meta property="og:image" content="https://tools.yowu.dev/opengraph.png" />
     <meta property="og:locale" content="${htmlLang}" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Yowu's DevTools | Developer Tools" />
-    <meta name="twitter:description" content="A privacy-first toolbox for developers. All processing happens in your browser." />
+    <meta name="twitter:title" content="${homeTitle}" />
+    <meta name="twitter:description" content="${homeDescription}" />
     <meta name="twitter:image" content="https://tools.yowu.dev/opengraph.png" />
   `;
 

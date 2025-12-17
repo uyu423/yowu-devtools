@@ -1182,6 +1182,11 @@ export const esES = {
     },
   },
   meta: {
+    home: {
+      title: "Yowu's DevTools",
+      description:
+        'Caja de herramientas para desarrolladores con privacidad prioritaria. Formato JSON, generación de contraseñas, cálculo de hash, creación de UUID y más. Todo el procesamiento ocurre en su navegador.',
+    },
     json: {
       title: 'JSON Viewer',
       description:

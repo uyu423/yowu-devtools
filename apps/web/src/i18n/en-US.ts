@@ -163,7 +163,8 @@ export const enUS = {
   tool: {
     json: {
       title: 'JSON Pretty Viewer',
-      description: 'Format JSON instantly and explore the structure as a tree.',
+      description:
+        'Format, validate, and navigate JSON with tree view and syntax highlighting.',
       inputTitle: 'Input JSON',
       inputPlaceholder: '{"key": "value"}',
       sortKeys: 'Sort keys',
@@ -194,7 +195,8 @@ export const enUS = {
     },
     url: {
       title: 'URL Encode/Decode',
-      description: 'Safely transform query params or path segments.',
+      description:
+        'Encode special characters and decode percent-encoded URLs instantly.',
       inputPlaceholder: 'Type or paste content here...',
       resultPlaceholder: 'Result will appear here...',
       useSpacePlus: 'Use + for spaces',
@@ -205,7 +207,8 @@ export const enUS = {
     },
     base64: {
       title: 'Base64 Converter',
-      description: 'Encode or decode UTF-8 text, including Base64URL.',
+      description:
+        'Encode text to Base64 or decode Base64 strings with UTF-8 and URL-safe support.',
       textInput: 'Text Input',
       base64Input: 'Base64 Input',
       textPlaceholder: 'Type text to encode...',
@@ -219,7 +222,8 @@ export const enUS = {
     },
     time: {
       title: 'Epoch / ISO Converter',
-      description: 'Switch between epoch timestamps and ISO8601 strings.',
+      description:
+        'Convert between Unix timestamps and ISO 8601 dates with timezone support.',
       epochTimestamp: 'Epoch Timestamp',
       epochPlaceholder: 'e.g. 1704067200000',
       isoDate: 'ISO 8601 Date',
@@ -266,7 +270,8 @@ export const enUS = {
     },
     yaml: {
       title: 'YAML ↔ JSON',
-      description: 'Convert both directions and inspect parse errors quickly.',
+      description:
+        'Convert between YAML and JSON formats bidirectionally with syntax validation.',
       yamlInput: 'YAML Input',
       jsonInput: 'JSON Input',
       yamlOutput: 'YAML Output',
@@ -279,7 +284,8 @@ export const enUS = {
     },
     diff: {
       title: 'Text Diff',
-      description: 'Spot differences between two text blocks instantly.',
+      description:
+        'Compare two texts side-by-side and highlight additions, deletions, and changes.',
       original: 'Original',
       modified: 'Modified',
       splitView: 'Split View',
@@ -305,7 +311,8 @@ export const enUS = {
     },
     cron: {
       title: 'Cron Parser',
-      description: 'Explain cron expressions and preview upcoming runs.',
+      description:
+        'Parse cron expressions, explain schedules in plain English, and preview next runs.',
       cronExpression: 'Cron Expression',
       humanReadable: 'Human readable',
       nextScheduledDates: 'Next Scheduled Dates',
@@ -485,7 +492,8 @@ export const enUS = {
     },
     password: {
       title: 'Password Generator',
-      description: 'Generate secure passwords with customizable options',
+      description:
+        'Generate cryptographically secure passwords with custom length and character rules.',
       length: 'Length',
       characterTypes: 'Character Types',
       exclusionOptions: 'Exclusion Options',
@@ -513,7 +521,7 @@ export const enUS = {
     urlParser: {
       title: 'URL Parser',
       description:
-        'Parse and visualize URL components including protocol, host, path, fragment, and query parameters.',
+        'Break down URLs into protocol, host, path, query parameters, and fragment.',
       inputPlaceholder:
         'Enter a URL or query string (e.g., https://example.com/search?q=laptop)...',
       urlOrQueryString: 'URL or Query String',
@@ -546,7 +554,7 @@ export const enUS = {
     regex: {
       title: 'Regex Tester',
       description:
-        'Test and visualize regular expressions with match highlighting and replacement preview',
+        'Test regex patterns with live match highlighting, group capture, and replacements.',
       pattern: 'Pattern',
       patternPlaceholder: 'Enter regular expression pattern...',
       flags: 'Flags',
@@ -811,7 +819,7 @@ export const enUS = {
     jwtDecoder: {
       title: 'JWT Decoder',
       description:
-        'Decode JSON Web Tokens to view header, payload, and signature.',
+        'Decode JWTs to inspect header, payload, expiration, and verify signatures.',
       jwtToken: 'JWT Token',
       tokenPlaceholder:
         'Paste JWT token (e.g., eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...)',
@@ -855,7 +863,8 @@ export const enUS = {
     },
     jwtEncoder: {
       title: 'JWT Encoder',
-      description: 'Encode JSON Web Tokens from header and payload.',
+      description:
+        'Create signed JWTs with custom header, payload, and HMAC algorithms.',
       headerJson: 'Header (JSON)',
       headerPlaceholder: '{"alg":"HS256","typ":"JWT"}',
       payloadJson: 'Payload (JSON)',
@@ -898,7 +907,8 @@ export const enUS = {
     },
     curl: {
       title: 'cURL Parser',
-      description: 'Parse and visualize cURL commands',
+      description:
+        'Parse cURL commands into method, URL, headers, cookies, and body components.',
       pasteHint: 'Paste cURL command',
       placeholder:
         'curl -X POST https://api.example.com/v1/users -H "Content-Type: application/json" -d \'{"name":"John"}\'',
@@ -961,7 +971,8 @@ export const enUS = {
     },
     apiTester: {
       title: 'API Tester',
-      description: 'Test REST APIs with request builder and CORS bypass.',
+      description:
+        'Build and send HTTP requests with headers, body, and CORS bypass via extension.',
       urlPlaceholder: 'https://api.example.com/v1/users',
       send: 'Send',
       cancel: 'Cancel',
@@ -1072,7 +1083,8 @@ export const enUS = {
     },
     apiDiff: {
       title: 'API Response Diff',
-      description: 'Compare API responses from two domains',
+      description:
+        'Call two API endpoints simultaneously and highlight JSON response differences.',
       domains: 'Domains',
       domainA: 'Domain A',
       domainB: 'Domain B',
@@ -1148,89 +1160,95 @@ export const enUS = {
     },
   },
   meta: {
+    home: {
+      title: "Yowu's DevTools",
+      description:
+        'A privacy-first toolbox for developers. JSON formatting, password generation, hash calculation, UUID creation, and more. All processing happens in your browser.',
+    },
     json: {
       title: 'JSON Viewer',
       description:
-        'Free online JSON viewer, formatter, and validator. Pretty print JSON with syntax highlighting, tree view, search, and copy features.',
+        'Free online JSON viewer, formatter, and validator. Format JSON with syntax highlighting, collapsible tree view, search, and one-click copy.',
     },
     url: {
       title: 'URL Encoder',
       description:
-        'Free online URL encoder and decoder. Encode and decode URL strings with support for special characters and Unicode.',
+        'Free online URL encoder and decoder. Percent-encode special characters or decode URLs with full Unicode and UTF-8 support.',
     },
     base64: {
       title: 'Base64 Converter',
       description:
-        'Free online Base64 encoder and decoder. Convert text to Base64 and back with URL-safe variant support.',
+        'Free online Base64 encoder and decoder. Encode text to Base64 or decode Base64 strings with UTF-8 and URL-safe variant support.',
     },
     time: {
       title: 'Time Converter',
       description:
-        'Free online epoch timestamp converter. Convert between Unix timestamps and ISO 8601 dates with timezone support.',
+        'Free online epoch timestamp converter. Convert Unix timestamps (seconds/milliseconds) to ISO 8601 dates and vice versa with timezone support.',
     },
     yaml: {
       title: 'YAML Converter',
       description:
-        'Free online YAML-JSON converter. Convert between YAML and JSON formats with syntax validation.',
+        'Free online YAML-JSON converter. Convert between YAML and JSON formats bidirectionally with syntax validation and error reporting.',
     },
     diff: {
       title: 'Text Diff',
       description:
-        'Free online text diff tool. Compare two text blocks and visualize differences in split or unified view.',
+        'Free online text diff tool. Compare two text blocks side-by-side or in unified view with line-by-line and character-level highlighting.',
     },
     cron: {
       title: 'Cron Parser',
       description:
-        'Free online cron expression parser. Explain cron schedules and preview upcoming execution times.',
+        'Free online cron expression parser. Explain cron schedules in plain English and preview next execution times with multiple dialect support.',
     },
     hash: {
       title: 'Hash Generator',
       description:
-        'Free online hash generator. Calculate MD5, SHA-1, SHA-256, SHA-512 hashes and HMAC signatures.',
+        'Free online hash generator. Calculate MD5, SHA-1, SHA-256, SHA-512 hashes for text or files, plus HMAC signatures with key support.',
     },
     uuid: {
       title: 'UUID Generator',
       description:
-        'Free online UUID and ULID generator. Generate UUID v4, UUID v7, and ULID identifiers.',
+        'Free online UUID and ULID generator. Generate cryptographically random UUID v4, timestamp-based UUID v7, and sortable ULID identifiers.',
     },
     password: {
       title: 'Password Generator',
       description:
-        'Free online password generator. Create secure passwords with customizable length and character options.',
+        'Free online password generator. Create cryptographically secure passwords with custom length, character types, and exclusion rules.',
     },
     urlParser: {
       title: 'URL Parser',
       description:
-        'Free online URL parser. Parse URL components including protocol, host, path, and query parameters.',
+        'Free online URL parser. Break down URLs into protocol, host, path, query parameters, and fragment with decoded value display.',
     },
     regex: {
       title: 'Regex Tester',
       description:
-        'Free online regular expression tester. Test and visualize regex with match highlighting.',
+        'Free online regular expression tester. Test regex patterns with live match highlighting, capture groups, and replacement preview.',
     },
     jwtDecoder: {
       title: 'JWT Decoder',
       description:
-        'Free online JWT decoder. Decode and inspect JSON Web Tokens with signature verification.',
+        'Free online JWT decoder. Decode JSON Web Tokens to inspect header, payload, expiration, and optionally verify HMAC/RSA signatures.',
     },
     jwtEncoder: {
       title: 'JWT Encoder',
       description:
-        'Free online JWT encoder. Create JSON Web Tokens with custom header and payload.',
+        'Free online JWT encoder. Create signed JSON Web Tokens with custom header, payload, and HS256/HS384/HS512 HMAC algorithms.',
     },
     stringLength: {
       title: 'String Length',
       description:
-        'Free online string length counter. Count characters, words, lines, and bytes in your text.',
+        'Free online string length counter. Count characters, words, lines, and UTF-8 bytes in your text with file upload support.',
     },
     curl: {
       title: 'cURL Parser',
-      description: 'Parse and visualize cURL commands',
+      description:
+        'Free online cURL command parser. Parse cURL into method, URL, headers, cookies, and body components with one-click API Tester import.',
     },
     apiTester: {
       title: 'API Tester',
       description:
-        'Free online API tester. Build and send HTTP requests with support for all methods, headers, body, and CORS bypass via extension.',
+        'Free online API tester. Build HTTP requests with all methods, headers, body types, and bypass CORS restrictions via browser extension.',
       curlPaste: {
         applied: 'cURL parsed and applied',
         failed: 'cURL parse failed',
@@ -1241,7 +1259,7 @@ export const enUS = {
     apiDiff: {
       title: 'API Response Diff',
       description:
-        'Free online API response comparison tool. Compare JSON responses from two domains side-by-side with diff highlighting.',
+        'Free online API response comparison tool. Call two endpoints simultaneously and highlight JSON response differences side-by-side.',
     },
   },
 } as const;

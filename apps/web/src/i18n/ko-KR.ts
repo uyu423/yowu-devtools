@@ -165,7 +165,7 @@ export const koKR = {
   tool: {
     json: {
       title: 'JSON Pretty Viewer',
-      description: 'JSON을 즉시 포맷하고 트리 구조로 탐색합니다.',
+      description: '트리 뷰와 구문 강조로 JSON을 포맷, 검증, 탐색합니다.',
       inputTitle: 'JSON 입력',
       inputPlaceholder: '{"key": "value"}',
       sortKeys: 'Key 정렬',
@@ -194,7 +194,8 @@ export const koKR = {
     },
     url: {
       title: 'URL Encode/Decode',
-      description: '쿼리 파라미터나 경로 세그먼트를 안전하게 변환합니다.',
+      description:
+        '특수 문자를 인코딩하거나 퍼센트 인코딩된 URL을 즉시 디코딩합니다.',
       inputPlaceholder: '내용을 입력하거나 붙여넣으세요...',
       resultPlaceholder: '결과가 여기에 표시됩니다...',
       useSpacePlus: '공백에 + 사용',
@@ -204,7 +205,8 @@ export const koKR = {
     },
     base64: {
       title: 'Base64 Converter',
-      description: 'Base64URL을 포함하여 UTF-8 텍스트를 Encode/Decode합니다.',
+      description:
+        '텍스트를 Base64로 인코딩하거나, UTF-8 및 URL-safe 지원으로 디코딩합니다.',
       textInput: '텍스트 입력',
       base64Input: 'Base64 입력',
       textPlaceholder: 'Encode할 텍스트를 입력하세요...',
@@ -218,7 +220,8 @@ export const koKR = {
     },
     time: {
       title: 'Epoch / ISO Converter',
-      description: 'Epoch Timestamp와 ISO8601 문자열을 상호 변환합니다.',
+      description:
+        'Unix 타임스탬프와 ISO 8601 날짜를 타임존 지원으로 변환합니다.',
       epochTimestamp: 'Epoch Timestamp',
       epochPlaceholder: '예: 1704067200000',
       isoDate: 'ISO 8601 날짜',
@@ -262,7 +265,7 @@ export const koKR = {
     },
     yaml: {
       title: 'YAML ↔ JSON',
-      description: '양방향 변환 및 파싱 오류를 빠르게 확인합니다.',
+      description: 'YAML과 JSON 형식 간 양방향 변환 및 구문 검증을 수행합니다.',
       yamlInput: 'YAML 입력',
       jsonInput: 'JSON 입력',
       yamlOutput: 'YAML 출력',
@@ -275,7 +278,8 @@ export const koKR = {
     },
     diff: {
       title: 'Text Diff',
-      description: '두 텍스트 블록의 차이점을 즉시 확인합니다.',
+      description:
+        '두 텍스트를 나란히 비교하고 추가, 삭제, 변경 사항을 강조합니다.',
       original: 'Original',
       modified: 'Modified',
       splitView: 'Split View',
@@ -300,7 +304,8 @@ export const koKR = {
     },
     cron: {
       title: 'Cron Parser',
-      description: 'Cron 표현식을 설명하고 예정된 실행 시간을 미리 봅니다.',
+      description:
+        'Cron 표현식을 파싱하고, 일반 언어로 설명하며, 다음 실행 시간을 미리 봅니다.',
       cronExpression: 'Cron 표현식',
       humanReadable: '읽기 쉬운 설명',
       nextScheduledDates: '다음 예정된 실행',
@@ -477,7 +482,8 @@ export const koKR = {
     },
     password: {
       title: 'Password Generator',
-      description: '사용자 정의 가능한 옵션으로 안전한 비밀번호를 생성합니다',
+      description:
+        '사용자 지정 길이와 문자 규칙으로 암호학적으로 안전한 비밀번호를 생성합니다.',
       length: '길이',
       characterTypes: '문자 유형',
       exclusionOptions: '제외 옵션',
@@ -505,7 +511,7 @@ export const koKR = {
     urlParser: {
       title: 'URL Parser',
       description:
-        'Protocol, Host, Path, Fragment 및 Query 파라미터를 포함한 URL 구성 요소를 분석합니다.',
+        'URL을 프로토콜, 호스트, 경로, 쿼리 파라미터, 프래그먼트로 분해합니다.',
       inputPlaceholder:
         'URL 또는 Query String을 입력하세요 (예: https://example.com/search?q=laptop)...',
       urlOrQueryString: 'URL 또는 Query String',
@@ -538,7 +544,7 @@ export const koKR = {
     regex: {
       title: 'Regex Tester',
       description:
-        '매치 하이라이트와 치환 미리보기로 정규식을 테스트하고 시각화합니다',
+        '실시간 매치 하이라이트, 그룹 캡처, 치환 미리보기로 정규식 패턴을 테스트합니다.',
       pattern: '패턴',
       patternPlaceholder: '정규식 패턴을 입력하세요...',
       flags: 'Flags',
@@ -786,7 +792,7 @@ export const koKR = {
     jwtDecoder: {
       title: 'JWT Decoder',
       description:
-        'JSON Web Token을 Decode하여 Header, Payload, Signature를 확인합니다.',
+        'JWT를 디코딩하여 헤더, 페이로드, 만료 시간을 확인하고 서명을 검증합니다.',
       jwtToken: 'JWT Token',
       tokenPlaceholder:
         'JWT Token을 붙여넣으세요 (예: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...)',
@@ -831,7 +837,8 @@ export const koKR = {
     },
     jwtEncoder: {
       title: 'JWT Encoder',
-      description: 'Header와 Payload로 JSON Web Token을 생성합니다.',
+      description:
+        '사용자 지정 헤더, 페이로드, HMAC 알고리즘으로 서명된 JWT를 생성합니다.',
       headerJson: 'Header (JSON)',
       headerPlaceholder: '{"alg":"HS256","typ":"JWT"}',
       payloadJson: 'Payload (JSON)',
@@ -874,7 +881,8 @@ export const koKR = {
     },
     curl: {
       title: 'cURL Parser',
-      description: 'cURL 명령어를 파싱하고 시각화합니다',
+      description:
+        'cURL 명령어를 메서드, URL, 헤더, 쿠키, 바디 구성요소로 파싱합니다.',
       pasteHint: 'cURL 명령어 붙여넣기',
       placeholder:
         'curl -X POST https://api.example.com/v1/users -H "Content-Type: application/json" -d \'{"name":"John"}\'',
@@ -937,7 +945,7 @@ export const koKR = {
     apiTester: {
       title: 'API Tester',
       description:
-        'Request Builder로 REST API를 테스트하고 CORS 우회를 지원합니다.',
+        '헤더, 바디로 HTTP 요청을 빌드하고 확장 프로그램으로 CORS를 우회합니다.',
       urlPlaceholder: 'https://api.example.com/v1/users',
       send: '전송',
       cancel: '취소',
@@ -1047,7 +1055,8 @@ export const koKR = {
     },
     apiDiff: {
       title: 'API Response Diff',
-      description: '두 도메인의 API 응답 비교',
+      description:
+        '두 API 엔드포인트를 동시에 호출하고 JSON 응답 차이를 강조 표시합니다.',
       domains: '도메인',
       domainA: '도메인 A',
       domainB: '도메인 B',
@@ -1123,89 +1132,95 @@ export const koKR = {
     },
   },
   meta: {
+    home: {
+      title: '요우의 개발자 도구',
+      description:
+        '개발자를 위한 프라이버시 우선 도구 모음. JSON 포맷팅, 비밀번호 생성, 해시 계산, UUID 생성 등. 모든 처리는 브라우저에서 이루어집니다.',
+    },
     json: {
       title: 'JSON Viewer',
       description:
-        '무료 온라인 JSON 뷰어, 포매터, 검증기. 구문 강조, 트리 뷰, 검색 및 복사 기능으로 JSON을 예쁘게 출력합니다.',
+        '무료 온라인 JSON 뷰어, 포매터, 검증기. 구문 강조, 접이식 트리 뷰, 검색, 원클릭 복사 기능으로 JSON을 포맷합니다.',
     },
     url: {
       title: 'URL Encoder',
       description:
-        '무료 온라인 URL 인코더/디코더. 특수 문자와 유니코드를 지원하여 URL 문자열을 인코딩/디코딩합니다.',
+        '무료 온라인 URL 인코더/디코더. 특수 문자를 퍼센트 인코딩하거나 전체 유니코드 및 UTF-8을 지원하여 URL을 디코딩합니다.',
     },
     base64: {
       title: 'Base64 Converter',
       description:
-        '무료 온라인 Base64 인코더/디코더. URL 안전 변형을 지원하여 텍스트를 Base64로 변환합니다.',
+        '무료 온라인 Base64 인코더/디코더. UTF-8 및 URL-safe 변형을 지원하여 텍스트를 Base64로 인코딩하거나 디코딩합니다.',
     },
     time: {
       title: 'Time Converter',
       description:
-        '무료 온라인 Epoch Timestamp 변환기. 타임존 지원으로 Unix Timestamp와 ISO 8601 날짜를 변환합니다.',
+        '무료 온라인 Epoch Timestamp 변환기. 타임존 지원으로 Unix Timestamp(초/밀리초)를 ISO 8601 날짜로 또는 그 반대로 변환합니다.',
     },
     yaml: {
       title: 'YAML Converter',
       description:
-        '무료 온라인 YAML-JSON 변환기. 구문 검증과 함께 YAML과 JSON 형식을 변환합니다.',
+        '무료 온라인 YAML-JSON 변환기. 구문 검증 및 오류 표시와 함께 YAML과 JSON 형식을 양방향으로 변환합니다.',
     },
     diff: {
       title: 'Text Diff',
       description:
-        '무료 온라인 텍스트 Diff 도구. 두 텍스트 블록을 비교하고 분할 또는 통합 뷰로 차이점을 시각화합니다.',
+        '무료 온라인 텍스트 Diff 도구. 두 텍스트 블록을 나란히 또는 통합 뷰로 비교하고 줄 단위 및 문자 단위로 하이라이트합니다.',
     },
     cron: {
       title: 'Cron Parser',
       description:
-        '무료 온라인 Cron 표현식 파서. Cron 스케줄을 설명하고 다음 실행 시간을 미리 봅니다.',
+        '무료 온라인 Cron 표현식 파서. 다양한 방언을 지원하여 Cron 스케줄을 일반 언어로 설명하고 다음 실행 시간을 미리 봅니다.',
     },
     hash: {
       title: 'Hash Generator',
       description:
-        '무료 온라인 Hash 생성기. MD5, SHA-1, SHA-256, SHA-512 해시와 HMAC 서명을 계산합니다.',
+        '무료 온라인 Hash 생성기. 텍스트 또는 파일의 MD5, SHA-1, SHA-256, SHA-512 해시와 키를 지원하는 HMAC 서명을 계산합니다.',
     },
     uuid: {
       title: 'UUID Generator',
       description:
-        '무료 온라인 UUID 및 ULID 생성기. UUID v4, UUID v7, ULID 식별자를 생성합니다.',
+        '무료 온라인 UUID 및 ULID 생성기. 암호학적으로 안전한 UUID v4, 타임스탬프 기반 UUID v7, 정렬 가능한 ULID 식별자를 생성합니다.',
     },
     password: {
       title: 'Password Generator',
       description:
-        '무료 온라인 비밀번호 생성기. 사용자 정의 가능한 길이와 문자 옵션으로 안전한 비밀번호를 생성합니다.',
+        '무료 온라인 비밀번호 생성기. 사용자 지정 길이, 문자 유형, 제외 규칙으로 암호학적으로 안전한 비밀번호를 생성합니다.',
     },
     urlParser: {
       title: 'URL Parser',
       description:
-        '무료 온라인 URL 파서. Protocol, Host, Path, Query 파라미터 등 URL 구성 요소를 분석합니다.',
+        '무료 온라인 URL 파서. 디코딩된 값 표시와 함께 URL을 프로토콜, 호스트, 경로, 쿼리 파라미터, 프래그먼트로 분해합니다.',
     },
     regex: {
       title: 'Regex Tester',
       description:
-        '무료 온라인 정규식 테스터. 매치 하이라이트로 정규식을 테스트하고 시각화합니다.',
+        '무료 온라인 정규식 테스터. 실시간 매치 하이라이트, 캡처 그룹, 치환 미리보기로 정규식 패턴을 테스트합니다.',
     },
     jwtDecoder: {
       title: 'JWT Decoder',
       description:
-        '무료 온라인 JWT 디코더. Signature 검증으로 JSON Web Token을 디코딩하고 검사합니다.',
+        '무료 온라인 JWT 디코더. JSON Web Token을 디코딩하여 헤더, 페이로드, 만료 시간을 확인하고 선택적으로 HMAC/RSA 서명을 검증합니다.',
     },
     jwtEncoder: {
       title: 'JWT Encoder',
       description:
-        '무료 온라인 JWT 인코더. 사용자 정의 Header와 Payload로 JSON Web Token을 생성합니다.',
+        '무료 온라인 JWT 인코더. 사용자 지정 헤더, 페이로드, HS256/HS384/HS512 HMAC 알고리즘으로 서명된 JSON Web Token을 생성합니다.',
     },
     stringLength: {
       title: 'String Length',
       description:
-        '무료 온라인 문자열 길이 계산기. 텍스트의 문자 수, 단어 수, 줄 수, 바이트 수를 계산합니다.',
+        '무료 온라인 문자열 길이 계산기. 파일 업로드를 지원하여 텍스트의 문자 수, 단어 수, 줄 수, UTF-8 바이트 수를 계산합니다.',
     },
     curl: {
       title: 'cURL Parser',
-      description: 'cURL 명령어를 파싱하고 시각화합니다',
+      description:
+        '무료 온라인 cURL 명령어 파서. cURL을 메서드, URL, 헤더, 쿠키, 바디 구성요소로 파싱하고 원클릭으로 API Tester로 가져옵니다.',
     },
     apiTester: {
       title: 'API Tester',
       description:
-        '무료 온라인 API 테스터. 모든 HTTP 메서드, 헤더, 바디를 지원하고 확장 프로그램을 통해 CORS 우회가 가능합니다.',
+        '무료 온라인 API 테스터. 모든 HTTP 메서드, 헤더, 바디 유형으로 요청을 빌드하고 브라우저 확장 프로그램을 통해 CORS 제한을 우회합니다.',
       curlPaste: {
         applied: 'cURL이 파싱되어 적용되었습니다',
         failed: 'cURL 파싱 실패',
@@ -1216,7 +1231,7 @@ export const koKR = {
     apiDiff: {
       title: 'API Response Diff',
       description:
-        '두 도메인의 API 응답을 나란히 비교하고 차이점을 하이라이트합니다.',
+        '무료 온라인 API 응답 비교 도구. 두 엔드포인트를 동시에 호출하고 JSON 응답 차이를 나란히 하이라이트합니다.',
     },
   },
 } as const satisfies I18nResource;
