@@ -40,9 +40,9 @@ interface ToolInfo {
 // Sitemap Priority 설정
 // 개발자들은 "json formatter", "base64 decode" 등으로 직접 검색하므로
 // 개별 도구 페이지가 홈페이지보다 priority가 높아야 함
-const TOOL_PRIORITY = 1.0;           // 모든 개별 도구 (en-US)
-const TOOL_LOCALE_PRIORITY = 0.9;    // Locale 버전 도구 페이지
-const HOME_PRIORITY = 0.8;           // 메인 페이지 (홈)
+const TOOL_PRIORITY = 1.0; // 모든 개별 도구 (en-US)
+const TOOL_LOCALE_PRIORITY = 0.9; // Locale 버전 도구 페이지
+const HOME_PRIORITY = 0.8; // 메인 페이지 (홈)
 
 // 도구 정보 (SEO 최적화된 상세 정보 포함)
 const tools: ToolInfo[] = [

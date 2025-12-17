@@ -1,12 +1,17 @@
 /**
  * Result Banner - 비교 결과 배너 및 Diff 테이블
+ * Simple & Modern Design
  */
 
 import {
-  AlertTriangle,
-  CheckCircle,
+  Check,
+  ChevronDown,
+  ChevronUp,
+  ExternalLink,
   GitCompare,
   GripHorizontal,
+  Minus,
+  X,
 } from 'lucide-react';
 import type { ComparisonResult, DifferentField } from '../types';
 import {
@@ -53,16 +58,15 @@ export const ResultBanner: React.FC<ResultBannerProps> = ({
   });
 
   const [isDragging, setIsDragging] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const startYRef = useRef(0);
   const startHeightRef = useRef(0);
 
-  // Save table height to localStorage
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY_DIFF_TABLE_HEIGHT, String(tableHeight));
   }, [tableHeight]);
 
-  // Handle drag to resize
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
     setIsDragging(true);
@@ -95,9 +99,7 @@ export const ResultBanner: React.FC<ResultBannerProps> = ({
     };
   }, [isDragging]);
 
-  // Navigate to Text Diff with response bodies
   const handleCompareInTextDiff = useCallback(() => {
-    // Format JSON for better readability
     const formatJson = (raw: string | null | undefined): string => {
       if (!raw) return '';
       try {
@@ -108,7 +110,6 @@ export const ResultBanner: React.FC<ResultBannerProps> = ({
       }
     };
 
-    // Pass state directly for useToolState to merge with default state
     navigate('/diff', {
       state: {
         left: formatJson(rawBodyA),
@@ -120,128 +121,201 @@ export const ResultBanner: React.FC<ResultBannerProps> = ({
   if (!hasResponses) return null;
   if (!comparison) return null;
 
+  // Success State
   if (comparison.isSame) {
     return (
-      <div className="mb-4 p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg">
-        <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400">
-          <CheckCircle className="w-5 h-5" />
-          <span className="font-medium">
+      <div className="mb-4">
+        <div
+          className={cn(
+            'flex items-center gap-3 px-4 py-3',
+            'bg-gray-50 dark:bg-gray-800/50',
+            'border border-gray-200 dark:border-gray-700',
+            'rounded-lg'
+          )}
+        >
+          <div className="flex items-center justify-center w-6 h-6 rounded-full bg-green-500 dark:bg-green-600">
+            <Check className="w-4 h-4 text-white" strokeWidth={3} />
+          </div>
+          <span className="font-medium text-gray-900 dark:text-gray-100">
             {t('tool.apiDiff.responsesIdentical')}
+          </span>
+          <span className="text-sm text-gray-500 dark:text-gray-400">
+            {comparison.statusA || 200}
           </span>
         </div>
       </div>
     );
   }
 
+  // Different State
+  const diffCount = comparison.differentFields.length;
+
   return (
-    <div className="mb-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
-          <AlertTriangle className="w-5 h-5" />
-          <span className="font-medium">
-            {t('tool.apiDiff.responsesDifferent')}
-          </span>
-          {!comparison.statusSame && (
-            <span className="text-sm ml-2">
-              ({t('tool.apiDiff.status')}: A=
-              {comparison.statusA || t('common.error')}, B=
-              {comparison.statusB || t('common.error')})
+    <div className="mb-4">
+      <div
+        className={cn(
+          'bg-gray-50 dark:bg-gray-800/50',
+          'border border-gray-200 dark:border-gray-700',
+          'rounded-lg overflow-hidden'
+        )}
+      >
+        {/* Header */}
+        <div className="flex items-center gap-3 px-4 py-3">
+          <div className="flex items-center justify-center w-6 h-6 rounded-full bg-red-500 dark:bg-red-600">
+            <X className="w-4 h-4 text-white" strokeWidth={3} />
+          </div>
+
+          <div className="flex-1 flex items-center gap-3 min-w-0">
+            <span className="font-medium text-gray-900 dark:text-gray-100">
+              {t('tool.apiDiff.responsesDifferent')}
             </span>
-          )}
+
+            {diffCount > 0 && (
+              <span className="px-2 py-0.5 text-xs font-medium rounded bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                {diffCount}
+              </span>
+            )}
+
+            {!comparison.statusSame && (
+              <span className="text-sm text-gray-500 dark:text-gray-400">
+                {comparison.statusA || '?'} / {comparison.statusB || '?'}
+              </span>
+            )}
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center gap-1">
+            {(rawBodyA || rawBodyB) && (
+              <button
+                onClick={handleCompareInTextDiff}
+                className={cn(
+                  'flex items-center gap-1.5 px-3 py-1.5 text-sm',
+                  'text-gray-600 dark:text-gray-300',
+                  'hover:bg-gray-200 dark:hover:bg-gray-700',
+                  'rounded-md transition-colors'
+                )}
+              >
+                <GitCompare className="w-4 h-4" />
+                <span className="hidden sm:inline">
+                  {t('tool.apiDiff.compareInTextDiff')}
+                </span>
+                <ExternalLink className="w-3 h-3 opacity-50" />
+              </button>
+            )}
+
+            {diffCount > 0 && (
+              <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                className={cn(
+                  'flex items-center justify-center w-8 h-8 rounded-md',
+                  'text-gray-500 dark:text-gray-400',
+                  'hover:bg-gray-200 dark:hover:bg-gray-700',
+                  'transition-colors'
+                )}
+              >
+                {isExpanded ? (
+                  <ChevronUp className="w-4 h-4" />
+                ) : (
+                  <ChevronDown className="w-4 h-4" />
+                )}
+              </button>
+            )}
+          </div>
         </div>
 
-        {/* Compare in Text Diff button */}
-        {(rawBodyA || rawBodyB) && (
-          <button
-            onClick={handleCompareInTextDiff}
-            className={cn(
-              'flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg',
-              'bg-amber-100 dark:bg-amber-800/40 text-amber-700 dark:text-amber-300',
-              'hover:bg-amber-200 dark:hover:bg-amber-800/60',
-              'transition-colors'
-            )}
+        {/* Diff Table */}
+        {diffCount > 0 && isExpanded && (
+          <div
+            ref={containerRef}
+            className="border-t border-gray-200 dark:border-gray-700"
           >
-            <GitCompare className="w-4 h-4" />
-            <span>{t('tool.apiDiff.compareInTextDiff')}</span>
-          </button>
+            <div className="overflow-auto" style={{ height: tableHeight }}>
+              <table className="w-full text-sm">
+                <thead className="sticky top-0 bg-gray-100 dark:bg-gray-800">
+                  <tr>
+                    <th className="text-left py-2 px-4 font-medium text-gray-600 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
+                      {t('tool.apiDiff.path')}
+                    </th>
+                    <th className="text-left py-2 px-4 font-medium text-gray-600 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
+                      {t('tool.apiDiff.valueA')}
+                    </th>
+                    <th className="text-left py-2 px-4 font-medium text-gray-600 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
+                      {t('tool.apiDiff.valueB')}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white dark:bg-gray-900">
+                  {comparison.differentFields.map((field, index) => (
+                    <DiffRow key={field.path || index} field={field} />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Drag Handle */}
+            <div
+              onMouseDown={handleMouseDown}
+              className={cn(
+                'flex items-center justify-center h-4 cursor-ns-resize',
+                'bg-gray-100 dark:bg-gray-800',
+                'border-t border-gray-200 dark:border-gray-700',
+                'hover:bg-gray-200 dark:hover:bg-gray-700',
+                'transition-colors'
+              )}
+            >
+              <GripHorizontal
+                className={cn(
+                  'w-4 h-4 text-gray-400 dark:text-gray-500',
+                  isDragging && 'text-gray-600 dark:text-gray-300'
+                )}
+              />
+            </div>
+          </div>
         )}
       </div>
-
-      {/* Diff Table */}
-      {comparison.differentFields.length > 0 && (
-        <div ref={containerRef}>
-          <div
-            className="overflow-auto border border-amber-200 dark:border-amber-800 rounded"
-            style={{ height: tableHeight }}
-          >
-            <table className="w-full text-sm">
-              <thead className="sticky top-0 bg-amber-100 dark:bg-amber-900/40">
-                <tr>
-                  <th className="text-left py-2 px-3 font-medium text-amber-800 dark:text-amber-300 border-b border-amber-200 dark:border-amber-800">
-                    {t('tool.apiDiff.path')}
-                  </th>
-                  <th className="text-left py-2 px-3 font-medium text-amber-800 dark:text-amber-300 border-b border-amber-200 dark:border-amber-800">
-                    {t('tool.apiDiff.valueA')}
-                  </th>
-                  <th className="text-left py-2 px-3 font-medium text-amber-800 dark:text-amber-300 border-b border-amber-200 dark:border-amber-800">
-                    {t('tool.apiDiff.valueB')}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {comparison.differentFields.map((field, index) => (
-                  <DiffRow key={field.path || index} field={field} />
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Drag Handle */}
-          <div
-            onMouseDown={handleMouseDown}
-            className={cn(
-              'flex items-center justify-center h-6 cursor-ns-resize',
-              'text-amber-400 dark:text-amber-600 hover:text-amber-500 dark:hover:text-amber-500',
-              isDragging && 'text-amber-600 dark:text-amber-400'
-            )}
-          >
-            <GripHorizontal className="w-5 h-5" />
-          </div>
-        </div>
-      )}
     </div>
   );
 };
 
-// Diff Row Component
+// Diff Row
 const DiffRow: React.FC<{ field: DifferentField }> = ({ field }) => {
   const valueAStr = formatDiffValue(field.valueA);
   const valueBStr = formatDiffValue(field.valueB);
+  const isAMissing = field.valueA === undefined;
+  const isBMissing = field.valueB === undefined;
 
   return (
-    <tr className="border-b border-amber-100 dark:border-amber-900/40 hover:bg-amber-50/50 dark:hover:bg-amber-900/20">
-      <td className="py-2 px-3 font-mono text-amber-900 dark:text-amber-200">
-        {field.path}
+    <tr className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50">
+      <td className="py-2 px-4 align-top">
+        <code className="text-xs font-mono text-gray-700 dark:text-gray-300">
+          {field.path}
+        </code>
       </td>
-      <td
-        className={cn(
-          'py-2 px-3 font-mono text-sm max-w-[200px] break-all',
-          field.valueA === undefined
-            ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
-            : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300'
+
+      <td className="py-2 px-4 align-top">
+        {isAMissing ? (
+          <span className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500 italic">
+            <Minus className="w-3 h-3" />
+            missing
+          </span>
+        ) : (
+          <code className="text-xs font-mono text-gray-800 dark:text-gray-200 break-all">
+            {valueAStr}
+          </code>
         )}
-      >
-        {valueAStr}
       </td>
-      <td
-        className={cn(
-          'py-2 px-3 font-mono text-sm max-w-[200px] break-all',
-          field.valueB === undefined
-            ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
-            : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300'
+
+      <td className="py-2 px-4 align-top">
+        {isBMissing ? (
+          <span className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500 italic">
+            <Minus className="w-3 h-3" />
+            missing
+          </span>
+        ) : (
+          <code className="text-xs font-mono text-gray-800 dark:text-gray-200 break-all">
+            {valueBStr}
+          </code>
         )}
-      >
-        {valueBStr}
       </td>
     </tr>
   );
