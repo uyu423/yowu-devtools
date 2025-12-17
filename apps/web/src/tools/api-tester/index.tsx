@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { Globe, Check, Terminal } from 'lucide-react';
+import { Globe, Check, Terminal, Cookie } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ToolDefinition } from '@/tools/types';
 import { ToolHeader } from '@/components/common/ToolHeader';
@@ -43,6 +43,7 @@ const DEFAULT_STATE: ApiTesterState = {
   timeoutMs: 30000,
   followRedirects: true,
   credentials: 'omit',
+  includeCookies: false,
   selectedMode: 'direct',
   activeTab: 'params',
   responseTab: 'body',
@@ -291,9 +292,27 @@ const ApiTesterTool: React.FC = () => {
               />
             </div>
 
-            {/* Extension status and Copy as cURL */}
+            {/* Extension status, Include Cookies, and Copy as cURL */}
             <div className="flex items-center justify-between mt-2">
-              <ExtensionStatus status={extensionStatus} onRetry={checkExtension} />
+              <div className="flex items-center gap-4">
+                <ExtensionStatus status={extensionStatus} onRetry={checkExtension} />
+                
+                {/* Include Cookies checkbox - only show when extension is available */}
+                {extensionStatus === 'connected' && (
+                  <label className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={state.includeCookies}
+                      onChange={(e) => updateState({ includeCookies: e.target.checked })}
+                      className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-0"
+                      disabled={isLoading}
+                    />
+                    <Cookie className="w-4 h-4" />
+                    <span>Include Cookies</span>
+                  </label>
+                )}
+              </div>
+              
               <button
                 onClick={handleCopyCurl}
                 className={cn(

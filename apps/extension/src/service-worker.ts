@@ -318,15 +318,16 @@ async function executeRequest(spec: RequestSpec): Promise<ResponseSpec> {
     };
   }
 
-  // Get cookies for the target URL (uses credentials: 'include' to send them)
-  const cookieValue = await getCookiesForUrl(spec.url);
+  // Get cookies for the target URL only if includeCookies option is enabled
+  const shouldIncludeCookies = spec.options.includeCookies === true;
+  const cookieValue = shouldIncludeCookies ? await getCookiesForUrl(spec.url) : null;
 
   // Create AbortController for timeout
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), spec.options.timeoutMs);
 
   try {
-    console.log('[Extension] Fetch:', method, spec.url, cookieValue ? '(with cookies)' : '');
+    console.log('[Extension] Fetch:', method, spec.url, cookieValue ? '(with cookies)' : '(no cookies)');
     
     const response = await fetch(spec.url, {
       method,

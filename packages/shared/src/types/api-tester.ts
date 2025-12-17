@@ -43,6 +43,8 @@ export interface RequestSpec {
     timeoutMs: number;
     redirect: 'follow' | 'manual';
     credentials: 'omit' | 'include';
+    /** Whether to include browser cookies in the request (extension mode only) */
+    includeCookies?: boolean;
   };
 }
 

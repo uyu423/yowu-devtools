@@ -42,6 +42,8 @@ export interface ApiTesterState {
   timeoutMs: number;
   followRedirects: boolean;
   credentials: 'omit' | 'same-origin' | 'include';
+  /** Include browser cookies in extension mode requests */
+  includeCookies: boolean;
 
   // Mode
   selectedMode: 'direct' | 'extension';

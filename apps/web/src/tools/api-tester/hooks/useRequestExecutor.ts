@@ -112,6 +112,7 @@ const buildRequestSpec = (state: ApiTesterState): RequestSpec => {
       timeoutMs: state.timeoutMs,
       redirect: state.followRedirects ? 'follow' : 'manual',
       credentials: state.credentials === 'same-origin' ? 'omit' : state.credentials,
+      includeCookies: state.includeCookies,
     },
   };
 };
