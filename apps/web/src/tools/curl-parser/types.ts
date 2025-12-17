@@ -7,8 +7,6 @@ export interface CurlParserState {
   displayOptions: {
     urlDecodeInDisplay: boolean;
     urlEncodeOnExport: boolean;
-    cookieDecode: boolean;
-    hideSensitiveValues: boolean;
   };
 }
 
@@ -17,8 +15,6 @@ export const DEFAULT_STATE: CurlParserState = {
   displayOptions: {
     urlDecodeInDisplay: true,
     urlEncodeOnExport: false,
-    cookieDecode: true,
-    hideSensitiveValues: true,
   },
 };
 

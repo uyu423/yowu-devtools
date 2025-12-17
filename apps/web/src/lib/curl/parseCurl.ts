@@ -314,7 +314,20 @@ export function parseCurl(input: string): CurlParseResult {
         const cookieValue = nextToken.value;
         
         // Check if it's a file path
-        if (cookieValue.includes('.txt') || cookieValue.includes('/') || cookieValue.includes('\\')) {
+        // File paths typically look like: /path/to/file.txt, cookies.txt, ./file, etc.
+        // Cookie strings contain key=value pairs separated by semicolons
+        // A simple heuristic: if it contains '=' and ';' or just '=', it's likely a cookie string
+        const looksLikeCookieString = cookieValue.includes('=');
+        const looksLikeFilePath = !looksLikeCookieString && (
+          cookieValue.endsWith('.txt') ||
+          cookieValue.endsWith('.cookie') ||
+          cookieValue.startsWith('/') ||
+          cookieValue.startsWith('./') ||
+          cookieValue.startsWith('../') ||
+          /^[a-zA-Z]:\\/.test(cookieValue) // Windows path like C:\
+        );
+        
+        if (looksLikeFilePath) {
           warnings.push({
             code: 'UNSUPPORTED_COOKIE_FILE',
             message: `Cookie file not supported: ${cookieValue}. Please paste cookie string directly.`,

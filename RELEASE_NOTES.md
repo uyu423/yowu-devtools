@@ -4,6 +4,53 @@ RELEASE_NOTES.md must be written in English.
 
 # Release Notes
 
+## v1.4.1 (December 2025) - cURL Parser & API Tester Integration
+
+Introducing the **cURL Parser** tool and enhanced cURL integration with API Tester.
+
+### New Features
+
+- ✨ **cURL Parser Tool**: Parse and analyze cURL commands
+
+  - Paste cURL commands and view structured breakdown
+  - Request Summary with method and URL
+  - Query Parameters table with enable/disable toggles
+  - Headers table with copy functionality
+  - Cookies section with raw string and parsed key-value table
+  - Body viewer with JSON pretty formatting
+  - Options display (follow redirects, compressed, insecure TLS, basic auth)
+  - Warnings for unsupported features (file uploads, shell variables, config files)
+
+- ✨ **"Open in API Tester" Button**: One-click transfer of parsed cURL to API Tester
+
+  - Preserves locale prefix (e.g., `/ko-KR/curl` → `/ko-KR/api-tester`)
+  - Automatically fills method, URL, headers, body, and options
+
+- ✨ **API Tester cURL Paste Support**: Paste cURL directly in URL input
+
+  - Auto-detects cURL commands vs regular URLs
+  - Automatically parses and fills the form
+  - Toast notification on success/failure
+  - "Paste as URL" fallback option on parse failure
+  - Undo functionality to restore previous state
+
+### Enhancements
+
+- 🔧 **JSON Viewer Integration**: Values that look like JSON show "Open in JSON Viewer" button
+- 🔧 **Clickable URLs**: URL values in parsed results are now clickable links
+- 🔧 **Collapsible Raw Cookie**: Raw cookie section collapsed by default (expandable)
+- 🔧 **URL Decode Display Option**: Toggle to show URL-decoded values
+- 🌐 **i18n**: Full internationalization support for cURL Parser (5 languages)
+
+### Technical
+
+- New cURL parsing library at `src/lib/curl/`
+- Shell-like tokenizer with quote handling and line continuation
+- Supports `-H`, `-d`, `-X`, `-b`, `-F`, `--data-urlencode`, and more
+- State transfer via sessionStorage for API Tester integration
+
+---
+
 ## v1.4.0 (December 2025) - API Tester & Monorepo Architecture
 
 Major release introducing the **API Tester** tool and migrating to a **pnpm + Turborepo monorepo** architecture.

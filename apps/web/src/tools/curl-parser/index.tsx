@@ -3,16 +3,24 @@
  * cURL Parser Tool
  *
  * Parse and visualize cURL commands.
+ * Redesigned to match URL Parser style.
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Terminal } from 'lucide-react';
+import { Terminal, ExternalLink } from 'lucide-react';
 import type { ToolDefinition } from '@/tools/types';
 import { ToolHeader } from '@/components/common/ToolHeader';
+import { EditorPanel } from '@/components/common/EditorPanel';
+import { ActionBar } from '@/components/common/ActionBar';
+import { ErrorBanner } from '@/components/common/ErrorBanner';
+import { ShareModal } from '@/components/common/ShareModal';
+import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
 import { useTitle } from '@/hooks/useTitle';
 import { useI18n } from '@/hooks/useI18nHooks';
+import { useShareModal } from '@/hooks/useShareModal';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { parseCurl } from '@/lib/curl/parseCurl';
 import { storeForApiTester } from '@/lib/curl/convertToApiTester';
 import { buildLocalePath } from '@/lib/i18nUtils';
@@ -25,6 +33,7 @@ import {
   HeadersView,
   CookiesView,
   BodyView,
+  OptionsView,
   WarningsView,
 } from './components';
 
@@ -33,73 +42,55 @@ const CurlParserTool: React.FC = () => {
   const navigate = useNavigate();
   useTitle(t('tool.curl.title'));
 
-  const { state, updateState, resetState } = useToolState<CurlParserState>(
-    'curl-parser',
-    DEFAULT_STATE,
-    {
+  const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
+    useToolState<CurlParserState>('curl-parser', DEFAULT_STATE, {
       shareStateFilter: ({ input, displayOptions }) => ({
         input,
         displayOptions,
-        // Exclude sensitive data from share by default
       }),
-    }
-  );
+    });
 
-  const [parseResult, setParseResult] = useState<CurlParseResult | null>(null);
-  const [parseError, setParseError] = useState<string | null>(null);
-  
-  // UI state for collapsible sections
-  const [requestSummaryOpen, setRequestSummaryOpen] = useState(true);
-  const [queryParamsOpen, setQueryParamsOpen] = useState(true);
-  const [headersOpen, setHeadersOpen] = useState(false);
-  const [cookiesOpen, setCookiesOpen] = useState(false);
-  const [bodyOpen, setBodyOpen] = useState(false);
-  const [optionsOpen, setOptionsOpen] = useState(false);
-  const [warningsOpen, setWarningsOpen] = useState(true);
+  const { handleShare, shareModalProps } = useShareModal({
+    copyShareLink,
+    shareViaWebShare,
+    getShareStateInfo,
+    toolName: t('tool.curl.title'),
+  });
 
-  // Parse cURL command
-  const handleParse = useCallback(() => {
-    if (!state.input.trim()) {
-      setParseResult(null);
-      setParseError(null);
-      return;
+  // Debounce input for auto-parsing
+  const debouncedInput = useDebouncedValue(state.input, 300);
+
+  // Auto-parse cURL command with useMemo
+  const parseResult = useMemo<{ result: CurlParseResult | null; error: string | null }>(() => {
+    if (!debouncedInput.trim()) {
+      return { result: null, error: null };
     }
 
     try {
-      const result = parseCurl(state.input);
-      setParseResult(result);
-      setParseError(null);
+      const result = parseCurl(debouncedInput);
+      return { result, error: null };
     } catch (error) {
-      setParseError(error instanceof Error ? error.message : t('tool.curl.parseFailed'));
-      setParseResult(null);
+      return {
+        result: null,
+        error: error instanceof Error ? error.message : t('tool.curl.parseFailed'),
+      };
     }
-  }, [state.input, t]);
-
-  // Auto-parse on input change (debounced)
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      handleParse();
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [handleParse]);
+  }, [debouncedInput, t]);
 
   const handleReset = useCallback(() => {
     resetState();
-    setParseResult(null);
-    setParseError(null);
   }, [resetState]);
 
   const handleOpenInApiTester = useCallback(() => {
-    if (!parseResult) return;
-    
+    if (!parseResult.result) return;
+
     // Store parse result for API Tester
-    storeForApiTester(parseResult);
-    
+    storeForApiTester(parseResult.result);
+
     // Navigate to API Tester with locale prefix preserved
-    const apiTesterPath = buildLocalePath(locale, '/api');
+    const apiTesterPath = buildLocalePath(locale, '/api-tester');
     navigate(apiTesterPath);
-  }, [parseResult, locale, navigate]);
+  }, [parseResult.result, locale, navigate]);
 
   return (
     <div className="flex flex-col h-full p-4 md:p-6 max-w-5xl mx-auto">
@@ -107,291 +98,109 @@ const CurlParserTool: React.FC = () => {
         title={t('tool.curl.title')}
         description={t('tool.curl.description')}
         onReset={handleReset}
+        onShare={handleShare}
       />
+      <ShareModal {...shareModalProps} />
 
-      <div className="flex flex-col gap-4 mt-4">
+      <div className="flex-1 flex flex-col gap-6">
         {/* Input area */}
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            {t('tool.curl.pasteHint')}
-          </label>
-          <textarea
-            value={state.input}
-            onChange={(e) => updateState({ input: e.target.value })}
-            placeholder={t('tool.curl.placeholder')}
-            className="w-full h-32 p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <div className="flex gap-2">
-            <button
-              onClick={handleParse}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
-            >
-              {t('tool.curl.parse')}
-            </button>
-            <button
-              onClick={() => updateState({ input: '' })}
-              className="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 rounded-lg text-sm font-medium transition-colors"
-            >
-              {t('common.clear')}
-            </button>
-          </div>
-        </div>
+        <EditorPanel
+          title={t('tool.curl.pasteHint')}
+          value={state.input}
+          onChange={(val) => updateState({ input: val })}
+          placeholder={t('tool.curl.placeholder')}
+          status={parseResult.error ? 'error' : 'default'}
+          resizable
+          minHeight={120}
+          maxHeight={500}
+          heightStorageKey="curl-parser-input-height"
+        />
 
         {/* Display Options */}
-        {parseResult && (
-          <div className="flex flex-wrap gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={state.displayOptions.urlDecodeInDisplay}
-                onChange={(e) =>
-                  updateState({
-                    displayOptions: {
-                      ...state.displayOptions,
-                      urlDecodeInDisplay: e.target.checked,
-                    },
-                  })
-                }
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-              />
-              <span className="text-sm text-gray-700 dark:text-gray-300">
-                {t('tool.curl.urlDecodeInDisplay')}
-              </span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={state.displayOptions.cookieDecode}
-                onChange={(e) =>
-                  updateState({
-                    displayOptions: {
-                      ...state.displayOptions,
-                      cookieDecode: e.target.checked,
-                    },
-                  })
-                }
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-              />
-              <span className="text-sm text-gray-700 dark:text-gray-300">
-                {t('tool.curl.cookieDecode')}
-              </span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={state.displayOptions.hideSensitiveValues}
-                onChange={(e) =>
-                  updateState({
-                    displayOptions: {
-                      ...state.displayOptions,
-                      hideSensitiveValues: e.target.checked,
-                    },
-                  })
-                }
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-              />
-              <span className="text-sm text-gray-700 dark:text-gray-300">
-                {t('tool.curl.hideSensitiveValues')}
-              </span>
-            </label>
-          </div>
-        )}
+        <ActionBar className="flex-col items-start gap-4 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm sm:flex-row sm:items-center">
+          <label className="flex items-center space-x-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+            <input
+              type="checkbox"
+              className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-500 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-0 cursor-pointer"
+              checked={state.displayOptions.urlDecodeInDisplay}
+              onChange={(e) =>
+                updateState({
+                  displayOptions: {
+                    ...state.displayOptions,
+                    urlDecodeInDisplay: e.target.checked,
+                  },
+                })
+              }
+            />
+            <OptionLabel tooltip={t('tool.curl.urlDecodeTooltip')}>
+              {t('tool.curl.urlDecodeInDisplay')}
+            </OptionLabel>
+          </label>
+
+          {/* Open in API Tester button */}
+          {parseResult.result && (
+            <button
+              onClick={handleOpenInApiTester}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors sm:ml-auto"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              <span>{t('tool.curl.openInApiTester')}</span>
+            </button>
+          )}
+        </ActionBar>
 
         {/* Error display */}
-        {parseError && (
-          <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-            <p className="text-sm text-red-800 dark:text-red-200">{parseError}</p>
-          </div>
+        {parseResult.error && (
+          <ErrorBanner message={t('tool.curl.parseFailed')} details={parseResult.error} />
         )}
 
-        {/* Parse result */}
-        {parseResult && (
-          <div className="mt-4 space-y-2 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+        {/* Parse result - Static sections (no collapsible) */}
+        {parseResult.result && (
+          <div className="space-y-6">
             {/* Request Summary */}
-            <div className="border-b border-gray-200 dark:border-gray-700">
-              <button
-                onClick={() => setRequestSummaryOpen(!requestSummaryOpen)}
-                className="w-full flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
-              >
-                {requestSummaryOpen ? (
-                  <span className="text-gray-500">▼</span>
-                ) : (
-                  <span className="text-gray-500">▶</span>
-                )}
-                <span>{t('tool.curl.requestSummary')}</span>
-              </button>
-              {requestSummaryOpen && (
-                <div className="px-4 pb-4">
-                  <RequestSummary
-                    result={parseResult}
-                    onOpenInApiTester={handleOpenInApiTester}
-                    urlDecoded={state.displayOptions.urlDecodeInDisplay}
-                  />
-                </div>
-              )}
-            </div>
+            <RequestSummary
+              result={parseResult.result}
+              urlDecoded={state.displayOptions.urlDecodeInDisplay}
+            />
 
-            {/* Query Params */}
-            {parseResult.request.query.length > 0 && (
-              <div className="border-b border-gray-200 dark:border-gray-700">
-                <button
-                  onClick={() => setQueryParamsOpen(!queryParamsOpen)}
-                  className="w-full flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
-                >
-                  {queryParamsOpen ? (
-                    <span className="text-gray-500">▼</span>
-                  ) : (
-                    <span className="text-gray-500">▶</span>
-                  )}
-                  <span>{t('tool.curl.queryParams')} ({parseResult.request.query.length})</span>
-                </button>
-                {queryParamsOpen && (
-                  <div className="px-4 pb-4">
-                    <QueryParamsView
-                      params={parseResult.request.query}
-                      urlDecoded={state.displayOptions.urlDecodeInDisplay}
-                    />
-                  </div>
-                )}
-              </div>
+            {/* Query Parameters */}
+            {parseResult.result.request.query.length > 0 && (
+              <QueryParamsView
+                params={parseResult.result.request.query}
+                urlDecoded={state.displayOptions.urlDecodeInDisplay}
+              />
             )}
 
             {/* Headers */}
-            {parseResult.request.headers.length > 0 && (
-              <div className="border-b border-gray-200 dark:border-gray-700">
-                <button
-                  onClick={() => setHeadersOpen(!headersOpen)}
-                  className="w-full flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
-                >
-                  {headersOpen ? (
-                    <span className="text-gray-500">▼</span>
-                  ) : (
-                    <span className="text-gray-500">▶</span>
-                  )}
-                  <span>{t('tool.curl.headers')} ({parseResult.request.headers.length})</span>
-                </button>
-                {headersOpen && (
-                  <div className="px-4 pb-4">
-                    <HeadersView
-                      headers={parseResult.request.headers}
-                      hideSensitive={state.displayOptions.hideSensitiveValues}
-                    />
-                  </div>
-                )}
-              </div>
+            {parseResult.result.request.headers.length > 0 && (
+              <HeadersView headers={parseResult.result.request.headers} />
             )}
 
             {/* Cookies */}
-            {parseResult.request.cookies && (
-              <div className="border-b border-gray-200 dark:border-gray-700">
-                <button
-                  onClick={() => setCookiesOpen(!cookiesOpen)}
-                  className="w-full flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
-                >
-                  {cookiesOpen ? (
-                    <span className="text-gray-500">▼</span>
-                  ) : (
-                    <span className="text-gray-500">▶</span>
-                  )}
-                  <span>{t('tool.curl.cookies')} ({parseResult.request.cookies.items.length})</span>
-                </button>
-                {cookiesOpen && (
-                  <div className="px-4 pb-4">
-                    <CookiesView
-                      cookies={parseResult.request.cookies}
-                      cookieDecode={state.displayOptions.cookieDecode}
-                      hideSensitive={state.displayOptions.hideSensitiveValues}
-                    />
-                  </div>
-                )}
-              </div>
+            {parseResult.result.request.cookies && (
+              <CookiesView cookies={parseResult.result.request.cookies} />
             )}
 
             {/* Body */}
-            {parseResult.request.body && parseResult.request.body.kind !== 'none' && (
-              <div className="border-b border-gray-200 dark:border-gray-700">
-                <button
-                  onClick={() => setBodyOpen(!bodyOpen)}
-                  className="w-full flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
-                >
-                  {bodyOpen ? (
-                    <span className="text-gray-500">▼</span>
-                  ) : (
-                    <span className="text-gray-500">▶</span>
-                  )}
-                  <span>{t('tool.curl.body')} ({parseResult.request.body.kind})</span>
-                </button>
-                {bodyOpen && (
-                  <div className="px-4 pb-4">
-                    <BodyView body={parseResult.request.body} />
-                  </div>
-                )}
-              </div>
-            )}
+            {parseResult.result.request.body &&
+              parseResult.result.request.body.kind !== 'none' && (
+                <BodyView body={parseResult.result.request.body} />
+              )}
 
             {/* Options */}
-            {(parseResult.request.options.followRedirects !== undefined ||
-              parseResult.request.options.insecureTLS !== undefined ||
-              parseResult.request.options.compressed !== undefined ||
-              parseResult.request.options.basicAuth !== undefined) && (
-              <div className="border-b border-gray-200 dark:border-gray-700">
-                <button
-                  onClick={() => setOptionsOpen(!optionsOpen)}
-                  className="w-full flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
-                >
-                  {optionsOpen ? (
-                    <span className="text-gray-500">▼</span>
-                  ) : (
-                    <span className="text-gray-500">▶</span>
-                  )}
-                  <span>{t('tool.curl.options')}</span>
-                </button>
-                {optionsOpen && (
-                  <div className="px-4 pb-4">
-                    <div className="space-y-2 text-sm">
-                      {parseResult.request.options.followRedirects && (
-                        <div className="text-gray-700 dark:text-gray-300">-L ({t('tool.curl.followRedirects')})</div>
-                      )}
-                      {parseResult.request.options.insecureTLS && (
-                        <div className="text-yellow-600 dark:text-yellow-400">
-                          -k ({t('tool.curl.insecureTLSBrowser')})
-                        </div>
-                      )}
-                      {parseResult.request.options.compressed && (
-                        <div className="text-gray-700 dark:text-gray-300">--compressed</div>
-                      )}
-                      {parseResult.request.options.basicAuth && (
-                        <div className="text-gray-700 dark:text-gray-300">
-                          -u ({t('tool.curl.basicAuth')}: {parseResult.request.options.basicAuth.user})
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
+            <OptionsView options={parseResult.result.request.options} />
 
             {/* Warnings */}
-            {parseResult.warnings.length > 0 && (
-              <div>
-                <button
-                  onClick={() => setWarningsOpen(!warningsOpen)}
-                  className="w-full flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
-                >
-                  {warningsOpen ? (
-                    <span className="text-gray-500">▼</span>
-                  ) : (
-                    <span className="text-gray-500">▶</span>
-                  )}
-                  <span>{t('tool.curl.warnings')} ({parseResult.warnings.length})</span>
-                </button>
-                {warningsOpen && (
-                  <div className="px-4 pb-4">
-                    <WarningsView warnings={parseResult.warnings} />
-                  </div>
-                )}
-              </div>
+            {parseResult.result.warnings.length > 0 && (
+              <WarningsView warnings={parseResult.result.warnings} />
             )}
+          </div>
+        )}
+
+        {/* Empty state */}
+        {!parseResult.error && !parseResult.result && debouncedInput.trim() === '' && (
+          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+            <p>{t('tool.curl.emptyState')}</p>
           </div>
         )}
       </div>
@@ -409,4 +218,3 @@ export const curlParserTool: ToolDefinition<CurlParserState> = {
   defaultState: DEFAULT_STATE,
   Component: CurlParserTool,
 };
-

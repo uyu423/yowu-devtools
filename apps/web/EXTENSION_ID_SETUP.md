@@ -13,6 +13,7 @@ Extension ID는 Chrome Web Store에 확장 프로그램을 업로드한 후에�
 ### 1단계: Extension을 Chrome Web Store에 업로드
 
 1. `apps/extension`에서 빌드:
+
    ```bash
    cd apps/extension
    pnpm run build
@@ -23,11 +24,13 @@ Extension ID는 Chrome Web Store에 확장 프로그램을 업로드한 후에�
 3. [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole)에서 업로드
 
 4. 업로드 후 URL에서 Extension ID 확인:
+
    ```
    https://chrome.google.com/webstore/devconsole/.../items/[EXTENSION_ID]
    ```
-   
+
    또는 확장 프로그램 상세 페이지에서 확인:
+
    ```
    https://chrome.google.com/webstore/detail/[EXTENSION_ID]
    ```
@@ -36,10 +39,10 @@ Extension ID는 Chrome Web Store에 확장 프로그램을 업로드한 후에�
 
 #### Extension ID 목록
 
-| 환경 | Extension ID | 용도 |
-|------|--------------|------|
-| **개발 환경** | `lhaoapjoifnhfnlklbkggodnkpeikgme` | 로컬 개발용 확장 프로그램 |
-| **프로덕션** | `jmkojnlpffcdelhhefnnjgbgffiaigce` | Chrome Web Store에 배포된 확장 프로그램 |
+| 환경          | Extension ID                       | 용도                                    |
+| ------------- | ---------------------------------- | --------------------------------------- |
+| **개발 환경** | `lhaoapjoifnhfnlklbkggodnkpeikgme` | 로컬 개발용 확장 프로그램               |
+| **프로덕션**  | `jmkojnlpffcdelhhefnnjgbgffiaigce` | Chrome Web Store에 배포된 확장 프로그램 |
 
 #### 로컬 개발 시
 
@@ -103,6 +106,7 @@ const EXTENSION_ID = import.meta.env.VITE_EXTENSION_ID || DEFAULT_EXTENSION_ID;
 ### 빌드 프로세스
 
 1. **로컬 빌드**:
+
    - `.env.local` 파일 또는 환경 변수 `VITE_EXTENSION_ID`에서 읽기
    - Vite가 빌드 시 환경 변수를 코드에 주입
 
@@ -112,10 +116,10 @@ const EXTENSION_ID = import.meta.env.VITE_EXTENSION_ID || DEFAULT_EXTENSION_ID;
 
 ## Extension ID와 Extension Key의 관계
 
-| 항목 | 용도 | 저장 위치 |
-|------|------|----------|
-| **Extension Key** (공개 키) | Extension ID 고정 | GitHub Secrets: `CHROME_EXTENSION_KEY` |
-| **Extension ID** | Web 앱에서 Extension과 통신 | GitHub Secrets: `VITE_EXTENSION_ID` |
+| 항목                        | 용도                        | 저장 위치                              |
+| --------------------------- | --------------------------- | -------------------------------------- |
+| **Extension Key** (공개 키) | Extension ID 고정           | GitHub Secrets: `CHROME_EXTENSION_KEY` |
+| **Extension ID**            | Web 앱에서 Extension과 통신 | GitHub Secrets: `VITE_EXTENSION_ID`    |
 
 - Extension Key는 extension 패키지의 manifest.json에 주입되어 Extension ID를 고정합니다
 - Extension ID는 web 패키지에서 Extension과 통신할 때 사용합니다
@@ -126,11 +130,13 @@ const EXTENSION_ID = import.meta.env.VITE_EXTENSION_ID || DEFAULT_EXTENSION_ID;
 ### Extension ID가 설정되지 않음
 
 **로컬 개발 시:**
+
 - `.env.local` 파일이 `apps/web/` 디렉토리에 있는지 확인
 - `.env.local` 파일에 `VITE_EXTENSION_ID` 환경 변수가 설정되어 있는지 확인
 - Vite는 `.env.local` 파일을 자동으로 로드합니다
 
 **CI/CD 빌드 시:**
+
 - GitHub Secrets에 `VITE_EXTENSION_ID`가 설정되어 있는지 확인
 - 워크플로우에서 환경 변수가 제대로 주입되는지 확인
 
@@ -145,4 +151,3 @@ const EXTENSION_ID = import.meta.env.VITE_EXTENSION_ID || DEFAULT_EXTENSION_ID;
 - Extension ID는 공개 정보입니다 (Chrome Web Store URL에 포함됨)
 - 하지만 GitHub Secrets에 저장하여 관리하는 것이 좋습니다
 - `.env.local` 파일은 커밋하지 마세요 (`.gitignore`에 추가됨)
-
