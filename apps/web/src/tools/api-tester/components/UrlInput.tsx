@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 interface UrlInputProps {
   value: string;
   onChange: (url: string) => void;
+  onPaste?: (text: string) => void;
   placeholder?: string;
   disabled?: boolean;
 }
@@ -15,14 +16,24 @@ interface UrlInputProps {
 export const UrlInput: React.FC<UrlInputProps> = ({
   value,
   onChange,
+  onPaste,
   placeholder = 'https://api.example.com/v1/users',
   disabled,
 }) => {
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    if (onPaste) {
+      const pastedText = e.clipboardData.getData('text');
+      onPaste(pastedText);
+      e.preventDefault(); // Prevent default paste behavior
+    }
+  };
+
   return (
     <input
       type="text"
       value={value}
       onChange={(e) => onChange(e.target.value)}
+      onPaste={handlePaste}
       placeholder={placeholder}
       disabled={disabled}
       className={cn(

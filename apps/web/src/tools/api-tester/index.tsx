@@ -35,7 +35,10 @@ import {
   CorsModal,
 } from './components';
 import { useRequestExecutor, useApiHistory, useCorsAllowlist } from './hooks';
-import { getStoredApiTesterState, clearStoredApiTesterState } from '@/lib/curl/convertToApiTester';
+import { getStoredApiTesterState, clearStoredApiTesterState, convertToApiTesterState } from '@/lib/curl/convertToApiTester';
+import { isCurlCommand } from '@/lib/curl/detectCurl';
+import { parseCurl } from '@/lib/curl/parseCurl';
+import { toast } from 'sonner';
 
 const DEFAULT_STATE: ApiTesterState = {
   method: 'GET',
@@ -191,6 +194,47 @@ const ApiTesterTool: React.FC = () => {
     prevHasCorsError.current = hasCorsError;
   }, [hasCorsError, response?.method, pendingCorsRetry]);
 
+  // Handle URL paste - detect cURL commands
+  const handleUrlPaste = useCallback(
+    (pastedText: string) => {
+      if (isCurlCommand(pastedText)) {
+        try {
+          const parseResult = parseCurl(pastedText);
+          const apiTesterState = convertToApiTesterState(parseResult);
+          
+          // Update state with parsed cURL data
+          updateState(apiTesterState);
+          
+          toast.success('cURL parsed and applied');
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Failed to parse cURL command';
+          toast.error(`cURL parse failed: ${errorMessage}`, {
+            action: {
+              label: 'Paste as URL',
+              onClick: () => {
+                updateState({ url: pastedText });
+                // Parse query params from URL
+                const parsedParams = parseUrlParams(pastedText);
+                if (parsedParams.length > 0) {
+                  updateState({ queryParams: [...parsedParams, createKeyValueItem()] });
+                }
+              },
+            },
+          });
+        }
+      } else {
+        // Not a cURL command, paste as URL
+        updateState({ url: pastedText });
+        // Parse query params from URL
+        const parsedParams = parseUrlParams(pastedText);
+        if (parsedParams.length > 0) {
+          updateState({ queryParams: [...parsedParams, createKeyValueItem()] });
+        }
+      }
+    },
+    [updateState]
+  );
+
   // Handle URL change with query param parsing
   const handleUrlChange = useCallback(
     (url: string) => {
@@ -315,6 +359,7 @@ const ApiTesterTool: React.FC = () => {
               <UrlInput
                 value={state.url}
                 onChange={handleUrlChange}
+                onPaste={handleUrlPaste}
                 placeholder="https://api.example.com/v1/users"
                 disabled={isLoading}
               />
