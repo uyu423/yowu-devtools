@@ -949,6 +949,7 @@ export const jaJP = {
       rename: '名前を変更',
       openInJsonViewer: 'JSON Viewerで開く',
       openInYamlConverter: 'YAML Converterで開く',
+      processing: '処理中...',
       delete: '削除',
       requestName: 'リクエスト名',
       timeoutError: '{ms}ms後にリクエストタイムアウト',

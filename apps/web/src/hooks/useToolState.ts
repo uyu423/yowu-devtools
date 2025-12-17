@@ -32,12 +32,33 @@ function cloneState<T>(state: T): T {
 function getInitialState<T>(
   toolId: string,
   defaultState: T,
-  search: string
+  search: string,
+  locationState?: unknown
 ): T {
   if (typeof window === 'undefined') {
     return cloneState(defaultState);
   }
 
+  // Priority 1: Check location.state (direct navigation from API Tester)
+  if (locationState && typeof locationState === 'object') {
+    try {
+      const stateData = locationState as Partial<T> & { tool?: string };
+      // Validate that it's for the correct tool (if toolId is in state)
+      if ('tool' in stateData && stateData.tool === toolId) {
+        // Remove tool field before merging
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { tool, ...rest } = stateData;
+        return { ...cloneState(defaultState), ...rest };
+      } else if (!('tool' in stateData)) {
+        // If no tool field, assume it's direct state data
+        return { ...cloneState(defaultState), ...stateData };
+      }
+    } catch {
+      // ignore invalid state
+    }
+  }
+
+  // Priority 2: Check URL parameter (shared link)
   const params = new URLSearchParams(search);
   const payload = params.get('d');
   if (payload) {
@@ -48,6 +69,7 @@ function getInitialState<T>(
     }
   }
 
+  // Priority 3: Check localStorage (saved state)
   const raw = window.localStorage.getItem(`${STORAGE_PREFIX}${toolId}`);
   if (raw) {
     try {
@@ -77,12 +99,38 @@ export function useToolState<T extends object>(
   const { t } = useI18n();
   const location = useLocation();
   const [state, setState] = useState<T>(() =>
-    getInitialState(toolId, defaultState, location.search)
+    getInitialState(toolId, defaultState, location.search, location.state)
   );
 
-  // Update state when URL search params change (e.g., when navigating to shared URL)
-  // Using useEffect to sync state with URL params is necessary for shared URL restoration
+  // Update state when URL search params or location state change
+  // Priority: location.state > URL param > localStorage
   useEffect(() => {
+    // Priority 1: Check location.state (direct navigation from API Tester)
+    if (location.state && typeof location.state === 'object') {
+      try {
+        const stateData = location.state as Partial<T> & { tool?: string };
+        // Validate that it's for the correct tool (if toolId is in state)
+        if ('tool' in stateData && stateData.tool === toolId) {
+          // Remove tool field before merging
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { tool, ...rest } = stateData;
+          setState({ ...cloneState(defaultState), ...rest });
+          // Clear location.state after use to prevent re-applying on re-render
+          window.history.replaceState({}, '', location.pathname + location.search);
+          return;
+        } else if (!('tool' in stateData)) {
+          // If no tool field, assume it's direct state data
+          setState({ ...cloneState(defaultState), ...stateData });
+          // Clear location.state after use
+          window.history.replaceState({}, '', location.pathname + location.search);
+          return;
+        }
+      } catch {
+        // ignore invalid state
+      }
+    }
+
+    // Priority 2: Check URL parameter (shared link)
     const params = new URLSearchParams(location.search);
     const payload = params.get('d');
     if (payload) {
@@ -92,7 +140,8 @@ export function useToolState<T extends object>(
         return;
       }
     }
-    // If no URL param, restore from localStorage if available
+
+    // Priority 3: Restore from localStorage if available
     // Only restore from localStorage if there's no URL param to avoid overwriting shared state
     if (!payload) {
       const raw = window.localStorage.getItem(`${STORAGE_PREFIX}${toolId}`);
@@ -108,7 +157,7 @@ export function useToolState<T extends object>(
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.search, toolId, t]);
+  }, [location.search, location.state, toolId, t]);
 
   const setAndPersist = useCallback(
     (updater: T | ((prev: T) => T)) => {

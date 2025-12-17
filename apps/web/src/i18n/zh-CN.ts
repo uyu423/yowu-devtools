@@ -884,6 +884,7 @@ export const zhCN = {
       rename: '重命名',
       openInJsonViewer: '在JSON Viewer中打开',
       openInYamlConverter: '在YAML Converter中打开',
+      processing: '处理中...',
       delete: '删除',
       requestName: '请求名称',
       timeoutError: '请求在{ms}ms后超时',

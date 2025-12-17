@@ -996,6 +996,7 @@ export const esES = {
       rename: 'Renombrar',
       openInJsonViewer: 'Abrir en JSON Viewer',
       openInYamlConverter: 'Abrir en YAML Converter',
+      processing: 'Procesando...',
       delete: 'Eliminar',
       requestName: 'Nombre de solicitud',
       timeoutError: 'Tiempo de espera agotado después de {ms}ms',

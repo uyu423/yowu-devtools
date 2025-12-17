@@ -5,7 +5,7 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { Copy, Download, Check, Clock, Database, FileType, ExternalLink, ChevronDown, ChevronUp, FileJson, FileCode2 } from 'lucide-react';
+import { Copy, Download, Check, Clock, Database, FileType, ExternalLink, ChevronDown, ChevronUp, FileJson, FileCode2, Loader2 } from 'lucide-react';
 import type { ResponseData } from '../types';
 import { getStatusColor, getStatusText, formatBytes } from '../types';
 import { parseResponseBody } from '../utils';
@@ -14,7 +14,6 @@ import { useResolvedTheme } from '@/hooks/useThemeHooks';
 import { useI18n } from '@/hooks/useI18nHooks';
 import CodeMirror from '@uiw/react-codemirror';
 import { oneDark } from '@codemirror/theme-one-dark';
-import { compressToEncodedURIComponent } from 'lz-string';
 
 interface ResponseViewerProps {
   response: ResponseData | null;
@@ -117,6 +116,7 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
   const [viewMode, setViewMode] = useState<ViewMode>('tree');
   const [copied, setCopied] = useState(false);
   const [showErrorDetails, setShowErrorDetails] = useState(false);
+  const [isNavigating, setIsNavigating] = useState<'json' | 'yaml' | null>(null);
   const resolvedTheme = useResolvedTheme();
   const isDark = resolvedTheme === 'dark';
 
@@ -202,47 +202,49 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
 
   // Navigate to JSON Viewer with data
   const handleOpenInJsonViewer = useCallback(() => {
-    if (!parsedBody || parsedBody.type !== 'json') return;
+    if (!parsedBody || parsedBody.type !== 'json' || isNavigating) return;
     
-    const jsonString = JSON.stringify(parsedBody.data, null, 2);
-    const shareState = {
-      input: jsonString,
-      indent: 2,
-      sortKeys: false,
-      viewMode: 'tree',
-      expandLevel: 5,
-    };
+    setIsNavigating('json');
     
-    const envelope = {
-      v: 1,
-      tool: 'json',
-      state: shareState,
-    };
-    
-    const encoded = compressToEncodedURIComponent(JSON.stringify(envelope));
-    navigate(`/json?d=${encoded}`);
-  }, [parsedBody, navigate]);
+    try {
+      const jsonString = JSON.stringify(parsedBody.data, null, 2);
+      const shareState = {
+        input: jsonString,
+        indent: 2,
+        sortKeys: false,
+        viewMode: 'tree',
+        expandLevel: 5,
+      };
+      
+      // Use React Router state instead of URL parameter for faster navigation
+      navigate('/json', { state: shareState });
+    } catch (error) {
+      console.error('Failed to navigate to JSON Viewer:', error);
+      setIsNavigating(null);
+    }
+  }, [parsedBody, navigate, isNavigating]);
 
   // Navigate to YAML Converter with data
   const handleOpenInYamlConverter = useCallback(() => {
-    if (!parsedBody || parsedBody.type !== 'yaml') return;
+    if (!parsedBody || parsedBody.type !== 'yaml' || isNavigating) return;
     
-    const yamlString = typeof parsedBody.data === 'string' ? parsedBody.data : '';
-    const shareState = {
-      source: yamlString,
-      direction: 'yaml2json' as const,
-      indent: 2,
-    };
+    setIsNavigating('yaml');
     
-    const envelope = {
-      v: 1,
-      tool: 'yaml',
-      state: shareState,
-    };
-    
-    const encoded = compressToEncodedURIComponent(JSON.stringify(envelope));
-    navigate(`/yaml?d=${encoded}`);
-  }, [parsedBody, navigate]);
+    try {
+      const yamlString = typeof parsedBody.data === 'string' ? parsedBody.data : '';
+      const shareState = {
+        source: yamlString,
+        direction: 'yaml2json' as const,
+        indent: 2,
+      };
+      
+      // Use React Router state instead of URL parameter for faster navigation
+      navigate('/yaml', { state: shareState });
+    } catch (error) {
+      console.error('Failed to navigate to YAML Converter:', error);
+      setIsNavigating(null);
+    }
+  }, [parsedBody, navigate, isNavigating]);
 
   // Calculate body size
   const bodySize = useMemo(() => {
@@ -393,67 +395,111 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
           {t('tool.apiTester.responseHeaders')} ({Object.keys(response.headers || {}).length})
         </button>
 
-        {/* View mode (only for body tab with JSON) */}
-        {activeTab === 'body' && parsedBody?.type === 'json' && (
-          <div className="ml-auto flex items-center gap-1">
-            {(['tree', 'pretty', 'raw'] as const).map((mode) => (
-              <button
-                key={mode}
-                onClick={() => setViewMode(mode)}
-                className={cn(
-                  'px-2 py-1 text-xs rounded transition-colors',
-                  viewMode === mode
-                    ? 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'
-                    : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
-                )}
-              >
-                {t(`tool.apiTester.view${mode.charAt(0).toUpperCase() + mode.slice(1)}`)}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* Open in JSON Viewer button - only for JSON responses */}
-        {activeTab === 'body' && parsedBody?.type === 'json' && (
-          <button
-            onClick={handleOpenInJsonViewer}
-            className={cn(
-              'ml-2 p-1.5 rounded text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400',
-              'hover:bg-gray-100 dark:hover:bg-gray-800',
-              'transition-colors'
-            )}
-            title={t('tool.apiTester.openInJsonViewer')}
-          >
-            <FileJson className="w-4 h-4" />
-          </button>
-        )}
-
-        {/* Open in YAML Converter button - only for YAML responses */}
-        {activeTab === 'body' && parsedBody?.type === 'yaml' && (
-          <button
-            onClick={handleOpenInYamlConverter}
-            className={cn(
-              'ml-2 p-1.5 rounded text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400',
-              'hover:bg-gray-100 dark:hover:bg-gray-800',
-              'transition-colors'
-            )}
-            title={t('tool.apiTester.openInYamlConverter')}
-          >
-            <FileCode2 className="w-4 h-4" />
-          </button>
-        )}
-
-        {/* Copy button */}
-        <button
-          onClick={handleCopy}
-          className={cn(
-            'ml-2 p-1.5 rounded text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200',
-            'hover:bg-gray-100 dark:hover:bg-gray-800',
-            copied && 'text-emerald-500 dark:text-emerald-400'
+        {/* View mode and action buttons */}
+        <div className="ml-auto flex items-center gap-2">
+          {/* View mode (only for body tab with JSON) */}
+          {activeTab === 'body' && parsedBody?.type === 'json' && (
+            <div className="flex items-center gap-1">
+              {(['tree', 'pretty', 'raw'] as const).map((mode) => (
+                <button
+                  key={mode}
+                  onClick={() => setViewMode(mode)}
+                  className={cn(
+                    'px-2 py-1 text-xs rounded transition-colors',
+                    viewMode === mode
+                      ? 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'
+                      : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
+                  )}
+                >
+                  {t(`tool.apiTester.view${mode.charAt(0).toUpperCase() + mode.slice(1)}`)}
+                </button>
+              ))}
+            </div>
           )}
-        >
-          {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-        </button>
+
+          {/* Divider between view mode and action buttons */}
+          {activeTab === 'body' && parsedBody?.type === 'json' && (
+            <div className="h-4 w-px bg-gray-300 dark:bg-gray-600" />
+          )}
+
+          {/* Open in JSON Viewer button - only for JSON responses */}
+          {activeTab === 'body' && parsedBody?.type === 'json' && (
+            <button
+              onClick={handleOpenInJsonViewer}
+              disabled={isNavigating !== null}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md',
+                'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300',
+                'border border-blue-200 dark:border-blue-800',
+                'hover:bg-blue-100 dark:hover:bg-blue-900/30',
+                'hover:border-blue-300 dark:hover:border-blue-700',
+                'transition-all duration-200',
+                'shadow-sm hover:shadow',
+                isNavigating === 'json' && 'opacity-75 cursor-wait',
+                isNavigating !== null && isNavigating !== 'json' && 'opacity-50 cursor-not-allowed'
+              )}
+            >
+              {isNavigating === 'json' ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <span>{t('tool.apiTester.processing')}</span>
+                </>
+              ) : (
+                <>
+                  <FileJson className="w-3.5 h-3.5" />
+                  <span>{t('tool.apiTester.openInJsonViewer')}</span>
+                  <ExternalLink className="w-3 h-3 opacity-70" />
+                </>
+              )}
+            </button>
+          )}
+
+          {/* Open in YAML Converter button - only for YAML responses */}
+          {activeTab === 'body' && parsedBody?.type === 'yaml' && (
+            <button
+              onClick={handleOpenInYamlConverter}
+              disabled={isNavigating !== null}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md',
+                'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300',
+                'border border-blue-200 dark:border-blue-800',
+                'hover:bg-blue-100 dark:hover:bg-blue-900/30',
+                'hover:border-blue-300 dark:hover:border-blue-700',
+                'transition-all duration-200',
+                'shadow-sm hover:shadow',
+                isNavigating === 'yaml' && 'opacity-75 cursor-wait',
+                isNavigating !== null && isNavigating !== 'yaml' && 'opacity-50 cursor-not-allowed'
+              )}
+            >
+              {isNavigating === 'yaml' ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <span>{t('tool.apiTester.processing')}</span>
+                </>
+              ) : (
+                <>
+                  <FileCode2 className="w-3.5 h-3.5" />
+                  <span>{t('tool.apiTester.openInYamlConverter')}</span>
+                  <ExternalLink className="w-3 h-3 opacity-70" />
+                </>
+              )}
+            </button>
+          )}
+
+          {/* Copy button */}
+          <button
+            onClick={handleCopy}
+            className={cn(
+              'p-1.5 rounded text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200',
+              'hover:bg-gray-100 dark:hover:bg-gray-800',
+              'transition-colors',
+              copied && 'text-emerald-500 dark:text-emerald-400'
+            )}
+            title={t('common.copy')}
+          >
+            {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+          </button>
+        </div>
       </div>
 
       {/* Content */}

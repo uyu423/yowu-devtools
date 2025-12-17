@@ -965,6 +965,7 @@ export const enUS = {
       rename: 'Rename',
       openInJsonViewer: 'Open in JSON Viewer',
       openInYamlConverter: 'Open in YAML Converter',
+      processing: 'Processing...',
       delete: 'Delete',
       requestName: 'Request name',
       timeoutError: 'Request timeout after {ms}ms',

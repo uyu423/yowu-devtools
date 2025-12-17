@@ -953,6 +953,7 @@ export const koKR = {
       rename: '이름 변경',
       openInJsonViewer: 'JSON Viewer에서 열기',
       openInYamlConverter: 'YAML Converter에서 열기',
+      processing: '처리 중...',
       delete: '삭제',
       requestName: '요청 이름',
       timeoutError: '{ms}ms 후 요청 시간 초과',
