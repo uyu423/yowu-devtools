@@ -132,6 +132,25 @@ export const getStatusColor = (status?: number): string => {
   return 'text-gray-500';
 };
 
+import { getReasonPhrase } from 'http-status-codes';
+
+/**
+ * Get status text for HTTP status code
+ * Falls back to provided statusText or library lookup if empty (HTTP/2 doesn't include status text)
+ */
+export const getStatusText = (status?: number, statusText?: string): string => {
+  if (statusText && statusText.trim()) return statusText;
+  if (status) {
+    try {
+      return getReasonPhrase(status);
+    } catch {
+      // Unknown status code
+      return '';
+    }
+  }
+  return '';
+};
+
 // Format bytes to human readable
 export const formatBytes = (bytes: number): string => {
   if (bytes === 0) return '0 B';

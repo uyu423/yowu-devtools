@@ -6,7 +6,7 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { Copy, Download, Check, Clock, Database, FileType, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
 import type { ResponseData } from '../types';
-import { getStatusColor, formatBytes } from '../types';
+import { getStatusColor, getStatusText, formatBytes } from '../types';
 import { parseResponseBody } from '../utils';
 import { copyToClipboard } from '@/lib/clipboard';
 import { useResolvedTheme } from '@/hooks/useThemeHooks';
@@ -281,7 +281,7 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
       <div className="flex items-center gap-4 px-4 py-2 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
         {/* Status code */}
         <div className={cn('font-semibold', getStatusColor(response.status))}>
-          {response.status} {response.statusText}
+          {response.status} {getStatusText(response.status, response.statusText)}
         </div>
 
         {/* Timing */}
