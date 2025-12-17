@@ -931,7 +931,7 @@ export const koKR = {
       binaryResponse: '바이너리 응답',
       sendingRequest: '요청 전송 중...',
       sendRequestToSee: '요청을 전송하여 응답을 확인하세요',
-      viaMethod: '{method}로 전송',
+      viaMethod: 'via {method}',
       // Error messages
       errorTimeout: '{ms}ms 후 요청 시간 초과',
       errorCors: '요청 실패. CORS 제한으로 인한 것일 수 있습니다. Extension 모드를 사용해 보세요.',

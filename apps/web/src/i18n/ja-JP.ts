@@ -938,7 +938,7 @@ export const jaJP = {
       binaryResponse: 'バイナリレスポンス',
       sendingRequest: 'リクエスト送信中...',
       sendRequestToSee: 'リクエストを送信してレスポンスを確認してください',
-      viaMethod: '{method}で送信',
+      viaMethod: 'via {method}',
       // Error messages
       errorTimeout: '{ms}ms後にリクエストがタイムアウトしました',
       errorCors: 'リクエストが失敗しました。CORS制限による可能性があります。Extensionモードをお試しください。',

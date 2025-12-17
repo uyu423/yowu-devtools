@@ -873,7 +873,7 @@ export const zhCN = {
       binaryResponse: '二进制响应',
       sendingRequest: '发送请求中...',
       sendRequestToSee: '发送请求以查看响应',
-      viaMethod: '通过{method}',
+      viaMethod: 'via {method}',
       // Error messages
       errorTimeout: '请求在{ms}ms后超时',
       errorCors: '请求失败。这可能是由于CORS限制。请尝试使用Extension模式。',
