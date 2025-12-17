@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import type { ToolDefinition } from '@/tools/types';
-import { FileJson, ListTree, Rows4, Text, Copy, Maximize2, Minimize2 } from 'lucide-react';
+import { FileJson, ListTree, Rows4, Text, Copy, Maximize2, Minimize2, ExternalLink } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { EditorPanel } from '@/components/common/EditorPanel';
 import { ActionBar } from '@/components/common/ActionBar';
@@ -20,8 +20,301 @@ import { useResolvedTheme } from '@/hooks/useThemeHooks';
 import { useWebWorker, shouldUseWorkerForText } from '@/hooks/useWebWorker';
 import { useI18n } from '@/hooks/useI18nHooks';
 import { copyToClipboard } from '@/lib/clipboard';
-import { JsonView, defaultStyles } from 'react-json-view-lite';
 import 'react-json-view-lite/dist/index.css';
+
+/**
+ * Custom JSON Tree Viewer with clickable URL support
+ */
+const JsonTreeView: React.FC<{
+  data: unknown;
+  expandLevel: number | typeof Infinity;
+  isDark: boolean;
+}> = React.memo(({ data, expandLevel, isDark }) => {
+  return (
+    <JsonNode
+      data={data}
+      depth={0}
+      expandLevel={expandLevel}
+      isDark={isDark}
+      isLast={true}
+    />
+  );
+});
+JsonTreeView.displayName = 'JsonTreeView';
+
+/**
+ * Recursive JSON Node component with URL link support
+ */
+const JsonNode: React.FC<{
+  data: unknown;
+  depth: number;
+  expandLevel: number | typeof Infinity;
+  isDark: boolean;
+  fieldName?: string;
+  isLast?: boolean;
+}> = React.memo(({ data, depth, expandLevel, isDark, fieldName, isLast = false }) => {
+  const [isExpanded, setIsExpanded] = React.useState(() => 
+    expandLevel === Infinity || depth < expandLevel
+  );
+
+  // Update expanded state when expandLevel changes
+  React.useEffect(() => {
+    setIsExpanded(expandLevel === Infinity || depth < expandLevel);
+  }, [expandLevel, depth]);
+
+  const toggleExpand = useCallback(() => {
+    setIsExpanded((prev) => !prev);
+  }, []);
+
+  const indent = depth * 16;
+
+  // Null value
+  if (data === null) {
+    return (
+      <div className="flex items-start" style={{ paddingLeft: indent }}>
+        {fieldName !== undefined && (
+          <>
+            <span className="text-gray-700 dark:text-gray-300">"{fieldName}"</span>
+            <span className="text-gray-500 dark:text-gray-400 mx-1">:</span>
+          </>
+        )}
+        <span className="text-gray-500 dark:text-gray-400">null</span>
+        {!isLast && <span className="text-gray-500 dark:text-gray-400">,</span>}
+      </div>
+    );
+  }
+
+  // Undefined value
+  if (data === undefined) {
+    return (
+      <div className="flex items-start" style={{ paddingLeft: indent }}>
+        {fieldName !== undefined && (
+          <>
+            <span className="text-gray-700 dark:text-gray-300">"{fieldName}"</span>
+            <span className="text-gray-500 dark:text-gray-400 mx-1">:</span>
+          </>
+        )}
+        <span className="text-gray-500 dark:text-gray-400">undefined</span>
+        {!isLast && <span className="text-gray-500 dark:text-gray-400">,</span>}
+      </div>
+    );
+  }
+
+  // String value with URL detection
+  if (typeof data === 'string') {
+    const isUrl = /^https?:\/\//i.test(data);
+    return (
+      <div className="flex items-start flex-wrap" style={{ paddingLeft: indent }}>
+        {fieldName !== undefined && (
+          <>
+            <span className="text-gray-700 dark:text-gray-300">"{fieldName}"</span>
+            <span className="text-gray-500 dark:text-gray-400 mx-1">:</span>
+          </>
+        )}
+        {isUrl ? (
+          <a
+            href={data}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1 break-all"
+            onClick={(e) => e.stopPropagation()}
+          >
+            "{data}"
+            <ExternalLink className="w-3 h-3 shrink-0" />
+          </a>
+        ) : (
+          <span className={`break-all ${isDark ? 'text-emerald-400' : 'text-emerald-600'}`}>
+            "{data}"
+          </span>
+        )}
+        {!isLast && <span className="text-gray-500 dark:text-gray-400">,</span>}
+      </div>
+    );
+  }
+
+  // Number value
+  if (typeof data === 'number') {
+    return (
+      <div className="flex items-start" style={{ paddingLeft: indent }}>
+        {fieldName !== undefined && (
+          <>
+            <span className="text-gray-700 dark:text-gray-300">"{fieldName}"</span>
+            <span className="text-gray-500 dark:text-gray-400 mx-1">:</span>
+          </>
+        )}
+        <span className={isDark ? 'text-purple-400' : 'text-purple-600'}>{data}</span>
+        {!isLast && <span className="text-gray-500 dark:text-gray-400">,</span>}
+      </div>
+    );
+  }
+
+  // Boolean value
+  if (typeof data === 'boolean') {
+    return (
+      <div className="flex items-start" style={{ paddingLeft: indent }}>
+        {fieldName !== undefined && (
+          <>
+            <span className="text-gray-700 dark:text-gray-300">"{fieldName}"</span>
+            <span className="text-gray-500 dark:text-gray-400 mx-1">:</span>
+          </>
+        )}
+        <span className={isDark ? 'text-orange-400' : 'text-orange-600'}>{data.toString()}</span>
+        {!isLast && <span className="text-gray-500 dark:text-gray-400">,</span>}
+      </div>
+    );
+  }
+
+  // Array value
+  if (Array.isArray(data)) {
+    if (data.length === 0) {
+      return (
+        <div className="flex items-start" style={{ paddingLeft: indent }}>
+          {fieldName !== undefined && (
+            <>
+              <span className="text-gray-700 dark:text-gray-300">"{fieldName}"</span>
+              <span className="text-gray-500 dark:text-gray-400 mx-1">:</span>
+            </>
+          )}
+          <span className="text-gray-600 dark:text-gray-300">[]</span>
+          {!isLast && <span className="text-gray-500 dark:text-gray-400">,</span>}
+        </div>
+      );
+    }
+
+    return (
+      <div>
+        <div
+          className="flex items-start cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700/50 rounded"
+          style={{ paddingLeft: indent }}
+          onClick={toggleExpand}
+        >
+          <span className="text-gray-500 dark:text-gray-400 select-none mr-1 w-3 inline-block">
+            {isExpanded ? '▾' : '▸'}
+          </span>
+          {fieldName !== undefined && (
+            <>
+              <span className="text-gray-700 dark:text-gray-300">"{fieldName}"</span>
+              <span className="text-gray-500 dark:text-gray-400 mx-1">:</span>
+            </>
+          )}
+          <span className="text-gray-600 dark:text-gray-300">[</span>
+          {!isExpanded && (
+            <>
+              <span className="text-gray-500 dark:text-gray-400 mx-1">...</span>
+              <span className="text-gray-600 dark:text-gray-300">]</span>
+              <span className="text-gray-400 dark:text-gray-500 ml-1 text-xs">
+                ({data.length} items)
+              </span>
+              {!isLast && <span className="text-gray-500 dark:text-gray-400">,</span>}
+            </>
+          )}
+        </div>
+        {isExpanded && (
+          <>
+            {data.map((item, index) => (
+              <JsonNode
+                key={index}
+                data={item}
+                depth={depth + 1}
+                expandLevel={expandLevel}
+                isDark={isDark}
+                isLast={index === data.length - 1}
+              />
+            ))}
+            <div style={{ paddingLeft: indent }}>
+              <span className="text-gray-600 dark:text-gray-300 ml-4">]</span>
+              {!isLast && <span className="text-gray-500 dark:text-gray-400">,</span>}
+            </div>
+          </>
+        )}
+      </div>
+    );
+  }
+
+  // Object value
+  if (typeof data === 'object' && data !== null) {
+    const entries = Object.entries(data);
+    if (entries.length === 0) {
+      return (
+        <div className="flex items-start" style={{ paddingLeft: indent }}>
+          {fieldName !== undefined && (
+            <>
+              <span className="text-gray-700 dark:text-gray-300">"{fieldName}"</span>
+              <span className="text-gray-500 dark:text-gray-400 mx-1">:</span>
+            </>
+          )}
+          <span className="text-gray-600 dark:text-gray-300">{'{}'}</span>
+          {!isLast && <span className="text-gray-500 dark:text-gray-400">,</span>}
+        </div>
+      );
+    }
+
+    return (
+      <div>
+        <div
+          className="flex items-start cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700/50 rounded"
+          style={{ paddingLeft: indent }}
+          onClick={toggleExpand}
+        >
+          <span className="text-gray-500 dark:text-gray-400 select-none mr-1 w-3 inline-block">
+            {isExpanded ? '▾' : '▸'}
+          </span>
+          {fieldName !== undefined && (
+            <>
+              <span className="text-gray-700 dark:text-gray-300">"{fieldName}"</span>
+              <span className="text-gray-500 dark:text-gray-400 mx-1">:</span>
+            </>
+          )}
+          <span className="text-gray-600 dark:text-gray-300">{'{'}</span>
+          {!isExpanded && (
+            <>
+              <span className="text-gray-500 dark:text-gray-400 mx-1">...</span>
+              <span className="text-gray-600 dark:text-gray-300">{'}'}</span>
+              <span className="text-gray-400 dark:text-gray-500 ml-1 text-xs">
+                ({entries.length} keys)
+              </span>
+              {!isLast && <span className="text-gray-500 dark:text-gray-400">,</span>}
+            </>
+          )}
+        </div>
+        {isExpanded && (
+          <>
+            {entries.map(([key, value], index) => (
+              <JsonNode
+                key={key}
+                data={value}
+                depth={depth + 1}
+                expandLevel={expandLevel}
+                isDark={isDark}
+                fieldName={key}
+                isLast={index === entries.length - 1}
+              />
+            ))}
+            <div style={{ paddingLeft: indent }}>
+              <span className="text-gray-600 dark:text-gray-300 ml-4">{'}'}</span>
+              {!isLast && <span className="text-gray-500 dark:text-gray-400">,</span>}
+            </div>
+          </>
+        )}
+      </div>
+    );
+  }
+
+  // Other values
+  return (
+    <div className="flex items-start" style={{ paddingLeft: indent }}>
+      {fieldName !== undefined && (
+        <>
+          <span className="text-gray-700 dark:text-gray-300">"{fieldName}"</span>
+          <span className="text-gray-500 dark:text-gray-400 mx-1">:</span>
+        </>
+      )}
+      <span className="text-gray-600 dark:text-gray-300">{String(data)}</span>
+      {!isLast && <span className="text-gray-500 dark:text-gray-400">,</span>}
+    </div>
+  );
+});
+JsonNode.displayName = 'JsonNode';
 
 interface JsonToolState {
   input: string;
@@ -80,20 +373,6 @@ const JsonTool: React.FC = () => {
   );
 
   const isDark = resolvedTheme === 'dark';
-
-  const jsonViewStyles = React.useMemo(
-    () => ({
-      ...defaultStyles,
-      container: `${defaultStyles.container} text-sm font-mono ${
-        isDark ? 'text-gray-100' : 'text-gray-900'
-      }`,
-      childFieldsContainer: `${
-        defaultStyles.childFieldsContainer ?? ''
-      } child-fields-container`,
-      stringValue: `${defaultStyles.stringValue} json-string-value`,
-    }),
-    [isDark]
-  );
 
   // Request ID for Worker response ordering (v1.2.0)
   const [requestId, setRequestId] = React.useState<number | undefined>(undefined);
@@ -404,15 +683,12 @@ const JsonTool: React.FC = () => {
                         </button>
                       </div>
                     </div>
-                    <div className="flex-1 min-h-0 overflow-auto p-4 json-tree-view">
-                      <JsonView
-                        key={`json-view-${isDark ? 'dark' : 'light'}`}
+                    <div className="flex-1 min-h-0 overflow-auto p-4 json-tree-view text-sm font-mono">
+                      <JsonTreeView
+                        key={`json-view-${isDark ? 'dark' : 'light'}-${state.expandLevel}`}
                         data={parseResult.data}
-                        shouldExpandNode={(level) =>
-                          state.expandLevel === Infinity ||
-                          level < state.expandLevel
-                        }
-                        style={jsonViewStyles}
+                        expandLevel={state.expandLevel}
+                        isDark={isDark}
                       />
                     </div>
                   </div>
