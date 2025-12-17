@@ -970,6 +970,9 @@ export const enUS = {
       // Include Cookies option
       includeCookies: 'Include Cookies',
       includeCookiesTooltip: 'Include browser cookies in the request. When enabled, cookies stored in your browser for the target domain will be automatically sent with the request.',
+      // Error details
+      showErrorDetails: 'Show Details',
+      hideErrorDetails: 'Hide Details',
     },
   },
   meta: {

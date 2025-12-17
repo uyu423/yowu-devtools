@@ -889,6 +889,9 @@ export const zhCN = {
       // Include Cookies option
       includeCookies: '包含Cookie',
       includeCookiesTooltip: '在请求中包含浏览器Cookie。启用后，存储在浏览器中的目标域Cookie将自动随请求发送。',
+      // Error details
+      showErrorDetails: '显示详情',
+      hideErrorDetails: '隐藏详情',
     },
   },
   meta: {

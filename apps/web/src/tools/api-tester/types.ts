@@ -67,6 +67,8 @@ export interface ResponseData {
   error?: {
     code: string;
     message: string;
+    /** Detailed error information for debugging */
+    details?: string;
   };
   method?: 'cors' | 'no-cors' | 'extension';
 }

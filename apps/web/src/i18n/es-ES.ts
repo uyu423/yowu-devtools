@@ -1001,6 +1001,9 @@ export const esES = {
       // Include Cookies option
       includeCookies: 'Incluir Cookies',
       includeCookiesTooltip: 'Incluir las cookies del navegador en la solicitud. Cuando está habilitado, las cookies almacenadas en el navegador para el dominio de destino se enviarán automáticamente con la solicitud.',
+      // Error details
+      showErrorDetails: 'Mostrar Detalles',
+      hideErrorDetails: 'Ocultar Detalles',
     },
   },
   meta: {

@@ -310,14 +310,31 @@ export const useRequestExecutor = (): UseRequestExecutorReturn => {
         };
       } catch (err) {
         console.error('[executeExtensionFetch] Error:', err);
+        const errorMessage = err instanceof Error ? err.message : 'Extension request failed';
+        const errorCode = (err as { code?: string })?.code || 'EXTENSION_ERROR';
+        const errorDetails = (err as { details?: string })?.details;
+        const errorStack = err instanceof Error ? err.stack : undefined;
+        
+        // Build detailed error information
+        const detailParts = [
+          errorDetails || `Error: ${errorMessage}`,
+          errorStack && !errorDetails ? `\nStack Trace:\n${errorStack}` : '',
+          `\n--- Request Info ---`,
+          `URL: ${buildUrlWithParams(getBaseUrl(state.url), state.queryParams)}`,
+          `Method: ${state.method}`,
+          `Include Cookies: ${state.includeCookies}`,
+          `Headers: ${state.headers.filter(h => h.enabled && h.key).map(h => `${h.key}: ${h.value}`).join(', ') || '(none)'}`,
+        ].filter(Boolean).join('\n');
+        
         return {
           id: requestId,
           ok: false,
           timingMs: Math.round(performance.now() - startTime),
           method: 'extension',
           error: {
-            code: 'EXTENSION_ERROR',
-            message: err instanceof Error ? err.message : 'Extension request failed',
+            code: errorCode,
+            message: errorMessage,
+            details: detailParts,
           },
         };
       }

@@ -954,6 +954,9 @@ export const jaJP = {
       // Include Cookies option
       includeCookies: 'クッキーを含める',
       includeCookiesTooltip: 'リクエストにブラウザのクッキーを含めます。有効にすると、対象ドメインに保存されているブラウザクッキーがリクエストと一緒に自動的に送信されます。',
+      // Error details
+      showErrorDetails: '詳細を表示',
+      hideErrorDetails: '詳細を隠す',
     },
   },
   meta: {

@@ -231,7 +231,11 @@ export const useExtension = (options: UseExtensionOptions = {}): UseExtensionRet
 
       if (response.type === 'ERROR') {
         console.error('[useExtension] Extension error:', response.error);
-        throw new Error(response.error.message);
+        // Create error with details attached
+        const error = new Error(response.error.message) as Error & { details?: string; code?: string };
+        error.code = response.error.code;
+        error.details = `Error Code: ${response.error.code}\nMessage: ${response.error.message}`;
+        throw error;
       }
 
       if (response.type === 'RESPONSE') {

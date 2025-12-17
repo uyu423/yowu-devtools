@@ -4,7 +4,7 @@
 
 import React, { useState, useMemo, useCallback } from 'react';
 import { cn } from '@/lib/utils';
-import { Copy, Download, Check, Clock, Database, FileType, ExternalLink } from 'lucide-react';
+import { Copy, Download, Check, Clock, Database, FileType, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
 import type { ResponseData } from '../types';
 import { getStatusColor, formatBytes } from '../types';
 import { parseResponseBody } from '../utils';
@@ -113,6 +113,7 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
   const [activeTab, setActiveTab] = useState<TabType>('body');
   const [viewMode, setViewMode] = useState<ViewMode>('tree');
   const [copied, setCopied] = useState(false);
+  const [showErrorDetails, setShowErrorDetails] = useState(false);
   const resolvedTheme = useResolvedTheme();
   const isDark = resolvedTheme === 'dark';
 
@@ -240,6 +241,34 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
           <div className="mt-2 text-sm text-red-600 dark:text-red-400">
             {getErrorMessage(response.error)}
           </div>
+          
+          {/* Error Details Toggle */}
+          {response.error.details && (
+            <div className="mt-4">
+              <button
+                onClick={() => setShowErrorDetails(!showErrorDetails)}
+                className="flex items-center gap-1 text-sm text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors"
+              >
+                {showErrorDetails ? (
+                  <>
+                    <ChevronUp className="w-4 h-4" />
+                    {t('tool.apiTester.hideErrorDetails')}
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="w-4 h-4" />
+                    {t('tool.apiTester.showErrorDetails')}
+                  </>
+                )}
+              </button>
+              
+              {showErrorDetails && (
+                <pre className="mt-2 p-3 bg-red-100 dark:bg-red-900/30 rounded text-xs font-mono text-red-800 dark:text-red-200 overflow-auto whitespace-pre-wrap break-words max-h-64">
+                  {response.error.details}
+                </pre>
+              )}
+            </div>
+          )}
         </div>
       </div>
     );

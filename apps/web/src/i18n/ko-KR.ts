@@ -947,6 +947,9 @@ export const koKR = {
       // Include Cookies option
       includeCookies: '쿠키 포함',
       includeCookiesTooltip: '요청에 브라우저 쿠키를 포함합니다. 활성화하면 대상 도메인에 저장된 브라우저 쿠키가 요청과 함께 자동으로 전송됩니다.',
+      // Error details
+      showErrorDetails: '상세 보기',
+      hideErrorDetails: '상세 숨기기',
     },
   },
   meta: {
