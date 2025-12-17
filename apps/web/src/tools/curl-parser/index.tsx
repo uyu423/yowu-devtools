@@ -6,6 +6,7 @@
  */
 
 import React, { useState, useCallback } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Terminal } from 'lucide-react';
 import type { ToolDefinition } from '@/tools/types';
 import { ToolHeader } from '@/components/common/ToolHeader';
@@ -13,6 +14,8 @@ import { useToolState } from '@/hooks/useToolState';
 import { useTitle } from '@/hooks/useTitle';
 import { useI18n } from '@/hooks/useI18nHooks';
 import { parseCurl } from '@/lib/curl/parseCurl';
+import { storeForApiTester } from '@/lib/curl/convertToApiTester';
+import { buildLocalePath } from '@/lib/i18nUtils';
 import type { CurlParseResult } from '@/lib/curl/types';
 import type { CurlParserState } from './types';
 import { DEFAULT_STATE } from './types';
@@ -26,7 +29,9 @@ import {
 } from './components';
 
 const CurlParserTool: React.FC = () => {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
+  const navigate = useNavigate();
+  const location = useLocation();
   useTitle(t('tool.curl.title'));
 
   const { state, updateState, resetState } = useToolState<CurlParserState>(
@@ -87,9 +92,15 @@ const CurlParserTool: React.FC = () => {
   }, [resetState]);
 
   const handleOpenInApiTester = useCallback(() => {
-    // TODO: Implement API Tester integration (Phase 2.6)
-    console.log('Open in API Tester', parseResult);
-  }, [parseResult]);
+    if (!parseResult) return;
+    
+    // Store parse result for API Tester
+    storeForApiTester(parseResult);
+    
+    // Navigate to API Tester with locale prefix preserved
+    const apiTesterPath = buildLocalePath(locale, '/api');
+    navigate(apiTesterPath);
+  }, [parseResult, locale, navigate]);
 
   return (
     <div className="flex flex-col h-full p-4 md:p-6 max-w-5xl mx-auto">

@@ -35,6 +35,7 @@ import {
   CorsModal,
 } from './components';
 import { useRequestExecutor, useApiHistory, useCorsAllowlist } from './hooks';
+import { getStoredApiTesterState, clearStoredApiTesterState } from '@/lib/curl/convertToApiTester';
 
 const DEFAULT_STATE: ApiTesterState = {
   method: 'GET',
@@ -54,6 +55,16 @@ const DEFAULT_STATE: ApiTesterState = {
 const ApiTesterTool: React.FC = () => {
   const { t } = useI18n();
   useTitle(t('tool.apiTester.title'));
+
+  // Check for stored cURL parse result on mount
+  const [initialStateFromCurl] = React.useState<Partial<ApiTesterState> | null>(() => {
+    const stored = getStoredApiTesterState();
+    if (stored) {
+      clearStoredApiTesterState();
+      return stored;
+    }
+    return null;
+  });
 
   const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
     useToolState<ApiTesterState>('api-tester', DEFAULT_STATE, {
@@ -141,6 +152,13 @@ const ApiTesterTool: React.FC = () => {
   const [headersExpanded, setHeadersExpanded] = useState(false);
   const [corsModalOpen, setCorsModalOpen] = useState(false);
   const [pendingCorsRetry, setPendingCorsRetry] = useState(false);
+
+  // Apply stored cURL parse result on mount
+  useEffect(() => {
+    if (initialStateFromCurl) {
+      updateState(initialStateFromCurl);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Save history sidebar state to localStorage
   useEffect(() => {
