@@ -7,6 +7,44 @@ import { APP_VERSION } from '@/lib/constants';
 const UPDATE_CHECK_INTERVAL = 60 * 60 * 1000; // 1시간
 // 버전 체크 간격 (밀리초) - Service Worker보다 더 자주 체크
 const VERSION_CHECK_INTERVAL = 5 * 60 * 1000; // 5분
+// 팝업 숨기기 기간 (밀리초)
+const DISMISS_DURATION = 24 * 60 * 60 * 1000; // 24시간
+
+// localStorage 키
+const STORAGE_KEY_UPDATE_DISMISSED = 'yowu-devtools:v1:pwa:updateDismissedUntil';
+const STORAGE_KEY_INSTALL_DISMISSED = 'yowu-devtools:v1:pwa:installDismissedUntil';
+
+/**
+ * localStorage에서 숨기기 만료 시간 확인
+ */
+function isDismissedUntil(key: string): boolean {
+  try {
+    const dismissedUntil = localStorage.getItem(key);
+    if (dismissedUntil) {
+      const expiry = parseInt(dismissedUntil, 10);
+      if (Date.now() < expiry) {
+        return true; // 아직 숨기기 기간 중
+      }
+      // 만료되었으면 제거
+      localStorage.removeItem(key);
+    }
+  } catch {
+    // localStorage 접근 오류 무시
+  }
+  return false;
+}
+
+/**
+ * localStorage에 숨기기 만료 시간 저장
+ */
+function setDismissedUntil(key: string): void {
+  try {
+    const expiry = Date.now() + DISMISS_DURATION;
+    localStorage.setItem(key, expiry.toString());
+  } catch {
+    // localStorage 접근 오류 무시
+  }
+}
 
 interface VersionInfo {
   version: string;
@@ -35,6 +73,7 @@ interface UsePWAResult {
  * @see https://vite-pwa-org.netlify.app/guide/periodic-sw-updates.html
  */
 export function usePWA(): UsePWAResult {
+  // 초기 상태: localStorage에서 숨기기 상태 확인
   const [needRefresh, setNeedRefresh] = useState(false);
   const [offlineReady, setOfflineReady] = useState(false);
   const [isInstallable, setIsInstallable] = useState(false);
@@ -43,6 +82,9 @@ export function usePWA(): UsePWAResult {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const versionIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const registrationRef = useRef<ServiceWorkerRegistration | null>(null);
+  
+  // 실제 업데이트 가능 상태 (내부 추적용)
+  const hasUpdateRef = useRef(false);
 
   /**
    * version.json을 조회하여 서버 버전과 현재 앱 버전 비교
@@ -70,10 +112,13 @@ export function usePWA(): UsePWAResult {
       const serverVersion: VersionInfo = await response.json();
       console.log(`[PWA] Version check: server=${serverVersion.version}, client=${APP_VERSION}`);
 
-      // 버전이 다르면 업데이트 알림
+      // 버전이 다르면 업데이트 알림 (숨기기 상태가 아닐 때만)
       if (serverVersion.version !== APP_VERSION) {
         console.log('[PWA] New version detected via version.json');
-        setNeedRefresh(true);
+        hasUpdateRef.current = true;
+        if (!isDismissedUntil(STORAGE_KEY_UPDATE_DISMISSED)) {
+          setNeedRefresh(true);
+        }
       }
     } catch (error) {
       // 네트워크 오류 등은 조용히 처리 (개발 환경에서는 version.json이 없을 수 있음)
@@ -123,7 +168,11 @@ export function usePWA(): UsePWAResult {
       immediate: true,
       onNeedRefresh() {
         console.log('[PWA] New content available - refresh needed');
-        setNeedRefresh(true);
+        hasUpdateRef.current = true;
+        // 숨기기 상태가 아닐 때만 알림 표시
+        if (!isDismissedUntil(STORAGE_KEY_UPDATE_DISMISSED)) {
+          setNeedRefresh(true);
+        }
       },
       onOfflineReady() {
         console.log('[PWA] App ready to work offline');
@@ -183,10 +232,13 @@ export function usePWA(): UsePWAResult {
     // 앱 설치 가능 여부 감지
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
-      setIsInstallable(true);
       // 이벤트를 저장하여 나중에 사용
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (window as any).deferredPrompt = e;
+      // 숨기기 상태가 아닐 때만 설치 프롬프트 표시
+      if (!isDismissedUntil(STORAGE_KEY_INSTALL_DISMISSED)) {
+        setIsInstallable(true);
+      }
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -219,10 +271,16 @@ export function usePWA(): UsePWAResult {
   const closePrompt = () => {
     setNeedRefresh(false);
     setOfflineReady(false);
+    // 하루 동안 업데이트 알림 숨기기
+    setDismissedUntil(STORAGE_KEY_UPDATE_DISMISSED);
+    console.log('[PWA] Update prompt dismissed for 24 hours');
   };
 
   const closeInstallPrompt = () => {
     setIsInstallable(false);
+    // 하루 동안 설치 알림 숨기기
+    setDismissedUntil(STORAGE_KEY_INSTALL_DISMISSED);
+    console.log('[PWA] Install prompt dismissed for 24 hours');
   };
 
   const installApp = async () => {
