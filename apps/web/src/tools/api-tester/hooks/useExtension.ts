@@ -10,9 +10,10 @@ import type {
   RequestSpec,
   ResponseSpec,
 } from '@yowu-devtools/shared';
+import { EXTENSION_ID as DEFAULT_EXTENSION_ID } from '../constants';
 
-// Get extension ID from environment or use default
-const EXTENSION_ID = import.meta.env.VITE_EXTENSION_ID || '';
+// Get extension ID from environment or use default from constants
+const EXTENSION_ID = import.meta.env.VITE_EXTENSION_ID || DEFAULT_EXTENSION_ID;
 
 interface UseExtensionOptions {
   /** Extension ID override */

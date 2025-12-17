@@ -39,6 +39,14 @@ function registerHandler(type: string, handler: MessageHandler): void {
 }
 
 // =============================================================================
+// Cookie Management
+// =============================================================================
+// Note: In Manifest V3, blocking webRequest listeners are only available for
+// Enterprise Policy-installed extensions. For regular extensions, we use
+// credentials: 'include' in fetch() which automatically includes cookies
+// accessible via chrome.cookies API.
+
+// =============================================================================
 // Origin Validation
 // =============================================================================
 
@@ -128,10 +136,6 @@ async function getGrantedOrigins(): Promise<string[]> {
   }
 }
 
-// =============================================================================
-// Cookie Management
-// =============================================================================
-
 /**
  * Extract all possible domain patterns from a hostname
  * e.g., "api.sub.example.com" -> 
@@ -160,57 +164,42 @@ async function getCookiesForUrl(url: string): Promise<string | null> {
     const hostname = parsedUrl.hostname;
     const domainPatterns = getDomainPatterns(hostname);
     
-    console.log('[Extension] Getting cookies for URL:', url);
-    console.log('[Extension] Domain patterns to check:', domainPatterns);
-    
     // Collect cookies from all domain patterns
     const cookieMap = new Map<string, chrome.cookies.Cookie>();
     
     for (const domain of domainPatterns) {
       try {
-        // Get cookies by domain pattern
         const domainCookies = await chrome.cookies.getAll({ domain });
-        console.log(`[Extension] Found ${domainCookies.length} cookies for domain: ${domain}`);
-        
         for (const cookie of domainCookies) {
           // Check if cookie applies to this URL
           const cookieApplies = 
-            // Domain matches
             (hostname === cookie.domain || hostname.endsWith(cookie.domain)) &&
-            // Path matches
             parsedUrl.pathname.startsWith(cookie.path) &&
-            // Secure flag matches
             (!cookie.secure || parsedUrl.protocol === 'https:');
           
           if (cookieApplies) {
-            // Use cookie name as key to avoid duplicates (later cookies override earlier)
             cookieMap.set(cookie.name, cookie);
           }
         }
-      } catch (err) {
-        console.warn(`[Extension] Failed to get cookies for domain ${domain}:`, err);
+      } catch {
+        // Ignore errors for individual domain patterns
       }
     }
     
     // Also try the URL-based approach as fallback
     try {
       const urlCookies = await chrome.cookies.getAll({ url });
-      console.log(`[Extension] Found ${urlCookies.length} cookies by URL`);
       for (const cookie of urlCookies) {
         cookieMap.set(cookie.name, cookie);
       }
-    } catch (err) {
-      console.warn('[Extension] Failed to get cookies by URL:', err);
+    } catch {
+      // Ignore errors
     }
     
     const cookies = Array.from(cookieMap.values());
-    console.log('[Extension] Total unique cookies:', cookies.length);
-    
     if (cookies.length === 0) return null;
     
-    const cookieString = cookies.map(cookie => `${cookie.name}=${cookie.value}`).join('; ');
-    console.log('[Extension] Cookie header length:', cookieString.length);
-    return cookieString;
+    return cookies.map(cookie => `${cookie.name}=${cookie.value}`).join('; ');
   } catch (error) {
     console.warn('[Extension] Failed to get cookies:', error);
     return null;
@@ -329,28 +318,26 @@ async function executeRequest(spec: RequestSpec): Promise<ResponseSpec> {
     };
   }
 
-  // Get cookies for the target URL and add to headers
-  // Note: In Service Worker context, we can set Cookie header directly
+  // Get cookies for the target URL (uses credentials: 'include' to send them)
   const cookieValue = await getCookiesForUrl(spec.url);
-  if (cookieValue) {
-    console.log('[Extension] Adding cookies to request headers for:', targetOrigin);
-    headers['Cookie'] = cookieValue;
-  }
 
   // Create AbortController for timeout
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), spec.options.timeoutMs);
 
   try {
-    console.log('[Extension] Executing fetch with headers:', Object.keys(headers));
+    console.log('[Extension] Fetch:', method, spec.url, cookieValue ? '(with cookies)' : '');
+    
     const response = await fetch(spec.url, {
       method,
       headers,
       body: method !== 'GET' && method !== 'HEAD' ? body : undefined,
       redirect: spec.options.redirect,
-      credentials: spec.options.credentials,
+      credentials: cookieValue ? 'include' : spec.options.credentials,
       signal: controller.signal,
     });
+    
+    console.log('[Extension] Response:', response.status, response.statusText);
 
     clearTimeout(timeoutId);
 
@@ -392,27 +379,18 @@ async function executeRequest(spec: RequestSpec): Promise<ResponseSpec> {
   } catch (error) {
     clearTimeout(timeoutId);
     const timingMs = Math.round(performance.now() - startTime);
-
-    if (error instanceof Error) {
-      if (error.name === 'AbortError') {
-        return {
-          id: spec.id,
-          ok: false,
-          timingMs,
-          error: {
-            code: ERROR_CODES.TIMEOUT,
-            message: `Request timeout after ${spec.options.timeoutMs}ms`,
-          },
-        };
-      }
-
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    
+    console.error('[Extension] Request failed:', errorMessage);
+    
+    if (error instanceof Error && (error.name === 'AbortError' || error.message.includes('abort'))) {
       return {
         id: spec.id,
         ok: false,
         timingMs,
         error: {
-          code: ERROR_CODES.NETWORK_ERROR,
-          message: error.message,
+          code: ERROR_CODES.TIMEOUT,
+          message: `Request timeout after ${spec.options.timeoutMs}ms`,
         },
       };
     }
@@ -423,7 +401,7 @@ async function executeRequest(spec: RequestSpec): Promise<ResponseSpec> {
       timingMs,
       error: {
         code: ERROR_CODES.NETWORK_ERROR,
-        message: 'Unknown error occurred',
+        message: errorMessage,
       },
     };
   }
@@ -591,7 +569,5 @@ chrome.action.onClicked.addListener(() => {
 // Service Worker Lifecycle
 // =============================================================================
 
-console.log('[Extension] Yowu DevTools Companion service worker initialized');
-console.log('[Extension] Protocol version:', PROTOCOL_VERSION);
-console.log('[Extension] Supported features:', SUPPORTED_FEATURES);
+console.log('[Extension] Yowu DevTools Companion v' + PROTOCOL_VERSION + ' initialized');
 

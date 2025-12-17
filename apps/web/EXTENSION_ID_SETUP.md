@@ -34,6 +34,13 @@ Extension ID는 Chrome Web Store에 확장 프로그램을 업로드한 후에�
 
 ### 2단계: Extension ID를 환경 변수로 설정
 
+#### Extension ID 목록
+
+| 환경 | Extension ID | 용도 |
+|------|--------------|------|
+| **개발 환경** | `lhaoapjoifnhfnlklbkggodnkpeikgme` | 로컬 개발용 확장 프로그램 |
+| **프로덕션** | `jmkojnlpffcdelhhefnnjgbgffiaigce` | Chrome Web Store에 배포된 확장 프로그램 |
+
 #### 로컬 개발 시
 
 **방법 1: .env.local 파일 사용 (권장)**
@@ -43,12 +50,23 @@ Extension ID는 Chrome Web Store에 확장 프로그램을 업로드한 후에�
 ```bash
 cd apps/web
 cat > .env.local << EOF
-VITE_EXTENSION_ID=<여기에 Extension ID 붙여넣기>
+# Development Extension ID
+VITE_EXTENSION_ID=lhaoapjoifnhfnlklbkggodnkpeikgme
+EOF
+```
+
+또는 프로덕션 Extension ID를 사용하려면:
+
+```bash
+cat > .env.local << EOF
+# Production Extension ID
+VITE_EXTENSION_ID=jmkojnlpffcdelhhefnnjgbgffiaigce
 EOF
 ```
 
 2. Vite가 자동으로 `.env.local` 파일을 로드합니다
 3. `.env.local` 파일은 `.gitignore`에 추가되어 있어 커밋되지 않습니다
+4. 환경 변수가 설정되지 않으면 `constants.ts`의 프로덕션 ID가 기본값으로 사용됩니다
 
 **방법 2: 환경 변수로 직접 설정**
 
@@ -74,10 +92,13 @@ GitHub Actions 워크플로우(`.github/workflows/deploy.yml`)에서 자동으�
 `apps/web/src/tools/api-tester/hooks/useExtension.ts`에서:
 
 ```typescript
-const EXTENSION_ID = import.meta.env.VITE_EXTENSION_ID || '';
+import { EXTENSION_ID as DEFAULT_EXTENSION_ID } from '../constants';
+
+// Get extension ID from environment or use default from constants
+const EXTENSION_ID = import.meta.env.VITE_EXTENSION_ID || DEFAULT_EXTENSION_ID;
 ```
 
-환경 변수가 설정되어 있으면 해당 ID를 사용하고, 없으면 빈 문자열로 처리됩니다.
+환경 변수가 설정되어 있으면 해당 ID를 사용하고, 없으면 `constants.ts`의 프로덕션 Extension ID가 기본값으로 사용됩니다.
 
 ### 빌드 프로세스
 

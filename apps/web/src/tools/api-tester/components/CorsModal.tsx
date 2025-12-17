@@ -10,6 +10,7 @@
 import { AlertTriangle, Check, ExternalLink, Info, X, Zap } from 'lucide-react';
 import React, { useState } from 'react';
 
+import { EXTENSION_STORE_URL } from '../constants';
 import type { ExtensionStatus } from '../types';
 import { cn } from '@/lib/utils';
 import { useI18n } from '@/hooks/useI18nHooks';
@@ -21,9 +22,6 @@ interface CorsModalProps {
   extensionStatus: ExtensionStatus;
   targetUrl?: string;
 }
-
-// Chrome Web Store URL for the extension (placeholder)
-const EXTENSION_STORE_URL = 'https://chromewebstore.google.com';
 
 /**
  * Extract origin from URL for display

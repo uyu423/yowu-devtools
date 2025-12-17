@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Yowu DevTools Companion",
   "short_name": "DevTools",
-  "version": "1.0.4",
+  "version": "1.0.1",
 
   "description": "Companion extension for tools.yowu.dev",
 
