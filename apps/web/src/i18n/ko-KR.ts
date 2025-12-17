@@ -1030,6 +1030,26 @@ export const koKR = {
       showErrorDetails: '상세 보기',
       hideErrorDetails: '상세 숨기기',
     },
+    apiDiff: {
+      title: 'API 응답 비교',
+      description: '두 도메인의 API 응답 비교',
+      domainA: '도메인 A',
+      domainB: '도메인 B',
+      execute: '실행',
+      cancel: '취소',
+      reset: '초기화',
+      responsesIdentical: '응답이 동일합니다',
+      responsesDifferent: '응답이 상이합니다',
+      path: '경로',
+      valueA: 'A 값',
+      valueB: 'B 값',
+      noResponseYet: '아직 응답 없음',
+      notValidJson:
+        '응답이 유효한 JSON 형식이 아닙니다. Raw 탭에서 내용을 확인하세요.',
+      parameters: '파라미터',
+      headers: '헤더',
+      body: '바디 (JSON)',
+    },
   },
   meta: {
     json: {
@@ -1122,16 +1142,10 @@ export const koKR = {
         undo: '실행 취소',
       },
     },
-  },
-  curl: {
-    warning: {
-      unsupportedFile: '파일 기반 옵션은 지원되지 않습니다. 내용을 직접 붙여넣어주세요.',
-      shellExpansion: '쉘 확장이 감지되었습니다. 변수 치환은 지원되지 않습니다.',
-      configFile: '설정 파일은 지원되지 않습니다. 명령어를 직접 붙여넣어주세요.',
-      variableSubstitution: '변수 치환은 지원되지 않습니다.',
-      insecureTLS: '비보안 TLS (-k)는 브라우저에서 지원되지 않습니다. 로컬 테스트는 Extension 모드를 사용하세요.',
-      unsupportedCookieFile: '쿠키 파일은 지원되지 않습니다. 쿠키 문자열을 직접 붙여넣어주세요.',
-      unsupportedDataFile: '데이터 파일은 지원되지 않습니다. 데이터를 직접 붙여넣어주세요.',
+    apiDiff: {
+      title: 'API 응답 비교',
+      description:
+        '두 도메인의 API 응답을 나란히 비교하고 차이점을 하이라이트합니다.',
     },
   },
 } as const satisfies I18nResource;

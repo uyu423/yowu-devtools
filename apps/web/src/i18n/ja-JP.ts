@@ -1024,6 +1024,25 @@ export const jaJP = {
       showErrorDetails: '詳細を表示',
       hideErrorDetails: '詳細を隠す',
     },
+    apiDiff: {
+      title: 'API レスポンス比較',
+      description: '2つのドメインからのAPIレスポンスを比較',
+      domainA: 'ドメイン A',
+      domainB: 'ドメイン B',
+      execute: '実行',
+      cancel: 'キャンセル',
+      reset: 'リセット',
+      responsesIdentical: 'レスポンスは同一です',
+      responsesDifferent: 'レスポンスが異なります',
+      path: 'パス',
+      valueA: '値 A',
+      valueB: '値 B',
+      noResponseYet: 'まだレスポンスがありません',
+      notValidJson: 'レスポンスは有効なJSONではありません。Rawタブで内容を確認してください。',
+      parameters: 'パラメータ',
+      headers: 'ヘッダー',
+      body: 'ボディ (JSON)',
+    },
   },
   meta: {
     json: {
@@ -1116,16 +1135,10 @@ export const jaJP = {
         undo: '元に戻す',
       },
     },
-  },
-  curl: {
-    warning: {
-      unsupportedFile: 'ファイルベースのオプションはサポートされていません。内容を直接貼り付けてください。',
-      shellExpansion: 'シェル展開が検出されました。変数置換はサポートされていません。',
-      configFile: '設定ファイルはサポートされていません。コマンドを直接貼り付けてください。',
-      variableSubstitution: '変数置換はサポートされていません。',
-      insecureTLS: '非セキュアTLS (-k)はブラウザでサポートされていません。ローカルテストにはExtensionモードを使用してください。',
-      unsupportedCookieFile: 'クッキーファイルはサポートされていません。クッキー文字列を直接貼り付けてください。',
-      unsupportedDataFile: 'データファイルはサポートされていません。データを直接貼り付けてください。',
+    apiDiff: {
+      title: 'API レスポンス比較',
+      description:
+        '2つのドメインからのAPIレスポンスを並べて比較し、差分をハイライトします。',
     },
   },
 } as const satisfies I18nResource;

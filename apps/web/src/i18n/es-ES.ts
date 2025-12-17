@@ -1071,6 +1071,25 @@ export const esES = {
       showErrorDetails: 'Mostrar Detalles',
       hideErrorDetails: 'Ocultar Detalles',
     },
+    apiDiff: {
+      title: 'Comparación de API',
+      description: 'Comparar respuestas de API de dos dominios',
+      domainA: 'Dominio A',
+      domainB: 'Dominio B',
+      execute: 'Ejecutar',
+      cancel: 'Cancelar',
+      reset: 'Restablecer',
+      responsesIdentical: 'Las respuestas son idénticas',
+      responsesDifferent: 'Las respuestas son diferentes',
+      path: 'Ruta',
+      valueA: 'Valor A',
+      valueB: 'Valor B',
+      noResponseYet: 'Sin respuesta aún',
+      notValidJson: 'La respuesta no es JSON válido. Ver la pestaña Raw para ver el contenido.',
+      parameters: 'Parámetros',
+      headers: 'Encabezados',
+      body: 'Cuerpo (JSON)',
+    },
   },
   meta: {
     json: {
@@ -1163,16 +1182,10 @@ export const esES = {
         undo: 'Deshacer',
       },
     },
-  },
-  curl: {
-    warning: {
-      unsupportedFile: 'Las opciones basadas en archivos no son compatibles. Por favor, pegue el contenido directamente.',
-      shellExpansion: 'Expansión de shell detectada. La sustitución de variables no es compatible.',
-      configFile: 'El archivo de configuración no es compatible. Por favor, pegue el comando directamente.',
-      variableSubstitution: 'La sustitución de variables no es compatible.',
-      insecureTLS: 'TLS inseguro (-k) no es compatible en el navegador. Use el modo Extension para pruebas locales.',
-      unsupportedCookieFile: 'El archivo de cookies no es compatible. Por favor, pegue la cadena de cookies directamente.',
-      unsupportedDataFile: 'El archivo de datos no es compatible. Por favor, pegue los datos directamente.',
+    apiDiff: {
+      title: 'Comparación de API',
+      description:
+        'Compare respuestas de API de dos dominios lado a lado con resaltado de diferencias.',
     },
   },
 } as const satisfies I18nResource;

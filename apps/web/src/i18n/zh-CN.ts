@@ -959,6 +959,25 @@ export const zhCN = {
       showErrorDetails: '显示详情',
       hideErrorDetails: '隐藏详情',
     },
+    apiDiff: {
+      title: 'API 响应对比',
+      description: '比较两个域名的 API 响应',
+      domainA: '域名 A',
+      domainB: '域名 B',
+      execute: '执行',
+      cancel: '取消',
+      reset: '重置',
+      responsesIdentical: '响应相同',
+      responsesDifferent: '响应不同',
+      path: '路径',
+      valueA: '值 A',
+      valueB: '值 B',
+      noResponseYet: '暂无响应',
+      notValidJson: '响应不是有效的 JSON 格式。请查看 Raw 选项卡。',
+      parameters: '参数',
+      headers: '请求头',
+      body: '请求体 (JSON)',
+    },
   },
   meta: {
     json: {
@@ -1047,16 +1066,10 @@ export const zhCN = {
         undo: '撤销',
       },
     },
-  },
-  curl: {
-    warning: {
-      unsupportedFile: '不支持基于文件的选项。请直接粘贴内容。',
-      shellExpansion: '检测到Shell扩展。不支持变量替换。',
-      configFile: '不支持配置文件。请直接粘贴命令。',
-      variableSubstitution: '不支持变量替换。',
-      insecureTLS: '不安全的TLS (-k)在浏览器中不受支持。本地测试请使用Extension模式。',
-      unsupportedCookieFile: '不支持Cookie文件。请直接粘贴Cookie字符串。',
-      unsupportedDataFile: '不支持数据文件。请直接粘贴数据。',
+    apiDiff: {
+      title: 'API 响应对比',
+      description:
+        '并排比较两个域名的 API 响应，高亮显示差异。',
     },
   },
 } as const satisfies I18nResource;

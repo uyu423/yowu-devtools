@@ -1040,6 +1040,25 @@ export const enUS = {
       showErrorDetails: 'Show Details',
       hideErrorDetails: 'Hide Details',
     },
+    apiDiff: {
+      title: 'API Response Diff',
+      description: 'Compare API responses from two domains',
+      domainA: 'Domain A',
+      domainB: 'Domain B',
+      execute: 'Execute',
+      cancel: 'Cancel',
+      reset: 'Reset',
+      responsesIdentical: 'Responses are identical',
+      responsesDifferent: 'Responses are different',
+      path: 'Path',
+      valueA: 'Value A',
+      valueB: 'Value B',
+      noResponseYet: 'No response yet',
+      notValidJson: 'Response is not valid JSON. View the Raw tab to see the content.',
+      parameters: 'Parameters',
+      headers: 'Headers',
+      body: 'Body (JSON)',
+    },
   },
   meta: {
     json: {
@@ -1132,16 +1151,10 @@ export const enUS = {
         undo: 'Undo',
       },
     },
-  },
-  curl: {
-    warning: {
-      unsupportedFile: 'File-based options are not supported. Please paste the content directly.',
-      shellExpansion: 'Shell expansion detected. Variable substitution is not supported.',
-      configFile: 'Config file not supported. Please paste command directly.',
-      variableSubstitution: 'Variable substitution is not supported.',
-      insecureTLS: 'Insecure TLS (-k) is not supported in browser. Use Extension mode for local testing.',
-      unsupportedCookieFile: 'Cookie file not supported. Please paste cookie string directly.',
-      unsupportedDataFile: 'Data file not supported. Please paste data directly.',
+    apiDiff: {
+      title: 'API Response Diff',
+      description:
+        'Free online API response comparison tool. Compare JSON responses from two domains side-by-side with diff highlighting.',
     },
   },
 } as const;
