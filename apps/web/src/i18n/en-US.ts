@@ -963,6 +963,8 @@ export const enUS = {
       errorPermissionDenied: 'Permission denied for {origin}. Please grant permission and try again.',
       errorExtension: 'Extension request failed',
       rename: 'Rename',
+      openInJsonViewer: 'Open in JSON Viewer',
+      openInYamlConverter: 'Open in YAML Converter',
       delete: 'Delete',
       requestName: 'Request name',
       timeoutError: 'Request timeout after {ms}ms',

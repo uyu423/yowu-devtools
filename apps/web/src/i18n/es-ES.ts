@@ -994,6 +994,8 @@ export const esES = {
       errorPermissionDenied: 'Permiso denegado para {origin}. Por favor, concede el permiso e inténtalo de nuevo.',
       errorExtension: 'La solicitud de Extension falló',
       rename: 'Renombrar',
+      openInJsonViewer: 'Abrir en JSON Viewer',
+      openInYamlConverter: 'Abrir en YAML Converter',
       delete: 'Eliminar',
       requestName: 'Nombre de solicitud',
       timeoutError: 'Tiempo de espera agotado después de {ms}ms',

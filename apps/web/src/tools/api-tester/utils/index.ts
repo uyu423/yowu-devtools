@@ -208,7 +208,7 @@ export const minifyJson = (text: string): string => {
 export const parseResponseBody = (
   body: { kind: 'text' | 'base64'; data: string } | undefined,
   contentType?: string
-): { type: 'json' | 'text' | 'image' | 'binary'; data: unknown } => {
+): { type: 'json' | 'yaml' | 'text' | 'image' | 'binary'; data: unknown } => {
   if (!body) {
     return { type: 'text', data: '' };
   }
@@ -222,11 +222,45 @@ export const parseResponseBody = (
   }
 
   // Text response
-  if (contentType?.includes('json')) {
+  const lowerContentType = contentType?.toLowerCase() || '';
+  
+  // Check for JSON
+  if (lowerContentType.includes('json')) {
     try {
       return { type: 'json', data: JSON.parse(body.data) };
     } catch {
       return { type: 'text', data: body.data };
+    }
+  }
+
+  // Check for YAML
+  if (lowerContentType.includes('yaml') || lowerContentType.includes('yml')) {
+    return { type: 'yaml', data: body.data };
+  }
+
+  // Try to detect JSON/YAML from content
+  if (body.data.trim()) {
+    // Try JSON first
+    if (body.data.trim().startsWith('{') || body.data.trim().startsWith('[')) {
+      try {
+        const parsed = JSON.parse(body.data);
+        return { type: 'json', data: parsed };
+      } catch {
+        // Not JSON, continue
+      }
+    }
+    
+    // Try YAML detection (basic heuristics)
+    // YAML often starts with key-value pairs or list items
+    const trimmed = body.data.trim();
+    if (
+      trimmed.includes(':') &&
+      (trimmed.includes('\n') || trimmed.split(':').length > 1) &&
+      !trimmed.startsWith('{') &&
+      !trimmed.startsWith('[')
+    ) {
+      // Could be YAML, but we'll return as text and let the user decide
+      // The UI will show a button if content-type suggests YAML
     }
   }
 

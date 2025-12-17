@@ -3,8 +3,9 @@
  */
 
 import React, { useState, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { Copy, Download, Check, Clock, Database, FileType, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
+import { Copy, Download, Check, Clock, Database, FileType, ExternalLink, ChevronDown, ChevronUp, FileJson, FileCode2 } from 'lucide-react';
 import type { ResponseData } from '../types';
 import { getStatusColor, getStatusText, formatBytes } from '../types';
 import { parseResponseBody } from '../utils';
@@ -13,6 +14,7 @@ import { useResolvedTheme } from '@/hooks/useThemeHooks';
 import { useI18n } from '@/hooks/useI18nHooks';
 import CodeMirror from '@uiw/react-codemirror';
 import { oneDark } from '@codemirror/theme-one-dark';
+import { compressToEncodedURIComponent } from 'lz-string';
 
 interface ResponseViewerProps {
   response: ResponseData | null;
@@ -110,6 +112,7 @@ const ERROR_MESSAGE_KEYS: Record<string, string> = {
 
 export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoading }) => {
   const { t } = useI18n();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabType>('body');
   const [viewMode, setViewMode] = useState<ViewMode>('tree');
   const [copied, setCopied] = useState(false);
@@ -160,6 +163,9 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
     if (parsedBody.type === 'json') {
       return JSON.stringify(parsedBody.data, null, 2);
     }
+    if (parsedBody.type === 'yaml') {
+      return typeof parsedBody.data === 'string' ? parsedBody.data : String(parsedBody.data);
+    }
     if (parsedBody.type === 'text') {
       return parsedBody.data as string;
     }
@@ -193,6 +199,50 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
     a.click();
     URL.revokeObjectURL(url);
   };
+
+  // Navigate to JSON Viewer with data
+  const handleOpenInJsonViewer = useCallback(() => {
+    if (!parsedBody || parsedBody.type !== 'json') return;
+    
+    const jsonString = JSON.stringify(parsedBody.data, null, 2);
+    const shareState = {
+      input: jsonString,
+      indent: 2,
+      sortKeys: false,
+      viewMode: 'tree',
+      expandLevel: 5,
+    };
+    
+    const envelope = {
+      v: 1,
+      tool: 'json',
+      state: shareState,
+    };
+    
+    const encoded = compressToEncodedURIComponent(JSON.stringify(envelope));
+    navigate(`/json?d=${encoded}`);
+  }, [parsedBody, navigate]);
+
+  // Navigate to YAML Converter with data
+  const handleOpenInYamlConverter = useCallback(() => {
+    if (!parsedBody || parsedBody.type !== 'yaml') return;
+    
+    const yamlString = typeof parsedBody.data === 'string' ? parsedBody.data : '';
+    const shareState = {
+      source: yamlString,
+      direction: 'yaml2json' as const,
+      indent: 2,
+    };
+    
+    const envelope = {
+      v: 1,
+      tool: 'yaml',
+      state: shareState,
+    };
+    
+    const encoded = compressToEncodedURIComponent(JSON.stringify(envelope));
+    navigate(`/yaml?d=${encoded}`);
+  }, [parsedBody, navigate]);
 
   // Calculate body size
   const bodySize = useMemo(() => {
@@ -363,6 +413,36 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
           </div>
         )}
 
+        {/* Open in JSON Viewer button - only for JSON responses */}
+        {activeTab === 'body' && parsedBody?.type === 'json' && (
+          <button
+            onClick={handleOpenInJsonViewer}
+            className={cn(
+              'ml-2 p-1.5 rounded text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400',
+              'hover:bg-gray-100 dark:hover:bg-gray-800',
+              'transition-colors'
+            )}
+            title={t('tool.apiTester.openInJsonViewer')}
+          >
+            <FileJson className="w-4 h-4" />
+          </button>
+        )}
+
+        {/* Open in YAML Converter button - only for YAML responses */}
+        {activeTab === 'body' && parsedBody?.type === 'yaml' && (
+          <button
+            onClick={handleOpenInYamlConverter}
+            className={cn(
+              'ml-2 p-1.5 rounded text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400',
+              'hover:bg-gray-100 dark:hover:bg-gray-800',
+              'transition-colors'
+            )}
+            title={t('tool.apiTester.openInYamlConverter')}
+          >
+            <FileCode2 className="w-4 h-4" />
+          </button>
+        )}
+
         {/* Copy button */}
         <button
           onClick={handleCopy}
@@ -407,6 +487,21 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
                   </pre>
                 )}
               </>
+            )}
+
+            {parsedBody?.type === 'yaml' && (
+              <div className="w-full overflow-hidden">
+                <CodeMirror
+                  value={typeof parsedBody.data === 'string' ? parsedBody.data : String(parsedBody.data)}
+                  height="auto"
+                  maxHeight="600px"
+                  extensions={[]}
+                  theme={isDark ? oneDark : undefined}
+                  editable={false}
+                  basicSetup={{ lineNumbers: true, foldGutter: true }}
+                  className="w-full [&_.cm-editor]:!max-w-full [&_.cm-scroller]:!overflow-x-auto"
+                />
+              </div>
             )}
 
             {parsedBody?.type === 'text' && (

@@ -947,6 +947,8 @@ export const jaJP = {
       errorPermissionDenied: '{origin}の権限が拒否されました。権限を付与してから再試行してください。',
       errorExtension: 'Extensionリクエストが失敗しました',
       rename: '名前を変更',
+      openInJsonViewer: 'JSON Viewerで開く',
+      openInYamlConverter: 'YAML Converterで開く',
       delete: '削除',
       requestName: 'リクエスト名',
       timeoutError: '{ms}ms後にリクエストタイムアウト',

@@ -882,6 +882,8 @@ export const zhCN = {
       errorPermissionDenied: '{origin}的权限被拒绝。请授予权限后重试。',
       errorExtension: 'Extension请求失败',
       rename: '重命名',
+      openInJsonViewer: '在JSON Viewer中打开',
+      openInYamlConverter: '在YAML Converter中打开',
       delete: '删除',
       requestName: '请求名称',
       timeoutError: '请求在{ms}ms后超时',

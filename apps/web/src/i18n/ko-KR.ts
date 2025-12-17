@@ -857,12 +857,14 @@ export const koKR = {
       urlLoadFailed: 'URL에서 로드하지 못했습니다.',
       sampleLoaded: '샘플 텍스트가 로드되었습니다.',
       corsWarningTitle: 'CORS 제한',
-      corsWarningDescription: '일부 웹사이트는 다른 도메인의 요청을 차단할 수 있습니다. 로드에 실패하면 파일을 직접 다운로드해 보세요.',
+      corsWarningDescription:
+        '일부 웹사이트는 다른 도메인의 요청을 차단할 수 있습니다. 로드에 실패하면 파일을 직접 다운로드해 보세요.',
       loadButton: '로드',
     },
     apiTester: {
       title: 'API Tester',
-      description: 'Request Builder로 REST API를 테스트하고 CORS 우회를 지원합니다.',
+      description:
+        'Request Builder로 REST API를 테스트하고 CORS 우회를 지원합니다.',
       urlPlaceholder: 'https://api.example.com/v1/users',
       send: '전송',
       cancel: '취소',
@@ -886,19 +888,26 @@ export const koKR = {
       extensionConnected: 'CORS Bypass Ready',
       extensionNotConnected: 'Not Connected',
       installExtension: '확장 프로그램 설치',
-      installExtensionTooltip: 'CORS 제한을 우회하려면 확장 프로그램을 설치하세요. API가 교차 출처 요청을 허용하면 설치할 필요가 없습니다.',
+      installExtensionTooltip:
+        'CORS 제한을 우회하려면 확장 프로그램을 설치하세요. API가 교차 출처 요청을 허용하면 설치할 필요가 없습니다.',
       extensionPermissionRequired: 'Permission Required',
       extensionChecking: 'Checking...',
       extensionTooltipChecking: '확장 프로그램 연결을 확인하는 중입니다...',
-      extensionTooltipNotConnected: '확장 프로그램이 감지되지 않았습니다. CORS 제한을 우회하려면 확장 프로그램을 설치하세요. 클릭하여 재확인.',
-      extensionTooltipPermissionRequired: '확장 프로그램이 감지되었지만 이 도메인에 대한 권한이 필요합니다. 확장 프로그램 아이콘을 클릭하여 접근을 허용하세요.',
-      extensionTooltipConnected: '확장 프로그램이 연결되었습니다! 필요시 CORS 제한이 자동으로 우회됩니다.',
+      extensionTooltipNotConnected:
+        '확장 프로그램이 감지되지 않았습니다. CORS 제한을 우회하려면 확장 프로그램을 설치하세요. 클릭하여 재확인.',
+      extensionTooltipPermissionRequired:
+        '확장 프로그램이 감지되었지만 이 도메인에 대한 권한이 필요합니다. 확장 프로그램 아이콘을 클릭하여 접근을 허용하세요.',
+      extensionTooltipConnected:
+        '확장 프로그램이 연결되었습니다! 필요시 CORS 제한이 자동으로 우회됩니다.',
       retryWithExtension: '확장 프로그램으로 재시도',
       corsErrorTitle: 'CORS 오류 감지됨',
-      corsErrorDescription: '이 요청은 브라우저의 CORS 정책에 의해 차단되었습니다.',
-      corsErrorExplanation: '브라우저는 보안을 위해 다른 도메인에 대한 요청을 차단합니다. API는 교차 출처 요청을 명시적으로 허용해야 하지만, 웹 앱에서 접근할 때 많은 API가 이를 허용하지 않습니다.',
+      corsErrorDescription:
+        '이 요청은 브라우저의 CORS 정책에 의해 차단되었습니다.',
+      corsErrorExplanation:
+        '브라우저는 보안을 위해 다른 도메인에 대한 요청을 차단합니다. API는 교차 출처 요청을 명시적으로 허용해야 하지만, 웹 앱에서 접근할 때 많은 API가 이를 허용하지 않습니다.',
       corsWhyExtension: '왜 확장 프로그램을 사용하나요?',
-      corsWhyExtensionDesc: '브라우저 확장 프로그램은 확장 컨텍스트에서 요청을 수행하여 CORS 제한을 우회할 수 있습니다. 이는 웹 페이지와 동일한 보안 규칙의 적용을 받지 않습니다.',
+      corsWhyExtensionDesc:
+        '브라우저 확장 프로그램은 확장 컨텍스트에서 요청을 수행하여 CORS 제한을 우회할 수 있습니다. 이는 웹 페이지와 동일한 보안 규칙의 적용을 받지 않습니다.',
       corsRetryWithExtension: '확장 프로그램으로 재시도',
       corsInstallExtension: 'Chrome 확장 프로그램 설치',
       corsRememberChoice: '이 도메인에 대해 기억',
@@ -934,20 +943,26 @@ export const koKR = {
       viaMethod: 'via {method}',
       // Error messages
       errorTimeout: '{ms}ms 후 요청 시간 초과',
-      errorCors: '요청 실패. CORS 제한으로 인한 것일 수 있습니다. Extension 모드를 사용해 보세요.',
+      errorCors:
+        '요청 실패. CORS 제한으로 인한 것일 수 있습니다. Extension 모드를 사용해 보세요.',
       errorNetwork: '네트워크 오류',
       errorUnknown: '알 수 없는 오류가 발생했습니다',
-      errorPermissionDenied: '{origin}에 대한 권한이 거부되었습니다. 권한을 부여하고 다시 시도해 주세요.',
+      errorPermissionDenied:
+        '{origin}에 대한 권한이 거부되었습니다. 권한을 부여하고 다시 시도해 주세요.',
       errorExtension: 'Extension 요청 실패',
       rename: '이름 변경',
+      openInJsonViewer: 'JSON Viewer에서 열기',
+      openInYamlConverter: 'YAML Converter에서 열기',
       delete: '삭제',
       requestName: '요청 이름',
       timeoutError: '{ms}ms 후 요청 시간 초과',
       networkError: '네트워크 오류',
-      permissionDenied: '{origin}에 대한 권한이 거부되었습니다. 권한을 부여하고 다시 시도하세요.',
+      permissionDenied:
+        '{origin}에 대한 권한이 거부되었습니다. 권한을 부여하고 다시 시도하세요.',
       // Include Cookies option
       includeCookies: '쿠키 포함',
-      includeCookiesTooltip: '요청에 브라우저 쿠키를 포함합니다. 활성화하면 대상 도메인에 저장된 브라우저 쿠키가 요청과 함께 자동으로 전송됩니다.',
+      includeCookiesTooltip:
+        '요청에 브라우저 쿠키를 포함합니다. 활성화하면 대상 도메인에 저장된 브라우저 쿠키가 요청과 함께 자동으로 전송됩니다.',
       // Error details
       showErrorDetails: '상세 보기',
       hideErrorDetails: '상세 숨기기',
