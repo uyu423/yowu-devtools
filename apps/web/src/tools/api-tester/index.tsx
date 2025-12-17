@@ -12,6 +12,7 @@ import type { ToolDefinition } from '@/tools/types';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { ShareModal } from '@/components/common/ShareModal';
 import { Tooltip } from '@/components/ui/Tooltip';
+import { ResizablePanels } from '@/components/common/ResizablePanels';
 import { useToolState } from '@/hooks/useToolState';
 import { useShareModal } from '@/hooks/useShareModal';
 import { useTitle } from '@/hooks/useTitle';
@@ -126,12 +127,27 @@ const ApiTesterTool: React.FC = () => {
   const { isAllowed: isCorsAllowed, addOrigin: addCorsOrigin } = useCorsAllowlist();
 
   // UI state
-  const [showHistory, setShowHistory] = useState(true); // Default expanded
+  const [showHistory, setShowHistory] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('yowu-devtools:v1:ui:api-tester:history-sidebar-open');
+      if (stored !== null) {
+        return stored === 'true';
+      }
+    }
+    return true; // Default expanded
+  });
   const [curlCopied, setCurlCopied] = useState(false);
   const [queryExpanded, setQueryExpanded] = useState(true);
   const [headersExpanded, setHeadersExpanded] = useState(false);
   const [corsModalOpen, setCorsModalOpen] = useState(false);
   const [pendingCorsRetry, setPendingCorsRetry] = useState(false);
+
+  // Save history sidebar state to localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('yowu-devtools:v1:ui:api-tester:history-sidebar-open', showHistory.toString());
+    }
+  }, [showHistory]);
 
   // Check if response has CORS error (only for direct/cors mode requests)
   const hasCorsError = response?.error?.code === 'CORS_ERROR' && response?.method === 'cors';
@@ -342,66 +358,71 @@ const ApiTesterTool: React.FC = () => {
             </div>
           </div>
 
-          {/* Request/Response split */}
-          <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
-            {/* Request builder - vertical sections */}
-            <div className="flex-1 flex flex-col overflow-hidden border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-gray-700">
-              <div className="flex-1 overflow-auto">
-                {/* Query Parameters Section */}
-                <CollapsibleSection
-                  title="Query Parameters"
-                  count={activeQueryCount}
-                  isOpen={queryExpanded}
-                  onToggle={() => setQueryExpanded(!queryExpanded)}
-                >
-                  <KeyValueEditor
-                    items={state.queryParams}
-                    onChange={(queryParams) => updateState({ queryParams })}
-                    keyPlaceholder="Parameter"
-                    valuePlaceholder="Value"
-                    disabled={isLoading}
-                  />
-                </CollapsibleSection>
-
-                {/* Headers Section */}
-                <CollapsibleSection
-                  title="Headers"
-                  count={activeHeaderCount}
-                  isOpen={headersExpanded}
-                  onToggle={() => setHeadersExpanded(!headersExpanded)}
-                >
-                  <KeyValueEditor
-                    items={state.headers}
-                    onChange={(headers) => updateState({ headers })}
-                    keyPlaceholder="Header"
-                    valuePlaceholder="Value"
-                    keyAutocomplete={COMMON_HEADERS}
-                    valueAutocomplete={COMMON_CONTENT_TYPES}
-                    disabled={isLoading}
-                  />
-                </CollapsibleSection>
-
-                {/* Body Section - only for methods that support it */}
-                {supportsBody && (
-                  <div className="border-b border-gray-200 dark:border-gray-700 p-4">
-                    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                      Request Body
-                    </h3>
-                    <BodyEditor
-                      body={state.body}
-                      onChange={(body) => updateState({ body })}
+          {/* Request/Response split - Resizable */}
+          <ResizablePanels
+            leftPanel={
+              <div className="flex flex-col overflow-hidden border-r border-gray-200 dark:border-gray-700 h-full">
+                <div className="flex-1 overflow-auto">
+                  {/* Query Parameters Section */}
+                  <CollapsibleSection
+                    title="Query Parameters"
+                    count={activeQueryCount}
+                    isOpen={queryExpanded}
+                    onToggle={() => setQueryExpanded(!queryExpanded)}
+                  >
+                    <KeyValueEditor
+                      items={state.queryParams}
+                      onChange={(queryParams) => updateState({ queryParams })}
+                      keyPlaceholder="Parameter"
+                      valuePlaceholder="Value"
                       disabled={isLoading}
                     />
-                  </div>
-                )}
-              </div>
-            </div>
+                  </CollapsibleSection>
 
-            {/* Response viewer */}
-            <div className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-gray-900">
-              <ResponseViewer response={response} isLoading={isLoading} />
-            </div>
-          </div>
+                  {/* Headers Section */}
+                  <CollapsibleSection
+                    title="Headers"
+                    count={activeHeaderCount}
+                    isOpen={headersExpanded}
+                    onToggle={() => setHeadersExpanded(!headersExpanded)}
+                  >
+                    <KeyValueEditor
+                      items={state.headers}
+                      onChange={(headers) => updateState({ headers })}
+                      keyPlaceholder="Header"
+                      valuePlaceholder="Value"
+                      keyAutocomplete={COMMON_HEADERS}
+                      valueAutocomplete={COMMON_CONTENT_TYPES}
+                      disabled={isLoading}
+                    />
+                  </CollapsibleSection>
+
+                  {/* Body Section - only for methods that support it */}
+                  {supportsBody && (
+                    <div className="border-b border-gray-200 dark:border-gray-700 p-4">
+                      <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                        Request Body
+                      </h3>
+                      <BodyEditor
+                        body={state.body}
+                        onChange={(body) => updateState({ body })}
+                        disabled={isLoading}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            }
+            rightPanel={
+              <div className="flex flex-col overflow-hidden bg-white dark:bg-gray-900 h-full">
+                <ResponseViewer response={response} isLoading={isLoading} />
+              </div>
+            }
+            initialLeftWidth={50}
+            minLeftWidth={25}
+            maxLeftWidth={75}
+            storageKey="api-tester:request-response-split"
+          />
         </div>
 
         {/* History sidebar */}
