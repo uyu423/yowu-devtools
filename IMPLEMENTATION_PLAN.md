@@ -6,8 +6,8 @@
 
 ## 1. 프로젝트 현황
 
-- **상태**: Phase 10 완료
-- **현재 버전**: v1.4.0 (2025-12-17)
+- **상태**: Phase 11 완료
+- **현재 버전**: v1.4.2 (2025-12-17)
 - **주요 변경점**:
   - Phase 3: 모든 도구 기능 구현 완료 (JSON, URL, Base64, Time, YAML, Diff, Cron)
   - Phase 4: CI/CD 및 배포 설정 완료
@@ -19,6 +19,8 @@
   - Phase 9 (v1.3.2): ✅ Cron Parser 고도화 - 다중 스펙 지원, 래퍼 정규화, 필드별 하이라이트 완료
   - Phase 9.5 (v1.3.3): ✅ PWA 업데이트 알림 수정, SEO sitemap priority 최적화 완료
   - Phase 10 (v1.4.0): ✅ **API Tester 도구 추가**, **pnpm + Turborepo 모노레포 구조 전환**, Chrome Extension companion v1.0.1
+  - Phase 10.5 (v1.4.1): ✅ **cURL Parser 도구 추가**, API Tester와 cURL 통합
+  - Phase 11 (v1.4.2): ✅ **API Response Diff 도구 추가**, **Locale-specific SEO 지원**
 
 ---
 
@@ -706,10 +708,12 @@ src/
 #### 8.6.1 PWA 업데이트 알림 수정 ✅ **완료**
 
 - [x] **PWA 업데이트 알림 미표시 버그 수정**:
+
   - [x] `registerType: 'prompt'` 모드와 `skipWaiting`/`clientsClaim` 충돌 해결
   - [x] vite-plugin-pwa 공식 문서 기반 설정 최적화
 
 - [x] **version.json 기반 업데이트 감지 추가**:
+
   - [x] 빌드 시 `/version.json` 자동 생성
   - [x] 앱 기동 시 서버 버전 비교
   - [x] 5분마다 주기적 버전 체크
@@ -723,10 +727,12 @@ src/
 #### 8.6.2 SEO Sitemap Priority 최적화 ✅ **완료**
 
 - [x] **Priority 전략 수립**:
+
   - [x] 개발자 검색 패턴 분석 (직접 도구 검색 > 홈페이지 검색)
   - [x] 개별 도구 페이지 우선 전략 결정
 
 - [x] **Priority 구현**:
+
   - [x] 개별 도구 (en-US): priority 1.0
   - [x] Locale 도구 페이지: priority 0.9
   - [x] 홈 페이지 (모든 locale): priority 0.8
@@ -940,6 +946,7 @@ v1.4.0은 **API Tester** 도구 추가와 **pnpm + Turborepo 모노레포 구조
 #### 10.1 모노레포 구조 전환 ✅ **완료**
 
 - [x] **pnpm + Turborepo 도입**:
+
   - [x] `pnpm-workspace.yaml` 설정
   - [x] `turbo.json` 빌드 파이프라인 설정
   - [x] 패키지 구조 분리:
@@ -955,6 +962,7 @@ v1.4.0은 **API Tester** 도구 추가와 **pnpm + Turborepo 모노레포 구조
 #### 10.2 API Tester 도구 구현 ✅ **완료**
 
 - [x] **기본 기능**:
+
   - [x] HTTP 메서드 지원 (GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS)
   - [x] URL 입력 및 Query Params 빌더
   - [x] Headers 빌더
@@ -962,11 +970,13 @@ v1.4.0은 **API Tester** 도구 추가와 **pnpm + Turborepo 모노레포 구조
   - [x] Response Viewer (syntax highlighting)
 
 - [x] **CORS 처리**:
+
   - [x] Direct 모드: 표준 fetch (CORS 제한)
   - [x] Extension 모드: Chrome Extension 통해 CORS bypass
   - [x] CORS 에러 안내 모달
 
 - [x] **응답 표시 개선**:
+
   - [x] HTTP Status Code + Status Text 표시 (예: "200 OK")
   - [x] `http-status-codes` 라이브러리 사용
   - [x] 응답 시간, 헤더, 바디 표시
@@ -978,12 +988,14 @@ v1.4.0은 **API Tester** 도구 추가와 **pnpm + Turborepo 모노레포 구조
 #### 10.3 Chrome Extension v1.0.1 ✅ **완료**
 
 - [x] **Extension 기능**:
+
   - [x] CORS bypass (declarativeNetRequest API)
   - [x] 도메인별 권한 관리
   - [x] Include Cookies 옵션 (`credentials: 'include'`)
   - [x] 에러 상세 정보 반환
 
 - [x] **Web 연동**:
+
   - [x] Extension 상태 표시 (Connected/Not Connected)
   - [x] Extension 미설치 시 설치 버튼
   - [x] 에러 상세 보기 (collapsible)
@@ -1002,6 +1014,7 @@ v1.4.0은 **API Tester** 도구 추가와 **pnpm + Turborepo 모노레포 구조
 #### 10.5 빌드 및 배포 ✅ **완료**
 
 - [x] **빌드 검증**:
+
   - [x] `npm run build` 성공
   - [x] `npm run lint` 통과
   - [x] Extension 빌드 분리 (`npm run build:extension`)
@@ -1010,3 +1023,89 @@ v1.4.0은 **API Tester** 도구 추가와 **pnpm + Turborepo 모노레포 구조
   - [x] `RELEASE_NOTES.md` v1.4.0 섹션 추가
   - [x] `IMPLEMENTATION_PLAN.md` Phase 10 추가
   - [x] Extension 관련 문서 업데이트
+
+---
+
+### Phase 11: v1.4.2 API Response Diff & Locale-specific SEO (December 2025) ✅ **완료**
+
+v1.4.2는 **API Response Diff** 도구 추가와 **언어별 SEO 최적화**를 포함하는 릴리스입니다.
+
+#### 11.1 API Response Diff 도구 구현 ✅ **완료**
+
+- [x] **기본 구조**:
+
+  - [x] `src/tools/api-diff/` 디렉토리 생성
+  - [x] 타입 정의 (`types.ts`)
+  - [x] 상수 정의 (`constants.ts`)
+  - [x] 컴포넌트 구조 설계
+
+- [x] **UI 구현**:
+
+  - [x] `TopSharedPanel`: Domain A/B 입력, Method, Path, Params, Headers, Body
+  - [x] `SidePanel`: 응답 패널 (Body, Headers, Raw, cURL 탭)
+  - [x] `ResultBanner`: 비교 결과 배너 및 Diff 테이블
+  - [x] `KeyValueEditor`: Parameters/Headers 에디터
+  - [x] `DomainPresetModal`: 도메인 프리셋 관리 모달
+  - [x] CodeMirror Body 에디터
+
+- [x] **요청 실행**:
+
+  - [x] `useApiDiffExecutor` 훅 구현
+  - [x] Chrome Extension 모드 지원
+  - [x] 병렬 요청 실행 (A/B 동시)
+  - [x] 타임아웃 처리 (10초)
+
+- [x] **비교 로직**:
+
+  - [x] `deepEqualIgnoringKeyOrder` 함수
+  - [x] `findDifferentFields` 함수
+  - [x] 상태코드 + JSON Body 비교
+  - [x] 상이한 필드 테이블 표시
+
+- [x] **추가 기능**:
+  - [x] 히스토리 관리 (최대 30개)
+  - [x] URL 공유 기능
+  - [x] Copy (cURL, JSON)
+  - [x] Download JSON
+  - [x] Diff 테이블 높이 조절
+
+#### 11.2 Locale-specific SEO 구현 ✅ **완료**
+
+- [x] **i18n 기반 SEO**:
+
+  - [x] `vite-plugin-generate-routes.ts`에 i18n 리소스 임포트
+  - [x] Tool ID → i18n meta key 매핑 함수
+  - [x] `generateToolHtml` 함수 locale별 SEO 적용
+  - [x] `generateHomeHtml` 함수 locale별 SEO 적용
+
+- [x] **i18n 리소스 업데이트**:
+
+  - [x] 모든 도구의 description 최신화 (en-US)
+  - [x] 모든 locale에 번역 반영 (ko-KR, ja-JP, zh-CN, es-ES)
+  - [x] `meta.home` 섹션 추가 (홈 페이지 SEO)
+
+- [x] **SEO 메타 정보**:
+  - [x] locale별 title 적용
+  - [x] locale별 description 적용
+  - [x] Open Graph / Twitter Card 메타 태그 locale화
+  - [x] JSON-LD 구조화 데이터 locale화
+
+#### 11.3 i18n 지원 ✅ **완료**
+
+- [x] **API Response Diff 번역 키**:
+  - [x] `tool.apiDiff.*` 네임스페이스 추가
+  - [x] `meta.apiDiff.*` SEO 메타 추가
+  - [x] 5개 언어 지원 완료
+
+#### 11.4 빌드 및 문서 ✅ **완료**
+
+- [x] **빌드 검증**:
+
+  - [x] `npm run build` 성공
+  - [x] `npm run lint` 통과
+  - [x] locale별 HTML 파일 생성 확인
+
+- [x] **문서 업데이트**:
+  - [x] `RELEASE_NOTES.md` v1.4.2 섹션 추가
+  - [x] `IMPLEMENTATION_PLAN.md` Phase 11 추가
+  - [x] `docs/V1.4.2_REQUIREMENTS.md` 상태 업데이트

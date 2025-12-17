@@ -4,6 +4,49 @@ RELEASE_NOTES.md must be written in English.
 
 # Release Notes
 
+## v1.4.2 (December 2025) - API Response Diff & Locale-specific SEO
+
+Introducing the **API Response Diff** tool for comparing API responses from two domains, plus **locale-specific SEO** for better international search visibility.
+
+### New Features
+
+- ✨ **API Response Diff Tool**: Compare API responses from two domains
+
+  - Send identical requests to Domain A and Domain B simultaneously
+  - JSON response comparison with deep equality (ignoring key order)
+  - Side-by-side diff view with field highlighting (yellow for different, red for missing)
+  - Diff table showing only different fields with field path and values
+  - Response metadata display (Status, Elapsed time, Size)
+  - Multiple tabs: Body (JSON Viewer), Headers, Raw, cURL
+  - **Domain Presets**: Save, load, export/import domain configurations
+  - Chrome Extension integration for CORS bypass (same as API Tester)
+  - History management (last 30 executions)
+  - URL sharing with current configuration
+
+- ✨ **Locale-specific SEO**: Language-optimized SEO for all tools
+
+  - Tool descriptions and meta tags in 5 languages (en-US, ko-KR, ja-JP, zh-CN, es-ES)
+  - Each locale's HTML files include localized meta descriptions
+  - Improved search visibility for international users
+  - Home page SEO also localized per language
+
+### Enhancements
+
+- 🔧 **Updated Tool Descriptions**: All tool descriptions refined to highlight main features
+- 🔧 **i18n Meta Integration**: Build system now imports i18n resources for SEO generation
+- 🔧 **Tool ID to i18n Key Mapping**: Automatic mapping between tool IDs and i18n keys
+
+### Technical
+
+- New tool directory: `src/tools/api-diff/`
+- Reuses `useExtension` and Extension mode from API Tester
+- Comparison utilities: `deepEqualIgnoringKeyOrder`, `findDifferentFields`
+- Domain presets stored in localStorage with export/import support
+- `vite-plugin-generate-routes.ts` extended to use i18n for locale-specific SEO
+- i18n `meta.home` section added for home page SEO
+
+---
+
 ## v1.4.1 (December 2025) - cURL Parser & API Tester Integration
 
 Introducing the **cURL Parser** tool and enhanced cURL integration with API Tester.
