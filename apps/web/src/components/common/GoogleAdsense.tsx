@@ -1,5 +1,5 @@
 import React from 'react';
-import AdSense from 'react-adsense';
+import { Adsense } from '@ctrl/react-adsense';
 
 import { cn } from '@/lib/utils';
 import { useI18n } from '@/hooks/useI18nHooks';
@@ -24,7 +24,7 @@ export const GoogleAdsense: React.FC<GoogleAdsenseProps> = ({ className }) => {
             : 'bg-gray-50 border-gray-200'
         )}
       >
-        <AdSense.Google
+        <Adsense
           client="ca-pub-2516647367332809"
           slot="1679105600"
           style={{
