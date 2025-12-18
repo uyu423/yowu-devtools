@@ -76,7 +76,7 @@ export const zhCN = {
     enable: '启用',
     disable: '禁用',
     processing: '处理中...',
-    copying: 'Copying...',
+    copying: '复制中...',
     load: '加载',
     // Common options for Image/Video Studio
     aspectRatio: {
@@ -1176,7 +1176,7 @@ export const zhCN = {
       description: '裁剪、调整大小、旋转和转换图像。所有处理都在浏览器中进行。',
       pipeline: '处理流程',
       stepsEnabled: '步骤已启用',
-      resetPipeline: '重置处理流程设置', // TODO: Verify Chinese translation
+      resetPipeline: '重置处理流程设置',
       runExport: '运行并导出',
       savePreset: '保存预设',
       loadPreset: '加载预设',
@@ -1191,9 +1191,9 @@ export const zhCN = {
       exportNotImplemented: '导出功能将在下一阶段实现',
       presetNotImplemented: '预设功能将在下一阶段实现',
       exportFailed: '导出图片失败',
-      copyToClipboard: 'Copy to Clipboard',
-      copiedToClipboard: 'Image copied to clipboard',
-      copyFailed: 'Failed to copy image to clipboard',
+      copyToClipboard: '复制到剪贴板',
+      copiedToClipboard: '图片已复制到剪贴板',
+      copyFailed: '复制图片到剪贴板失败',
       crop: {
         title: '裁剪',
         aspectRatio: '宽高比',
@@ -1253,7 +1253,7 @@ export const zhCN = {
       description: '裁剪、剪切、调整大小和转换视频。所有处理都在浏览器中进行。',
       pipeline: '处理流程',
       stepsEnabled: '步骤已启用',
-      resetPipeline: '重置处理流程设置', // TODO: Verify Chinese translation
+      resetPipeline: '重置处理流程设置',
       runExport: '运行并导出',
       savePreset: '保存预设',
       loadPreset: '加载预设',
@@ -1264,9 +1264,9 @@ export const zhCN = {
       fileTooLarge: '文件太大。最大大小为 500MB。',
       failedToLoadVideo: '加载视频失败',
       noVideoLoaded: '未加载视频',
-      exportInProgress: 'Video export is in progress. Please wait.',
-      thumbnailInProgress: 'Thumbnail extraction is in progress. Please wait.',
-      leavePageWarning: 'Video processing is in progress. If you leave this page, the processing will be cancelled. Are you sure you want to leave?',
+      exportInProgress: '视频导出中，请稍候。',
+      thumbnailInProgress: '缩略图提取中，请稍候。',
+      leavePageWarning: '视频处理正在进行中。如果离开此页面，处理将被取消。确定要离开吗？',
       mobileWarning: '大型视频文件可能会在移动设备上导致性能问题。',
       loadingEngine: '正在加载视频处理引擎...',
       preparing: '正在准备视频...',
@@ -1463,7 +1463,6 @@ export const zhCN = {
       description:
         '免费在线图片编辑器。裁剪、调整大小、旋转图片并转换为PNG、JPEG或WebP格式。所有处理都在浏览器中进行。',
     },
-    // TODO: Translate to Chinese
     videoStudio: {
       title: 'Video Studio',
       description:
