@@ -312,8 +312,8 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         className={cn(
-          'flex flex-col items-center justify-center w-full h-64 md:h-96',
-          'border-2 border-dashed rounded-lg transition-colors cursor-pointer',
+          'w-full h-64 md:h-96',
+          'border-2 border-dashed rounded-lg transition-colors',
           isDragging
             ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
             : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
@@ -328,7 +328,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
         />
         <label
           htmlFor="image-studio-file-input"
-          className="flex flex-col items-center cursor-pointer"
+          className="flex flex-col items-center justify-center w-full h-full cursor-pointer"
         >
           <Upload className="w-12 h-12 mb-4 text-gray-400 dark:text-gray-500" />
           <p className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
