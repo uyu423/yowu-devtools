@@ -1001,6 +1001,8 @@ export const jaJP = {
         'ブラウザ拡張機能は、拡張機能コンテキストからリクエストを行うことでCORS制限をバイパスできます。これはWebページと同じセキュリティルールの対象外です。',
       corsRetryWithExtension: '拡張機能で再試行',
       corsInstallExtension: 'Chrome拡張機能をインストール',
+      corsMobileNotSupported: 'モバイル端末ではChrome拡張機能を使用できません',
+      corsMobileUseDesktop: 'CORS制限のあるAPIにアクセスするには、デスクトップ版のChromeをご利用ください。',
       corsRememberChoice: 'このドメインを記憶',
       corsRememberChoiceDesc: '{origin}に対して自動的に拡張機能を使用',
       sendToApiDiff: 'API Diffに送信',

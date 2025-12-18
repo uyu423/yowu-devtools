@@ -991,6 +991,8 @@ export const koKR = {
         '브라우저 확장 프로그램은 확장 컨텍스트에서 요청을 수행하여 CORS 제한을 우회할 수 있습니다. 이는 웹 페이지와 동일한 보안 규칙의 적용을 받지 않습니다.',
       corsRetryWithExtension: '확장 프로그램으로 재시도',
       corsInstallExtension: 'Chrome 확장 프로그램 설치',
+      corsMobileNotSupported: '모바일 환경에서는 Chrome 확장 프로그램을 사용할 수 없습니다',
+      corsMobileUseDesktop: 'CORS 제한이 있는 API에 접근하려면 데스크톱 버전의 Chrome을 사용해 주세요.',
       corsRememberChoice: '이 도메인에 대해 기억',
       corsRememberChoiceDesc: '{origin}에 대해 자동으로 확장 프로그램 사용',
       sendToApiDiff: 'API Diff로 보내기',

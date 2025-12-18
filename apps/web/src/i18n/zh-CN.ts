@@ -916,6 +916,8 @@ export const zhCN = {
       corsWhyExtensionDesc: '浏览器扩展程序可以通过从扩展上下文发出请求来绕过CORS限制，不受与网页相同的安全规则约束。',
       corsRetryWithExtension: '使用扩展重试',
       corsInstallExtension: '安装Chrome扩展程序',
+      corsMobileNotSupported: '移动设备不支持Chrome扩展程序',
+      corsMobileUseDesktop: '请使用桌面版Chrome访问有CORS限制的API。',
       corsRememberChoice: '记住此域',
       corsRememberChoiceDesc: '自动为{origin}使用扩展程序',
       sendToApiDiff: '发送到 API Diff',

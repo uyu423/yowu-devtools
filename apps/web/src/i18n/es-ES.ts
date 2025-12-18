@@ -1041,6 +1041,8 @@ export const esES = {
         'La extensión del navegador puede evitar restricciones CORS haciendo solicitudes desde el contexto de la extensión, que no está sujeto a las mismas reglas de seguridad que las páginas web.',
       corsRetryWithExtension: 'Reintentar con extensión',
       corsInstallExtension: 'Instalar extensión de Chrome',
+      corsMobileNotSupported: 'Las extensiones de Chrome no están disponibles en dispositivos móviles',
+      corsMobileUseDesktop: 'Por favor, use la versión de escritorio de Chrome para acceder a APIs con restricciones CORS.',
       corsRememberChoice: 'Recordar para este dominio',
       corsRememberChoiceDesc: 'Usar extensión automáticamente para {origin}',
       sendToApiDiff: 'Enviar a API Diff',

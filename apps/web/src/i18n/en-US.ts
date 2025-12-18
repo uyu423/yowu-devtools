@@ -1019,6 +1019,8 @@ export const enUS = {
         "The browser extension can bypass CORS restrictions by making requests from the extension context, which isn't subject to the same security rules as web pages.",
       corsRetryWithExtension: 'Retry with Extension',
       corsInstallExtension: 'Install Chrome Extension',
+      corsMobileNotSupported: 'Chrome extensions are not available on mobile devices',
+      corsMobileUseDesktop: 'Please use the desktop version of Chrome to access APIs with CORS restrictions.',
       corsRememberChoice: 'Remember for this domain',
       corsRememberChoiceDesc: 'Automatically use extension for {origin}',
       sendToApiDiff: 'Send to API Diff',

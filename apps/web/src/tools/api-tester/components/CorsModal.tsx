@@ -4,16 +4,27 @@
  * Features:
  * - Explains why CORS errors occur and why extension is needed
  * - Option to remember choice for the domain
+ * - Mobile detection: shows message that extension is not available on mobile
  * - i18n support
  */
 
-import { AlertTriangle, Check, ExternalLink, Info, X, Zap } from 'lucide-react';
-import React, { useState } from 'react';
+import { AlertTriangle, Check, ExternalLink, Info, Monitor, X, Zap } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
 
 import { EXTENSION_STORE_URL } from '../constants';
 import type { ExtensionStatus } from '../types';
 import { cn } from '@/lib/utils';
 import { useI18n } from '@/hooks/useI18nHooks';
+
+/**
+ * Detect if the device is mobile
+ */
+const isMobileDevice = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent
+  );
+};
 
 interface CorsModalProps {
   isOpen: boolean;
@@ -44,6 +55,7 @@ export const CorsModal: React.FC<CorsModalProps> = ({
 }) => {
   const { t } = useI18n();
   const [rememberChoice, setRememberChoice] = useState(true);
+  const isMobile = useMemo(() => isMobileDevice(), []);
 
   if (!isOpen) return null;
 
@@ -110,8 +122,23 @@ export const CorsModal: React.FC<CorsModalProps> = ({
             </div>
           </div>
 
+          {/* Mobile warning */}
+          {isMobile && (
+            <div className="flex items-start gap-3 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-md">
+              <Monitor className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                  {t('tool.apiTester.corsMobileNotSupported')}
+                </p>
+                <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
+                  {t('tool.apiTester.corsMobileUseDesktop')}
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Remember choice checkbox */}
-          {isExtensionAvailable && origin && (
+          {!isMobile && isExtensionAvailable && origin && (
             <label className="flex items-start gap-3 p-3 rounded-md bg-gray-50 dark:bg-gray-700/50 cursor-pointer group">
               <div className="relative flex items-center justify-center mt-0.5">
                 <input
@@ -165,26 +192,28 @@ export const CorsModal: React.FC<CorsModalProps> = ({
             onClick={onClose}
             className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
           >
-            {t('common.cancel')}
+            {isMobile ? t('common.ok') : t('common.cancel')}
           </button>
-          {isExtensionAvailable ? (
-            <button
-              onClick={handleRetry}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 rounded-md transition-colors"
-            >
-              <Zap className="w-4 h-4" />
-              {t('tool.apiTester.corsRetryWithExtension')}
-            </button>
-          ) : (
-            <a
-              href={EXTENSION_STORE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 rounded-md transition-colors"
-            >
-              {t('tool.apiTester.corsInstallExtension')}
-              <ExternalLink className="w-4 h-4" />
-            </a>
+          {!isMobile && (
+            isExtensionAvailable ? (
+              <button
+                onClick={handleRetry}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 rounded-md transition-colors"
+              >
+                <Zap className="w-4 h-4" />
+                {t('tool.apiTester.corsRetryWithExtension')}
+              </button>
+            ) : (
+              <a
+                href={EXTENSION_STORE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 rounded-md transition-colors"
+              >
+                {t('tool.apiTester.corsInstallExtension')}
+                <ExternalLink className="w-4 h-4" />
+              </a>
+            )
           )}
         </div>
       </div>
