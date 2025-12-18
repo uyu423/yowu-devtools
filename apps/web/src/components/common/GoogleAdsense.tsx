@@ -1,5 +1,5 @@
-import React from 'react';
 import { Adsense } from '@ctrl/react-adsense';
+import React from 'react';
 
 import { cn } from '@/lib/utils';
 import { useI18n } from '@/hooks/useI18nHooks';
@@ -16,9 +16,10 @@ export const GoogleAdsense: React.FC<GoogleAdsenseProps> = ({ className }) => {
 
   return (
     <div className={className}>
+      {/* AdSense 가이드: 고정 높이 컨테이너 사용 금지 - 광고가 자유롭게 크기 조정 가능하도록 함 */}
       <div
         className={cn(
-          'max-h-24 overflow-hidden rounded-lg border p-2',
+          'rounded-lg border p-2',
           isDark
             ? 'bg-gray-800/50 border-gray-700'
             : 'bg-gray-50 border-gray-200'
@@ -29,10 +30,9 @@ export const GoogleAdsense: React.FC<GoogleAdsenseProps> = ({ className }) => {
           slot="1679105600"
           style={{
             display: 'block',
-            maxHeight: '90px',
             background: isDark ? '#1f2937' : '#f9fafb',
           }}
-          format="horizontal"
+          format="auto"
           responsive="true"
         />
       </div>
