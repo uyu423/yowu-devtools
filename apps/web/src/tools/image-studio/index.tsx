@@ -12,7 +12,8 @@ import { ShareModal } from '@/components/common/ShareModal';
 import { toast } from 'sonner';
 
 import type { ImageStudioState, ImageMetadata, CropArea, ExportFormat } from './types';
-import { DEFAULT_STATE, MAX_FILE_SIZE, SUPPORTED_INPUT_FORMATS } from './constants';
+import { DEFAULT_STATE, MAX_FILE_SIZE, SUPPORTED_INPUT_FORMATS, EXPORT_FORMAT_OPTIONS } from './constants';
+import { executeAndDownload, type PipelineConfig } from './processing';
 import {
   ImagePreview,
   PipelinePanel,
@@ -211,7 +212,7 @@ const ImageStudioTool: React.FC = () => {
     });
   };
 
-  // Export image (placeholder - actual processing will be implemented later)
+  // Export image using the processing pipeline
   const handleExport = async () => {
     if (!imageUrl || !imageMetadata) {
       toast.error(t('tool.imageStudio.noImageLoaded'));
@@ -222,19 +223,55 @@ const ImageStudioTool: React.FC = () => {
     setError(null);
 
     try {
-      // TODO: Implement actual image processing pipeline
-      // For now, just show a toast
-      toast.info(t('tool.imageStudio.exportNotImplemented'));
-      
-      // Simulate processing delay
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      
+      // Build pipeline configuration from current state
+      const config: PipelineConfig = {
+        crop: {
+          enabled: state.cropEnabled,
+          area: state.cropArea,
+        },
+        resize: {
+          enabled: state.resizeEnabled,
+          width: state.resizeWidth,
+          height: state.resizeHeight,
+          mode: state.resizeMode,
+          quality: state.resizeQuality,
+        },
+        rotate: {
+          enabled: state.rotateEnabled,
+          rotation: state.rotation,
+          flipHorizontal: state.flipHorizontal,
+          flipVertical: state.flipVertical,
+        },
+        export: {
+          format: state.exportFormat,
+          quality: state.exportQuality,
+          fileName: buildOutputFileName(),
+        },
+      };
+
+      // Execute pipeline
+      const result = await executeAndDownload(imageUrl, config);
+
+      if (result.success) {
+        toast.success(t('common.fileDownloadSuccess'));
+      } else {
+        throw new Error(result.error || t('tool.imageStudio.exportFailed'));
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : t('tool.imageStudio.exportFailed'));
+      toast.error(t('tool.imageStudio.exportFailed'));
     } finally {
       setIsProcessing(false);
     }
   };
+
+  // Build output file name
+  const buildOutputFileName = React.useCallback(() => {
+    const baseName = imageMetadata?.fileName.replace(/\.[^/.]+$/, '') || 'image';
+    const suffix = state.exportSuffix || '_edited';
+    const extension = EXPORT_FORMAT_OPTIONS.find((f) => f.value === state.exportFormat)?.extension || '.png';
+    return `${baseName}${suffix}${extension}`;
+  }, [imageMetadata?.fileName, state.exportSuffix, state.exportFormat]);
 
   // Reset all
   const handleReset = () => {
