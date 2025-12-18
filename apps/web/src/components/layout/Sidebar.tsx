@@ -1,6 +1,7 @@
 import { ArrowDownAZ, ChevronLeft, ChevronRight, Clock, ExternalLink, Hash, Laptop, Moon, Sparkles, Star, Sun, TrendingUp, X } from 'lucide-react';
 import { getToolById, tools } from '@/tools';
 
+import { BetaBadge } from '@/components/ui/BetaBadge';
 import { LanguageSelector } from '@/components/common/LanguageSelector';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { NavLink } from 'react-router-dom';
@@ -97,7 +98,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile, isCollapsed, on
     tool: typeof tools[0];
     showFavoriteStar?: boolean;
   }> = ({ tool, showFavoriteStar }) => (
-    <Tooltip content={tool.title} position="right" nowrap>
+    <Tooltip content={tool.beta ? `${tool.title} (${t('sidebar.beta')})` : tool.title} position="right" nowrap>
       <NavLink
         to={getLocalePath(tool.path)}
         onClick={onCloseMobile}
@@ -113,6 +114,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile, isCollapsed, on
         {tool.icon && <tool.icon className="w-5 h-5" />}
         {showFavoriteStar && isFavorite(tool.id) && (
           <Star className="w-2 h-2 fill-yellow-400 text-yellow-400 absolute -top-0.5 -right-0.5" />
+        )}
+        {tool.beta && (
+          <BetaBadge dotOnly className="absolute -bottom-0.5 -right-0.5 w-2 h-2" />
         )}
       </NavLink>
     </Tooltip>
@@ -281,7 +285,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile, isCollapsed, on
                     {tool.icon && (
                       <tool.icon className="w-4 h-4 mr-3 opacity-70" />
                     )}
-                    <span className="flex-1">{tool.title}</span>
+                    <span className="flex-1 flex items-center gap-1.5">
+                      {tool.title}
+                      {tool.beta && <BetaBadge size="sm" />}
+                    </span>
                     <button
                       onClick={(e) => {
                         e.preventDefault();
@@ -324,7 +331,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile, isCollapsed, on
                     {tool.icon && (
                       <tool.icon className="w-4 h-4 mr-3 opacity-70" />
                     )}
-                    <span className="flex-1">{tool.title}</span>
+                    <span className="flex-1 flex items-center gap-1.5">
+                      {tool.title}
+                      {tool.beta && <BetaBadge size="sm" />}
+                    </span>
                     <button
                       onClick={(e) => {
                         e.preventDefault();
@@ -392,7 +402,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile, isCollapsed, on
                     {tool.icon && (
                       <tool.icon className="w-4 h-4 mr-3 opacity-70" />
                     )}
-                    <span className="flex-1">{tool.title}</span>
+                    <span className="flex-1 flex items-center gap-1.5">
+                      {tool.title}
+                      {tool.beta && <BetaBadge size="sm" />}
+                    </span>
                     <button
                       onClick={(e) => {
                         e.preventDefault();

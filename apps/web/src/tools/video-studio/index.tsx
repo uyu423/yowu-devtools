@@ -12,8 +12,20 @@ import { useI18n } from '@/hooks/useI18nHooks';
 import { ShareModal } from '@/components/common/ShareModal';
 import { toast } from 'sonner';
 
-import type { VideoStudioState, VideoMetadata, CropArea, ProcessingState, CutSegment, ThumbnailFormat } from './types';
-import { DEFAULT_STATE, MAX_FILE_SIZE, SUPPORTED_INPUT_FORMATS, EXPORT_FORMAT_OPTIONS } from './constants';
+import type {
+  VideoStudioState,
+  VideoMetadata,
+  CropArea,
+  ProcessingState,
+  CutSegment,
+  ThumbnailFormat,
+} from './types';
+import {
+  DEFAULT_STATE,
+  MAX_FILE_SIZE,
+  SUPPORTED_INPUT_FORMATS,
+  EXPORT_FORMAT_OPTIONS,
+} from './constants';
 import {
   executeVideoPipeline,
   extractThumbnail,
@@ -39,7 +51,10 @@ import {
   ExportPanel,
   LeaveConfirmModal,
 } from './components';
-import { usePipelinePresets, type VideoPipelinePreset } from './hooks/usePipelinePresets';
+import {
+  usePipelinePresets,
+  type VideoPipelinePreset,
+} from './hooks/usePipelinePresets';
 
 const INITIAL_PROCESSING_STATE: ProcessingState = {
   isProcessing: false,
@@ -54,44 +69,50 @@ const VideoStudioTool: React.FC = () => {
   const { t } = useI18n();
   useTitle(t('tool.videoStudio.title'));
 
-  const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
-    useToolState<VideoStudioState>('video-studio', DEFAULT_STATE, {
-      shareStateFilter: ({
-        // Thumbnail is separate - not part of pipeline
-        trimEnabled,
-        cutEnabled,
-        cropEnabled,
-        resizeEnabled,
-        trimStart,
-        trimEnd,
-        resizeWidth,
-        resizeHeight,
-        resizeLockAspect,
-        resizeMode,
-        exportFormat,
-        qualityPreset,
-        exportSuffix,
-      }) => ({
-        trimEnabled,
-        cutEnabled,
-        cropEnabled,
-        resizeEnabled,
-        // Thumbnail settings are not shared (separate action)
-        thumbnailTime: 0,
-        thumbnailFormat: 'jpeg' as ThumbnailFormat,
-        trimStart,
-        trimEnd,
-        cutSegments: [], // Don't share segments (video-specific)
-        cropArea: null, // Don't share crop area (video-specific)
-        resizeWidth,
-        resizeHeight,
-        resizeLockAspect,
-        resizeMode,
-        exportFormat,
-        qualityPreset,
-        exportSuffix,
-      }),
-    });
+  const {
+    state,
+    updateState,
+    resetState,
+    copyShareLink,
+    shareViaWebShare,
+    getShareStateInfo,
+  } = useToolState<VideoStudioState>('video-studio', DEFAULT_STATE, {
+    shareStateFilter: ({
+      // Thumbnail is separate - not part of pipeline
+      trimEnabled,
+      cutEnabled,
+      cropEnabled,
+      resizeEnabled,
+      trimStart,
+      trimEnd,
+      resizeWidth,
+      resizeHeight,
+      resizeLockAspect,
+      resizeMode,
+      exportFormat,
+      qualityPreset,
+      exportSuffix,
+    }) => ({
+      trimEnabled,
+      cutEnabled,
+      cropEnabled,
+      resizeEnabled,
+      // Thumbnail settings are not shared (separate action)
+      thumbnailTime: 0,
+      thumbnailFormat: 'jpeg' as ThumbnailFormat,
+      trimStart,
+      trimEnd,
+      cutSegments: [], // Don't share segments (video-specific)
+      cropArea: null, // Don't share crop area (video-specific)
+      resizeWidth,
+      resizeHeight,
+      resizeLockAspect,
+      resizeMode,
+      exportFormat,
+      qualityPreset,
+      exportSuffix,
+    }),
+  });
 
   const { handleShare, shareModalProps } = useShareModal({
     copyShareLink,
@@ -103,12 +124,16 @@ const VideoStudioTool: React.FC = () => {
   // Video state
   const [videoFile, setVideoFile] = React.useState<File | null>(null);
   const [videoUrl, setVideoUrl] = React.useState<string | null>(null);
-  const [videoMetadata, setVideoMetadata] = React.useState<VideoMetadata | null>(null);
+  const [videoMetadata, setVideoMetadata] =
+    React.useState<VideoMetadata | null>(null);
   const [error, setError] = React.useState<string | null>(null);
-  const [processingState, setProcessingState] = React.useState<ProcessingState>(INITIAL_PROCESSING_STATE);
+  const [processingState, setProcessingState] = React.useState<ProcessingState>(
+    INITIAL_PROCESSING_STATE
+  );
 
   // Thumbnail extraction state (separate from pipeline)
-  const [isExtractingThumbnail, setIsExtractingThumbnail] = React.useState(false);
+  const [isExtractingThumbnail, setIsExtractingThumbnail] =
+    React.useState(false);
 
   // Preset modal state
   const [presetModalOpen, setPresetModalOpen] = React.useState(false);
@@ -124,7 +149,14 @@ const VideoStudioTool: React.FC = () => {
   // Navigation blocking when processing
   const isProcessingAny = processingState.isProcessing || isExtractingThumbnail;
   const location = useLocation();
-  
+
+  // Ref to track downloading state - used to skip beforeunload during file download
+  // React state updates are async, so we need a ref for synchronous checks
+  const isDownloadingRef = React.useRef(false);
+
+  // Ref to track intentional navigation - used to skip beforeunload when user confirms leaving
+  const isIntentionalNavigationRef = React.useRef(false);
+
   // Leave confirmation modal state
   const [leaveModalOpen, setLeaveModalOpen] = React.useState(false);
   const [pendingNavigation, setPendingNavigation] = React.useState<{
@@ -136,7 +168,10 @@ const VideoStudioTool: React.FC = () => {
   const handleLeaveConfirm = React.useCallback(() => {
     cancelFFmpeg();
     setLeaveModalOpen(false);
-    
+
+    // Set intentional navigation flag to skip beforeunload warning
+    isIntentionalNavigationRef.current = true;
+
     if (pendingNavigation?.type === 'link' && pendingNavigation.url) {
       // Navigate to the stored URL
       window.location.href = pendingNavigation.url;
@@ -144,7 +179,7 @@ const VideoStudioTool: React.FC = () => {
       // Allow the back navigation
       window.history.back();
     }
-    
+
     setPendingNavigation(null);
   }, [pendingNavigation]);
 
@@ -152,7 +187,7 @@ const VideoStudioTool: React.FC = () => {
     setLeaveModalOpen(false);
     setPendingNavigation(null);
   }, []);
-  
+
   // Block SPA navigation when processing (intercept link clicks)
   React.useEffect(() => {
     if (!isProcessingAny) return;
@@ -160,12 +195,22 @@ const VideoStudioTool: React.FC = () => {
     const handleClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       const link = target.closest('a');
-      
-      // Only intercept internal navigation links (not external links with target="_blank")
-      if (link && link.href && !link.target) {
+
+      // Skip download links (they have download attribute) - these are for file downloads, not navigation
+      // Also skip external links (with target="_blank") and blob: URLs
+      if (
+        link &&
+        link.href &&
+        !link.target &&
+        !link.download &&
+        !link.href.startsWith('blob:')
+      ) {
         const url = new URL(link.href);
         // Check if it's an internal navigation (same origin, different path)
-        if (url.origin === window.location.origin && url.pathname !== location.pathname) {
+        if (
+          url.origin === window.location.origin &&
+          url.pathname !== location.pathname
+        ) {
           e.preventDefault();
           e.stopPropagation();
           setPendingNavigation({ type: 'link', url: link.href });
@@ -184,7 +229,7 @@ const VideoStudioTool: React.FC = () => {
 
     document.addEventListener('click', handleClick, true);
     window.addEventListener('popstate', handlePopState);
-    
+
     return () => {
       document.removeEventListener('click', handleClick, true);
       window.removeEventListener('popstate', handlePopState);
@@ -194,6 +239,18 @@ const VideoStudioTool: React.FC = () => {
   // Block browser close/refresh when processing
   React.useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      // Skip if we're in the middle of downloading a file
+      // The download link.click() triggers beforeunload, but we want to allow it
+      if (isDownloadingRef.current) {
+        return;
+      }
+
+      // Skip if user has already confirmed leaving via our custom modal
+      // This prevents duplicate warnings (modal + browser native dialog)
+      if (isIntentionalNavigationRef.current) {
+        return;
+      }
+
       if (isProcessingAny) {
         e.preventDefault();
         e.returnValue = t('tool.videoStudio.leavePageWarning');
@@ -211,7 +268,10 @@ const VideoStudioTool: React.FC = () => {
       setError(null);
 
       // Validate file type
-      if (!SUPPORTED_INPUT_FORMATS.includes(file.type) && !file.type.startsWith('video/')) {
+      if (
+        !SUPPORTED_INPUT_FORMATS.includes(file.type) &&
+        !file.type.startsWith('video/')
+      ) {
         setError(t('tool.videoStudio.unsupportedFormat'));
         return;
       }
@@ -262,7 +322,9 @@ const VideoStudioTool: React.FC = () => {
           thumbnailTime: 0,
         });
 
-        toast.success(t('common.fileLoadedSuccess').replace('{name}', file.name));
+        toast.success(
+          t('common.fileLoadedSuccess').replace('{name}', file.name)
+        );
       };
 
       video.onerror = () => {
@@ -310,7 +372,7 @@ const VideoStudioTool: React.FC = () => {
   };
 
   // Reset entire pipeline settings (not the video)
-  const handleResetPipeline = () => {
+  const handleResetPipeline = React.useCallback(() => {
     const resetValues: Partial<VideoStudioState> = {
       // Pipeline steps
       trimEnabled: DEFAULT_STATE.trimEnabled,
@@ -327,7 +389,12 @@ const VideoStudioTool: React.FC = () => {
       cutSegments: DEFAULT_STATE.cutSegments,
       // Crop settings
       cropArea: videoMetadata
-        ? { x: 0, y: 0, width: videoMetadata.width, height: videoMetadata.height }
+        ? {
+            x: 0,
+            y: 0,
+            width: videoMetadata.width,
+            height: videoMetadata.height,
+          }
         : DEFAULT_STATE.cropArea,
       // Resize settings
       resizeWidth: videoMetadata?.width || DEFAULT_STATE.resizeWidth,
@@ -341,7 +408,7 @@ const VideoStudioTool: React.FC = () => {
     };
     updateState(resetValues);
     toast.success(t('common.reset'));
-  };
+  }, [videoMetadata, updateState, t]);
 
   // Handle cut segments change
   const handleCutSegmentsChange = (segments: CutSegment[]) => {
@@ -376,9 +443,16 @@ const VideoStudioTool: React.FC = () => {
         Math.max(0, state.thumbnailTime),
         Math.max(0, videoMetadata.duration - 0.1) // Slightly before the end to ensure a frame exists
       );
-      
-      console.log('[Thumbnail] Clamped time:', clampedTime, 'from:', state.thumbnailTime, 'duration:', videoMetadata.duration);
-      
+
+      console.log(
+        '[Thumbnail] Clamped time:',
+        clampedTime,
+        'from:',
+        state.thumbnailTime,
+        'duration:',
+        videoMetadata.duration
+      );
+
       const config: ThumbnailConfig = {
         time: clampedTime,
         format: state.thumbnailFormat,
@@ -391,29 +465,75 @@ const VideoStudioTool: React.FC = () => {
       });
 
       if (result.success && result.blobs && result.blobs.length > 0) {
+        // Set downloading flag to skip beforeunload handler during download
+        isDownloadingRef.current = true;
+        setIsExtractingThumbnail(false);
         downloadThumbnail(result.blobs[0], config.fileName);
+        isDownloadingRef.current = false;
         toast.success(t('common.fileDownloadSuccess'));
       } else {
-        throw new Error(result.error || t('tool.videoStudio.thumbnail.extractFailed'));
+        throw new Error(
+          result.error || t('tool.videoStudio.thumbnail.extractFailed')
+        );
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('tool.videoStudio.thumbnail.extractFailed'));
+      setError(
+        err instanceof Error
+          ? err.message
+          : t('tool.videoStudio.thumbnail.extractFailed')
+      );
       toast.error(t('tool.videoStudio.thumbnail.extractFailed'));
-    } finally {
       setIsExtractingThumbnail(false);
     }
   };
 
   // Build thumbnail file name
   const buildThumbnailFileName = React.useCallback(() => {
-    const baseName = videoMetadata?.fileName.replace(/\.[^/.]+$/, '') || 'video';
+    const baseName =
+      videoMetadata?.fileName.replace(/\.[^/.]+$/, '') || 'video';
     const extension = getFileExtension(state.thumbnailFormat);
     const timeStr = `_${Math.floor(state.thumbnailTime)}s`;
     return `${baseName}_thumbnail${timeStr}${extension}`;
   }, [videoMetadata?.fileName, state.thumbnailFormat, state.thumbnailTime]);
 
+  // Build output file name
+  const buildOutputFileName = React.useCallback(() => {
+    const baseName =
+      videoMetadata?.fileName.replace(/\.[^/.]+$/, '') || 'video';
+    const suffix = state.exportSuffix || '_edited';
+    const extension =
+      EXPORT_FORMAT_OPTIONS.find((f) => f.value === state.exportFormat)
+        ?.extension || '.mp4';
+    return `${baseName}${suffix}${extension}`;
+  }, [videoMetadata?.fileName, state.exportSuffix, state.exportFormat]);
+
+  // Get localized progress message
+  const getProgressMessage = React.useCallback(
+    (progress: VideoProcessingProgress): string => {
+      switch (progress.stage) {
+        case 'loading-engine':
+          return t('tool.videoStudio.loadingEngine');
+        case 'preparing':
+          return t('tool.videoStudio.preparing');
+        case 'processing':
+          return `${t('tool.videoStudio.processing')} ${progress.progress}%`;
+        case 'finalizing':
+          return t('tool.videoStudio.finalizing');
+        case 'complete':
+          return 'Complete!';
+        case 'error':
+          return progress.message;
+        case 'cancelled':
+          return t('tool.videoStudio.cancelled');
+        default:
+          return progress.message;
+      }
+    },
+    [t]
+  );
+
   // Export video using the processing pipeline
-  const handleExport = async () => {
+  const handleExport = React.useCallback(async () => {
     if (!videoFile || !videoMetadata) {
       toast.error(t('tool.videoStudio.noVideoLoaded'));
       return;
@@ -491,62 +611,45 @@ const VideoStudioTool: React.FC = () => {
       }
 
       if (result.success && result.blobs && result.blobs.length > 0) {
+        // Set downloading flag BEFORE download to skip beforeunload handler
+        // The download link.click() triggers beforeunload, but we want to allow it
+        isDownloadingRef.current = true;
+        setProcessingState(INITIAL_PROCESSING_STATE);
         downloadResult(result.blobs[0], config.export.fileName);
+        isDownloadingRef.current = false;
         toast.success(t('common.fileDownloadSuccess'));
       } else {
         throw new Error(result.error || t('tool.videoStudio.exportFailed'));
       }
     } catch (err) {
       // Ignore cancelled errors
-      const errorMessage = err instanceof Error ? err.message : t('tool.videoStudio.exportFailed');
+      const errorMessage =
+        err instanceof Error ? err.message : t('tool.videoStudio.exportFailed');
       if (errorMessage === 'Operation cancelled' || wasCancelled()) {
         console.log('[Export] Operation was cancelled, not showing error');
+        setProcessingState(INITIAL_PROCESSING_STATE);
         return;
       }
       setError(errorMessage);
-      setProcessingState((prev) => ({
-        ...prev,
+      setProcessingState({
+        ...INITIAL_PROCESSING_STATE,
         stage: 'error',
         error: errorMessage,
-      }));
+      });
       toast.error(t('tool.videoStudio.exportFailed'));
-    } finally {
-      setProcessingState(INITIAL_PROCESSING_STATE);
     }
-  };
-
-  // Build output file name
-  const buildOutputFileName = React.useCallback(() => {
-    const baseName = videoMetadata?.fileName.replace(/\.[^/.]+$/, '') || 'video';
-    const suffix = state.exportSuffix || '_edited';
-    const extension = EXPORT_FORMAT_OPTIONS.find((f) => f.value === state.exportFormat)?.extension || '.mp4';
-    return `${baseName}${suffix}${extension}`;
-  }, [videoMetadata?.fileName, state.exportSuffix, state.exportFormat]);
-
-  // Get localized progress message
-  const getProgressMessage = (progress: VideoProcessingProgress): string => {
-    switch (progress.stage) {
-      case 'loading-engine':
-        return t('tool.videoStudio.loadingEngine');
-      case 'preparing':
-        return t('tool.videoStudio.preparing');
-      case 'processing':
-        return `${t('tool.videoStudio.processing')} ${progress.progress}%`;
-      case 'finalizing':
-        return t('tool.videoStudio.finalizing');
-      case 'complete':
-        return 'Complete!';
-      case 'error':
-        return progress.message;
-      case 'cancelled':
-        return t('tool.videoStudio.cancelled');
-      default:
-        return progress.message;
-    }
-  };
+  }, [
+    videoFile,
+    videoMetadata,
+    isExtractingThumbnail,
+    state,
+    buildOutputFileName,
+    getProgressMessage,
+    t,
+  ]);
 
   // Cancel processing
-  const handleCancel = () => {
+  const handleCancel = React.useCallback(() => {
     // Actually cancel FFmpeg operation
     cancelFFmpeg();
 
@@ -557,7 +660,7 @@ const VideoStudioTool: React.FC = () => {
       message: t('tool.videoStudio.cancelled'),
     }));
     toast.info(t('tool.videoStudio.processingCancelled'));
-  };
+  }, [t]);
 
   // Reset all
   const handleReset = () => {
@@ -572,20 +675,93 @@ const VideoStudioTool: React.FC = () => {
     resetState();
   };
 
+  // Keyboard shortcuts
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Cmd/Ctrl + O: Open file
+      if ((e.metaKey || e.ctrlKey) && e.key === 'o') {
+        e.preventDefault();
+        const input = document.getElementById(
+          'video-studio-file-input'
+        ) as HTMLInputElement;
+        input?.click();
+        return;
+      }
+
+      // Cmd/Ctrl + Enter: Export
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        e.preventDefault();
+        if (
+          videoFile &&
+          videoMetadata &&
+          !processingState.isProcessing &&
+          !isExtractingThumbnail
+        ) {
+          handleExport();
+        }
+        return;
+      }
+
+      // Cmd/Ctrl + Shift + R: Reset pipeline
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === 'r') {
+        e.preventDefault();
+        handleResetPipeline();
+        return;
+      }
+
+      // Esc: Close modal or cancel processing
+      if (e.key === 'Escape') {
+        if (leaveModalOpen) {
+          e.preventDefault();
+          handleLeaveCancel();
+          return;
+        }
+        if (presetModalOpen) {
+          e.preventDefault();
+          setPresetModalOpen(false);
+          return;
+        }
+        // If processing, show confirmation
+        if (processingState.isProcessing) {
+          e.preventDefault();
+          handleCancel();
+          return;
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [
+    videoFile,
+    videoMetadata,
+    processingState.isProcessing,
+    isExtractingThumbnail,
+    leaveModalOpen,
+    presetModalOpen,
+    handleLeaveCancel,
+    handleResetPipeline,
+    handleCancel,
+    handleExport,
+  ]);
+
   // Get current settings for preset (excluding thumbnail - separate action)
-  const getCurrentSettings = React.useCallback((): VideoPipelinePreset['settings'] => ({
-    trimEnabled: state.trimEnabled,
-    cutEnabled: state.cutEnabled,
-    cropEnabled: state.cropEnabled,
-    resizeEnabled: state.resizeEnabled,
-    resizeWidth: state.resizeWidth,
-    resizeHeight: state.resizeHeight,
-    resizeLockAspect: state.resizeLockAspect,
-    resizeMode: state.resizeMode,
-    exportFormat: state.exportFormat,
-    qualityPreset: state.qualityPreset,
-    exportSuffix: state.exportSuffix,
-  }), [state]);
+  const getCurrentSettings = React.useCallback(
+    (): VideoPipelinePreset['settings'] => ({
+      trimEnabled: state.trimEnabled,
+      cutEnabled: state.cutEnabled,
+      cropEnabled: state.cropEnabled,
+      resizeEnabled: state.resizeEnabled,
+      resizeWidth: state.resizeWidth,
+      resizeHeight: state.resizeHeight,
+      resizeLockAspect: state.resizeLockAspect,
+      resizeMode: state.resizeMode,
+      exportFormat: state.exportFormat,
+      qualityPreset: state.qualityPreset,
+      exportSuffix: state.exportSuffix,
+    }),
+    [state]
+  );
 
   // Handle preset selection (load preset)
   const handleSelectPreset = (preset: VideoPipelinePreset) => {
@@ -612,6 +788,7 @@ const VideoStudioTool: React.FC = () => {
           description={t('tool.videoStudio.description')}
           onReset={handleReset}
           onShare={handleShare}
+          beta
         />
       </div>
 
@@ -628,12 +805,18 @@ const VideoStudioTool: React.FC = () => {
             videoUrl={videoUrl}
             metadata={videoMetadata}
             cropArea={state.cropArea}
-            trimRange={state.trimEnabled ? { start: state.trimStart, end: state.trimEnd } : null}
+            trimRange={
+              state.trimEnabled
+                ? { start: state.trimStart, end: state.trimEnd }
+                : null
+            }
             showCropOverlay={state.cropEnabled}
             showTrimOverlay={state.trimEnabled}
             thumbnailTime={state.thumbnailTime}
             onFileSelect={handleFileSelect}
-            onCropAreaChange={state.cropEnabled ? handleCropAreaChange : undefined}
+            onCropAreaChange={
+              state.cropEnabled ? handleCropAreaChange : undefined
+            }
             onSeek={handleSeek}
             t={t}
           />
@@ -646,12 +829,14 @@ const VideoStudioTool: React.FC = () => {
             hasVideo={!!videoUrl}
             isExtracting={isExtractingThumbnail}
             onTimeChange={(time) => updateState({ thumbnailTime: time })}
-            onFormatChange={(format) => updateState({ thumbnailFormat: format })}
+            onFormatChange={(format) =>
+              updateState({ thumbnailFormat: format })
+            }
             onSeekTo={handleSeek}
             onExtract={handleExtractThumbnail}
             t={t}
           />
-          
+
           {/* Bug Report Link */}
           <div className="flex justify-center mt-2">
             <a
@@ -726,7 +911,9 @@ const VideoStudioTool: React.FC = () => {
               originalHeight={videoMetadata?.height || 1080}
               onWidthChange={(width) => updateState({ resizeWidth: width })}
               onHeightChange={(height) => updateState({ resizeHeight: height })}
-              onLockAspectChange={(locked) => updateState({ resizeLockAspect: locked })}
+              onLockAspectChange={(locked) =>
+                updateState({ resizeLockAspect: locked })
+              }
               onModeChange={(mode) => updateState({ resizeMode: mode })}
               t={t}
               disabled={!state.resizeEnabled}
@@ -740,7 +927,9 @@ const VideoStudioTool: React.FC = () => {
               suffix={state.exportSuffix}
               originalFileName={videoMetadata?.fileName || 'video'}
               onFormatChange={(format) => updateState({ exportFormat: format })}
-              onQualityPresetChange={(preset) => updateState({ qualityPreset: preset })}
+              onQualityPresetChange={(preset) =>
+                updateState({ qualityPreset: preset })
+              }
               onSuffixChange={(suffix) => updateState({ exportSuffix: suffix })}
               t={t}
             />
@@ -795,6 +984,7 @@ export const videoStudioTool: ToolDefinition<VideoStudioState> = {
     'compress',
   ],
   category: 'Media',
+  beta: true,
   defaultState: DEFAULT_STATE,
   Component: VideoStudioTool,
 };

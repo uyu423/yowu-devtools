@@ -15,6 +15,9 @@ export interface ToolDefinition<TState = unknown> {
   keywords?: string[]; // Search keywords for Command Palette
   category?: string; // Tool category (e.g., 'converter', 'viewer', 'generator')
   
+  // Beta flag - marks tool as experimental/unstable
+  beta?: boolean;
+  
   defaultState: TState;
   
   // Component to render

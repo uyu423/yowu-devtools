@@ -33,6 +33,12 @@ export const PipelinePanel: React.FC<PipelinePanelProps> = ({
   children,
 }) => {
   const [expandedSteps, setExpandedSteps] = React.useState<Set<string>>(new Set(['crop', 'resize', 'rotate', 'export']));
+  
+  // Detect Mac for keyboard shortcut display
+  const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(navigator.platform);
+  const copyShortcut = isMac ? '⌘C' : 'Ctrl+C';
+  const exportShortcut = isMac ? '⌘↵' : 'Ctrl+Enter';
+  const resetShortcut = isMac ? '⌘⇧R' : 'Ctrl+Shift+R';
 
   const toggleExpand = (stepId: string) => {
     setExpandedSteps((prev) => {
@@ -71,7 +77,7 @@ export const PipelinePanel: React.FC<PipelinePanelProps> = ({
           <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
             {t('tool.imageStudio.pipeline')}
           </h3>
-          <Tooltip content={t('tool.imageStudio.resetPipeline')}>
+          <Tooltip content={`${t('tool.imageStudio.resetPipeline')} (${resetShortcut})`}>
             <button
               type="button"
               onClick={onResetPipeline}
@@ -190,22 +196,24 @@ export const PipelinePanel: React.FC<PipelinePanelProps> = ({
       <div className="p-4 border-t border-gray-200 dark:border-gray-700 space-y-2">
         {/* Export Buttons */}
         <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={onExport}
-            disabled={!hasImage || isProcessing || isCopying}
-            className={cn(
-              'flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors',
-              hasImage && !isProcessing && !isCopying
-                ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                : 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
-            )}
-          >
-            <Download className="w-4 h-4" />
-            {isProcessing ? t('common.processing') : t('common.download')}
-          </button>
+          <Tooltip content={`${t('common.download')} (${exportShortcut})`} className="flex-1">
+            <button
+              type="button"
+              onClick={onExport}
+              disabled={!hasImage || isProcessing || isCopying}
+              className={cn(
+                'w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors',
+                hasImage && !isProcessing && !isCopying
+                  ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+              )}
+            >
+              <Download className="w-4 h-4" />
+              {isProcessing ? t('common.processing') : t('common.download')}
+            </button>
+          </Tooltip>
           {onCopyToClipboard && (
-            <Tooltip content={t('tool.imageStudio.copyToClipboard')}>
+            <Tooltip content={`${t('tool.imageStudio.copyToClipboard')} (${copyShortcut})`}>
               <button
                 type="button"
                 onClick={onCopyToClipboard}

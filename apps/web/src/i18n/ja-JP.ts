@@ -198,6 +198,9 @@ export const jaJP = {
     // Collapse/Expand
     collapseSidebar: 'サイドバーを折りたたむ',
     expandSidebar: 'サイドバーを展開',
+    // Beta badge
+    beta: 'ベータ',
+    betaTooltip: 'この機能は実験的であり、不安定な可能性があります。テストと改善を進めています。',
   },
   commandPalette: {
     searchTools: 'ツールを検索...',

@@ -214,7 +214,7 @@ const ImageStudioTool: React.FC = () => {
   };
 
   // Reset entire pipeline settings (not the image)
-  const handleResetPipeline = () => {
+  const handleResetPipeline = React.useCallback(() => {
     const resetValues: Partial<ImageStudioState> = {
       // Pipeline steps
       cropEnabled: DEFAULT_STATE.cropEnabled,
@@ -243,10 +243,18 @@ const ImageStudioTool: React.FC = () => {
     };
     updateState(resetValues);
     toast.success(t('common.reset'));
-  };
+  }, [imageMetadata, updateState, t]);
+
+  // Build output file name
+  const buildOutputFileName = React.useCallback(() => {
+    const baseName = imageMetadata?.fileName.replace(/\.[^/.]+$/, '') || 'image';
+    const suffix = state.exportSuffix || '_edited';
+    const extension = EXPORT_FORMAT_OPTIONS.find((f) => f.value === state.exportFormat)?.extension || '.png';
+    return `${baseName}${suffix}${extension}`;
+  }, [imageMetadata?.fileName, state.exportSuffix, state.exportFormat]);
 
   // Export image using the processing pipeline
-  const handleExport = async () => {
+  const handleExport = React.useCallback(async () => {
     if (!imageUrl || !imageMetadata) {
       toast.error(t('tool.imageStudio.noImageLoaded'));
       return;
@@ -296,10 +304,10 @@ const ImageStudioTool: React.FC = () => {
     } finally {
       setIsProcessing(false);
     }
-  };
+  }, [imageUrl, imageMetadata, state, buildOutputFileName, t]);
 
   // Copy processed image to clipboard
-  const handleCopyToClipboard = async () => {
+  const handleCopyToClipboard = React.useCallback(async () => {
     if (!imageUrl || !imageMetadata) {
       toast.error(t('tool.imageStudio.noImageLoaded'));
       return;
@@ -355,15 +363,7 @@ const ImageStudioTool: React.FC = () => {
     } finally {
       setIsCopying(false);
     }
-  };
-
-  // Build output file name
-  const buildOutputFileName = React.useCallback(() => {
-    const baseName = imageMetadata?.fileName.replace(/\.[^/.]+$/, '') || 'image';
-    const suffix = state.exportSuffix || '_edited';
-    const extension = EXPORT_FORMAT_OPTIONS.find((f) => f.value === state.exportFormat)?.extension || '.png';
-    return `${baseName}${suffix}${extension}`;
-  }, [imageMetadata?.fileName, state.exportSuffix, state.exportFormat]);
+  }, [imageUrl, imageMetadata, state, t]);
 
   // Reset all
   const handleReset = () => {
@@ -375,6 +375,70 @@ const ImageStudioTool: React.FC = () => {
     setError(null);
     resetState();
   };
+
+  // Keyboard shortcuts
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const activeElement = document.activeElement;
+      const isInputFocused =
+        activeElement instanceof HTMLInputElement ||
+        activeElement instanceof HTMLTextAreaElement ||
+        activeElement?.getAttribute('contenteditable') === 'true';
+
+      // Cmd/Ctrl + O: Open file
+      if ((e.metaKey || e.ctrlKey) && e.key === 'o') {
+        e.preventDefault();
+        // Click the file input to trigger file picker
+        const input = document.getElementById('image-studio-file-input') as HTMLInputElement;
+        input?.click();
+        return;
+      }
+
+      // Cmd/Ctrl + Enter: Export
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        e.preventDefault();
+        if (imageUrl && imageMetadata && !isProcessing && !isCopying) {
+          handleExport();
+        }
+        return;
+      }
+
+      // Cmd/Ctrl + Shift + R: Reset pipeline
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === 'r') {
+        e.preventDefault();
+        handleResetPipeline();
+        return;
+      }
+
+      // Esc: Close modal
+      if (e.key === 'Escape') {
+        if (presetModalOpen) {
+          e.preventDefault();
+          setPresetModalOpen(false);
+        }
+        return;
+      }
+
+      // Cmd/Ctrl + C: Copy image to clipboard
+      if ((e.metaKey || e.ctrlKey) && e.key === 'c') {
+        // Skip if focus is on an input
+        if (isInputFocused) {
+          return; // Allow default copy behavior for text inputs
+        }
+
+        // Skip if no image is loaded or already processing
+        if (!imageUrl || !imageMetadata || isCopying || isProcessing) {
+          return;
+        }
+
+        e.preventDefault();
+        handleCopyToClipboard();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [imageUrl, imageMetadata, isCopying, isProcessing, presetModalOpen, handleCopyToClipboard, handleResetPipeline, handleExport]);
 
   // Get current settings for preset
   const getCurrentSettings = React.useCallback((): ImagePipelinePreset['settings'] => ({

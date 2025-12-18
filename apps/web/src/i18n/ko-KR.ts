@@ -198,6 +198,9 @@ export const koKR = {
     // Collapse/Expand
     collapseSidebar: '사이드바 접기',
     expandSidebar: '사이드바 펼치기',
+    // Beta badge
+    beta: 'Beta',
+    betaTooltip: '이 기능은 실험적이며 불안정할 수 있습니다. 테스트 및 개선 중입니다.',
   },
   commandPalette: {
     searchTools: '도구 검색...',

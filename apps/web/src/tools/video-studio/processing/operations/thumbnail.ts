@@ -25,24 +25,14 @@ export async function extractThumbnail(
   config: ThumbnailConfig,
   onProgress?: (progress: VideoProcessingProgress) => void
 ): Promise<VideoProcessingResult> {
-  console.log('[Thumbnail] Starting extraction...', {
-    fileName: videoFile.name,
-    fileSize: videoFile.size,
-    fileType: videoFile.type,
-    config,
-  });
-
   const inputFileName = 'input' + getInputExtension(videoFile.type);
   const outputFileName = `thumbnail${getFileExtension(config.format)}`;
-  console.log('[Thumbnail] File names:', { inputFileName, outputFileName });
 
   let ffmpeg: Awaited<ReturnType<typeof getFFmpeg>> | null = null;
   
   try {
     // Get FFmpeg instance
-    console.log('[Thumbnail] Getting FFmpeg instance...');
     ffmpeg = await getFFmpeg(onProgress);
-    console.log('[Thumbnail] FFmpeg instance obtained');
 
     onProgress?.({
       stage: 'preparing',
@@ -59,13 +49,8 @@ export async function extractThumbnail(
     }
 
     // Write input file to virtual filesystem
-    console.log('[Thumbnail] Reading video file as ArrayBuffer...');
     const inputData = await videoFile.arrayBuffer();
-    console.log('[Thumbnail] ArrayBuffer size:', inputData.byteLength);
-    
-    console.log('[Thumbnail] Writing to virtual filesystem...');
     await writeFile(ffmpeg, inputFileName, arrayBufferToUint8Array(inputData));
-    console.log('[Thumbnail] File written to VFS');
 
     onProgress?.({
       stage: 'processing',
@@ -77,7 +62,6 @@ export async function extractThumbnail(
     // Note: We can't know exact duration without probing, but we validate on the UI side
     // If time is too large, clamp to 0 to at least get the first frame
     const seekTime = Math.max(0, config.time);
-    console.log('[Thumbnail] Seek time:', seekTime);
 
     // Build FFmpeg arguments for frame extraction
     // IMPORTANT: Put -ss BEFORE -i for "input seeking" which is more memory efficient
@@ -99,10 +83,8 @@ export async function extractThumbnail(
 
     args.push('-y', outputFileName);
 
-    console.log('[Thumbnail] Executing FFmpeg with args:', args);
     // Execute FFmpeg command
     await exec(ffmpeg, args);
-    console.log('[Thumbnail] FFmpeg execution completed');
 
     onProgress?.({
       stage: 'finalizing',
@@ -111,24 +93,19 @@ export async function extractThumbnail(
     });
 
     // Read output file
-    console.log('[Thumbnail] Reading output file from VFS...');
     let outputData: Uint8Array;
     try {
       outputData = await readFile(ffmpeg, outputFileName);
     } catch (readError) {
-      console.error('[Thumbnail] Failed to read output file:', readError);
-      // Check if this is because the file doesn't exist (FFmpeg didn't create it)
+      console.error('[Thumbnail] Failed to read output:', readError);
       throw new Error('Failed to extract frame. The seek time may be beyond the video duration.');
     }
-    
-    console.log('[Thumbnail] Output data size:', outputData.byteLength);
     
     if (outputData.byteLength === 0) {
       throw new Error('Extracted frame is empty. Try a different time position.');
     }
     
     const blob = uint8ArrayToBlob(outputData, getMimeType(config.format));
-    console.log('[Thumbnail] Blob created:', blob.size, 'bytes', blob.type);
 
     onProgress?.({
       stage: 'complete',
@@ -137,14 +114,12 @@ export async function extractThumbnail(
     });
 
     // Cleanup virtual filesystem (success path)
-    console.log('[Thumbnail] Cleaning up VFS...');
     try {
       await deleteFile(ffmpeg, inputFileName);
       await deleteFile(ffmpeg, outputFileName);
     } catch {
       // Ignore cleanup errors
     }
-    console.log('[Thumbnail] Cleanup completed');
 
     return {
       success: true,
@@ -174,7 +149,6 @@ export async function extractThumbnail(
     }
     
     if (isMemoryError) {
-      console.log('[Thumbnail] Memory error detected, cleaning up FFmpeg instance...');
       cleanupFFmpeg();
     }
     
@@ -226,4 +200,3 @@ export function downloadThumbnail(blob: Blob, fileName: string): void {
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 }
-

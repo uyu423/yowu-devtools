@@ -121,8 +121,6 @@ export async function executeVideoPipeline(
       },
     };
   } catch (error) {
-    console.error('[Pipeline] Error during video processing:', error);
-    
     // Check if error was due to cancellation
     if (wasCancelled()) {
       onProgress?.({
@@ -142,7 +140,6 @@ export async function executeVideoPipeline(
       errorMessage.includes('failed');
 
     if (isCorruptingError) {
-      console.log('[Pipeline] Cleaning up FFmpeg instance due to corrupting error');
       cleanupFFmpeg();
     }
 

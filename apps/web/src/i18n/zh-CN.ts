@@ -196,6 +196,9 @@ export const zhCN = {
     // Collapse/Expand
     collapseSidebar: '折叠侧边栏',
     expandSidebar: '展开侧边栏',
+    // Beta badge
+    beta: '测试版',
+    betaTooltip: '此功能仍处于实验阶段，可能不稳定。我们正在积极测试和改进中。',
   },
   commandPalette: {
     searchTools: '搜索工具...',

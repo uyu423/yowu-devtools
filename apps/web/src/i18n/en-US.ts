@@ -196,6 +196,9 @@ export const enUS = {
     // Collapse/Expand
     collapseSidebar: 'Collapse sidebar',
     expandSidebar: 'Expand sidebar',
+    // Beta badge
+    beta: 'Beta',
+    betaTooltip: 'This feature is experimental and may be unstable. We are actively testing and improving it.',
   },
   commandPalette: {
     searchTools: 'Search tools...',

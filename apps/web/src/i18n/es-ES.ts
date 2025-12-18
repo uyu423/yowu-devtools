@@ -200,6 +200,9 @@ export const esES = {
     // Collapse/Expand
     collapseSidebar: 'Contraer barra lateral',
     expandSidebar: 'Expandir barra lateral',
+    // Beta badge
+    beta: 'Beta',
+    betaTooltip: 'Esta función es experimental y puede ser inestable. La estamos probando y mejorando activamente.',
   },
   commandPalette: {
     searchTools: 'Buscar herramientas...',
