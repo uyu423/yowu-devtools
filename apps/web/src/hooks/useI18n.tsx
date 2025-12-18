@@ -2,8 +2,9 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { I18nContext, type I18nContextValue } from './i18nContext';
 import type { LocaleCode } from '@/lib/constants';
+import { DEFAULT_LOCALE } from '@/lib/constants';
 import { I18N } from '@/i18n';
-import { detectLocale, saveLocale, getToolPathFromUrl, buildLocalePath } from '@/lib/i18nUtils';
+import { detectLocale, saveLocale, getToolPathFromUrl, buildLocalePath, getLocaleFromUrl, getStoredLocale } from '@/lib/i18nUtils';
 
 /**
  * Get nested value from object using dot notation
@@ -30,6 +31,26 @@ function useProvideI18n(): I18nContextValue {
     detectLocale(location.pathname),
     [location.pathname]
   );
+
+  // Redirect to locale-prefixed URL if needed
+  // This ensures URL matches the stored locale preference
+  useEffect(() => {
+    const urlLocale = getLocaleFromUrl(location.pathname);
+    const storedLocale = getStoredLocale();
+
+    // Redirect conditions:
+    // 1. URL has no locale prefix (urlLocale is null)
+    // 2. localStorage has a stored locale
+    // 3. Stored locale is NOT the default locale (en-US)
+    // In this case, redirect to the stored locale URL
+    // Note: No infinite loop because after redirect, urlLocale will not be null
+    if (urlLocale === null && storedLocale && storedLocale !== DEFAULT_LOCALE) {
+      const toolPath = getToolPathFromUrl(location.pathname);
+      const newPath = buildLocalePath(storedLocale, toolPath);
+      const hash = location.hash;
+      navigate(`${newPath}${hash}`, { replace: true });
+    }
+  }, [location.pathname, location.hash, navigate]);
 
   // Save locale to localStorage when it changes
   useEffect(() => {
