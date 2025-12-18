@@ -12,7 +12,17 @@ import { ShareModal } from '@/components/common/ShareModal';
 import { toast } from 'sonner';
 
 import type { VideoStudioState, VideoMetadata, CropArea, ProcessingState, CutSegment, ThumbnailFormat } from './types';
-import { DEFAULT_STATE, MAX_FILE_SIZE, SUPPORTED_INPUT_FORMATS } from './constants';
+import { DEFAULT_STATE, MAX_FILE_SIZE, SUPPORTED_INPUT_FORMATS, EXPORT_FORMAT_OPTIONS } from './constants';
+import {
+  executeVideoPipeline,
+  extractThumbnail,
+  downloadResult,
+  downloadThumbnail,
+  type VideoPipelineConfig,
+  type ThumbnailConfig,
+  type VideoProcessingProgress,
+  getFileExtension,
+} from './processing';
 import {
   VideoPreview,
   PipelinePanel,
@@ -90,6 +100,7 @@ const VideoStudioTool: React.FC = () => {
   });
 
   // Video state
+  const [videoFile, setVideoFile] = React.useState<File | null>(null);
   const [videoUrl, setVideoUrl] = React.useState<string | null>(null);
   const [videoMetadata, setVideoMetadata] = React.useState<VideoMetadata | null>(null);
   const [error, setError] = React.useState<string | null>(null);
@@ -139,6 +150,7 @@ const VideoStudioTool: React.FC = () => {
       video.preload = 'metadata';
 
       video.onloadedmetadata = () => {
+        setVideoFile(file);
         setVideoUrl(url);
         setVideoMetadata({
           fileName: file.name,
@@ -223,28 +235,51 @@ const VideoStudioTool: React.FC = () => {
 
   // Extract thumbnail (separate from pipeline - outputs image)
   const handleExtractThumbnail = async () => {
-    if (!videoUrl || !videoMetadata) {
+    if (!videoFile || !videoMetadata) {
       toast.error(t('tool.videoStudio.noVideoLoaded'));
       return;
     }
 
     setIsExtractingThumbnail(true);
+    setError(null);
 
     try {
-      // TODO: Implement actual thumbnail extraction using canvas
-      // For now, just show a toast
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      toast.info(t('tool.videoStudio.thumbnail.extractNotImplemented'));
+      const config: ThumbnailConfig = {
+        time: state.thumbnailTime,
+        format: state.thumbnailFormat,
+        fileName: buildThumbnailFileName(),
+      };
+
+      const result = await extractThumbnail(videoFile, config, (progress) => {
+        // Could update UI with progress if needed
+        console.log('Thumbnail extraction progress:', progress);
+      });
+
+      if (result.success && result.blobs && result.blobs.length > 0) {
+        downloadThumbnail(result.blobs[0], config.fileName);
+        toast.success(t('common.fileDownloadSuccess'));
+      } else {
+        throw new Error(result.error || t('tool.videoStudio.thumbnail.extractFailed'));
+      }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : t('tool.videoStudio.thumbnail.extractFailed'));
+      setError(err instanceof Error ? err.message : t('tool.videoStudio.thumbnail.extractFailed'));
+      toast.error(t('tool.videoStudio.thumbnail.extractFailed'));
     } finally {
       setIsExtractingThumbnail(false);
     }
   };
 
-  // Export video (placeholder - actual processing will be implemented later)
+  // Build thumbnail file name
+  const buildThumbnailFileName = React.useCallback(() => {
+    const baseName = videoMetadata?.fileName.replace(/\.[^/.]+$/, '') || 'video';
+    const extension = getFileExtension(state.thumbnailFormat);
+    const timeStr = `_${Math.floor(state.thumbnailTime)}s`;
+    return `${baseName}_thumbnail${timeStr}${extension}`;
+  }, [videoMetadata?.fileName, state.thumbnailFormat, state.thumbnailTime]);
+
+  // Export video using the processing pipeline
   const handleExport = async () => {
-    if (!videoUrl || !videoMetadata) {
+    if (!videoFile || !videoMetadata) {
       toast.error(t('tool.videoStudio.noVideoLoaded'));
       return;
     }
@@ -257,26 +292,58 @@ const VideoStudioTool: React.FC = () => {
       error: null,
       canCancel: true,
     });
+    setError(null);
 
     try {
-      // TODO: Implement actual video processing pipeline with ffmpeg.wasm
-      // For now, just simulate processing
-      for (let i = 0; i <= 100; i += 10) {
-        await new Promise((resolve) => setTimeout(resolve, 200));
+      // Build pipeline configuration from current state
+      const config: VideoPipelineConfig = {
+        trim: {
+          enabled: state.trimEnabled,
+          start: state.trimStart,
+          end: state.trimEnd || videoMetadata.duration,
+        },
+        cut: {
+          enabled: state.cutEnabled,
+          mode: state.cutMode,
+          segments: state.cutSegments,
+          splitCount: state.splitCount,
+        },
+        crop: {
+          enabled: state.cropEnabled,
+          area: state.cropArea,
+        },
+        resize: {
+          enabled: state.resizeEnabled,
+          width: state.resizeWidth,
+          height: state.resizeHeight,
+          mode: state.resizeMode,
+        },
+        export: {
+          format: state.exportFormat,
+          qualityPreset: state.qualityPreset,
+          fileName: buildOutputFileName(),
+        },
+      };
+
+      // Progress handler
+      const handleProgress = (progress: VideoProcessingProgress) => {
         setProcessingState((prev) => ({
           ...prev,
-          progress: i,
-          stage: i < 30 ? 'preparing' : i < 90 ? 'processing' : 'finalizing',
-          message:
-            i < 30
-              ? t('tool.videoStudio.preparing')
-              : i < 90
-                ? `${t('tool.videoStudio.processing')} ${i}%`
-                : t('tool.videoStudio.finalizing'),
+          progress: progress.progress,
+          stage: progress.stage,
+          message: getProgressMessage(progress),
         }));
-      }
+      };
 
-      toast.info(t('tool.videoStudio.exportNotImplemented'));
+      // Execute pipeline
+      const result = await executeVideoPipeline(videoFile, config, handleProgress);
+
+      if (result.success && result.blobs && result.blobs.length > 0) {
+        downloadResult(result.blobs[0], config.export.fileName);
+        toast.success(t('common.fileDownloadSuccess'));
+      } else {
+        throw new Error(result.error || t('tool.videoStudio.exportFailed'));
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : t('tool.videoStudio.exportFailed'));
       setProcessingState((prev) => ({
@@ -284,8 +351,39 @@ const VideoStudioTool: React.FC = () => {
         stage: 'error',
         error: err instanceof Error ? err.message : 'Unknown error',
       }));
+      toast.error(t('tool.videoStudio.exportFailed'));
     } finally {
       setProcessingState(INITIAL_PROCESSING_STATE);
+    }
+  };
+
+  // Build output file name
+  const buildOutputFileName = React.useCallback(() => {
+    const baseName = videoMetadata?.fileName.replace(/\.[^/.]+$/, '') || 'video';
+    const suffix = state.exportSuffix || '_edited';
+    const extension = EXPORT_FORMAT_OPTIONS.find((f) => f.value === state.exportFormat)?.extension || '.mp4';
+    return `${baseName}${suffix}${extension}`;
+  }, [videoMetadata?.fileName, state.exportSuffix, state.exportFormat]);
+
+  // Get localized progress message
+  const getProgressMessage = (progress: VideoProcessingProgress): string => {
+    switch (progress.stage) {
+      case 'loading-engine':
+        return t('tool.videoStudio.loadingEngine');
+      case 'preparing':
+        return t('tool.videoStudio.preparing');
+      case 'processing':
+        return `${t('tool.videoStudio.processing')} ${progress.progress}%`;
+      case 'finalizing':
+        return t('tool.videoStudio.finalizing');
+      case 'complete':
+        return 'Complete!';
+      case 'error':
+        return progress.message;
+      case 'cancelled':
+        return t('tool.videoStudio.cancelled');
+      default:
+        return progress.message;
     }
   };
 
@@ -305,6 +403,7 @@ const VideoStudioTool: React.FC = () => {
     if (videoUrl) {
       URL.revokeObjectURL(videoUrl);
     }
+    setVideoFile(null);
     setVideoUrl(null);
     setVideoMetadata(null);
     setError(null);
