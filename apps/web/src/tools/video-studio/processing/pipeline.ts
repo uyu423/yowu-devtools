@@ -24,6 +24,7 @@ import {
   getMimeType,
   getFileExtension,
   wasCancelled,
+  cleanupFFmpeg,
 } from './ffmpeg';
 
 /**
@@ -120,6 +121,8 @@ export async function executeVideoPipeline(
       },
     };
   } catch (error) {
+    console.error('[Pipeline] Error during video processing:', error);
+    
     // Check if error was due to cancellation
     if (wasCancelled()) {
       onProgress?.({
@@ -128,6 +131,19 @@ export async function executeVideoPipeline(
         message: 'Operation cancelled',
       });
       return { success: false, error: 'Operation cancelled' };
+    }
+
+    // Check for codec-related or memory errors that corrupt FFmpeg instance
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const isCorruptingError = 
+      errorMessage.includes('memory') ||
+      errorMessage.includes('RuntimeError') ||
+      errorMessage.includes('exit code') ||
+      errorMessage.includes('failed');
+
+    if (isCorruptingError) {
+      console.log('[Pipeline] Cleaning up FFmpeg instance due to corrupting error');
+      cleanupFFmpeg();
     }
 
     onProgress?.({
@@ -188,11 +204,13 @@ function buildFFmpegArgs(
       '-b:a', '128k'
     );
   } else if (config.export.format === 'webm') {
+    // Use VP8 (libvpx) instead of VP9 for better compatibility with ffmpeg.wasm
+    // VP9 (libvpx-vp9) is not always available in ffmpeg.wasm builds
     args.push(
-      '-c:v', 'libvpx-vp9',
+      '-c:v', 'libvpx',
       '-crf', QUALITY_CRF_MAP[config.export.qualityPreset].toString(),
-      '-b:v', '0', // Use CRF mode
-      '-c:a', 'libopus',
+      '-b:v', '1M', // VP8 requires bitrate alongside CRF
+      '-c:a', 'libvorbis', // Use Vorbis instead of Opus for better compatibility
       '-b:a', '128k'
     );
   }
