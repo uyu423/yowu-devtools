@@ -1,7 +1,16 @@
 {
   "name": "@yowu-devtools/shared",
   "version": "1.0.0",
-  "private": true,
+  "license": "SEE LICENSE IN LICENSE",
+  "author": {
+    "name": "Yongwoo Yu (Yowu)",
+    "email": "me@yowu.dev",
+    "url": "https://yowu.dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/uyu423/yowu-devtools.git"
+  },
   "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
@@ -16,4 +25,3 @@
     "typescript": "~5.9.3"
   }
 }
-

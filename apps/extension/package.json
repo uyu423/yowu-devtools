@@ -1,7 +1,16 @@
 {
   "name": "@yowu-devtools/extension",
   "version": "1.0.3",
-  "private": true,
+  "license": "SEE LICENSE IN LICENSE",
+  "author": {
+    "name": "Yongwoo Yu (Yowu)",
+    "email": "me@yowu.dev",
+    "url": "https://yowu.dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/uyu423/yowu-devtools.git"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite build --watch --mode development",
