@@ -8,15 +8,11 @@ import React, {
 import { useNavigate } from 'react-router-dom';
 import { Search, X, Star, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { tools } from '@/tools';
+import { tools, getToolI18nKey } from '@/tools';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useRecentTools } from '@/hooks/useRecentTools';
 import { useI18n } from '@/hooks/useI18nHooks';
 import { buildLocalePath } from '@/lib/i18nUtils';
-
-// Helper to convert tool id to i18n key (url-parser → urlParser)
-const toI18nToolId = (id: string) =>
-  id.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
 
 interface CommandPaletteProps {
   isOpen: boolean;
@@ -321,7 +317,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                         )}
                       </div>
                       <div className="text-sm text-gray-500 dark:text-gray-400 truncate">
-                        {t(`tool.${toI18nToolId(tool.id)}.description`)}
+                        {t(`tool.${getToolI18nKey(tool)}.description`)}
                       </div>
                     </div>
                     <button

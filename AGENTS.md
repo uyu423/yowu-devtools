@@ -931,3 +931,92 @@ function validateKeys(source: any, target: any, path: string = '') {
 - 큰 데이터 전송 시 성능 오버헤드 고려
 - Worker 지원 여부 확인 (`typeof Worker !== 'undefined'`)
 - 폴백 로직 필수 (Worker 미지원 시 메인 스레드 처리)
+
+## Cross-Tool Navigation Button 디자인 가이드
+
+도구 간 데이터 전달 버튼 ("Open in X", "Send to X", "Compare in X" 등)의 스타일을 통일합니다.
+
+### 표준 스타일 (텍스트 + 아이콘)
+
+```tsx
+import { cn } from '@/lib/utils';
+import { ExternalLink } from 'lucide-react';
+// 대상 도구의 아이콘을 import (예: FileJson, Globe, FileDiff 등)
+
+<button
+  onClick={handleNavigate}
+  className={cn(
+    'flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md',
+    'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300',
+    'border border-blue-200 dark:border-blue-800',
+    'hover:bg-blue-100 dark:hover:bg-blue-900/30',
+    'hover:border-blue-300 dark:hover:border-blue-700',
+    'transition-all duration-200',
+    'shadow-sm hover:shadow'
+  )}
+>
+  <TargetToolIcon className="w-3.5 h-3.5" />
+  <span>{t('tool.xxx.openInYYY')}</span>
+  <ExternalLink className="w-3 h-3 opacity-70" />
+</button>
+```
+
+### 컴팩트 스타일 (아이콘만)
+
+테이블 셀이나 공간이 제한된 곳에서 아이콘만 사용할 때:
+
+```tsx
+<button
+  onClick={handleNavigate}
+  className={cn(
+    'p-1.5 rounded-md',
+    'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300',
+    'border border-blue-200 dark:border-blue-800',
+    'hover:bg-blue-100 dark:hover:bg-blue-900/30',
+    'hover:border-blue-300 dark:hover:border-blue-700',
+    'transition-all duration-200',
+    'shadow-sm hover:shadow'
+  )}
+  title={t('tool.xxx.openInYYY')}
+>
+  <TargetToolIcon className="w-4 h-4" />
+</button>
+```
+
+### 아이콘 사용 규칙
+
+대상 도구의 정의된 아이콘을 사용합니다:
+
+| 대상 도구 | 아이콘 | Import |
+|-----------|--------|--------|
+| JSON Viewer | `FileJson` | `lucide-react` |
+| YAML Converter | `FileCode2` | `lucide-react` |
+| API Tester | `Globe` | `lucide-react` |
+| API Diff | `GitCompare` | `lucide-react` |
+| Text Diff | `FileDiff` | `lucide-react` |
+
+### 적용 사례
+
+| 위치 | 버튼 | 아이콘 |
+|------|------|--------|
+| cURL Parser | Open in API Tester | `Globe` |
+| cURL Parser | Open in JSON Viewer (compact) | `FileJson` |
+| API Tester | Send to API Diff | `GitCompare` |
+| API Tester | Open in JSON Viewer | `FileJson` |
+| API Tester | Open in YAML Converter | `FileCode2` |
+| API Diff | Compare in Text Diff | `FileDiff` |
+
+### 스타일 특징
+
+1. **파란색 테마**: `blue-50/blue-900` 배경, `blue-200/blue-800` 테두리
+2. **미묘한 그림자**: `shadow-sm` 기본, `hover:shadow` 호버 시
+3. **테두리 상호작용**: `hover:border-blue-300/blue-700`로 호버 피드백
+4. **부드러운 전환**: `transition-all duration-200`
+5. **작은 텍스트**: `text-xs font-medium`
+6. **ExternalLink 아이콘**: 외부 네비게이션임을 시각적으로 표시 (`opacity-70`로 약간 흐리게)
+
+### 주의사항
+
+- 버튼 비활성화 시 `opacity-50 cursor-not-allowed` 추가
+- 로딩 상태 시 `Loader2` 아이콘으로 교체 (`animate-spin` 적용)
+- 드롭다운 메뉴가 있는 경우 `ChevronDown` 아이콘 추가

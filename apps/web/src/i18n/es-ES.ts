@@ -996,7 +996,7 @@ export const esES = {
       title: 'API Tester',
       description:
         'Prueba APIs REST con constructor de solicitudes y bypass de CORS.',
-      urlPlaceholder: 'https://api.example.com/v1/users',
+      urlPlaceholder: 'Ingresa URL o pega comando cURL',
       send: 'Enviar',
       cancel: 'Cancelar',
       history: 'Historial',

@@ -6,6 +6,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Copy, FileJson, ExternalLink, AlertTriangle, ChevronDown, ChevronRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { useI18n } from '@/hooks/useI18nHooks';
 import { copyToClipboard } from '@/lib/clipboard';
 import { buildLocalePath } from '@/lib/i18nUtils';
@@ -106,7 +107,15 @@ const OpenInJsonViewerButton: React.FC<OpenInJsonViewerButtonProps> = ({ value, 
     return (
       <button
         onClick={handleOpenInJsonViewer}
-        className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+        className={cn(
+          'p-1.5 rounded-md',
+          'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300',
+          'border border-blue-200 dark:border-blue-800',
+          'hover:bg-blue-100 dark:hover:bg-blue-900/30',
+          'hover:border-blue-300 dark:hover:border-blue-700',
+          'transition-all duration-200',
+          'shadow-sm hover:shadow'
+        )}
         title={t('tool.curl.openInJsonViewer')}
       >
         <FileJson className="w-4 h-4" />
@@ -117,7 +126,15 @@ const OpenInJsonViewerButton: React.FC<OpenInJsonViewerButtonProps> = ({ value, 
   return (
     <button
       onClick={handleOpenInJsonViewer}
-      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+      className={cn(
+        'flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md',
+        'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300',
+        'border border-blue-200 dark:border-blue-800',
+        'hover:bg-blue-100 dark:hover:bg-blue-900/30',
+        'hover:border-blue-300 dark:hover:border-blue-700',
+        'transition-all duration-200',
+        'shadow-sm hover:shadow'
+      )}
     >
       <FileJson className="w-3.5 h-3.5" />
       <span>{t('tool.curl.openInJsonViewer')}</span>

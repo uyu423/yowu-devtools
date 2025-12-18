@@ -12,6 +12,7 @@ import { parseResponseBody } from '../utils';
 import { copyToClipboard } from '@/lib/clipboard';
 import { useResolvedTheme } from '@/hooks/useThemeHooks';
 import { useI18n } from '@/hooks/useI18nHooks';
+import { JsonTreeView } from '@/components/common/JsonTreeView';
 import CodeMirror from '@uiw/react-codemirror';
 import { oneDark } from '@codemirror/theme-one-dark';
 
@@ -22,82 +23,6 @@ interface ResponseViewerProps {
 
 type ViewMode = 'tree' | 'pretty' | 'raw';
 type TabType = 'body' | 'headers';
-
-/**
- * Recursively render JSON with clickable links for URLs
- */
-const JsonWithLinks: React.FC<{ data: unknown; depth?: number }> = ({ data, depth = 0 }) => {
-  if (data === null) return <span className="text-gray-500">null</span>;
-  if (data === undefined) return <span className="text-gray-500">undefined</span>;
-
-  if (typeof data === 'string') {
-    // Check if it's a URL
-    if (/^https?:\/\//i.test(data)) {
-      return (
-        <a
-          href={data}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1"
-          onClick={(e) => e.stopPropagation()}
-        >
-          "{data}"
-          <ExternalLink className="w-3 h-3" />
-        </a>
-      );
-    }
-    return <span className="text-emerald-600 dark:text-emerald-400">"{data}"</span>;
-  }
-
-  if (typeof data === 'number') {
-    return <span className="text-purple-600 dark:text-purple-400">{data}</span>;
-  }
-
-  if (typeof data === 'boolean') {
-    return <span className="text-orange-600 dark:text-orange-400">{data.toString()}</span>;
-  }
-
-  if (Array.isArray(data)) {
-    if (data.length === 0) return <span>[]</span>;
-    return (
-      <span>
-        {'['}
-        <div className="pl-4">
-          {data.map((item, index) => (
-            <div key={index}>
-              <JsonWithLinks data={item} depth={depth + 1} />
-              {index < data.length - 1 && ','}
-            </div>
-          ))}
-        </div>
-        {']'}
-      </span>
-    );
-  }
-
-  if (typeof data === 'object') {
-    const entries = Object.entries(data);
-    if (entries.length === 0) return <span>{'{}'}</span>;
-    return (
-      <span>
-        {'{'}
-        <div className="pl-4">
-          {entries.map(([key, value], index) => (
-            <div key={key}>
-              <span className="text-gray-700 dark:text-gray-300">"{key}"</span>
-              <span className="text-gray-500">: </span>
-              <JsonWithLinks data={value} depth={depth + 1} />
-              {index < entries.length - 1 && ','}
-            </div>
-          ))}
-        </div>
-        {'}'}
-      </span>
-    );
-  }
-
-  return <span>{String(data)}</span>;
-};
 
 // Map error codes to i18n keys
 const ERROR_MESSAGE_KEYS: Record<string, string> = {
@@ -510,7 +435,7 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
               <>
                 {viewMode === 'tree' && (
                   <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 overflow-auto font-mono text-sm">
-                    <JsonWithLinks data={parsedBody.data} />
+                    <JsonTreeView data={parsedBody.data} expandLevel={2} isDark={isDark} />
                   </div>
                 )}
                 {viewMode === 'pretty' && (

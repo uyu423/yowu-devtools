@@ -878,7 +878,7 @@ export const zhCN = {
     apiTester: {
       title: 'API Tester',
       description: '使用请求构建器测试REST API，支持CORS绕过。',
-      urlPlaceholder: 'https://api.example.com/v1/users',
+      urlPlaceholder: '输入URL或粘贴cURL命令',
       send: '发送',
       cancel: '取消',
       history: '历史',

@@ -8,7 +8,8 @@
 
 import React, { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Terminal, ExternalLink } from 'lucide-react';
+import { Terminal, ExternalLink, Globe } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import type { ToolDefinition } from '@/tools/types';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { EditorPanel } from '@/components/common/EditorPanel';
@@ -141,10 +142,20 @@ const CurlParserTool: React.FC = () => {
           {parseResult.result && (
             <button
               onClick={handleOpenInApiTester}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors sm:ml-auto"
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md',
+                'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300',
+                'border border-blue-200 dark:border-blue-800',
+                'hover:bg-blue-100 dark:hover:bg-blue-900/30',
+                'hover:border-blue-300 dark:hover:border-blue-700',
+                'transition-all duration-200',
+                'shadow-sm hover:shadow',
+                'sm:ml-auto'
+              )}
             >
-              <ExternalLink className="w-3.5 h-3.5" />
+              <Globe className="w-3.5 h-3.5" />
               <span>{t('tool.curl.openInApiTester')}</span>
+              <ExternalLink className="w-3 h-3 opacity-70" />
             </button>
           )}
         </ActionBar>

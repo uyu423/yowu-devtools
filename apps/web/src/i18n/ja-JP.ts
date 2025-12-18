@@ -956,7 +956,7 @@ export const jaJP = {
       title: 'API Tester',
       description:
         'ヘッダー、ボディ付きでHTTPリクエストをビルドし、拡張機能でCORSをバイパスします。',
-      urlPlaceholder: 'https://api.example.com/v1/users',
+      urlPlaceholder: 'URLを入力またはcURLコマンドを貼り付け',
       send: '送信',
       cancel: 'キャンセル',
       history: '履歴',

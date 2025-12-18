@@ -973,7 +973,7 @@ export const enUS = {
       title: 'API Tester',
       description:
         'Build and send HTTP requests with headers, body, and CORS bypass via extension.',
-      urlPlaceholder: 'https://api.example.com/v1/users',
+      urlPlaceholder: 'Enter URL or paste cURL command',
       send: 'Send',
       cancel: 'Cancel',
       history: 'History',

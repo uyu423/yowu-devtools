@@ -946,7 +946,7 @@ export const koKR = {
       title: 'API Tester',
       description:
         '헤더, 바디로 HTTP 요청을 빌드하고 확장 프로그램으로 CORS를 우회합니다.',
-      urlPlaceholder: 'https://api.example.com/v1/users',
+      urlPlaceholder: 'URL 입력 또는 cURL 명령어 붙여넣기',
       send: '전송',
       cancel: '취소',
       history: '히스토리',

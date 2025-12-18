@@ -435,7 +435,7 @@ const ApiTesterTool: React.FC = () => {
               value={state.url}
               onChange={handleUrlChange}
               onPaste={handleUrlPaste}
-              placeholder="https://api.example.com/v1/users"
+              placeholder={t('tool.apiTester.urlPlaceholder')}
               disabled={isLoading}
             />
             <SendButton
@@ -501,13 +501,17 @@ const ApiTesterTool: React.FC = () => {
                   onClick={() => setApiDiffDropdownOpen(!apiDiffDropdownOpen)}
                   disabled={!state.url.trim()}
                   className={cn(
-                    'flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg',
-                    'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700',
-                    'transition-colors',
+                    'flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md',
+                    'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300',
+                    'border border-blue-200 dark:border-blue-800',
+                    'hover:bg-blue-100 dark:hover:bg-blue-900/30',
+                    'hover:border-blue-300 dark:hover:border-blue-700',
+                    'transition-all duration-200',
+                    'shadow-sm hover:shadow',
                     !state.url.trim() && 'opacity-50 cursor-not-allowed'
                   )}
                 >
-                  <GitCompare className="w-4 h-4" />
+                  <GitCompare className="w-3.5 h-3.5" />
                   <span>{t('tool.apiTester.sendToApiDiff')}</span>
                   <ChevronDown className={cn('w-3 h-3 transition-transform', apiDiffDropdownOpen && 'rotate-180')} />
                 </button>
