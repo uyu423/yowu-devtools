@@ -104,7 +104,9 @@ export async function getFFmpeg(
       message: 'Loading video processing engine...',
     });
 
+    console.log('[FFmpeg] Creating new FFmpeg instance...');
     ffmpegInstance = new FFmpeg();
+    console.log('[FFmpeg] FFmpeg instance created');
 
     // Set up progress handler with duration-based tracking
     if (onProgress && totalDuration) {
@@ -125,11 +127,12 @@ export async function getFFmpeg(
     console.log('[FFmpeg] Loading core files from:', FFMPEG_BASE_URL);
 
     // Load FFmpeg core from local files
+    console.log('[FFmpeg] Fetching ffmpeg-core.js...');
     const coreURL = await toBlobURL(
       `${FFMPEG_BASE_URL}/ffmpeg-core.js`,
       'text/javascript'
     );
-    console.log('[FFmpeg] Core JS loaded');
+    console.log('[FFmpeg] Core JS blob URL created:', coreURL.substring(0, 50) + '...');
 
     onProgress?.({
       stage: 'loading-engine',
@@ -137,11 +140,12 @@ export async function getFFmpeg(
       message: 'Loading FFmpeg WASM...',
     });
 
+    console.log('[FFmpeg] Fetching ffmpeg-core.wasm...');
     const wasmURL = await toBlobURL(
       `${FFMPEG_BASE_URL}/ffmpeg-core.wasm`,
       'application/wasm'
     );
-    console.log('[FFmpeg] Core WASM loaded');
+    console.log('[FFmpeg] Core WASM blob URL created:', wasmURL.substring(0, 50) + '...');
 
     onProgress?.({
       stage: 'loading-engine',
@@ -149,6 +153,7 @@ export async function getFFmpeg(
       message: 'Initializing FFmpeg...',
     });
 
+    console.log('[FFmpeg] Calling ffmpegInstance.load()...');
     await ffmpegInstance.load({
       coreURL,
       wasmURL,
@@ -168,6 +173,11 @@ export async function getFFmpeg(
     return ffmpegInstance;
   } catch (error) {
     console.error('[FFmpeg] Failed to load FFmpeg:', error);
+    console.error('[FFmpeg] Error details:', {
+      name: error instanceof Error ? error.name : 'Unknown',
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     isLoading = false;
     isLoaded = false;
     ffmpegInstance = null;
@@ -236,8 +246,14 @@ export async function deleteFile(ffmpeg: FFmpeg, name: string): Promise<void> {
 /**
  * Execute FFmpeg command
  */
-export async function exec(ffmpeg: FFmpeg, args: string[]): Promise<void> {
-  await ffmpeg.exec(args);
+export async function exec(ffmpeg: FFmpeg, args: string[]): Promise<number> {
+  console.log('[FFmpeg] Executing command:', args.join(' '));
+  const exitCode = await ffmpeg.exec(args);
+  console.log('[FFmpeg] Command finished with exit code:', exitCode);
+  if (exitCode !== 0) {
+    throw new Error(`FFmpeg command failed with exit code ${exitCode}`);
+  }
+  return exitCode;
 }
 
 /**

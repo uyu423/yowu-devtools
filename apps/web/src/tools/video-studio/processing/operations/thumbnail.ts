@@ -24,12 +24,22 @@ export async function extractThumbnail(
   config: ThumbnailConfig,
   onProgress?: (progress: VideoProcessingProgress) => void
 ): Promise<VideoProcessingResult> {
+  console.log('[Thumbnail] Starting extraction...', {
+    fileName: videoFile.name,
+    fileSize: videoFile.size,
+    fileType: videoFile.type,
+    config,
+  });
+
   const inputFileName = 'input' + getInputExtension(videoFile.type);
   const outputFileName = `thumbnail${getFileExtension(config.format)}`;
+  console.log('[Thumbnail] File names:', { inputFileName, outputFileName });
 
   try {
     // Get FFmpeg instance
+    console.log('[Thumbnail] Getting FFmpeg instance...');
     const ffmpeg = await getFFmpeg(onProgress);
+    console.log('[Thumbnail] FFmpeg instance obtained');
 
     onProgress?.({
       stage: 'preparing',
@@ -38,8 +48,13 @@ export async function extractThumbnail(
     });
 
     // Write input file to virtual filesystem
+    console.log('[Thumbnail] Reading video file as ArrayBuffer...');
     const inputData = await videoFile.arrayBuffer();
+    console.log('[Thumbnail] ArrayBuffer size:', inputData.byteLength);
+    
+    console.log('[Thumbnail] Writing to virtual filesystem...');
     await writeFile(ffmpeg, inputFileName, arrayBufferToUint8Array(inputData));
+    console.log('[Thumbnail] File written to VFS');
 
     onProgress?.({
       stage: 'processing',
@@ -64,8 +79,10 @@ export async function extractThumbnail(
 
     args.push('-y', outputFileName);
 
+    console.log('[Thumbnail] Executing FFmpeg with args:', args);
     // Execute FFmpeg command
     await exec(ffmpeg, args);
+    console.log('[Thumbnail] FFmpeg execution completed');
 
     onProgress?.({
       stage: 'finalizing',
@@ -74,12 +91,18 @@ export async function extractThumbnail(
     });
 
     // Read output file
+    console.log('[Thumbnail] Reading output file from VFS...');
     const outputData = await readFile(ffmpeg, outputFileName);
+    console.log('[Thumbnail] Output data size:', outputData.byteLength);
+    
     const blob = uint8ArrayToBlob(outputData, getMimeType(config.format));
+    console.log('[Thumbnail] Blob created:', blob.size, 'bytes', blob.type);
 
     // Cleanup virtual filesystem
+    console.log('[Thumbnail] Cleaning up VFS...');
     await deleteFile(ffmpeg, inputFileName);
     await deleteFile(ffmpeg, outputFileName);
+    console.log('[Thumbnail] Cleanup completed');
 
     onProgress?.({
       stage: 'complete',
@@ -96,15 +119,18 @@ export async function extractThumbnail(
       },
     };
   } catch (error) {
+    console.error('[Thumbnail] Extraction failed:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Extraction failed';
+    
     onProgress?.({
       stage: 'error',
       progress: 0,
-      message: error instanceof Error ? error.message : 'Extraction failed',
+      message: errorMessage,
     });
 
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error occurred',
+      error: errorMessage,
     };
   }
 }
