@@ -1,9 +1,18 @@
-import React from 'react';
-import { ChevronDown, ChevronRight, Power, Settings, RotateCcw, Copy, Download } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Tooltip } from '@/components/ui/Tooltip';
+import {
+  ChevronDown,
+  ChevronRight,
+  Copy,
+  Download,
+  Power,
+  RotateCcw,
+  Settings,
+} from 'lucide-react';
+
 import type { ImageStudioState } from '../types';
 import { PIPELINE_STEPS } from '../constants';
+import React from 'react';
+import { Tooltip } from '@/components/ui/Tooltip';
+import { cn } from '@/lib/utils';
 
 interface PipelinePanelProps {
   state: ImageStudioState;
@@ -32,10 +41,14 @@ export const PipelinePanel: React.FC<PipelinePanelProps> = ({
   t,
   children,
 }) => {
-  const [expandedSteps, setExpandedSteps] = React.useState<Set<string>>(new Set(['crop', 'resize', 'rotate', 'export']));
-  
+  const [expandedSteps, setExpandedSteps] = React.useState<Set<string>>(
+    new Set(['crop', 'resize', 'rotate', 'export'])
+  );
+
   // Detect Mac for keyboard shortcut display
-  const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(navigator.platform);
+  const isMac =
+    typeof navigator !== 'undefined' &&
+    /Mac|iPhone|iPad|iPod/.test(navigator.platform);
   const copyShortcut = isMac ? '⌘C' : 'Ctrl+C';
   const exportShortcut = isMac ? '⌘↵' : 'Ctrl+Enter';
   const resetShortcut = isMac ? '⌘⇧R' : 'Ctrl+Shift+R';
@@ -67,7 +80,11 @@ export const PipelinePanel: React.FC<PipelinePanelProps> = ({
     }
   };
 
-  const enabledStepsCount = [state.cropEnabled, state.resizeEnabled, state.rotateEnabled].filter(Boolean).length;
+  const enabledStepsCount = [
+    state.cropEnabled,
+    state.resizeEnabled,
+    state.rotateEnabled,
+  ].filter(Boolean).length;
 
   return (
     <div className="flex flex-col h-full">
@@ -77,7 +94,11 @@ export const PipelinePanel: React.FC<PipelinePanelProps> = ({
           <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
             {t('tool.imageStudio.pipeline')}
           </h3>
-          <Tooltip content={`${t('tool.imageStudio.resetPipeline')} (${resetShortcut})`}>
+          <Tooltip
+            content={`${t(
+              'tool.imageStudio.resetPipeline'
+            )} (${resetShortcut})`}
+          >
             <button
               type="button"
               onClick={onResetPipeline}
@@ -182,9 +203,12 @@ export const PipelinePanel: React.FC<PipelinePanelProps> = ({
               {isExpanded && (
                 <div className="px-4 pb-4">
                   {/* Render children based on step.id */}
-                  {children && React.Children.toArray(children).find(
-                    (child) => React.isValidElement<{ 'data-step'?: string }>(child) && child.props['data-step'] === step.id
-                  )}
+                  {children &&
+                    React.Children.toArray(children).find(
+                      (child) =>
+                        React.isValidElement<{ 'data-step'?: string }>(child) &&
+                        child.props['data-step'] === step.id
+                    )}
                 </div>
               )}
             </div>
@@ -226,7 +250,9 @@ export const PipelinePanel: React.FC<PipelinePanelProps> = ({
                 )}
               >
                 <Copy className="w-4 h-4" />
-                {isCopying && <span className="text-sm">{t('common.copying')}</span>}
+                {isCopying && (
+                  <span className="text-sm">{t('common.copying')}</span>
+                )}
               </button>
             </Tooltip>
           )}
@@ -245,4 +271,3 @@ export const PipelinePanel: React.FC<PipelinePanelProps> = ({
     </div>
   );
 };
-

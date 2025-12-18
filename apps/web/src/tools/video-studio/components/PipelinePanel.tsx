@@ -1,9 +1,17 @@
-import React from 'react';
-import { ChevronDown, ChevronRight, Power, Play, Settings, RotateCcw } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Tooltip } from '@/components/ui/Tooltip';
-import type { VideoStudioState, ProcessingState } from '../types';
+import {
+  ChevronDown,
+  ChevronRight,
+  Play,
+  Power,
+  RotateCcw,
+  Settings,
+} from 'lucide-react';
+import type { ProcessingState, VideoStudioState } from '../types';
+
 import { PIPELINE_STEPS } from '../constants';
+import React from 'react';
+import { Tooltip } from '@/components/ui/Tooltip';
+import { cn } from '@/lib/utils';
 
 interface PipelinePanelProps {
   state: VideoStudioState;
@@ -35,7 +43,9 @@ export const PipelinePanel: React.FC<PipelinePanelProps> = ({
   );
 
   // Detect Mac for keyboard shortcut display
-  const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(navigator.platform);
+  const isMac =
+    typeof navigator !== 'undefined' &&
+    /Mac|iPhone|iPad|iPod/.test(navigator.platform);
   const exportShortcut = isMac ? '⌘↵' : 'Ctrl+Enter';
   const resetShortcut = isMac ? '⌘⇧R' : 'Ctrl+Shift+R';
   const cancelShortcut = 'Esc';
@@ -84,7 +94,11 @@ export const PipelinePanel: React.FC<PipelinePanelProps> = ({
           <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
             {t('tool.videoStudio.pipeline')}
           </h3>
-          <Tooltip content={`${t('tool.videoStudio.resetPipeline')} (${resetShortcut})`}>
+          <Tooltip
+            content={`${t(
+              'tool.videoStudio.resetPipeline'
+            )} (${resetShortcut})`}
+          >
             <button
               type="button"
               onClick={onResetPipeline}
@@ -164,7 +178,9 @@ export const PipelinePanel: React.FC<PipelinePanelProps> = ({
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      onToggleStep(step.id as 'trim' | 'cut' | 'crop' | 'resize');
+                      onToggleStep(
+                        step.id as 'trim' | 'cut' | 'crop' | 'resize'
+                      );
                     }}
                     className={cn(
                       'p-1 rounded transition-colors',
@@ -191,7 +207,9 @@ export const PipelinePanel: React.FC<PipelinePanelProps> = ({
                 <div className="px-4 pb-4">
                   {children &&
                     React.Children.toArray(children).find(
-                      (child) => React.isValidElement<{ 'data-step'?: string }>(child) && child.props['data-step'] === step.id
+                      (child) =>
+                        React.isValidElement<{ 'data-step'?: string }>(child) &&
+                        child.props['data-step'] === step.id
                     )}
                 </div>
               )}
@@ -248,7 +266,9 @@ export const PipelinePanel: React.FC<PipelinePanelProps> = ({
             )}
           >
             <Play className="w-4 h-4" />
-            {processingState.isProcessing ? t('common.processing') : t('tool.videoStudio.runExport')}
+            {processingState.isProcessing
+              ? t('common.processing')
+              : t('tool.videoStudio.runExport')}
           </button>
         </Tooltip>
 
@@ -266,4 +286,3 @@ export const PipelinePanel: React.FC<PipelinePanelProps> = ({
     </div>
   );
 };
-

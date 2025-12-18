@@ -11,9 +11,18 @@
   font-display: swap;
 }
 
+/* Pretendard Variable Font - excellent multilingual support */
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/PretendardVariable.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  font-family: 'NanumSquareNeo', Inter, system-ui, Avenir, Helvetica, Arial,
-    sans-serif;
+  font-family: 'NanumSquareNeo', 'Pretendard', Inter, system-ui, Avenir,
+    Helvetica, Arial, sans-serif;
   line-height: 1.75; /* comfortable line spacing for CJK languages */
   word-break: keep-all; /* CJK languages: break at word boundaries */
   overflow-wrap: break-word; /* break long words if necessary */
