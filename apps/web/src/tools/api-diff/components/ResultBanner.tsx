@@ -23,6 +23,7 @@ import {
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { cn } from '@/lib/utils';
+import { buildLocalePath } from '@/lib/i18nUtils';
 import { formatDiffValue } from '../utils';
 import { useI18n } from '@/hooks/useI18nHooks';
 import { useNavigate } from 'react-router-dom';
@@ -40,7 +41,7 @@ export const ResultBanner: React.FC<ResultBannerProps> = ({
   rawBodyA,
   rawBodyB,
 }) => {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const navigate = useNavigate();
   const [tableHeight, setTableHeight] = useState<number>(() => {
     if (typeof window === 'undefined') return DIFF_TABLE_DEFAULT_HEIGHT;
@@ -110,13 +111,13 @@ export const ResultBanner: React.FC<ResultBannerProps> = ({
       }
     };
 
-    navigate('/diff', {
+    navigate(buildLocalePath(locale, '/diff'), {
       state: {
         left: formatJson(rawBodyA),
         right: formatJson(rawBodyB),
       },
     });
-  }, [rawBodyA, rawBodyB, navigate]);
+  }, [rawBodyA, rawBodyB, navigate, locale]);
 
   if (!hasResponses) return null;
   if (!comparison) return null;
