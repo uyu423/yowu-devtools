@@ -1307,7 +1307,7 @@ export const zhCN = {
         last30s: '后 30 秒',
       },
       cut: {
-        title: '剪切 / 分割',
+        title: '删除片段',
         mode: '模式',
         removeSegment: '移除片段',
         splitInto: '分割为片段',

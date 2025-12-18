@@ -1387,7 +1387,7 @@ export const koKR = {
         last30s: '마지막 30초',
       },
       cut: {
-        title: '잘라내기 / 분할',
+        title: '구간 제거',
         mode: '모드',
         removeSegment: '구간 제거',
         splitInto: '클립으로 분할',

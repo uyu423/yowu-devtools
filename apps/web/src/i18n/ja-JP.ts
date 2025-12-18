@@ -1398,7 +1398,7 @@ export const jaJP = {
         last30s: '最後の30秒',
       },
       cut: {
-        title: 'カット',
+        title: 'セグメント削除',
         mode: 'モード',
         removeSegment: 'セグメント削除',
         splitInto: 'クリップに分割',

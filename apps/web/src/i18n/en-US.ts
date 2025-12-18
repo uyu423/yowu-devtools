@@ -1415,7 +1415,7 @@ export const enUS = {
         last30s: 'Last 30s',
       },
       cut: {
-        title: 'Cut / Split',
+        title: 'Remove Segments',
         mode: 'Mode',
         removeSegment: 'Remove Segment',
         splitInto: 'Split Into Clips',

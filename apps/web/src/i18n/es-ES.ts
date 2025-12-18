@@ -1437,7 +1437,7 @@ export const esES = {
         last30s: 'Últimos 30s',
       },
       cut: {
-        title: 'Cortar',
+        title: 'Eliminar segmentos',
         mode: 'Modo',
         removeSegment: 'Eliminar segmento',
         splitInto: 'Dividir en clips',

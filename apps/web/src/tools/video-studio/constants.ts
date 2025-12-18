@@ -54,7 +54,7 @@ export const EXPORT_FORMAT_OPTIONS: { value: string; label: string; mimeType: st
 // Pipeline steps for video processing (thumbnail is separate - it outputs image, not video)
 export const PIPELINE_STEPS: Omit<PipelineStep, 'enabled'>[] = [
   { id: 'trim', name: 'Trim', icon: Scissors },
-  { id: 'cut', name: 'Cut / Split', icon: ScissorsLineDashed },
+  { id: 'cut', name: 'Remove Segments', icon: ScissorsLineDashed },
   { id: 'crop', name: 'Crop', icon: Crop },
   { id: 'resize', name: 'Resize', icon: Maximize2 },
   { id: 'export', name: 'Export', icon: Download },
