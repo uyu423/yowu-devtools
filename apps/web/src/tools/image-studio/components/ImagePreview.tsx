@@ -353,12 +353,30 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
+      {/* Hidden file input for replacing image */}
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleFileInputChange}
+        className="hidden"
+        id="image-studio-replace-input"
+      />
+
       {/* Metadata display */}
       {metadata && (
         <div className="absolute top-2 left-2 z-10 px-2 py-1 text-xs bg-black/60 text-white rounded">
           {metadata.width} × {metadata.height} • {(metadata.fileSize / 1024).toFixed(1)} KB
         </div>
       )}
+
+      {/* Replace image button */}
+      <label
+        htmlFor="image-studio-replace-input"
+        className="absolute top-2 right-2 z-10 flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium bg-black/60 hover:bg-black/80 text-white rounded cursor-pointer transition-colors"
+      >
+        <Upload className="w-3.5 h-3.5" />
+        {t('common.changeFile')}
+      </label>
 
       {/* Image container with transforms */}
       <div className="flex items-center justify-center p-4 min-h-64 md:min-h-96">

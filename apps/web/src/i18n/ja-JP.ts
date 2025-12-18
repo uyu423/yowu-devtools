@@ -16,6 +16,7 @@ export const jaJP = {
     downloaded: 'ダウンロード完了!',
     downloadJson: 'JSONをダウンロード',
     upload: 'アップロード',
+    changeFile: 'ファイル変更',
     export: 'エクスポート',
     import: 'インポート',
     save: '保存',
@@ -1265,6 +1266,7 @@ export const jaJP = {
       description: 'Crop, resize, rotate, and convert images. All processing happens in your browser.',
       pipeline: 'Pipeline',
       stepsEnabled: 'steps enabled',
+      resetPipeline: 'Reset pipeline settings', // TODO: Translate to Japanese
       runExport: 'Run & Export',
       savePreset: 'Save Preset',
       loadPreset: 'Load Preset',
@@ -1338,6 +1340,7 @@ export const jaJP = {
       description: 'Trim, cut, crop, resize, and convert videos. All processing happens in your browser.',
       pipeline: 'Pipeline',
       stepsEnabled: 'steps enabled',
+      resetPipeline: 'Reset pipeline settings', // TODO: Translate to Japanese
       runExport: 'Run & Export',
       savePreset: 'Save Preset',
       loadPreset: 'Load Preset',

@@ -182,6 +182,15 @@ export const VideoPreview: React.FC<VideoPreviewProps> = ({
 
   return (
     <div className="relative w-full bg-gray-900 rounded-lg overflow-hidden">
+      {/* Hidden file input for replacing video */}
+      <input
+        type="file"
+        accept="video/*"
+        onChange={handleFileInputChange}
+        className="hidden"
+        id="video-studio-replace-input"
+      />
+
       {/* Mobile Warning */}
       {showMobileWarning && (
         <div className="absolute top-0 left-0 right-0 z-20 flex items-center gap-2 px-3 py-2 bg-amber-500 text-amber-900 text-xs">
@@ -195,6 +204,15 @@ export const VideoPreview: React.FC<VideoPreviewProps> = ({
           </button>
         </div>
       )}
+
+      {/* Replace video button */}
+      <label
+        htmlFor="video-studio-replace-input"
+        className="absolute top-2 left-2 z-10 flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium bg-black/60 hover:bg-black/80 text-white rounded cursor-pointer transition-colors"
+      >
+        <Upload className="w-3.5 h-3.5" />
+        {t('common.changeFile')}
+      </label>
 
       {/* Metadata display */}
       {metadata && (

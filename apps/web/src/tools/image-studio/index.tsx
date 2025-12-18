@@ -212,6 +212,38 @@ const ImageStudioTool: React.FC = () => {
     });
   };
 
+  // Reset entire pipeline settings (not the image)
+  const handleResetPipeline = () => {
+    const resetValues: Partial<ImageStudioState> = {
+      // Pipeline steps
+      cropEnabled: DEFAULT_STATE.cropEnabled,
+      resizeEnabled: DEFAULT_STATE.resizeEnabled,
+      rotateEnabled: DEFAULT_STATE.rotateEnabled,
+      // Crop settings
+      cropAspectRatio: DEFAULT_STATE.cropAspectRatio,
+      cropCustomRatio: DEFAULT_STATE.cropCustomRatio,
+      cropArea: imageMetadata
+        ? { x: 0, y: 0, width: imageMetadata.width, height: imageMetadata.height }
+        : DEFAULT_STATE.cropArea,
+      // Resize settings
+      resizeWidth: imageMetadata?.width || DEFAULT_STATE.resizeWidth,
+      resizeHeight: imageMetadata?.height || DEFAULT_STATE.resizeHeight,
+      resizeLockAspect: DEFAULT_STATE.resizeLockAspect,
+      resizeMode: DEFAULT_STATE.resizeMode,
+      resizeQuality: DEFAULT_STATE.resizeQuality,
+      // Rotate/Flip settings
+      rotation: DEFAULT_STATE.rotation,
+      flipHorizontal: DEFAULT_STATE.flipHorizontal,
+      flipVertical: DEFAULT_STATE.flipVertical,
+      // Export settings
+      exportFormat: DEFAULT_STATE.exportFormat,
+      exportQuality: DEFAULT_STATE.exportQuality,
+      exportSuffix: DEFAULT_STATE.exportSuffix,
+    };
+    updateState(resetValues);
+    toast.success(t('common.reset'));
+  };
+
   // Export image using the processing pipeline
   const handleExport = async () => {
     if (!imageUrl || !imageMetadata) {
@@ -367,6 +399,7 @@ const ImageStudioTool: React.FC = () => {
             hasImage={!!imageUrl}
             isProcessing={isProcessing}
             onToggleStep={handleToggleStep}
+            onResetPipeline={handleResetPipeline}
             onExport={handleExport}
             onOpenPresets={() => setPresetModalOpen(true)}
             t={t}

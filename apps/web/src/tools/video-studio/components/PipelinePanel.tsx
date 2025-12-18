@@ -1,6 +1,7 @@
 import React from 'react';
-import { ChevronDown, ChevronRight, Power, Play, Settings } from 'lucide-react';
+import { ChevronDown, ChevronRight, Power, Play, Settings, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Tooltip } from '@/components/ui/Tooltip';
 import type { VideoStudioState, ProcessingState } from '../types';
 import { PIPELINE_STEPS } from '../constants';
 
@@ -9,6 +10,7 @@ interface PipelinePanelProps {
   hasVideo: boolean;
   processingState: ProcessingState;
   onToggleStep: (stepId: 'trim' | 'cut' | 'crop' | 'resize') => void;
+  onResetPipeline: () => void;
   onExport: () => void;
   onCancel: () => void;
   onOpenPresets: () => void;
@@ -21,6 +23,7 @@ export const PipelinePanel: React.FC<PipelinePanelProps> = ({
   hasVideo,
   processingState,
   onToggleStep,
+  onResetPipeline,
   onExport,
   onCancel,
   onOpenPresets,
@@ -71,9 +74,21 @@ export const PipelinePanel: React.FC<PipelinePanelProps> = ({
     <div className="flex flex-col h-full">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-          {t('tool.videoStudio.pipeline')}
-        </h3>
+        <div className="flex items-center gap-2">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+            {t('tool.videoStudio.pipeline')}
+          </h3>
+          <Tooltip content={t('tool.videoStudio.resetPipeline')}>
+            <button
+              type="button"
+              onClick={onResetPipeline}
+              disabled={processingState.isProcessing}
+              className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+            </button>
+          </Tooltip>
+        </div>
         <span className="text-xs text-gray-500 dark:text-gray-400">
           {enabledStepsCount} {t('tool.videoStudio.stepsEnabled')}
         </span>

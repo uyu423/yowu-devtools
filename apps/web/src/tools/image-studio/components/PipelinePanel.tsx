@@ -1,6 +1,7 @@
 import React from 'react';
-import { ChevronDown, ChevronRight, Power, Play, Settings } from 'lucide-react';
+import { ChevronDown, ChevronRight, Power, Play, Settings, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Tooltip } from '@/components/ui/Tooltip';
 import type { ImageStudioState } from '../types';
 import { PIPELINE_STEPS } from '../constants';
 
@@ -9,6 +10,7 @@ interface PipelinePanelProps {
   hasImage: boolean;
   isProcessing: boolean;
   onToggleStep: (stepId: 'crop' | 'resize' | 'rotate') => void;
+  onResetPipeline: () => void;
   onExport: () => void;
   onOpenPresets: () => void;
   t: (key: string) => string;
@@ -20,6 +22,7 @@ export const PipelinePanel: React.FC<PipelinePanelProps> = ({
   hasImage,
   isProcessing,
   onToggleStep,
+  onResetPipeline,
   onExport,
   onOpenPresets,
   t,
@@ -60,9 +63,20 @@ export const PipelinePanel: React.FC<PipelinePanelProps> = ({
     <div className="flex flex-col h-full">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-          {t('tool.imageStudio.pipeline')}
-        </h3>
+        <div className="flex items-center gap-2">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+            {t('tool.imageStudio.pipeline')}
+          </h3>
+          <Tooltip content={t('tool.imageStudio.resetPipeline')}>
+            <button
+              type="button"
+              onClick={onResetPipeline}
+              className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+            </button>
+          </Tooltip>
+        </div>
         <span className="text-xs text-gray-500 dark:text-gray-400">
           {enabledStepsCount} {t('tool.imageStudio.stepsEnabled')}
         </span>

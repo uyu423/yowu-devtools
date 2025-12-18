@@ -222,6 +222,42 @@ const VideoStudioTool: React.FC = () => {
     }
   };
 
+  // Reset entire pipeline settings (not the video)
+  const handleResetPipeline = () => {
+    const resetValues: Partial<VideoStudioState> = {
+      // Pipeline steps
+      trimEnabled: DEFAULT_STATE.trimEnabled,
+      cutEnabled: DEFAULT_STATE.cutEnabled,
+      cropEnabled: DEFAULT_STATE.cropEnabled,
+      resizeEnabled: DEFAULT_STATE.resizeEnabled,
+      // Thumbnail settings (kept separate but reset anyway)
+      thumbnailTime: DEFAULT_STATE.thumbnailTime,
+      thumbnailFormat: DEFAULT_STATE.thumbnailFormat,
+      // Trim settings
+      trimStart: DEFAULT_STATE.trimStart,
+      trimEnd: videoMetadata?.duration || DEFAULT_STATE.trimEnd,
+      // Cut settings
+      cutMode: DEFAULT_STATE.cutMode,
+      cutSegments: DEFAULT_STATE.cutSegments,
+      splitCount: DEFAULT_STATE.splitCount,
+      // Crop settings
+      cropArea: videoMetadata
+        ? { x: 0, y: 0, width: videoMetadata.width, height: videoMetadata.height }
+        : DEFAULT_STATE.cropArea,
+      // Resize settings
+      resizeWidth: videoMetadata?.width || DEFAULT_STATE.resizeWidth,
+      resizeHeight: videoMetadata?.height || DEFAULT_STATE.resizeHeight,
+      resizeLockAspect: DEFAULT_STATE.resizeLockAspect,
+      resizeMode: DEFAULT_STATE.resizeMode,
+      // Export settings
+      exportFormat: DEFAULT_STATE.exportFormat,
+      qualityPreset: DEFAULT_STATE.qualityPreset,
+      exportSuffix: DEFAULT_STATE.exportSuffix,
+    };
+    updateState(resetValues);
+    toast.success(t('common.reset'));
+  };
+
   // Handle cut segments change
   const handleCutSegmentsChange = (segments: CutSegment[]) => {
     updateState({ cutSegments: segments });
@@ -502,6 +538,7 @@ const VideoStudioTool: React.FC = () => {
             hasVideo={!!videoUrl}
             processingState={processingState}
             onToggleStep={handleToggleStep}
+            onResetPipeline={handleResetPipeline}
             onExport={handleExport}
             onCancel={handleCancel}
             onOpenPresets={() => setPresetModalOpen(true)}

@@ -16,6 +16,7 @@ export const zhCN = {
     downloaded: '下载完成!',
     downloadJson: '下载JSON',
     upload: '上传',
+    changeFile: '更换文件',
     export: '导出',
     import: '导入',
     save: '保存',
@@ -1173,6 +1174,7 @@ export const zhCN = {
       description: '裁剪、调整大小、旋转和转换图像。所有处理都在浏览器中进行。',
       pipeline: '处理流程',
       stepsEnabled: '步骤已启用',
+      resetPipeline: '重置处理流程设置', // TODO: Verify Chinese translation
       runExport: '运行并导出',
       savePreset: '保存预设',
       loadPreset: '加载预设',
@@ -1246,6 +1248,7 @@ export const zhCN = {
       description: '裁剪、剪切、调整大小和转换视频。所有处理都在浏览器中进行。',
       pipeline: '处理流程',
       stepsEnabled: '步骤已启用',
+      resetPipeline: '重置处理流程设置', // TODO: Verify Chinese translation
       runExport: '运行并导出',
       savePreset: '保存预设',
       loadPreset: '加载预设',

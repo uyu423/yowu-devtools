@@ -16,6 +16,7 @@ export const esES = {
     downloaded: '¡Descargado!',
     downloadJson: 'Descargar JSON',
     upload: 'Subir',
+    changeFile: 'Cambiar archivo',
     export: 'Exportar',
     import: 'Importar',
     save: 'Guardar',
@@ -1304,6 +1305,7 @@ export const esES = {
       description: 'Crop, resize, rotate, and convert images. All processing happens in your browser.',
       pipeline: 'Pipeline',
       stepsEnabled: 'steps enabled',
+      resetPipeline: 'Reset pipeline settings', // TODO: Translate to Spanish
       runExport: 'Run & Export',
       savePreset: 'Save Preset',
       loadPreset: 'Load Preset',
@@ -1377,6 +1379,7 @@ export const esES = {
       description: 'Trim, cut, crop, resize, and convert videos. All processing happens in your browser.',
       pipeline: 'Pipeline',
       stepsEnabled: 'steps enabled',
+      resetPipeline: 'Reset pipeline settings', // TODO: Translate to Spanish
       runExport: 'Run & Export',
       savePreset: 'Save Preset',
       loadPreset: 'Load Preset',
