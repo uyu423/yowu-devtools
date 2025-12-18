@@ -37,6 +37,7 @@ import {
   CropPanel,
   ResizePanel,
   ExportPanel,
+  LeaveConfirmModal,
 } from './components';
 import { usePipelinePresets, type VideoPipelinePreset } from './hooks/usePipelinePresets';
 
@@ -124,6 +125,34 @@ const VideoStudioTool: React.FC = () => {
   const isProcessingAny = processingState.isProcessing || isExtractingThumbnail;
   const location = useLocation();
   
+  // Leave confirmation modal state
+  const [leaveModalOpen, setLeaveModalOpen] = React.useState(false);
+  const [pendingNavigation, setPendingNavigation] = React.useState<{
+    type: 'link' | 'popstate';
+    url?: string;
+  } | null>(null);
+
+  // Handle leave confirmation
+  const handleLeaveConfirm = React.useCallback(() => {
+    cancelFFmpeg();
+    setLeaveModalOpen(false);
+    
+    if (pendingNavigation?.type === 'link' && pendingNavigation.url) {
+      // Navigate to the stored URL
+      window.location.href = pendingNavigation.url;
+    } else if (pendingNavigation?.type === 'popstate') {
+      // Allow the back navigation
+      window.history.back();
+    }
+    
+    setPendingNavigation(null);
+  }, [pendingNavigation]);
+
+  const handleLeaveCancel = React.useCallback(() => {
+    setLeaveModalOpen(false);
+    setPendingNavigation(null);
+  }, []);
+  
   // Block SPA navigation when processing (intercept link clicks)
   React.useEffect(() => {
     if (!isProcessingAny) return;
@@ -132,33 +161,25 @@ const VideoStudioTool: React.FC = () => {
       const target = e.target as HTMLElement;
       const link = target.closest('a');
       
+      // Only intercept internal navigation links (not external links with target="_blank")
       if (link && link.href && !link.target) {
         const url = new URL(link.href);
         // Check if it's an internal navigation (same origin, different path)
         if (url.origin === window.location.origin && url.pathname !== location.pathname) {
-          const confirmLeave = window.confirm(t('tool.videoStudio.leavePageWarning'));
-          if (!confirmLeave) {
-            e.preventDefault();
-            e.stopPropagation();
-          } else {
-            // Cancel FFmpeg before navigation
-            cancelFFmpeg();
-          }
+          e.preventDefault();
+          e.stopPropagation();
+          setPendingNavigation({ type: 'link', url: link.href });
+          setLeaveModalOpen(true);
         }
       }
     };
 
     // Handle browser back/forward buttons
     const handlePopState = () => {
-      if (isProcessingAny) {
-        const confirmLeave = window.confirm(t('tool.videoStudio.leavePageWarning'));
-        if (!confirmLeave) {
-          // Push the current state back to prevent navigation
-          window.history.pushState(null, '', location.pathname);
-        } else {
-          cancelFFmpeg();
-        }
-      }
+      // Immediately push current state back to prevent navigation
+      window.history.pushState(null, '', location.pathname);
+      setPendingNavigation({ type: 'popstate' });
+      setLeaveModalOpen(true);
     };
 
     document.addEventListener('click', handleClick, true);
@@ -168,7 +189,7 @@ const VideoStudioTool: React.FC = () => {
       document.removeEventListener('click', handleClick, true);
       window.removeEventListener('popstate', handlePopState);
     };
-  }, [isProcessingAny, location.pathname, t]);
+  }, [isProcessingAny, location.pathname]);
 
   // Block browser close/refresh when processing
   React.useEffect(() => {
@@ -740,6 +761,13 @@ const VideoStudioTool: React.FC = () => {
         onExport={exportPresets}
         onImport={importPresets}
         getCurrentSettings={getCurrentSettings}
+        t={t}
+      />
+
+      <LeaveConfirmModal
+        isOpen={leaveModalOpen}
+        onConfirm={handleLeaveConfirm}
+        onCancel={handleLeaveCancel}
         t={t}
       />
     </div>

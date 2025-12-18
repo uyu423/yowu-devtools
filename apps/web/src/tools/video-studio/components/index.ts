@@ -7,4 +7,5 @@ export { CutPanel } from './CutPanel';
 export { CropPanel } from './CropPanel';
 export { ResizePanel } from './ResizePanel';
 export { ExportPanel } from './ExportPanel';
+export { LeaveConfirmModal } from './LeaveConfirmModal';
 
