@@ -174,6 +174,8 @@ const VideoStudioTool: React.FC = () => {
           resizeHeight: video.videoHeight,
           trimStart: 0,
           trimEnd: video.duration,
+          // Reset thumbnail time to start of new video
+          thumbnailTime: 0,
         });
 
         toast.success(t('common.fileLoadedSuccess').replace('{name}', file.name));
@@ -281,8 +283,16 @@ const VideoStudioTool: React.FC = () => {
     setError(null);
 
     try {
+      // Clamp thumbnail time to video duration
+      const clampedTime = Math.min(
+        Math.max(0, state.thumbnailTime),
+        Math.max(0, videoMetadata.duration - 0.1) // Slightly before the end to ensure a frame exists
+      );
+      
+      console.log('[Thumbnail] Clamped time:', clampedTime, 'from:', state.thumbnailTime, 'duration:', videoMetadata.duration);
+      
       const config: ThumbnailConfig = {
-        time: state.thumbnailTime,
+        time: clampedTime,
         format: state.thumbnailFormat,
         fileName: buildThumbnailFileName(),
       };

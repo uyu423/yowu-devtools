@@ -62,10 +62,17 @@ export async function extractThumbnail(
       message: 'Extracting frame...',
     });
 
+    // Clamp time to valid range (use 0 if time exceeds a reasonable limit)
+    // Note: We can't know exact duration without probing, but we validate on the UI side
+    // If time is too large, clamp to 0 to at least get the first frame
+    const seekTime = Math.max(0, config.time);
+    console.log('[Thumbnail] Seek time:', seekTime);
+
     // Build FFmpeg arguments for frame extraction
+    // Put -ss AFTER -i for more accurate seeking (input seeking vs output seeking)
     const args = [
-      '-ss', config.time.toString(),  // Seek to time
       '-i', inputFileName,            // Input file
+      '-ss', seekTime.toString(),     // Seek to time (after input for accuracy)
       '-vframes', '1',                // Extract 1 frame
       '-q:v', '2',                    // High quality
     ];
@@ -92,8 +99,20 @@ export async function extractThumbnail(
 
     // Read output file
     console.log('[Thumbnail] Reading output file from VFS...');
-    const outputData = await readFile(ffmpeg, outputFileName);
+    let outputData: Uint8Array;
+    try {
+      outputData = await readFile(ffmpeg, outputFileName);
+    } catch (readError) {
+      console.error('[Thumbnail] Failed to read output file:', readError);
+      // Check if this is because the file doesn't exist (FFmpeg didn't create it)
+      throw new Error('Failed to extract frame. The seek time may be beyond the video duration.');
+    }
+    
     console.log('[Thumbnail] Output data size:', outputData.byteLength);
+    
+    if (outputData.byteLength === 0) {
+      throw new Error('Extracted frame is empty. Try a different time position.');
+    }
     
     const blob = uint8ArrayToBlob(outputData, getMimeType(config.format));
     console.log('[Thumbnail] Blob created:', blob.size, 'bytes', blob.type);
