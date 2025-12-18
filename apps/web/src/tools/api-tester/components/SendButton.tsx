@@ -2,10 +2,11 @@
  * SendButton - Request send button with mode indicator
  */
 
-import React from 'react';
 import { Send, Square, Zap } from 'lucide-react';
-import { cn } from '@/lib/utils';
+
+import React from 'react';
 import { Tooltip } from '@/components/ui/Tooltip';
+import { cn } from '@/lib/utils';
 
 interface SendButtonProps {
   onClick: () => void;
@@ -30,7 +31,7 @@ export const SendButton: React.FC<SendButtonProps> = ({
 }) => {
   if (isLoading) {
     return (
-      <Tooltip content={`Cancel (Esc)`}>
+      <Tooltip content="Esc">
         <button
           onClick={onCancel}
           className={cn(
@@ -49,7 +50,7 @@ export const SendButton: React.FC<SendButtonProps> = ({
   }
 
   return (
-    <Tooltip content={`Send (${sendShortcut})`}>
+    <Tooltip content={sendShortcut}>
       <button
         onClick={onClick}
         disabled={disabled}
@@ -74,4 +75,3 @@ export const SendButton: React.FC<SendButtonProps> = ({
 };
 
 export default SendButton;
-

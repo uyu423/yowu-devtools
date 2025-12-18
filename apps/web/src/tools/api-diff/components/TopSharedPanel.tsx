@@ -2,21 +2,22 @@
  * Top Shared Panel - C영역 (Domains, Method, Path, Params, Body, Headers)
  */
 
-import React, { useCallback, useState, useMemo } from 'react';
-import { Play, Square, List, Cookie, HelpCircle } from 'lucide-react';
-import type { HttpMethod, KeyValuePair, DomainPreset } from '../types';
+import { Cookie, HelpCircle, List, Play, Square } from 'lucide-react';
+import type { DomainPreset, HttpMethod, KeyValuePair } from '../types';
+import React, { useCallback, useMemo, useState } from 'react';
+
 import { BODY_SUPPORTED_METHODS } from '../types';
-import { HTTP_METHODS } from '../constants';
-import { parsePathWithQuery } from '../utils';
-import KeyValueEditor from './KeyValueEditor';
-import DomainPresetModal from './DomainPresetModal';
-import { cn } from '@/lib/utils';
-import { useI18n } from '@/hooks/useI18nHooks';
 import CodeMirror from '@uiw/react-codemirror';
-import { json } from '@codemirror/lang-json';
+import DomainPresetModal from './DomainPresetModal';
 import { ExtensionStatus } from '@/tools/api-tester/components';
 import type { ExtensionStatus as ExtensionStatusType } from '@/tools/api-tester/types';
+import { HTTP_METHODS } from '../constants';
+import KeyValueEditor from './KeyValueEditor';
 import { Tooltip } from '@/components/ui/Tooltip';
+import { cn } from '@/lib/utils';
+import { json } from '@codemirror/lang-json';
+import { parsePathWithQuery } from '../utils';
+import { useI18n } from '@/hooks/useI18nHooks';
 
 // Detect Mac for keyboard shortcut display
 const isMac =
@@ -51,7 +52,9 @@ interface TopSharedPanelProps {
   onRemovePreset: (id: string) => void;
   onClearAllPresets: () => void;
   onExportPresets: () => void;
-  onImportPresets: (file: File) => Promise<{ success: boolean; count: number; error?: string }>;
+  onImportPresets: (
+    file: File
+  ) => Promise<{ success: boolean; count: number; error?: string }>;
   // Extension status
   extensionStatus: ExtensionStatusType;
   onCheckExtension: () => void;
@@ -115,7 +118,9 @@ export const TopSharedPanel: React.FC<TopSharedPanelProps> = ({
       if (queryParams.length > 0) {
         // Merge with existing params (query params take precedence)
         const existingParams = params.filter(
-          (p) => p.key.trim() && !queryParams.find((qp: KeyValuePair) => qp.key === p.key)
+          (p) =>
+            p.key.trim() &&
+            !queryParams.find((qp: KeyValuePair) => qp.key === p.key)
         );
         onParamsChange([...existingParams, ...queryParams]);
       }
@@ -180,14 +185,23 @@ export const TopSharedPanel: React.FC<TopSharedPanelProps> = ({
                   disabled={isExecuting}
                 />
                 <Cookie className="w-4 h-4" />
-                <span className="hidden sm:inline">{t('tool.apiDiff.includeCookies')}</span>
+                <span className="hidden sm:inline">
+                  {t('tool.apiDiff.includeCookies')}
+                </span>
               </label>
-              <Tooltip content={t('tool.apiDiff.includeCookiesTooltip')} position="bottom" nowrap={false}>
+              <Tooltip
+                content={t('tool.apiDiff.includeCookiesTooltip')}
+                position="bottom"
+                nowrap={false}
+              >
                 <HelpCircle className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 cursor-help" />
               </Tooltip>
             </div>
           )}
-          <ExtensionStatus status={extensionStatus} onRetry={onCheckExtension} />
+          <ExtensionStatus
+            status={extensionStatus}
+            onRetry={onCheckExtension}
+          />
         </div>
       </div>
 
@@ -262,7 +276,7 @@ export const TopSharedPanel: React.FC<TopSharedPanelProps> = ({
           placeholder="/api/v1/example"
           className="flex-1 min-w-0 px-2 sm:px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
         />
-        <Tooltip content={isExecuting ? `${t('common.cancel')} (Esc)` : `${t('tool.apiDiff.execute')} (${isMac ? '⌘↵' : 'Ctrl+Enter'})`}>
+        <Tooltip content={isExecuting ? 'Esc' : isMac ? '⌘↵' : 'Ctrl+Enter'}>
           <button
             onClick={onExecute}
             className={cn(
@@ -280,7 +294,9 @@ export const TopSharedPanel: React.FC<TopSharedPanelProps> = ({
             ) : (
               <>
                 <Play className="w-4 h-4" />
-                <span className="hidden sm:inline">{t('tool.apiDiff.execute')}</span>
+                <span className="hidden sm:inline">
+                  {t('tool.apiDiff.execute')}
+                </span>
               </>
             )}
           </button>

@@ -196,7 +196,7 @@ export const PipelinePanel: React.FC<PipelinePanelProps> = ({
       <div className="p-4 border-t border-gray-200 dark:border-gray-700 space-y-2">
         {/* Export Buttons */}
         <div className="flex gap-2">
-          <Tooltip content={`${t('common.download')} (${exportShortcut})`} className="flex-1">
+          <Tooltip content={exportShortcut} className="flex-1">
             <button
               type="button"
               onClick={onExport}
@@ -213,7 +213,7 @@ export const PipelinePanel: React.FC<PipelinePanelProps> = ({
             </button>
           </Tooltip>
           {onCopyToClipboard && (
-            <Tooltip content={`${t('tool.imageStudio.copyToClipboard')} (${copyShortcut})`}>
+            <Tooltip content={copyShortcut}>
               <button
                 type="button"
                 onClick={onCopyToClipboard}
