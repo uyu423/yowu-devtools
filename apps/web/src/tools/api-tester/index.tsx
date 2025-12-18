@@ -293,6 +293,21 @@ const ApiTesterTool: React.FC = () => {
     await executeWithAutoMode(requestState, shouldUseExtension);
   }, [state, executeWithAutoMode, isCorsAllowed, extensionStatus, updateState]);
 
+  // Keyboard shortcut: Cmd+Enter (Mac) or Ctrl+Enter (Windows) to send request
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        e.preventDefault();
+        if (!isLoading && state.url.trim()) {
+          handleSend();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleSend, isLoading, state.url]);
+
   // Handle retry with extension (from modal)
   const handleRetryWithExtension = useCallback(async (rememberChoice: boolean) => {
     console.log('[API Tester] Retrying with extension, remember:', rememberChoice);

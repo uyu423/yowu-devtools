@@ -198,6 +198,21 @@ const ApiDiffTool: React.FC = () => {
     }
   }, [isLoading, state, cancelRequests, executeRequests, updateState, addHistoryItem, t, isCorsAllowed, extensionStatus]);
 
+  // Keyboard shortcut: Cmd+Enter (Mac) or Ctrl+Enter (Windows) to execute comparison
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        e.preventDefault();
+        if (!isLoading && state.path.trim() && state.domainA.trim() && state.domainB.trim()) {
+          handleExecute();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleExecute, isLoading, state.path, state.domainA, state.domainB]);
+
   // Handle retry with extension (from CORS modal)
   const handleRetryWithExtension = useCallback(
     async (rememberChoice: boolean) => {
