@@ -284,7 +284,8 @@ export const zhCN = {
     },
     base64: {
       title: 'Base64 Converter',
-      description: '将文本编码为Base64或解码Base64字符串，支持UTF-8和URL安全格式。',
+      description:
+        '将文本编码为Base64或解码Base64字符串，支持UTF-8和URL安全格式。',
       textInput: '文本输入',
       base64Input: 'Base64输入',
       textPlaceholder: '输入要编码的文本...',
@@ -434,10 +435,8 @@ export const zhCN = {
       warningAwsDomDow:
         'AWS EventBridge：不能在日（月）和星期中同时使用*。请在一个字段中使用?。',
       warningJenkinsHash: 'Jenkins H令牌：短间隔可能导致月末执行不规则。',
-      warningAwsTz:
-        'AWS EventBridge调度默认使用UTC。如需要，请指定时区。',
-      warningK8sTz:
-        'Kubernetes CronJob：使用.spec.timeZone字段支持时区。',
+      warningAwsTz: 'AWS EventBridge调度默认使用UTC。如需要，请指定时区。',
+      warningK8sTz: 'Kubernetes CronJob：使用.spec.timeZone字段支持时区。',
       // Special tokens
       specialTokens: '特殊令牌',
       tokenQuestion: '? - 无特定值（占位符）',
@@ -549,8 +548,7 @@ export const zhCN = {
       characterTypesTooltip:
         '选择要包含在密码中的字符集。使用多种类型可以提高安全性。',
       exclusionOptions: '排除选项',
-      exclusionOptionsTooltip:
-        '排除在某些情况下可能造成混淆或引起问题的字符。',
+      exclusionOptionsTooltip: '排除在某些情况下可能造成混淆或引起问题的字符。',
       uppercase: '大写字母 (A-Z)',
       lowercase: '小写字母 (a-z)',
       numbers: '数字 (0-9)',
@@ -565,8 +563,7 @@ export const zhCN = {
       regenerate: '重新生成',
       generatedPasswords: '生成的密码',
       strength: '强度',
-      strengthTooltip:
-        '密码强度基于熵值计算——长度和字符集大小的组合。',
+      strengthTooltip: '密码强度基于熵值计算——长度和字符集大小的组合。',
       weak: '弱',
       medium: '中等',
       strong: '强',
@@ -840,8 +837,7 @@ export const zhCN = {
       signatureVerificationTooltip:
         '验证令牌是否使用预期的密钥签名且未被篡改。',
       header: 'Header',
-      headerTooltip:
-        '包含关于令牌类型和签名算法的元数据（如alg、typ）。',
+      headerTooltip: '包含关于令牌类型和签名算法的元数据（如alg、typ）。',
       payload: 'Payload',
       payloadTooltip:
         '包含声明——关于用户和附加数据的声明（如sub、name、exp、iat）。',
@@ -906,7 +902,8 @@ export const zhCN = {
       urlLoadFailed: '从URL加载失败。',
       sampleLoaded: '已加载示例文本。',
       corsWarningTitle: 'CORS限制',
-      corsWarningDescription: '某些网站可能会阻止来自其他域的请求。如果加载失败，请尝试手动下载文件。',
+      corsWarningDescription:
+        '某些网站可能会阻止来自其他域的请求。如果加载失败，请尝试手动下载文件。',
       loadButton: '加载',
     },
     jwtEncoder: {
@@ -1024,19 +1021,24 @@ export const zhCN = {
       extensionConnected: 'CORS Bypass Ready',
       extensionNotConnected: 'Not Connected',
       installExtension: '安装扩展程序',
-      installExtensionTooltip: '安装扩展程序以绕过CORS限制。如果API允许跨域请求，则无需安装。',
+      installExtensionTooltip:
+        '安装扩展程序以绕过CORS限制。如果API允许跨域请求，则无需安装。',
       extensionPermissionRequired: 'Permission Required',
       extensionChecking: 'Checking...',
       extensionTooltipChecking: '正在验证扩展程序连接...',
-      extensionTooltipNotConnected: '未检测到扩展程序。安装CORS Helper扩展程序以绕过CORS限制。点击重试检测。',
-      extensionTooltipPermissionRequired: '检测到扩展程序，但需要此域的权限。点击扩展程序图标并允许访问。',
+      extensionTooltipNotConnected:
+        '未检测到扩展程序。安装CORS Helper扩展程序以绕过CORS限制。点击重试检测。',
+      extensionTooltipPermissionRequired:
+        '检测到扩展程序，但需要此域的权限。点击扩展程序图标并允许访问。',
       extensionTooltipConnected: '扩展程序已连接！需要时将自动绕过CORS限制。',
       retryWithExtension: '使用扩展重试',
       corsErrorTitle: '检测到CORS错误',
       corsErrorDescription: '此请求被浏览器的CORS策略阻止。',
-      corsErrorExplanation: '浏览器出于安全原因阻止对不同域的请求。API必须明确允许跨源请求，但从Web应用访问时，许多API不允许这样做。',
+      corsErrorExplanation:
+        '浏览器出于安全原因阻止对不同域的请求。API必须明确允许跨源请求，但从Web应用访问时，许多API不允许这样做。',
       corsWhyExtension: '为什么使用扩展程序？',
-      corsWhyExtensionDesc: '浏览器扩展程序可以通过从扩展上下文发出请求来绕过CORS限制，不受与网页相同的安全规则约束。',
+      corsWhyExtensionDesc:
+        '浏览器扩展程序可以通过从扩展上下文发出请求来绕过CORS限制，不受与网页相同的安全规则约束。',
       corsRetryWithExtension: '使用扩展重试',
       corsInstallExtension: '安装Chrome扩展程序',
       corsMobileNotSupported: '移动设备不支持Chrome扩展程序',
@@ -1094,7 +1096,8 @@ export const zhCN = {
       permissionDenied: '{origin}的权限被拒绝。请授予权限后重试。',
       // Include Cookies option
       includeCookies: '包含Cookie',
-      includeCookiesTooltip: '在请求中包含浏览器Cookie。启用后，存储在浏览器中的目标域Cookie将自动随请求发送。',
+      includeCookiesTooltip:
+        '在请求中包含浏览器Cookie。启用后，存储在浏览器中的目标域Cookie将自动随请求发送。',
       // Error details
       showErrorDetails: '显示详情',
       hideErrorDetails: '隐藏详情',
@@ -1125,7 +1128,8 @@ export const zhCN = {
       hideDetails: '隐藏详情',
       status: '状态',
       includeCookies: '包含 Cookie',
-      includeCookiesTooltip: '通过扩展程序发送请求时包含浏览器 Cookie。当前浏览器会话的 Cookie 将随请求一起发送。',
+      includeCookiesTooltip:
+        '通过扩展程序发送请求时包含浏览器 Cookie。当前浏览器会话的 Cookie 将随请求一起发送。',
       parameters: '参数',
       headers: '请求头',
       body: '请求体 (JSON)',
@@ -1247,7 +1251,8 @@ export const zhCN = {
         suffixTooltip: '附加到原始文件名的文本',
         outputFileName: '输出文件名',
         privacyNote: '隐私保护',
-        privacyDescription: '所有处理都在浏览器中进行。您的图片从不会上传到任何服务器。',
+        privacyDescription:
+          '所有处理都在浏览器中进行。您的图片从不会上传到任何服务器。',
       },
     },
     // TODO: Translate to Chinese
@@ -1269,10 +1274,15 @@ export const zhCN = {
       noVideoLoaded: '未加载视频',
       exportInProgress: '视频导出中，请稍候。',
       thumbnailInProgress: '缩略图提取中，请稍候。',
-      leavePageWarning: '视频处理正在进行中。如果离开此页面，处理将被取消。确定要离开吗？',
+      leavePageWarning:
+        '视频处理正在进行中。如果离开此页面，处理将被取消。确定要离开吗？',
       leavePageTitle: '离开页面？',
       stayOnPage: '留在此页面',
       leavePage: '离开页面',
+      cancelProcessingTitle: '取消处理？',
+      cancelProcessingWarning: '视频处理正在进行中。确定要取消吗？',
+      continueProcessing: '继续',
+      cancelProcessing: '取消处理',
       mobileWarning: '大型视频文件可能会在移动设备上导致性能问题。',
       loadingEngine: '正在加载视频处理引擎...',
       preparing: '正在准备视频...',
@@ -1325,7 +1335,8 @@ export const zhCN = {
         eachClipDuration: '每个片段时长',
         splitNote: '视频将被分割成等长的片段并下载为 ZIP 文件。',
         removeHint: '添加要从视频中移除的时间片段。可以一次移除多个片段。',
-        splitHint: '将视频分割成多个等长的片段。每个片段将单独导出为 ZIP 文件。',
+        splitHint:
+          '将视频分割成多个等长的片段。每个片段将单独导出为 ZIP 文件。',
       },
       crop: {
         title: '裁剪',
@@ -1360,9 +1371,11 @@ export const zhCN = {
         suffixTooltip: '附加到原始文件名的文本',
         outputFileName: '输出文件名',
         privacyNote: '隐私保护',
-        privacyDescription: '所有处理都使用 WebAssembly 在浏览器中进行。您的视频从不会上传到任何服务器。',
+        privacyDescription:
+          '所有处理都使用 WebAssembly 在浏览器中进行。您的视频从不会上传到任何服务器。',
         performanceNote: '性能',
-        performanceDescription: '视频处理是计算密集型的。大文件可能需要几分钟来处理。',
+        performanceDescription:
+          '视频处理是计算密集型的。大文件可能需要几分钟来处理。',
       },
     },
   },
@@ -1460,8 +1473,7 @@ export const zhCN = {
     },
     apiDiff: {
       title: 'API Response Diff',
-      description:
-        '并排比较两个域名的 API 响应，高亮显示差异。',
+      description: '并排比较两个域名的 API 响应，高亮显示差异。',
     },
     // TODO: Translate to Chinese
     imageStudio: {

@@ -8,4 +8,4 @@ export { CropPanel } from './CropPanel';
 export { ResizePanel } from './ResizePanel';
 export { ExportPanel } from './ExportPanel';
 export { LeaveConfirmModal } from './LeaveConfirmModal';
-
+export { CancelConfirmModal } from './CancelConfirmModal';

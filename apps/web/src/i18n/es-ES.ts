@@ -88,7 +88,8 @@ export const esES = {
     },
     resizeMode: {
       contain: 'Contener',
-      containDesc: 'Ajustar dentro de los límites, puede tener relleno/letterbox',
+      containDesc:
+        'Ajustar dentro de los límites, puede tener relleno/letterbox',
       cover: 'Cubrir',
       coverDesc: 'Llenar límites, puede recortar bordes',
       stretch: 'Estirar',
@@ -127,7 +128,8 @@ export const esES = {
       nameRequired: 'El nombre del preajuste es requerido',
       savePreset: 'Guardar preajuste',
       savedPresets: 'Preajustes guardados',
-      noPresets: 'Aún no hay preajustes guardados. ¡Guarde su primer preajuste arriba!',
+      noPresets:
+        'Aún no hay preajustes guardados. ¡Guarde su primer preajuste arriba!',
       load: 'Cargar',
       remove: 'Eliminar',
       added: 'Preajuste guardado exitosamente',
@@ -202,7 +204,8 @@ export const esES = {
     expandSidebar: 'Expandir barra lateral',
     // Beta badge
     beta: 'Beta',
-    betaTooltip: 'Esta función es experimental y puede ser inestable. La estamos probando y mejorando activamente.',
+    betaTooltip:
+      'Esta función es experimental y puede ser inestable. La estamos probando y mejorando activamente.',
   },
   commandPalette: {
     searchTools: 'Buscar herramientas...',
@@ -617,7 +620,8 @@ export const esES = {
       lengthError: 'La longitud de la contraseña debe estar entre 4 y 128',
       failedToGenerate: 'Error al generar contraseña',
       resultPlaceholder: 'Las contraseñas generadas aparecerán aquí',
-      lengthTooltip: 'Longitud de la contraseña (4-128 caracteres). Más largo = más seguro.',
+      lengthTooltip:
+        'Longitud de la contraseña (4-128 caracteres). Más largo = más seguro.',
       countTooltip: 'Número de contraseñas a generar a la vez (1-20).',
     },
     urlParser: {
@@ -1163,8 +1167,10 @@ export const esES = {
         'La extensión del navegador puede evitar restricciones CORS haciendo solicitudes desde el contexto de la extensión, que no está sujeto a las mismas reglas de seguridad que las páginas web.',
       corsRetryWithExtension: 'Reintentar con extensión',
       corsInstallExtension: 'Instalar extensión de Chrome',
-      corsMobileNotSupported: 'Las extensiones de Chrome no están disponibles en dispositivos móviles',
-      corsMobileUseDesktop: 'Por favor, use la versión de escritorio de Chrome para acceder a APIs con restricciones CORS.',
+      corsMobileNotSupported:
+        'Las extensiones de Chrome no están disponibles en dispositivos móviles',
+      corsMobileUseDesktop:
+        'Por favor, use la versión de escritorio de Chrome para acceder a APIs con restricciones CORS.',
       corsRememberChoice: 'Recordar para este dominio',
       corsRememberChoiceDesc: 'Usar extensión automáticamente para {origin}',
       sendToApiDiff: 'Enviar a API Diff',
@@ -1307,7 +1313,8 @@ export const esES = {
     // TODO: Translate to Spanish
     imageStudio: {
       title: 'Image Studio',
-      description: 'Recorta, redimensiona, rota y convierte imágenes. Todo el procesamiento ocurre en tu navegador.',
+      description:
+        'Recorta, redimensiona, rota y convierte imágenes. Todo el procesamiento ocurre en tu navegador.',
       pipeline: 'Pipeline',
       stepsEnabled: 'pasos habilitados',
       resetPipeline: 'Restablecer configuración del pipeline',
@@ -1322,8 +1329,10 @@ export const esES = {
       fileTooLarge: 'El archivo es demasiado grande. El tamaño máximo es 50MB.',
       failedToLoadImage: 'Error al cargar la imagen',
       noImageLoaded: 'No hay imagen cargada',
-      exportNotImplemented: 'La funcionalidad de exportación se implementará en la próxima fase',
-      presetNotImplemented: 'La funcionalidad de presets se implementará en la próxima fase',
+      exportNotImplemented:
+        'La funcionalidad de exportación se implementará en la próxima fase',
+      presetNotImplemented:
+        'La funcionalidad de presets se implementará en la próxima fase',
       exportFailed: 'Error al exportar la imagen',
       copyToClipboard: 'Copiar al portapapeles',
       copiedToClipboard: 'Imagen copiada al portapapeles',
@@ -1331,7 +1340,8 @@ export const esES = {
       crop: {
         title: 'Recortar',
         aspectRatio: 'Relación de aspecto',
-        aspectRatioTooltip: 'Bloquear la selección de recorte a una relación de aspecto específica',
+        aspectRatioTooltip:
+          'Bloquear la selección de recorte a una relación de aspecto específica',
         coordinates: 'Coordenadas',
         width: 'Ancho',
         height: 'Alto',
@@ -1348,7 +1358,8 @@ export const esES = {
         mode: 'Modo de redimensionamiento',
         modeTooltip: 'Cómo manejar las diferencias de relación de aspecto',
         quality: 'Calidad de interpolación',
-        qualityTooltip: 'Mayor calidad produce mejores resultados pero tarda más',
+        qualityTooltip:
+          'Mayor calidad produce mejores resultados pero tarda más',
         presets: 'Presets',
         useOriginal: 'Usar original',
       },
@@ -1369,65 +1380,84 @@ export const esES = {
         format: 'Formato',
         formatTooltip: 'Formato de imagen de salida',
         formatNotSupported: 'Formato no soportado por tu navegador',
-        webpNotSupported: 'La exportación WebP no está soportada por tu navegador',
+        webpNotSupported:
+          'La exportación WebP no está soportada por tu navegador',
         quality: 'Calidad',
-        qualityTooltip: 'Mayor calidad produce archivos más grandes (solo JPEG/WebP)',
+        qualityTooltip:
+          'Mayor calidad produce archivos más grandes (solo JPEG/WebP)',
         smaller: 'Archivo más pequeño',
         better: 'Mejor calidad',
         suffix: 'Sufijo del nombre de archivo',
         suffixTooltip: 'Texto para añadir al nombre de archivo original',
         outputFileName: 'Nombre del archivo de salida',
         privacyNote: 'Privacidad',
-        privacyDescription: 'Todo el procesamiento ocurre en tu navegador. Tus imágenes nunca se suben a ningún servidor.',
+        privacyDescription:
+          'Todo el procesamiento ocurre en tu navegador. Tus imágenes nunca se suben a ningún servidor.',
       },
     },
     videoStudio: {
       title: 'Video Studio',
-      description: 'Recorta, corta, redimensiona y convierte videos. Todo el procesamiento ocurre en tu navegador.',
+      description:
+        'Recorta, corta, redimensiona y convierte videos. Todo el procesamiento ocurre en tu navegador.',
       pipeline: 'Pipeline',
       stepsEnabled: 'pasos habilitados',
       resetPipeline: 'Restablecer configuración del pipeline',
       runExport: 'Ejecutar y exportar',
       savePreset: 'Guardar preset',
       loadPreset: 'Cargar preset',
-      dropVideoHere: 'Arrastra un archivo de video aquí o haz clic para explorar',
+      dropVideoHere:
+        'Arrastra un archivo de video aquí o haz clic para explorar',
       supportedFormats: 'MP4, WebM, MOV, AVI, MKV soportados',
       dropToReplace: 'Arrastra para reemplazar el video actual',
       unsupportedFormat: 'Formato de video no soportado',
-      fileTooLarge: 'El archivo es demasiado grande. El tamaño máximo es 500MB.',
+      fileTooLarge:
+        'El archivo es demasiado grande. El tamaño máximo es 500MB.',
       failedToLoadVideo: 'Error al cargar el video',
       noVideoLoaded: 'No hay video cargado',
       exportInProgress: 'Exportación de video en progreso. Por favor espere.',
-      thumbnailInProgress: 'Extracción de miniatura en progreso. Por favor espere.',
-      leavePageWarning: 'El procesamiento de video está en progreso. Si abandona esta página, el procesamiento se cancelará. ¿Está seguro de que desea salir?',
+      thumbnailInProgress:
+        'Extracción de miniatura en progreso. Por favor espere.',
+      leavePageWarning:
+        'El procesamiento de video está en progreso. Si abandona esta página, el procesamiento se cancelará. ¿Está seguro de que desea salir?',
       leavePageTitle: '¿Abandonar página?',
       stayOnPage: 'Permanecer en esta página',
       leavePage: 'Abandonar página',
-      mobileWarning: 'Los archivos de video grandes pueden causar problemas de rendimiento en dispositivos móviles.',
+      cancelProcessingTitle: '¿Cancelar procesamiento?',
+      cancelProcessingWarning:
+        'El procesamiento de video está en progreso. ¿Está seguro de que desea cancelar?',
+      continueProcessing: 'Continuar',
+      cancelProcessing: 'Cancelar procesamiento',
+      mobileWarning:
+        'Los archivos de video grandes pueden causar problemas de rendimiento en dispositivos móviles.',
       loadingEngine: 'Cargando motor de procesamiento de video...',
       preparing: 'Preparando video...',
       processing: 'Procesando...',
       finalizing: 'Finalizando salida...',
       cancelled: 'Procesamiento cancelado',
-      exportNotImplemented: 'La funcionalidad de exportación se implementará con la integración de ffmpeg.wasm',
-      presetNotImplemented: 'La funcionalidad de presets se implementará en la próxima fase',
+      exportNotImplemented:
+        'La funcionalidad de exportación se implementará con la integración de ffmpeg.wasm',
+      presetNotImplemented:
+        'La funcionalidad de presets se implementará en la próxima fase',
       exportFailed: 'Error al exportar el video',
       processingCancelled: 'El procesamiento de video fue cancelado',
       thumbnail: {
         title: 'Extraer miniatura',
         description: 'Extrae un fotograma del vídeo como archivo de imagen.',
         extractAt: 'Extraer en',
-        timeTooltip: 'Posición de tiempo para extraer el fotograma de la miniatura',
+        timeTooltip:
+          'Posición de tiempo para extraer el fotograma de la miniatura',
         start: 'Inicio',
         end: 'Fin',
         quickSelect: 'Selección rápida',
         format: 'Formato de salida',
         extractButton: 'Extraer miniatura',
         extracting: 'Extrayendo...',
-        extractNotImplemented: 'La extracción de miniaturas se implementará en la fase de procesamiento.',
+        extractNotImplemented:
+          'La extracción de miniaturas se implementará en la fase de procesamiento.',
         extractFailed: 'Error al extraer la miniatura',
         note: 'La extracción de miniaturas es una acción separada del pipeline de vídeo. Produce un archivo de imagen, no un vídeo procesado.',
-        previewHint: 'El marcador amarillo en la línea de tiempo muestra la posición de la miniatura. La vista previa se actualiza al buscar.',
+        previewHint:
+          'El marcador amarillo en la línea de tiempo muestra la posición de la miniatura. La vista previa se actualiza al buscar.',
       },
       trim: {
         title: 'Recortar tiempo',
@@ -1449,18 +1479,23 @@ export const esES = {
         splitInto: 'Dividir en clips',
         segmentsToRemove: 'Segmentos a eliminar',
         addSegment: 'Añadir segmento',
-        noSegments: 'No hay segmentos añadidos. Haz clic en "Añadir segmento" para eliminar partes del video.',
+        noSegments:
+          'No hay segmentos añadidos. Haz clic en "Añadir segmento" para eliminar partes del video.',
         numberOfClips: 'Número de clips',
         clips: 'clips',
         eachClipDuration: 'Duración de cada clip',
-        splitNote: 'El video se dividirá en clips de igual duración y se descargará como archivo ZIP.',
-        removeHint: 'Añade segmentos de tiempo que quieras eliminar del video. Se pueden eliminar múltiples segmentos a la vez.',
-        splitHint: 'Divide el video en múltiples clips de igual duración. Cada clip se exportará por separado como archivo ZIP.',
+        splitNote:
+          'El video se dividirá en clips de igual duración y se descargará como archivo ZIP.',
+        removeHint:
+          'Añade segmentos de tiempo que quieras eliminar del video. Se pueden eliminar múltiples segmentos a la vez.',
+        splitHint:
+          'Divide el video en múltiples clips de igual duración. Cada clip se exportará por separado como archivo ZIP.',
       },
       crop: {
         title: 'Recortar área',
         aspectRatio: 'Relación de aspecto',
-        aspectRatioTooltip: 'Bloquear la selección de recorte a una relación de aspecto específica',
+        aspectRatioTooltip:
+          'Bloquear la selección de recorte a una relación de aspecto específica',
         coordinates: 'Coordenadas',
         width: 'Ancho',
         height: 'Alto',
@@ -1485,14 +1520,17 @@ export const esES = {
         format: 'Formato',
         formatTooltip: 'Formato y códec de video de salida',
         quality: 'Preset de calidad',
-        qualityTooltip: 'Mayor calidad produce archivos más grandes y tarda más en procesar',
+        qualityTooltip:
+          'Mayor calidad produce archivos más grandes y tarda más en procesar',
         suffix: 'Sufijo del nombre de archivo',
         suffixTooltip: 'Texto para añadir al nombre de archivo original',
         outputFileName: 'Nombre del archivo de salida',
         privacyNote: 'Privacidad',
-        privacyDescription: 'Todo el procesamiento ocurre en tu navegador usando WebAssembly. Tus videos nunca se suben a ningún servidor.',
+        privacyDescription:
+          'Todo el procesamiento ocurre en tu navegador usando WebAssembly. Tus videos nunca se suben a ningún servidor.',
         performanceNote: 'Rendimiento',
-        performanceDescription: 'El procesamiento de video es computacionalmente intensivo. Los archivos grandes pueden tardar varios minutos en procesarse.',
+        performanceDescription:
+          'El procesamiento de video es computacionalmente intensivo. Los archivos grandes pueden tardar varios minutos en procesarse.',
       },
     },
   },

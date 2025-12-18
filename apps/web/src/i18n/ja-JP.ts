@@ -125,7 +125,8 @@ export const jaJP = {
       nameRequired: 'プリセット名を入力してください',
       savePreset: 'プリセットを保存',
       savedPresets: '保存済みプリセット',
-      noPresets: 'プリセットがまだありません。上で最初のプリセットを保存しましょう！',
+      noPresets:
+        'プリセットがまだありません。上で最初のプリセットを保存しましょう！',
       load: '読み込み',
       remove: '削除',
       added: 'プリセットを保存しました',
@@ -200,7 +201,8 @@ export const jaJP = {
     expandSidebar: 'サイドバーを展開',
     // Beta badge
     beta: 'ベータ',
-    betaTooltip: 'この機能は実験的であり、不安定な可能性があります。テストと改善を進めています。',
+    betaTooltip:
+      'この機能は実験的であり、不安定な可能性があります。テストと改善を進めています。',
   },
   commandPalette: {
     searchTools: 'ツールを検索...',
@@ -1125,7 +1127,8 @@ export const jaJP = {
       corsRetryWithExtension: '拡張機能で再試行',
       corsInstallExtension: 'Chrome拡張機能をインストール',
       corsMobileNotSupported: 'モバイル端末ではChrome拡張機能を使用できません',
-      corsMobileUseDesktop: 'CORS制限のあるAPIにアクセスするには、デスクトップ版のChromeをご利用ください。',
+      corsMobileUseDesktop:
+        'CORS制限のあるAPIにアクセスするには、デスクトップ版のChromeをご利用ください。',
       corsRememberChoice: 'このドメインを記憶',
       corsRememberChoiceDesc: '{origin}に対して自動的に拡張機能を使用',
       sendToApiDiff: 'API Diffに送信',
@@ -1268,7 +1271,8 @@ export const jaJP = {
     // TODO: Translate to Japanese
     imageStudio: {
       title: 'Image Studio',
-      description: '画像の切り抜き、サイズ変更、回転、変換を行います。すべての処理はブラウザ内で行われます。',
+      description:
+        '画像の切り抜き、サイズ変更、回転、変換を行います。すべての処理はブラウザ内で行われます。',
       pipeline: 'パイプライン',
       stepsEnabled: 'ステップ有効',
       resetPipeline: 'パイプライン設定をリセット',
@@ -1330,21 +1334,25 @@ export const jaJP = {
         format: '形式',
         formatTooltip: '出力画像形式',
         formatNotSupported: 'お使いのブラウザでサポートされていない形式',
-        webpNotSupported: 'お使いのブラウザではWebPエクスポートがサポートされていません',
+        webpNotSupported:
+          'お使いのブラウザではWebPエクスポートがサポートされていません',
         quality: '品質',
-        qualityTooltip: '高品質ほどファイルサイズが大きくなります（JPEG/WebPのみ）',
+        qualityTooltip:
+          '高品質ほどファイルサイズが大きくなります（JPEG/WebPのみ）',
         smaller: '小さいファイル',
         better: '高品質',
         suffix: 'ファイル名接尾辞',
         suffixTooltip: '元のファイル名に追加するテキスト',
         outputFileName: '出力ファイル名',
         privacyNote: 'プライバシー',
-        privacyDescription: 'すべての処理はブラウザ内で行われます。画像がサーバーにアップロードされることはありません。',
+        privacyDescription:
+          'すべての処理はブラウザ内で行われます。画像がサーバーにアップロードされることはありません。',
       },
     },
     videoStudio: {
       title: 'Video Studio',
-      description: '動画のトリミング、カット、切り抜き、サイズ変更、変換を行います。すべての処理はブラウザ内で行われます。',
+      description:
+        '動画のトリミング、カット、切り抜き、サイズ変更、変換を行います。すべての処理はブラウザ内で行われます。',
       pipeline: 'パイプライン',
       stepsEnabled: 'ステップ有効',
       resetPipeline: 'パイプライン設定をリセット',
@@ -1360,11 +1368,17 @@ export const jaJP = {
       noVideoLoaded: '動画が読み込まれていません',
       exportInProgress: '動画のエクスポート中です。しばらくお待ちください。',
       thumbnailInProgress: 'サムネイル抽出中です。しばらくお待ちください。',
-      leavePageWarning: '動画処理中です。このページを離れると処理がキャンセルされます。本当に移動しますか？',
+      leavePageWarning:
+        '動画処理中です。このページを離れると処理がキャンセルされます。本当に移動しますか？',
       leavePageTitle: 'ページを離れますか？',
       stayOnPage: 'このページに留まる',
       leavePage: 'ページを離れる',
-      mobileWarning: '大きな動画ファイルはモバイルデバイスでパフォーマンスの問題を引き起こす可能性があります。',
+      cancelProcessingTitle: '処理をキャンセルしますか？',
+      cancelProcessingWarning: '動画処理中です。本当にキャンセルしますか？',
+      continueProcessing: '続行',
+      cancelProcessing: '処理をキャンセル',
+      mobileWarning:
+        '大きな動画ファイルはモバイルデバイスでパフォーマンスの問題を引き起こす可能性があります。',
       loadingEngine: '動画処理エンジンを読み込み中...',
       preparing: '動画を準備中...',
       processing: '処理中...',
@@ -1388,7 +1402,8 @@ export const jaJP = {
         extractNotImplemented: 'サムネイル抽出は処理フェーズで実装されます。',
         extractFailed: 'サムネイル抽出に失敗しました',
         note: 'サムネイル抽出は動画パイプラインとは別の操作です。処理済み動画ではなく、画像ファイルを出力します。',
-        previewHint: 'タイムラインの黄色いマーカーがサムネイル位置を示します。シーク時にプレビューが更新されます。',
+        previewHint:
+          'タイムラインの黄色いマーカーがサムネイル位置を示します。シーク時にプレビューが更新されます。',
       },
       trim: {
         title: 'トリミング',
@@ -1410,13 +1425,17 @@ export const jaJP = {
         splitInto: 'クリップに分割',
         segmentsToRemove: '削除するセグメント',
         addSegment: 'セグメント追加',
-        noSegments: 'セグメントが追加されていません。「セグメント追加」をクリックして動画の一部を削除してください。',
+        noSegments:
+          'セグメントが追加されていません。「セグメント追加」をクリックして動画の一部を削除してください。',
         numberOfClips: 'クリップ数',
         clips: 'クリップ',
         eachClipDuration: '各クリップの長さ',
-        splitNote: '動画は等間隔のクリップに分割され、ZIPファイルとしてダウンロードされます。',
-        removeHint: '動画から削除したい時間セグメントを追加します。複数のセグメントを一度に削除できます。',
-        splitHint: '動画を複数の等間隔クリップに分割します。各クリップは個別にZIPファイルとしてエクスポートされます。',
+        splitNote:
+          '動画は等間隔のクリップに分割され、ZIPファイルとしてダウンロードされます。',
+        removeHint:
+          '動画から削除したい時間セグメントを追加します。複数のセグメントを一度に削除できます。',
+        splitHint:
+          '動画を複数の等間隔クリップに分割します。各クリップは個別にZIPファイルとしてエクスポートされます。',
       },
       crop: {
         title: '切り抜き',
@@ -1446,14 +1465,17 @@ export const jaJP = {
         format: '形式',
         formatTooltip: '出力動画形式とコーデック',
         quality: '品質プリセット',
-        qualityTooltip: '高品質ほどファイルサイズが大きくなり、処理に時間がかかります',
+        qualityTooltip:
+          '高品質ほどファイルサイズが大きくなり、処理に時間がかかります',
         suffix: 'ファイル名接尾辞',
         suffixTooltip: '元のファイル名に追加するテキスト',
         outputFileName: '出力ファイル名',
         privacyNote: 'プライバシー',
-        privacyDescription: 'すべての処理はWebAssemblyを使用してブラウザ内で行われます。動画がサーバーにアップロードされることはありません。',
+        privacyDescription:
+          'すべての処理はWebAssemblyを使用してブラウザ内で行われます。動画がサーバーにアップロードされることはありません。',
         performanceNote: 'パフォーマンス',
-        performanceDescription: '動画処理は計算負荷が高いです。大きなファイルは処理に数分かかる場合があります。',
+        performanceDescription:
+          '動画処理は計算負荷が高いです。大きなファイルは処理に数分かかる場合があります。',
       },
     },
   },

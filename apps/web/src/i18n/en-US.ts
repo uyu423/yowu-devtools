@@ -198,7 +198,8 @@ export const enUS = {
     expandSidebar: 'Expand sidebar',
     // Beta badge
     beta: 'Beta',
-    betaTooltip: 'This feature is experimental and may be unstable. We are actively testing and improving it.',
+    betaTooltip:
+      'This feature is experimental and may be unstable. We are actively testing and improving it.',
   },
   commandPalette: {
     searchTools: 'Search tools...',
@@ -610,7 +611,8 @@ export const enUS = {
       lengthError: 'Password length must be between 4 and 128',
       failedToGenerate: 'Failed to generate password',
       resultPlaceholder: 'Generated password will appear here',
-      lengthTooltip: 'Password length (4-128 characters). Longer passwords are more secure.',
+      lengthTooltip:
+        'Password length (4-128 characters). Longer passwords are more secure.',
       countTooltip: 'Number of passwords to generate at once (1-20).',
     },
     urlParser: {
@@ -1142,8 +1144,10 @@ export const enUS = {
         "The browser extension can bypass CORS restrictions by making requests from the extension context, which isn't subject to the same security rules as web pages.",
       corsRetryWithExtension: 'Retry with Extension',
       corsInstallExtension: 'Install Chrome Extension',
-      corsMobileNotSupported: 'Chrome extensions are not available on mobile devices',
-      corsMobileUseDesktop: 'Please use the desktop version of Chrome to access APIs with CORS restrictions.',
+      corsMobileNotSupported:
+        'Chrome extensions are not available on mobile devices',
+      corsMobileUseDesktop:
+        'Please use the desktop version of Chrome to access APIs with CORS restrictions.',
       corsRememberChoice: 'Remember for this domain',
       corsRememberChoiceDesc: 'Automatically use extension for {origin}',
       sendToApiDiff: 'Send to API Diff',
@@ -1285,7 +1289,8 @@ export const enUS = {
     },
     imageStudio: {
       title: 'Image Studio',
-      description: 'Crop, resize, rotate, and convert images. All processing happens in your browser.',
+      description:
+        'Crop, resize, rotate, and convert images. All processing happens in your browser.',
       pipeline: 'Pipeline',
       stepsEnabled: 'steps enabled',
       resetPipeline: 'Reset pipeline settings',
@@ -1300,8 +1305,10 @@ export const enUS = {
       fileTooLarge: 'File is too large. Maximum size is 50MB.',
       failedToLoadImage: 'Failed to load image',
       noImageLoaded: 'No image loaded',
-      exportNotImplemented: 'Export functionality will be implemented in the next phase',
-      presetNotImplemented: 'Preset functionality will be implemented in the next phase',
+      exportNotImplemented:
+        'Export functionality will be implemented in the next phase',
+      presetNotImplemented:
+        'Preset functionality will be implemented in the next phase',
       exportFailed: 'Failed to export image',
       copyToClipboard: 'Copy to Clipboard',
       copiedToClipboard: 'Image copied to clipboard',
@@ -1326,7 +1333,8 @@ export const enUS = {
         mode: 'Resize Mode',
         modeTooltip: 'How to handle aspect ratio differences',
         quality: 'Interpolation Quality',
-        qualityTooltip: 'Higher quality produces better results but takes longer',
+        qualityTooltip:
+          'Higher quality produces better results but takes longer',
         presets: 'Presets',
         useOriginal: 'Use original',
       },
@@ -1356,12 +1364,14 @@ export const enUS = {
         suffixTooltip: 'Text to append to the original filename',
         outputFileName: 'Output File Name',
         privacyNote: 'Privacy',
-        privacyDescription: 'All processing happens in your browser. Your images are never uploaded to any server.',
+        privacyDescription:
+          'All processing happens in your browser. Your images are never uploaded to any server.',
       },
     },
     videoStudio: {
       title: 'Video Studio',
-      description: 'Trim, cut, crop, resize, and convert videos. All processing happens in your browser.',
+      description:
+        'Trim, cut, crop, resize, and convert videos. All processing happens in your browser.',
       pipeline: 'Pipeline',
       stepsEnabled: 'steps enabled',
       resetPipeline: 'Reset pipeline settings',
@@ -1377,18 +1387,27 @@ export const enUS = {
       noVideoLoaded: 'No video loaded',
       exportInProgress: 'Video export is in progress. Please wait.',
       thumbnailInProgress: 'Thumbnail extraction is in progress. Please wait.',
-      leavePageWarning: 'Video processing is in progress. If you leave this page, the processing will be cancelled. Are you sure you want to leave?',
+      leavePageWarning:
+        'Video processing is in progress. If you leave this page, the processing will be cancelled. Are you sure you want to leave?',
       leavePageTitle: 'Leave Page?',
       stayOnPage: 'Stay on Page',
       leavePage: 'Leave Page',
-      mobileWarning: 'Large video files may cause performance issues on mobile devices.',
+      cancelProcessingTitle: 'Cancel Processing?',
+      cancelProcessingWarning:
+        'Video processing is in progress. Are you sure you want to cancel?',
+      continueProcessing: 'Continue',
+      cancelProcessing: 'Cancel Processing',
+      mobileWarning:
+        'Large video files may cause performance issues on mobile devices.',
       loadingEngine: 'Loading video processing engine...',
       preparing: 'Preparing video...',
       processing: 'Processing...',
       finalizing: 'Finalizing output...',
       cancelled: 'Processing cancelled',
-      exportNotImplemented: 'Export functionality will be implemented with ffmpeg.wasm integration',
-      presetNotImplemented: 'Preset functionality will be implemented in the next phase',
+      exportNotImplemented:
+        'Export functionality will be implemented with ffmpeg.wasm integration',
+      presetNotImplemented:
+        'Preset functionality will be implemented in the next phase',
       exportFailed: 'Failed to export video',
       processingCancelled: 'Video processing was cancelled',
       thumbnail: {
@@ -1402,10 +1421,12 @@ export const enUS = {
         format: 'Output Format',
         extractButton: 'Extract Thumbnail',
         extracting: 'Extracting...',
-        extractNotImplemented: 'Thumbnail extraction will be implemented in the processing phase.',
+        extractNotImplemented:
+          'Thumbnail extraction will be implemented in the processing phase.',
         extractFailed: 'Failed to extract thumbnail',
         note: 'Thumbnail extraction is a separate action from the video pipeline. It outputs an image file, not a processed video.',
-        previewHint: 'The yellow marker on the timeline shows the thumbnail position. The preview will update when you seek.',
+        previewHint:
+          'The yellow marker on the timeline shows the thumbnail position. The preview will update when you seek.',
       },
       trim: {
         title: 'Trim',
@@ -1427,13 +1448,17 @@ export const enUS = {
         splitInto: 'Split Into Clips',
         segmentsToRemove: 'Segments to Remove',
         addSegment: 'Add Segment',
-        noSegments: 'No segments added. Click "Add Segment" to remove parts of the video.',
+        noSegments:
+          'No segments added. Click "Add Segment" to remove parts of the video.',
         numberOfClips: 'Number of Clips',
         clips: 'clips',
         eachClipDuration: 'Each clip duration',
-        splitNote: 'Video will be split into equal-length clips and downloaded as a ZIP file.',
-        removeHint: 'Add time segments you want to remove from the video. Multiple segments can be removed at once.',
-        splitHint: 'Split the video into multiple equal-length clips. Each clip will be exported separately as a ZIP file.',
+        splitNote:
+          'Video will be split into equal-length clips and downloaded as a ZIP file.',
+        removeHint:
+          'Add time segments you want to remove from the video. Multiple segments can be removed at once.',
+        splitHint:
+          'Split the video into multiple equal-length clips. Each clip will be exported separately as a ZIP file.',
       },
       crop: {
         title: 'Crop',
@@ -1463,14 +1488,17 @@ export const enUS = {
         format: 'Format',
         formatTooltip: 'Output video format and codec',
         quality: 'Quality Preset',
-        qualityTooltip: 'Higher quality produces larger files and takes longer to process',
+        qualityTooltip:
+          'Higher quality produces larger files and takes longer to process',
         suffix: 'File Name Suffix',
         suffixTooltip: 'Text to append to the original filename',
         outputFileName: 'Output File Name',
         privacyNote: 'Privacy',
-        privacyDescription: 'All processing happens in your browser using WebAssembly. Your videos are never uploaded to any server.',
+        privacyDescription:
+          'All processing happens in your browser using WebAssembly. Your videos are never uploaded to any server.',
         performanceNote: 'Performance',
-        performanceDescription: 'Video processing is computationally intensive. Large files may take several minutes to process.',
+        performanceDescription:
+          'Video processing is computationally intensive. Large files may take several minutes to process.',
       },
     },
   },

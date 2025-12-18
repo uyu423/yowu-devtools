@@ -200,7 +200,8 @@ export const koKR = {
     expandSidebar: '사이드바 펼치기',
     // Beta badge
     beta: 'Beta',
-    betaTooltip: '이 기능은 실험적이며 불안정할 수 있습니다. 테스트 및 개선 중입니다.',
+    betaTooltip:
+      '이 기능은 실험적이며 불안정할 수 있습니다. 테스트 및 개선 중입니다.',
   },
   commandPalette: {
     searchTools: '도구 검색...',
@@ -1114,8 +1115,10 @@ export const koKR = {
         '브라우저 확장 프로그램은 확장 컨텍스트에서 요청을 수행하여 CORS 제한을 우회할 수 있습니다. 이는 웹 페이지와 동일한 보안 규칙의 적용을 받지 않습니다.',
       corsRetryWithExtension: '확장 프로그램으로 재시도',
       corsInstallExtension: 'Chrome 확장 프로그램 설치',
-      corsMobileNotSupported: '모바일 환경에서는 Chrome 확장 프로그램을 사용할 수 없습니다',
-      corsMobileUseDesktop: 'CORS 제한이 있는 API에 접근하려면 데스크톱 버전의 Chrome을 사용해 주세요.',
+      corsMobileNotSupported:
+        '모바일 환경에서는 Chrome 확장 프로그램을 사용할 수 없습니다',
+      corsMobileUseDesktop:
+        'CORS 제한이 있는 API에 접근하려면 데스크톱 버전의 Chrome을 사용해 주세요.',
       corsRememberChoice: '이 도메인에 대해 기억',
       corsRememberChoiceDesc: '{origin}에 대해 자동으로 확장 프로그램 사용',
       sendToApiDiff: 'API Diff로 보내기',
@@ -1257,7 +1260,8 @@ export const koKR = {
     },
     imageStudio: {
       title: 'Image Studio',
-      description: '이미지를 자르고, 크기 조정, 회전, 변환합니다. 모든 처리는 브라우저에서 이루어집니다.',
+      description:
+        '이미지를 자르고, 크기 조정, 회전, 변환합니다. 모든 처리는 브라우저에서 이루어집니다.',
       pipeline: '파이프라인',
       stepsEnabled: '단계 활성화',
       resetPipeline: '파이프라인 설정 초기화',
@@ -1298,7 +1302,8 @@ export const koKR = {
         mode: '크기 조정 모드',
         modeTooltip: '종횡비 차이를 처리하는 방법',
         quality: '보간 품질',
-        qualityTooltip: '높은 품질은 더 나은 결과를 생성하지만 시간이 더 걸립니다',
+        qualityTooltip:
+          '높은 품질은 더 나은 결과를 생성하지만 시간이 더 걸립니다',
         presets: '프리셋',
         useOriginal: '원본 사용',
       },
@@ -1321,19 +1326,22 @@ export const koKR = {
         formatNotSupported: '브라우저에서 지원하지 않는 형식',
         webpNotSupported: '브라우저에서 WebP 내보내기를 지원하지 않습니다',
         quality: '품질',
-        qualityTooltip: '높은 품질은 더 큰 파일을 생성합니다 (JPEG/WebP만 해당)',
+        qualityTooltip:
+          '높은 품질은 더 큰 파일을 생성합니다 (JPEG/WebP만 해당)',
         smaller: '작은 파일',
         better: '높은 품질',
         suffix: '파일명 접미사',
         suffixTooltip: '원본 파일명에 추가할 텍스트',
         outputFileName: '출력 파일명',
         privacyNote: '개인정보 보호',
-        privacyDescription: '모든 처리는 브라우저에서 이루어집니다. 이미지는 서버로 업로드되지 않습니다.',
+        privacyDescription:
+          '모든 처리는 브라우저에서 이루어집니다. 이미지는 서버로 업로드되지 않습니다.',
       },
     },
     videoStudio: {
       title: 'Video Studio',
-      description: '비디오를 자르고, 잘라내고, 크기 조정, 변환합니다. 모든 처리는 브라우저에서 이루어집니다.',
+      description:
+        '비디오를 자르고, 잘라내고, 크기 조정, 변환합니다. 모든 처리는 브라우저에서 이루어집니다.',
       pipeline: '파이프라인',
       stepsEnabled: '단계 활성화',
       resetPipeline: '파이프라인 설정 초기화',
@@ -1349,17 +1357,25 @@ export const koKR = {
       noVideoLoaded: '로드된 비디오 없음',
       exportInProgress: '비디오 내보내기가 진행 중입니다. 잠시 기다려주세요.',
       thumbnailInProgress: '썸네일 추출이 진행 중입니다. 잠시 기다려주세요.',
-      leavePageWarning: '비디오 처리가 진행 중입니다. 페이지를 벗어나면 처리가 취소됩니다. 정말 이동하시겠습니까?',
+      leavePageWarning:
+        '비디오 처리가 진행 중입니다. 페이지를 벗어나면 처리가 취소됩니다. 정말 이동하시겠습니까?',
       leavePageTitle: '페이지를 떠나시겠습니까?',
       stayOnPage: '이 페이지에 머무르기',
       leavePage: '페이지 떠나기',
-      mobileWarning: '대용량 비디오 파일은 모바일 기기에서 성능 문제를 일으킬 수 있습니다.',
+      cancelProcessingTitle: '처리를 취소하시겠습니까?',
+      cancelProcessingWarning:
+        '비디오 처리가 진행 중입니다. 정말로 취소하시겠습니까?',
+      continueProcessing: '계속 진행',
+      cancelProcessing: '처리 취소',
+      mobileWarning:
+        '대용량 비디오 파일은 모바일 기기에서 성능 문제를 일으킬 수 있습니다.',
       loadingEngine: '비디오 처리 엔진 로드 중...',
       preparing: '비디오 준비 중...',
       processing: '처리 중...',
       finalizing: '출력 마무리 중...',
       cancelled: '처리 취소됨',
-      exportNotImplemented: '내보내기 기능은 ffmpeg.wasm 통합과 함께 구현됩니다',
+      exportNotImplemented:
+        '내보내기 기능은 ffmpeg.wasm 통합과 함께 구현됩니다',
       presetNotImplemented: '프리셋 기능은 다음 단계에서 구현됩니다',
       exportFailed: '비디오 내보내기 실패',
       processingCancelled: '비디오 처리가 취소되었습니다',
@@ -1377,7 +1393,8 @@ export const koKR = {
         extractNotImplemented: '썸네일 추출은 처리 단계에서 구현됩니다.',
         extractFailed: '썸네일 추출 실패',
         note: '썸네일 추출은 비디오 파이프라인과 별개의 작업입니다. 처리된 비디오가 아닌 이미지 파일을 출력합니다.',
-        previewHint: '타임라인의 노란색 마커가 썸네일 위치를 나타냅니다. 탐색 시 미리보기가 업데이트됩니다.',
+        previewHint:
+          '타임라인의 노란색 마커가 썸네일 위치를 나타냅니다. 탐색 시 미리보기가 업데이트됩니다.',
       },
       trim: {
         title: '트림',
@@ -1399,13 +1416,17 @@ export const koKR = {
         splitInto: '클립으로 분할',
         segmentsToRemove: '제거할 구간',
         addSegment: '구간 추가',
-        noSegments: '추가된 구간이 없습니다. "구간 추가"를 클릭하여 비디오의 일부를 제거하세요.',
+        noSegments:
+          '추가된 구간이 없습니다. "구간 추가"를 클릭하여 비디오의 일부를 제거하세요.',
         numberOfClips: '클립 수',
         clips: '클립',
         eachClipDuration: '각 클립 시간',
-        splitNote: '비디오가 동일한 길이의 클립으로 분할되어 ZIP 파일로 다운로드됩니다.',
-        removeHint: '비디오에서 제거할 시간 구간을 추가합니다. 여러 구간을 한 번에 제거할 수 있습니다.',
-        splitHint: '비디오를 여러 개의 동일한 길이의 클립으로 분할합니다. 각 클립은 별도로 ZIP 파일로 내보내집니다.',
+        splitNote:
+          '비디오가 동일한 길이의 클립으로 분할되어 ZIP 파일로 다운로드됩니다.',
+        removeHint:
+          '비디오에서 제거할 시간 구간을 추가합니다. 여러 구간을 한 번에 제거할 수 있습니다.',
+        splitHint:
+          '비디오를 여러 개의 동일한 길이의 클립으로 분할합니다. 각 클립은 별도로 ZIP 파일로 내보내집니다.',
       },
       crop: {
         title: '자르기',
@@ -1435,14 +1456,17 @@ export const koKR = {
         format: '형식',
         formatTooltip: '출력 비디오 형식 및 코덱',
         quality: '품질 프리셋',
-        qualityTooltip: '높은 품질은 더 큰 파일을 생성하고 처리 시간이 더 걸립니다',
+        qualityTooltip:
+          '높은 품질은 더 큰 파일을 생성하고 처리 시간이 더 걸립니다',
         suffix: '파일명 접미사',
         suffixTooltip: '원본 파일명에 추가할 텍스트',
         outputFileName: '출력 파일명',
         privacyNote: '개인정보 보호',
-        privacyDescription: '모든 처리는 WebAssembly를 사용하여 브라우저에서 이루어집니다. 비디오는 서버로 업로드되지 않습니다.',
+        privacyDescription:
+          '모든 처리는 WebAssembly를 사용하여 브라우저에서 이루어집니다. 비디오는 서버로 업로드되지 않습니다.',
         performanceNote: '성능',
-        performanceDescription: '비디오 처리는 계산 집약적입니다. 대용량 파일은 처리하는 데 몇 분이 걸릴 수 있습니다.',
+        performanceDescription:
+          '비디오 처리는 계산 집약적입니다. 대용량 파일은 처리하는 데 몇 분이 걸릴 수 있습니다.',
       },
     },
   },

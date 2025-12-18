@@ -50,6 +50,7 @@ import {
   ResizePanel,
   ExportPanel,
   LeaveConfirmModal,
+  CancelConfirmModal,
 } from './components';
 import {
   usePipelinePresets,
@@ -163,6 +164,10 @@ const VideoStudioTool: React.FC = () => {
     type: 'link' | 'popstate';
     url?: string;
   } | null>(null);
+
+  // Cancel confirmation modal state
+  const [cancelConfirmModalOpen, setCancelConfirmModalOpen] =
+    React.useState(false);
 
   // Handle leave confirmation
   const handleLeaveConfirm = React.useCallback(() => {
@@ -648,8 +653,16 @@ const VideoStudioTool: React.FC = () => {
     t,
   ]);
 
-  // Cancel processing
-  const handleCancel = React.useCallback(() => {
+  // Show cancel confirmation modal
+  const handleShowCancelConfirm = React.useCallback(() => {
+    setCancelConfirmModalOpen(true);
+  }, []);
+
+  // Actually cancel processing (after confirmation)
+  const handleConfirmCancel = React.useCallback(() => {
+    // Close modal first
+    setCancelConfirmModalOpen(false);
+
     // Actually cancel FFmpeg operation
     cancelFFmpeg();
 
@@ -661,6 +674,11 @@ const VideoStudioTool: React.FC = () => {
     }));
     toast.info(t('tool.videoStudio.processingCancelled'));
   }, [t]);
+
+  // Close cancel confirmation modal without cancelling
+  const handleCancelConfirmClose = React.useCallback(() => {
+    setCancelConfirmModalOpen(false);
+  }, []);
 
   // Reset all
   const handleReset = () => {
@@ -709,8 +727,13 @@ const VideoStudioTool: React.FC = () => {
         return;
       }
 
-      // Esc: Close modal or cancel processing
+      // Esc: Close modal or show cancel confirmation
       if (e.key === 'Escape') {
+        if (cancelConfirmModalOpen) {
+          e.preventDefault();
+          handleCancelConfirmClose();
+          return;
+        }
         if (leaveModalOpen) {
           e.preventDefault();
           handleLeaveCancel();
@@ -721,10 +744,10 @@ const VideoStudioTool: React.FC = () => {
           setPresetModalOpen(false);
           return;
         }
-        // If processing, show confirmation
+        // If processing, show cancel confirmation modal
         if (processingState.isProcessing) {
           e.preventDefault();
-          handleCancel();
+          handleShowCancelConfirm();
           return;
         }
       }
@@ -737,11 +760,13 @@ const VideoStudioTool: React.FC = () => {
     videoMetadata,
     processingState.isProcessing,
     isExtractingThumbnail,
+    cancelConfirmModalOpen,
     leaveModalOpen,
     presetModalOpen,
+    handleCancelConfirmClose,
     handleLeaveCancel,
     handleResetPipeline,
-    handleCancel,
+    handleShowCancelConfirm,
     handleExport,
   ]);
 
@@ -860,7 +885,7 @@ const VideoStudioTool: React.FC = () => {
             onToggleStep={handleToggleStep}
             onResetPipeline={handleResetPipeline}
             onExport={handleExport}
-            onCancel={handleCancel}
+            onCancel={handleShowCancelConfirm}
             onOpenPresets={() => setPresetModalOpen(true)}
             t={t}
           >
@@ -957,6 +982,13 @@ const VideoStudioTool: React.FC = () => {
         isOpen={leaveModalOpen}
         onConfirm={handleLeaveConfirm}
         onCancel={handleLeaveCancel}
+        t={t}
+      />
+
+      <CancelConfirmModal
+        isOpen={cancelConfirmModalOpen}
+        onConfirm={handleConfirmCancel}
+        onCancel={handleCancelConfirmClose}
         t={t}
       />
     </div>
