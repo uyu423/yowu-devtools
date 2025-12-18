@@ -57,6 +57,11 @@ function useProvideI18n(): I18nContextValue {
     saveLocale(locale);
   }, [locale]);
 
+  // Update document lang attribute when locale changes (for accessibility and SEO)
+  useEffect(() => {
+    document.documentElement.lang = locale;
+  }, [locale]);
+
   // Translation function
   const t = useCallback((key: string): string => {
     const resource = I18N[locale];

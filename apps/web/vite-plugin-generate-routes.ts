@@ -732,8 +732,8 @@ export function generateRoutes(): Plugin {
             ? localizedDescription.substring(0, 157) + '...'
             : localizedDescription;
 
-        // HTML lang 속성용 locale 코드 (BCP 47)
-        const htmlLang = locale.toLowerCase().replace('_', '-');
+        // HTML lang 속성용 locale 코드 (BCP 47: en-US, ko-KR, ja-JP 등)
+        const htmlLang = locale;
 
         // 메타 태그 생성
         const metaTags = `
@@ -817,7 +817,8 @@ export function generateRoutes(): Plugin {
       ): string {
         const homePath = locale === DEFAULT_LOCALE ? '/' : `/${locale}`;
         const homeUrl = `https://tools.yowu.dev${homePath}`;
-        const htmlLang = locale.toLowerCase().replace('_', '-');
+        // HTML lang 속성용 locale 코드 (BCP 47: en-US, ko-KR, ja-JP 등)
+        const htmlLang = locale;
 
         // i18n 리소스에서 locale별 홈 SEO 정보 가져오기
         const i18n = i18nResources[locale];
