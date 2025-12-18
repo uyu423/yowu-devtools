@@ -122,6 +122,10 @@ export const koKR = {
     license: '라이센스',
     sourceCode: '소스 코드',
     noWarranty: '보증 없음',
+    // Sort options
+    sortAlphabetical: '알파벳 순',
+    sortAdded: '추가된 순',
+    sortNewest: '최신 순',
   },
   commandPalette: {
     searchTools: '도구 검색...',

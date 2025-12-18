@@ -124,6 +124,10 @@ export const esES = {
     license: 'Licencia',
     sourceCode: 'Código',
     noWarranty: 'Sin garantía',
+    // Sort options
+    sortAlphabetical: 'Alfabético',
+    sortAdded: 'Orden agregado',
+    sortNewest: 'Más reciente',
   },
   commandPalette: {
     searchTools: 'Buscar herramientas...',

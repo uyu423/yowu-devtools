@@ -120,6 +120,10 @@ export const enUS = {
     license: 'License',
     sourceCode: 'Source',
     noWarranty: 'No Warranty',
+    // Sort options
+    sortAlphabetical: 'Alphabetical',
+    sortAdded: 'Added order',
+    sortNewest: 'Newest first',
   },
   commandPalette: {
     searchTools: 'Search tools...',

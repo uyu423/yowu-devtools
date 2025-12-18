@@ -122,6 +122,10 @@ export const jaJP = {
     license: 'ライセンス',
     sourceCode: 'ソース',
     noWarranty: '保証なし',
+    // Sort options
+    sortAlphabetical: 'アルファベット順',
+    sortAdded: '追加順',
+    sortNewest: '新しい順',
   },
   commandPalette: {
     searchTools: 'ツールを検索...',

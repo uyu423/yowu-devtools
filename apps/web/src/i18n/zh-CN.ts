@@ -120,6 +120,10 @@ export const zhCN = {
     license: '许可证',
     sourceCode: '源代码',
     noWarranty: '无保证',
+    // Sort options
+    sortAlphabetical: '字母顺序',
+    sortAdded: '添加顺序',
+    sortNewest: '最新优先',
   },
   commandPalette: {
     searchTools: '搜索工具...',

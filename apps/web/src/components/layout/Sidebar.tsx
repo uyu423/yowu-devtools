@@ -1,7 +1,8 @@
-import { Clock, ExternalLink, Laptop, Moon, Sparkles, Star, Sun, X } from 'lucide-react';
+import { ArrowDownAZ, Clock, ExternalLink, Hash, Laptop, Moon, Sparkles, Star, Sun, TrendingUp, X } from 'lucide-react';
 import { getToolById, tools } from '@/tools';
 
 import { LanguageSelector } from '@/components/common/LanguageSelector';
+import { Tooltip } from '@/components/ui/Tooltip';
 import { NavLink } from 'react-router-dom';
 import React from 'react';
 import { buildLocalePath } from '@/lib/i18nUtils';
@@ -12,6 +13,11 @@ import { useI18n } from '@/hooks/useI18nHooks';
 import { useRecentTools } from '@/hooks/useRecentTools';
 import { useTheme } from '@/hooks/useThemeHooks';
 
+// 정렬 타입 정의
+type SortType = 'alphabetical' | 'added' | 'newest';
+const SORT_STORAGE_KEY = 'yowu-devtools:v1:app:toolSort';
+const SORT_CYCLE: SortType[] = ['alphabetical', 'added', 'newest'];
+
 interface SidebarProps {
   onCloseMobile: () => void;
 }
@@ -21,6 +27,38 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
   const { favorites, toggleFavorite, isFavorite } = useFavorites();
   const { recentTools } = useRecentTools();
   const { t, locale } = useI18n();
+
+  // 정렬 상태 (localStorage에서 초기값 로드, 기본값: alphabetical)
+  const [sortType, setSortType] = React.useState<SortType>(() => {
+    if (typeof window === 'undefined') return 'alphabetical';
+    const saved = localStorage.getItem(SORT_STORAGE_KEY);
+    return (saved as SortType) || 'alphabetical';
+  });
+
+  // 정렬 순환 함수
+  const cycleSortType = () => {
+    const currentIndex = SORT_CYCLE.indexOf(sortType);
+    const nextIndex = (currentIndex + 1) % SORT_CYCLE.length;
+    const nextSort = SORT_CYCLE[nextIndex];
+    setSortType(nextSort);
+    localStorage.setItem(SORT_STORAGE_KEY, nextSort);
+  };
+
+  // 정렬 아이콘 및 라벨 매핑
+  const sortConfig = {
+    alphabetical: {
+      icon: ArrowDownAZ,
+      label: t('sidebar.sortAlphabetical'),
+    },
+    added: {
+      icon: Hash,
+      label: t('sidebar.sortAdded'),
+    },
+    newest: {
+      icon: TrendingUp,
+      label: t('sidebar.sortNewest'),
+    },
+  };
 
   // Helper function to build locale-aware path
   const getLocalePath = (path: string) => buildLocalePath(locale, path);
@@ -35,8 +73,22 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
     .map(({ toolId }) => getToolById(toolId))
     .filter((tool): tool is NonNullable<typeof tool> => tool !== undefined);
 
-  // All Tools: 모든 도구를 표시 (최근 사용/즐겨찾기와 중복 표시됨)
-  const allTools = tools;
+  // All Tools: 정렬된 도구 목록
+  const sortedTools = React.useMemo(() => {
+    const toolsCopy = [...tools];
+    switch (sortType) {
+      case 'alphabetical':
+        return toolsCopy.sort((a, b) => a.title.localeCompare(b.title));
+      case 'added':
+        // 원래 순서 유지 (tools 배열의 순서)
+        return tools;
+      case 'newest':
+        // 역순 (최신이 위)
+        return toolsCopy.reverse();
+      default:
+        return toolsCopy;
+    }
+  }, [sortType]);
 
   return (
     <div className="flex flex-col h-full bg-gray-50/50 dark:bg-gray-900 dark:border-gray-800 transition-colors">
@@ -182,11 +234,19 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
             </div>
           ) : (
             <div>
-              <div className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                {t('sidebar.allTools')}
+              <div className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 flex items-center justify-between">
+                <span>{t('sidebar.allTools')}</span>
+                <Tooltip content={sortConfig[sortType].label} position="bottom" align="right">
+                  <button
+                    onClick={cycleSortType}
+                    className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                  >
+                    {React.createElement(sortConfig[sortType].icon, { className: 'w-3 h-3' })}
+                  </button>
+                </Tooltip>
               </div>
               <div className="space-y-1 mt-1">
-                {allTools.map((tool) => (
+                {sortedTools.map((tool) => (
                   <NavLink
                     key={tool.id}
                     to={getLocalePath(tool.path)}
