@@ -139,7 +139,7 @@ export const esES = {
   homepage: {
     title: "Yowu's DevTools",
     heroDescription:
-      'Una caja de herramientas con privacidad primero para desarrolladores que quieren mantener sus datos en sus propias máquinas. Todo el procesamiento ocurre en tu navegador—sin servidores, sin rastreadores, sin recolección de datos. Código abierto y auditable, haciendo tareas comunes de desarrollo (formateo JSON, generación de contraseñas, cálculo de hash, creación de UUID y más) rápidas, seguras y confiables.',
+      'Una caja de herramientas con privacidad primero para desarrolladores que quieren mantener sus datos en sus propias máquinas. Todo el procesamiento ocurre en tu navegador—sin servidores, sin rastreadores, sin recolección de datos. Código abierto y auditable, con más de 18 herramientas incluyendo visor JSON, probador de API, analizador cURL, probador de regex, generador de hash y más. Rápido, seguro y confiable.',
     whyItExists: 'Por qué existe',
     privacyFirst: 'Privacidad primero',
     privacyFirstDescription:

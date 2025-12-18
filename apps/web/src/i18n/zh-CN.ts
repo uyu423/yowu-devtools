@@ -135,7 +135,7 @@ export const zhCN = {
   homepage: {
     title: "Yowu's DevTools",
     heroDescription:
-      '为希望将数据保留在本地的开发者打造的隐私优先工具箱。所有处理都在浏览器中进行——无服务器、无追踪、无数据收集。开源可审计，使JSON格式化、密码生成、哈希计算、UUID创建等常见开发任务快速、安全、可信。',
+      '为希望将数据保留在本地的开发者打造的隐私优先工具箱。所有处理都在浏览器中进行——无服务器、无追踪、无数据收集。开源可审计，提供18+工具，包括JSON查看器、API测试器、cURL解析器、正则表达式测试器、哈希生成器等。快速、安全、可信。',
     whyItExists: '为什么创建这个',
     privacyFirst: '隐私优先',
     privacyFirstDescription:

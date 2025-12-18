@@ -135,7 +135,7 @@ export const enUS = {
   homepage: {
     title: "Yowu's DevTools",
     heroDescription:
-      'A privacy-first toolbox for developers who want to keep their data on their own machines. All processing happens in your browser—no servers, no trackers, no data collection. Open source and auditable, making common developer tasks (JSON formatting, password generation, hash calculation, UUID creation, and more) fast, secure, and trustworthy.',
+      'A privacy-first toolbox for developers who want to keep their data on their own machines. All processing happens in your browser—no servers, no trackers, no data collection. Open source and auditable, with 18+ tools including JSON viewer, API tester, cURL parser, regex tester, hash generator, and more. Fast, secure, and trustworthy.',
     whyItExists: 'Why it exists',
     privacyFirst: 'Privacy-first',
     privacyFirstDescription:

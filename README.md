@@ -1,6 +1,6 @@
 # tools.yowu.dev
 
-An open toolbox for developers who would rather keep sensitive snippets on their own machines. Too many "free" web converters quietly ship data to unknown backends, so this project keeps every transformation inside the browser, publishes every line of code, and documents the UX decisions in the open. The goal is simple: make the common chores (JSON inspection, cron sanity checks, quick diffs, etc.) pleasant **and** trustworthy.
+An open toolbox for developers who would rather keep sensitive snippets on their own machines. Too many "free" web converters quietly ship data to unknown backends, so this project keeps every transformation inside the browser, publishes every line of code, and documents the UX decisions in the open. The goal is simple: make the common chores (JSON inspection, cron sanity checks, quick diffs, API testing, etc.) pleasant **and** trustworthy.
 
 ## Why it exists
 
@@ -10,28 +10,46 @@ An open toolbox for developers who would rather keep sensitive snippets on their
 
 ## Highlights
 
+### Core Features
 - Client-only React + Vite app with Tailwind styling and CodeMirror editors.
-- Tool registry under `src/tools/` keeps features isolated but consistent (state storage, sharing, theming).
+- Tool registry under `apps/web/src/tools/` keeps features isolated but consistent (state storage, sharing, theming).
 - Toast-powered feedback for copy/share actions, and live conversion flows tuned for quick iteration.
 - LocalStorage + share-links let you hand off repro cases without inventing screenshots.
 - **SEO-optimized**: Each tool has its own page with dedicated meta tags for search engine indexing.
 - **Dark mode support**: System/Light/Dark theme toggle with consistent styling across all tools.
-- **Enhanced Sidebar** (v1.1.0): Recent tools and favorites for quick access, all stored locally.
-- **Web App support** (v1.1.0): Install as a Chrome app for standalone usage with offline caching.
-- **Performance optimized** (v1.1.0): Web Workers prevent UI freezing when processing large data.
+- **i18n Support**: Multi-language support with 5 languages (English, Korean, Japanese, Chinese, Spanish).
+- **Language-specific URLs**: Locale-prefixed routes (`/ko-KR/json`, `/ja-JP/diff`, etc.) for SEO optimization.
+
+### Recent Releases
+
+#### v1.4.x - API Testing Suite
+- **API Response Diff** (v1.4.2): Compare API responses from two domains side-by-side with JSON diff highlighting.
+- **Locale-specific SEO** (v1.4.2): Language-optimized meta tags and descriptions for all tools.
+- **cURL Parser** (v1.4.1): Parse cURL commands into structured components with one-click API Tester import.
+- **API Tester** (v1.4.0): Full-featured HTTP client with CORS bypass via Chrome Extension.
+- **Chrome Extension**: Companion extension for CORS bypass and cookie handling in API requests.
+- **Monorepo Architecture** (v1.4.0): Migrated to pnpm + Turborepo for better build performance.
+
+#### v1.3.x - Internationalization & Polish
+- **Cron Parser Advanced** (v1.3.2): Multi-dialect support (UNIX, Quartz, AWS, Jenkins, K8s) with field breakdown.
+- **JSON Viewer Fullscreen** (v1.3.4): Expand result panel to full width for large JSON exploration.
+- **Share Modal UX** (v1.3.4): Confirmation modal shows what data will be shared before copying.
+- **PWA Update Fix** (v1.3.3): Improved version detection and update notifications.
+- **Sitemap Priority** (v1.3.3): SEO-optimized sitemap with tool pages prioritized over homepage.
+
+#### v1.2.x - Power User Features
 - **Command Palette** (v1.2.0): Fast tool navigation with `⌘K` / `Ctrl+K` keyboard shortcut.
 - **File Workflow** (v1.2.0): Drag & drop files and download results for JSON, YAML, and Diff tools.
-- **Enhanced Share** (v1.2.0): Improved sharing with Web Share API support and privacy warnings.
-- **PWA Polish** (v1.2.0): Extended shortcuts for all tools and screenshots support.
-- **Version Display** (v1.2.0): App version shown in sidebar footer.
-- **New Tools** (v1.2.0): Hash Generator, UUID Generator, and URL Parser added.
-- **Hash/HMAC Enhancement** (v1.2.1): File hash support, Base64URL encoding, HMAC key encoding options, random key generation, and verification section.
-- **Regex Tester** (v1.2.1): Test and visualize regular expressions with match highlighting, capture groups, and replacement preview.
-- **Web Share API Improvement** (v1.2.1): Enhanced share message formatting with professional layout and better privacy messaging.
-- **i18n Support** (v1.3.0): Multi-language support with 5 languages (English, Korean, Japanese, Chinese, Spanish).
-- **Language-specific URLs** (v1.3.0): Locale-prefixed routes (`/ko-KR/json`, `/ja-JP/diff`, etc.) for SEO optimization.
-- **NanumSquareNeo Font** (v1.3.0): Beautiful Korean-optimized variable font for better CJK readability.
-- **UI/UX Improvements** (v1.3.0): Various enhancements including improved tool layouts and localized cron descriptions.
+- **Regex Tester** (v1.2.1): Test regex patterns with match highlighting, capture groups, and replacement preview.
+- **Hash/HMAC Generator** (v1.2.0): SHA-256/512, file hash, HMAC signatures with verification.
+- **UUID Generator** (v1.2.0): Generate UUID v4/v7 and ULID identifiers.
+- **URL Parser** (v1.2.0): Break down URLs into protocol, host, path, query parameters, and fragment.
+
+#### v1.1.x - PWA & Performance
+- **Enhanced Sidebar** (v1.1.0): Recent tools and favorites for quick access.
+- **Web App support** (v1.1.0): Install as a Chrome app with offline caching.
+- **Performance optimized** (v1.1.0): Web Workers prevent UI freezing for large data.
+- **JWT Decoder/Encoder** (v1.1.0): Decode JWTs and create signed tokens with HMAC algorithms.
 
 ## Release Notes
 
@@ -51,30 +69,42 @@ For the full specification, UX rules, and backlog, read `SAS.md`. This README in
 ## Getting started
 
 ```bash
-npm install
-npm run dev       # http://localhost:5173
-npm run lint
-npm run build
-npm run preview
+# Install dependencies (uses pnpm workspaces)
+pnpm install
+
+# Development
+pnpm --filter web dev       # http://localhost:5173
+
+# Linting and building
+pnpm --filter web lint
+pnpm --filter web build
+pnpm --filter web preview
 ```
 
 ## Repository layout
 
+This project uses a **pnpm + Turborepo monorepo** structure:
+
 ```
-src/
-  components/   shared layout + primitives (ToolHeader, ActionBar, etc.)
-  hooks/        tool state, title, theme, i18n helpers
-  i18n/         translation files for each locale (en-US, ko-KR, ja-JP, zh-CN, es-ES)
-  lib/          clipboard + misc utilities + i18n utils
-  tools/        each self-contained feature (json, url, base64, jwt, ...)
-  workers/      web workers for heavy processing (optional)
+apps/
+  web/                 Main web application (tools.yowu.dev)
+    src/
+      components/      Shared layout + primitives (ToolHeader, ActionBar, etc.)
+      hooks/           Tool state, title, theme, i18n helpers
+      i18n/            Translation files for each locale
+      lib/             Clipboard + utilities + i18n utils
+      tools/           Each self-contained feature (json, url, api-tester, ...)
+      workers/         Web workers for heavy processing
+  extension/           Chrome Extension for CORS bypass
+packages/
+  shared/              Shared types and utilities between web and extension
 ```
 
 Shared contributor instructions live in `AGENTS.md`; treat them as the working agreement before sending any PRs.
 
 ## Deployment
 
-Pushes to `main` trigger `.github/workflows/deploy.yml`, which builds `dist/` and updates GitHub Pages under the `tools.yowu.dev` custom domain. Always run `npm run lint` and `npm run build` locally before merging to keep the pipeline green.
+Pushes to `main` trigger `.github/workflows/deploy.yml`, which builds `apps/web/dist/` and updates GitHub Pages under the `tools.yowu.dev` custom domain. Always run `pnpm --filter web lint` and `pnpm --filter web build` locally before merging to keep the pipeline green.
 
 ### SEO & Routing
 
