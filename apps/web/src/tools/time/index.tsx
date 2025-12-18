@@ -5,6 +5,7 @@ import { Clock, Copy } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
 import { OptionLabel } from '@/components/ui/OptionLabel';
+import { RadioGroup } from '@/components/ui/RadioGroup';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { useToolSetup } from '@/hooks/useToolSetup';
 import { format, formatISO } from 'date-fns';
@@ -234,31 +235,30 @@ const TimeTool: React.FC = () => {
             >
               {t('tool.time.epochTimestamp')}
             </OptionLabel>
-            <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
-              {(['ms', 's'] as const).map((unit) => (
-                <label
-                  key={unit}
-                  className="inline-flex items-center gap-2 cursor-pointer"
-                >
-                  <input
-                    type="radio"
-                    name="epoch-unit"
-                    checked={state.epochUnit === unit}
-                    onChange={() => handleUnitChange(unit)}
-                    className="text-blue-600 dark:text-blue-500"
-                  />
-                  <OptionLabel
-                    tooltip={
-                      unit === 'ms'
-                        ? t('tool.time.msTooltip')
-                        : t('tool.time.secTooltip')
-                    }
-                  >
-                    {unit === 'ms' ? t('tool.time.milliseconds') : t('tool.time.seconds')}
-                  </OptionLabel>
-                </label>
-              ))}
-            </div>
+            <RadioGroup
+              name="epoch-unit"
+              value={state.epochUnit}
+              onChange={(val) => handleUnitChange(val as 'ms' | 's')}
+              options={[
+                {
+                  value: 'ms',
+                  label: (
+                    <OptionLabel tooltip={t('tool.time.msTooltip')}>
+                      {t('tool.time.milliseconds')}
+                    </OptionLabel>
+                  ),
+                },
+                {
+                  value: 's',
+                  label: (
+                    <OptionLabel tooltip={t('tool.time.secTooltip')}>
+                      {t('tool.time.seconds')}
+                    </OptionLabel>
+                  ),
+                },
+              ]}
+              className="text-sm text-gray-600 dark:text-gray-400"
+            />
           </div>
           <input
             type="text"

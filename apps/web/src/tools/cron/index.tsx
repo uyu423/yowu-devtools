@@ -5,6 +5,8 @@ import { Timer, Copy, AlertTriangle, Info, ChevronDown, ChevronUp } from 'lucide
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
 import { OptionLabel } from '@/components/ui/OptionLabel';
+import { Select, type SelectOption } from '@/components/ui/Select';
+import { CheckboxWithLabel } from '@/components/ui/Checkbox';
 import { useToolSetup } from '@/hooks/useToolSetup';
 import { format, formatDistanceToNow } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
@@ -294,73 +296,66 @@ const CronTool: React.FC = () => {
           {/* Options */}
           <div className="mt-3 flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400">
             {/* Spec dropdown */}
-            <label className="inline-flex items-center gap-2">
+            <div className="inline-flex items-center gap-2">
               <OptionLabel tooltip={t('tool.cron.specTooltip')}>
                 {t('tool.cron.spec')}
               </OptionLabel>
-              <select
-                className="rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-2 py-1 text-sm"
+              <Select
                 value={state.spec}
-                onChange={(e) => handleSpecChange(e.target.value as CronSpec)}
-              >
-                {SPEC_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {t(`tool.cron.${opt.labelKey}`)}
-                  </option>
-                ))}
-              </select>
-            </label>
+                onChange={(val) => handleSpecChange(val as CronSpec)}
+                options={SPEC_OPTIONS.map((opt) => ({
+                  value: opt.value,
+                  label: t(`tool.cron.${opt.labelKey}`),
+                })) as SelectOption<CronSpec>[]}
+                size="sm"
+              />
+            </div>
 
             {/* Include seconds checkbox */}
-            <label className="inline-flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-500 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-0 cursor-pointer"
-                checked={state.hasSeconds}
-                onChange={(e) => updateState({ hasSeconds: e.target.checked })}
-                disabled={state.spec === 'unix' || state.spec === 'k8s' || state.spec === 'jenkins'}
-              />
-              <OptionLabel tooltip={t('tool.cron.secondsTooltip')}>
-                {t('tool.cron.includeSeconds')}
-              </OptionLabel>
-            </label>
+            <CheckboxWithLabel
+              checked={state.hasSeconds}
+              onChange={(checked) => updateState({ hasSeconds: checked })}
+              disabled={state.spec === 'unix' || state.spec === 'k8s' || state.spec === 'jenkins'}
+              useTransitionOnChange
+              label={
+                <OptionLabel tooltip={t('tool.cron.secondsTooltip')}>
+                  {t('tool.cron.includeSeconds')}
+                </OptionLabel>
+              }
+            />
 
             {/* Timezone */}
-            <label className="inline-flex items-center gap-2">
+            <div className="inline-flex items-center gap-2">
               <OptionLabel tooltip={t('tool.cron.timezoneTooltip')}>
                 {t('tool.cron.timezone')}
               </OptionLabel>
-              <select
-                className="rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-2 py-1 text-sm"
+              <Select
                 value={state.timezone}
-                onChange={(e) =>
-                  updateState({
-                    timezone: e.target.value as CronToolState['timezone'],
-                  })
-                }
-              >
-                <option value="local">{t('tool.time.local')}</option>
-                <option value="utc">{t('tool.time.utc')}</option>
-              </select>
-            </label>
+                onChange={(val) => updateState({ timezone: val as CronToolState['timezone'] })}
+                options={[
+                  { value: 'local', label: t('tool.time.local') },
+                  { value: 'utc', label: t('tool.time.utc') },
+                ]}
+                size="sm"
+              />
+            </div>
 
             {/* Next runs count */}
-            <label className="inline-flex items-center gap-2">
+            <div className="inline-flex items-center gap-2">
               <OptionLabel tooltip={t('tool.cron.nextRunsTooltip')}>
                 {t('tool.cron.nextRuns')}
               </OptionLabel>
-              <select
-                className="rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-2 py-1 text-sm"
-                value={state.nextCount}
-                onChange={(e) =>
-                  updateState({ nextCount: Number(e.target.value) as 10 | 20 | 50 })
-                }
-              >
-                <option value={10}>{t('tool.cron.items10')}</option>
-                <option value={20}>{t('tool.cron.items20')}</option>
-                <option value={50}>{t('tool.cron.items50')}</option>
-              </select>
-            </label>
+              <Select
+                value={String(state.nextCount)}
+                onChange={(val) => updateState({ nextCount: Number(val) as 10 | 20 | 50 })}
+                options={[
+                  { value: '10', label: t('tool.cron.items10') },
+                  { value: '20', label: t('tool.cron.items20') },
+                  { value: '50', label: t('tool.cron.items50') },
+                ]}
+                size="sm"
+              />
+            </div>
           </div>
 
           {/* From datetime */}

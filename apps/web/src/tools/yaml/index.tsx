@@ -10,6 +10,7 @@ import { FileInput } from '@/components/common/FileInput';
 import { FileDownload } from '@/components/common/FileDownload';
 import { getMimeType } from '@/lib/fileUtils';
 import { OptionLabel } from '@/components/ui/OptionLabel';
+import { Select } from '@/components/ui/Select';
 import { useToolSetup } from '@/hooks/useToolSetup';
 import { useWebWorker, shouldUseWorkerForText } from '@/hooks/useWebWorker';
 import { copyToClipboard } from '@/lib/clipboard';
@@ -225,21 +226,20 @@ const YamlTool: React.FC = () => {
       )}
 
       <ActionBar className="mt-4 flex-wrap items-center justify-between">
-        <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+        <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
           <OptionLabel tooltip={t('tool.yaml.indentTooltip')}>
             {t('common.indent')}
           </OptionLabel>
-          <select
-            className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-2 py-1"
-            value={state.indent}
-            onChange={(e) =>
-              updateState({ indent: Number(e.target.value) as 2 | 4 })
-            }
-          >
-            <option value={2}>{t('common.spaces2')}</option>
-            <option value={4}>{t('common.spaces4')}</option>
-          </select>
-        </label>
+          <Select
+            value={String(state.indent) as '2' | '4'}
+            onChange={(val) => updateState({ indent: Number(val) as 2 | 4 })}
+            options={[
+              { value: '2', label: t('common.spaces2') },
+              { value: '4', label: t('common.spaces4') },
+            ]}
+            size="sm"
+          />
+        </div>
         <div className="flex flex-wrap gap-2">
           <FileDownload
             content={conversion.output || ''}

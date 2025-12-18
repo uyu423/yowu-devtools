@@ -13,6 +13,8 @@ import { ResizablePanels } from '@/components/common/ResizablePanels';
 import { JsonTreeView } from '@/components/common/JsonTreeView';
 import { getMimeType } from '@/lib/fileUtils';
 import { OptionLabel } from '@/components/ui/OptionLabel';
+import { Select } from '@/components/ui/Select';
+import { CheckboxWithLabel } from '@/components/ui/Checkbox';
 import { useToolState } from '@/hooks/useToolState';
 import { useShareModal } from '@/hooks/useShareModal';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
@@ -194,36 +196,34 @@ const JsonTool: React.FC = () => {
         leftPanel={
           <div className="flex flex-col flex-1 min-h-0">
             <div className="mb-3 flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400 shrink-0">
-              <label className="flex items-center gap-2">
+              <div className="flex items-center gap-2">
                 <OptionLabel
                   tooltip={t('tool.json.indentTooltip')}
                   className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
                 >
                   {t('common.indent')}
                 </OptionLabel>
-                <select
-                  className="rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-2 py-1 text-sm"
-                  value={state.indent}
-                  onChange={(e) =>
-                    updateState({ indent: Number(e.target.value) as 2 | 4 })
-                  }
-                >
-                  <option value={2}>{t('common.spaces2')}</option>
-                  <option value={4}>{t('common.spaces4')}</option>
-                </select>
-              </label>
-
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={state.sortKeys}
-                  onChange={(e) => updateState({ sortKeys: e.target.checked })}
-                  className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-500 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-0 cursor-pointer"
+                <Select
+                  value={String(state.indent) as '2' | '4'}
+                  onChange={(val) => updateState({ indent: Number(val) as 2 | 4 })}
+                  options={[
+                    { value: '2', label: t('common.spaces2') },
+                    { value: '4', label: t('common.spaces4') },
+                  ]}
+                  size="sm"
                 />
-                <OptionLabel tooltip={t('tool.json.sortKeysTooltip')}>
-                  {t('tool.json.sortKeys')}
-                </OptionLabel>
-              </label>
+              </div>
+
+              <CheckboxWithLabel
+                checked={state.sortKeys}
+                onChange={(checked) => updateState({ sortKeys: checked })}
+                useTransitionOnChange
+                label={
+                  <OptionLabel tooltip={t('tool.json.sortKeysTooltip')}>
+                    {t('tool.json.sortKeys')}
+                  </OptionLabel>
+                }
+              />
 
               <label className="flex items-center gap-2">
                 <OptionLabel

@@ -10,6 +10,8 @@ import { FileDownload } from '@/components/common/FileDownload';
 import { ModeToggle } from '@/components/common/ModeToggle';
 import { getMimeType } from '@/lib/fileUtils';
 import { OptionLabel } from '@/components/ui/OptionLabel';
+import { Select } from '@/components/ui/Select';
+import { CheckboxWithLabel } from '@/components/ui/Checkbox';
 import { useToolSetup } from '@/hooks/useToolSetup';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useWebWorker, shouldUseWorkerForText } from '@/hooks/useWebWorker';
@@ -228,48 +230,43 @@ const DiffTool: React.FC = () => {
           />
 
           <div className="flex flex-wrap items-center gap-4 text-sm text-gray-700 dark:text-gray-300">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-500 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-0 cursor-pointer"
-                checked={state.ignoreWhitespace}
-                onChange={(e) =>
-                  updateState({ ignoreWhitespace: e.target.checked })
-                }
-              />
-              <OptionLabel tooltip={t('tool.diff.ignoreWhitespaceTooltip')}>
-                {t('tool.diff.ignoreWhitespace')}
-              </OptionLabel>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-500 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-0 cursor-pointer"
-                checked={state.ignoreCase}
-                onChange={(e) => updateState({ ignoreCase: e.target.checked })}
-              />
-              <OptionLabel tooltip={t('tool.diff.ignoreCaseTooltip')}>
-                {t('tool.diff.ignoreCase')}
-              </OptionLabel>
-            </label>
+            <CheckboxWithLabel
+              checked={state.ignoreWhitespace}
+              onChange={(checked) => updateState({ ignoreWhitespace: checked })}
+              useTransitionOnChange
+              label={
+                <OptionLabel tooltip={t('tool.diff.ignoreWhitespaceTooltip')}>
+                  {t('tool.diff.ignoreWhitespace')}
+                </OptionLabel>
+              }
+            />
+            <CheckboxWithLabel
+              checked={state.ignoreCase}
+              onChange={(checked) => updateState({ ignoreCase: checked })}
+              useTransitionOnChange
+              label={
+                <OptionLabel tooltip={t('tool.diff.ignoreCaseTooltip')}>
+                  {t('tool.diff.ignoreCase')}
+                </OptionLabel>
+              }
+            />
             {state.view === 'hunk' && (
-              <label className="flex items-center gap-2 cursor-pointer">
+              <div className="flex items-center gap-2">
                 <OptionLabel tooltip={t('tool.diff.contextLinesTooltip')}>
                   {t('tool.diff.contextLines')}
                 </OptionLabel>
-                <select
-                  value={state.contextLines}
-                  onChange={(e) =>
-                    updateState({ contextLines: Number(e.target.value) })
-                  }
-                  className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 py-1 text-sm text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 cursor-pointer"
-                >
-                  <option value={1}>1</option>
-                  <option value={3}>3</option>
-                  <option value={5}>5</option>
-                  <option value={10}>10</option>
-                </select>
-              </label>
+                <Select
+                  value={String(state.contextLines)}
+                  onChange={(val) => updateState({ contextLines: Number(val) })}
+                  options={[
+                    { value: '1', label: '1' },
+                    { value: '3', label: '3' },
+                    { value: '5', label: '5' },
+                    { value: '10', label: '10' },
+                  ]}
+                  size="sm"
+                />
+              </div>
             )}
             <FileDownload
               content={unifiedExport}
