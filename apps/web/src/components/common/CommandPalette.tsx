@@ -66,6 +66,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
   const { favorites, toggleFavorite, isFavorite } = useFavorites();
   const { recentTools } = useRecentTools();
   const { locale, t } = useI18n();
@@ -158,6 +159,22 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   useEffect(() => {
     setSelectedIndex(0);
   }, [results.length, query]);
+
+  // Scroll selected item into view
+  useEffect(() => {
+    if (!isOpen || !listRef.current) return;
+
+    const selectedItem = listRef.current.querySelector(
+      `[data-index="${selectedIndex}"]`
+    ) as HTMLElement | null;
+
+    if (selectedItem) {
+      selectedItem.scrollIntoView({
+        block: 'nearest',
+        behavior: 'smooth',
+      });
+    }
+  }, [selectedIndex, isOpen]);
 
   // Focus input when opened
   useEffect(() => {
@@ -259,7 +276,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         </div>
 
         {/* Results */}
-        <div className="max-h-[60vh] overflow-y-auto">
+        <div ref={listRef} className="max-h-[60vh] overflow-y-auto">
           {results.length === 0 ? (
             <div className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
               {t('commandPalette.noResults')}
@@ -275,6 +292,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                 return (
                   <div
                     key={tool.id}
+                    data-index={index}
                     onClick={() => handleToolClick(tool)}
                     className={cn(
                       'flex items-center px-4 py-3 cursor-pointer transition-colors',
