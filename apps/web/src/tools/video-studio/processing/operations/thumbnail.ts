@@ -14,6 +14,7 @@ import {
   uint8ArrayToBlob,
   getMimeType,
   getFileExtension,
+  cleanupFFmpeg,
 } from '../ffmpeg';
 
 /**
@@ -35,10 +36,12 @@ export async function extractThumbnail(
   const outputFileName = `thumbnail${getFileExtension(config.format)}`;
   console.log('[Thumbnail] File names:', { inputFileName, outputFileName });
 
+  let ffmpeg: Awaited<ReturnType<typeof getFFmpeg>> | null = null;
+  
   try {
     // Get FFmpeg instance
     console.log('[Thumbnail] Getting FFmpeg instance...');
-    const ffmpeg = await getFFmpeg(onProgress);
+    ffmpeg = await getFFmpeg(onProgress);
     console.log('[Thumbnail] FFmpeg instance obtained');
 
     onProgress?.({
@@ -46,6 +49,14 @@ export async function extractThumbnail(
       progress: 0,
       message: 'Preparing to extract thumbnail...',
     });
+
+    // Clean up any existing files first to free memory
+    try {
+      await deleteFile(ffmpeg, inputFileName);
+      await deleteFile(ffmpeg, outputFileName);
+    } catch {
+      // Ignore errors if files don't exist
+    }
 
     // Write input file to virtual filesystem
     console.log('[Thumbnail] Reading video file as ArrayBuffer...');
@@ -69,10 +80,12 @@ export async function extractThumbnail(
     console.log('[Thumbnail] Seek time:', seekTime);
 
     // Build FFmpeg arguments for frame extraction
-    // Put -ss AFTER -i for more accurate seeking (input seeking vs output seeking)
+    // IMPORTANT: Put -ss BEFORE -i for "input seeking" which is more memory efficient
+    // Input seeking uses container index to seek directly without decoding all frames
+    // This is crucial for large video files to avoid "memory access out of bounds" errors
     const args = [
+      '-ss', seekTime.toString(),     // Seek BEFORE input (memory efficient)
       '-i', inputFileName,            // Input file
-      '-ss', seekTime.toString(),     // Seek to time (after input for accuracy)
       '-vframes', '1',                // Extract 1 frame
       '-q:v', '2',                    // High quality
     ];
@@ -117,17 +130,21 @@ export async function extractThumbnail(
     const blob = uint8ArrayToBlob(outputData, getMimeType(config.format));
     console.log('[Thumbnail] Blob created:', blob.size, 'bytes', blob.type);
 
-    // Cleanup virtual filesystem
-    console.log('[Thumbnail] Cleaning up VFS...');
-    await deleteFile(ffmpeg, inputFileName);
-    await deleteFile(ffmpeg, outputFileName);
-    console.log('[Thumbnail] Cleanup completed');
-
     onProgress?.({
       stage: 'complete',
       progress: 100,
       message: 'Thumbnail extracted!',
     });
+
+    // Cleanup virtual filesystem (success path)
+    console.log('[Thumbnail] Cleaning up VFS...');
+    try {
+      await deleteFile(ffmpeg, inputFileName);
+      await deleteFile(ffmpeg, outputFileName);
+    } catch {
+      // Ignore cleanup errors
+    }
+    console.log('[Thumbnail] Cleanup completed');
 
     return {
       success: true,
@@ -139,7 +156,34 @@ export async function extractThumbnail(
     };
   } catch (error) {
     console.error('[Thumbnail] Extraction failed:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Extraction failed';
+    
+    // Check for memory-related errors and cleanup FFmpeg instance
+    const isMemoryError = error instanceof Error && 
+      (error.message.includes('memory access out of bounds') || 
+       error.message.includes('out of memory') ||
+       error.name === 'RuntimeError');
+    
+    // Always try to clean up VFS on error
+    if (ffmpeg) {
+      try {
+        await deleteFile(ffmpeg, inputFileName);
+        await deleteFile(ffmpeg, outputFileName);
+      } catch {
+        // Ignore cleanup errors
+      }
+    }
+    
+    if (isMemoryError) {
+      console.log('[Thumbnail] Memory error detected, cleaning up FFmpeg instance...');
+      cleanupFFmpeg();
+    }
+    
+    let errorMessage = error instanceof Error ? error.message : 'Extraction failed';
+    
+    // Provide more user-friendly error messages
+    if (isMemoryError) {
+      errorMessage = 'Video file is too large. Try a smaller video file or a different time position.';
+    }
     
     onProgress?.({
       stage: 'error',
