@@ -1246,4 +1246,8 @@ export const jaJP = {
         '無料オンラインAPIレスポンス比較ツール。2つのエンドポイントを同時に呼び出し、JSONレスポンスの差異を並列でハイライトします。',
     },
   },
+  ads: {
+    disclaimer:
+      'この広告の収益は、Yowu\'s DevToolsの無料運営と維持管理に使用されます。ご利用いただきありがとうございます。',
+  },
 } as const satisfies I18nResource;

@@ -1149,4 +1149,8 @@ export const zhCN = {
         '并排比较两个域名的 API 响应，高亮显示差异。',
     },
   },
+  ads: {
+    disclaimer:
+      '此广告收入用于支持Yowu\'s DevTools的免费运营和维护。感谢您的支持。',
+  },
 } as const satisfies I18nResource;

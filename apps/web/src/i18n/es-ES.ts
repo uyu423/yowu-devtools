@@ -1285,4 +1285,8 @@ export const esES = {
         'Compare respuestas de API de dos dominios lado a lado con resaltado de diferencias.',
     },
   },
+  ads: {
+    disclaimer:
+      'Los ingresos de este anuncio ayudan a mantener Yowu\'s DevTools gratuito y actualizado. Gracias por su apoyo.',
+  },
 } as const satisfies I18nResource;

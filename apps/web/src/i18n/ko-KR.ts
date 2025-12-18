@@ -1236,4 +1236,8 @@ export const koKR = {
         '무료 온라인 API 응답 비교 도구. 두 엔드포인트를 동시에 호출하고 JSON 응답 차이를 나란히 하이라이트합니다.',
     },
   },
+  ads: {
+    disclaimer:
+      '이 광고 수익은 Yowu\'s DevTools의 무료 운영과 유지보수에 사용됩니다. 이용해 주셔서 감사합니다.',
+  },
 } as const satisfies I18nResource;

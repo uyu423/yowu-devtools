@@ -1264,6 +1264,10 @@ export const enUS = {
         'Free online API response comparison tool. Call two endpoints simultaneously and highlight JSON response differences side-by-side.',
     },
   },
+  ads: {
+    disclaimer:
+      "Ad revenue from this space helps keep Yowu's DevTools free and maintained. Thank you for your support.",
+  },
 } as const;
 
 // Helper type to convert literal string types to string
