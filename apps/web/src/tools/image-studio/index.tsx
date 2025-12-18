@@ -384,6 +384,21 @@ const ImageStudioTool: React.FC = () => {
               onCropAreaChange={handleCropAreaChange}
               onResetCrop={handleResetCrop}
               t={t}
+              disabled={!state.cropEnabled}
+            />
+
+            {/* Rotate Panel */}
+            <RotatePanel
+              data-step="rotate"
+              rotation={state.rotation}
+              flipHorizontal={state.flipHorizontal}
+              flipVertical={state.flipVertical}
+              onRotationChange={(rotation) => updateState({ rotation })}
+              onFlipHorizontalChange={(flip) => updateState({ flipHorizontal: flip })}
+              onFlipVerticalChange={(flip) => updateState({ flipVertical: flip })}
+              onResetTransform={handleResetTransform}
+              t={t}
+              disabled={!state.rotateEnabled}
             />
 
             {/* Resize Panel */}
@@ -402,22 +417,10 @@ const ImageStudioTool: React.FC = () => {
               onModeChange={(mode) => updateState({ resizeMode: mode })}
               onQualityChange={(quality) => updateState({ resizeQuality: quality })}
               t={t}
+              disabled={!state.resizeEnabled}
             />
 
-            {/* Rotate Panel */}
-            <RotatePanel
-              data-step="rotate"
-              rotation={state.rotation}
-              flipHorizontal={state.flipHorizontal}
-              flipVertical={state.flipVertical}
-              onRotationChange={(rotation) => updateState({ rotation })}
-              onFlipHorizontalChange={(flip) => updateState({ flipHorizontal: flip })}
-              onFlipVerticalChange={(flip) => updateState({ flipVertical: flip })}
-              onResetTransform={handleResetTransform}
-              t={t}
-            />
-
-            {/* Export Panel */}
+            {/* Export Panel - always enabled */}
             <ExportPanel
               data-step="export"
               format={state.exportFormat}

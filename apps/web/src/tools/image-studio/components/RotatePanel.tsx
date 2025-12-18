@@ -13,6 +13,7 @@ interface RotatePanelProps {
   onFlipVerticalChange: (flip: boolean) => void;
   onResetTransform: () => void;
   t: (key: string) => string;
+  disabled?: boolean;
 }
 
 export const RotatePanel: React.FC<RotatePanelProps> = ({
@@ -24,6 +25,7 @@ export const RotatePanel: React.FC<RotatePanelProps> = ({
   onFlipVerticalChange,
   onResetTransform,
   t,
+  disabled = false,
 }) => {
   const handleRotateLeft = () => {
     const newRotation = ((rotation - 90 + 360) % 360) as Rotation;
@@ -36,7 +38,7 @@ export const RotatePanel: React.FC<RotatePanelProps> = ({
   };
 
   return (
-    <div className="space-y-4" data-step="rotate">
+    <div className={cn('space-y-4', disabled && 'opacity-50 pointer-events-none')} data-step="rotate">
       {/* Rotation */}
       <div>
         <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">

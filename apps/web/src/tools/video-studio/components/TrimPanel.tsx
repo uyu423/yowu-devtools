@@ -1,6 +1,7 @@
 import React from 'react';
 import { Clock, Scissors } from 'lucide-react';
 import { OptionLabel } from '@/components/ui/OptionLabel';
+import { cn } from '@/lib/utils';
 import { formatTime, parseTime } from '../constants';
 
 interface TrimPanelProps {
@@ -11,6 +12,7 @@ interface TrimPanelProps {
   onEndChange: (time: number) => void;
   onSeekTo: (time: number) => void;
   t: (key: string) => string;
+  disabled?: boolean;
 }
 
 export const TrimPanel: React.FC<TrimPanelProps> = ({
@@ -21,6 +23,7 @@ export const TrimPanel: React.FC<TrimPanelProps> = ({
   onEndChange,
   onSeekTo,
   t,
+  disabled = false,
 }) => {
   const [startInput, setStartInput] = React.useState(formatTime(trimStart));
   const [endInput, setEndInput] = React.useState(formatTime(trimEnd));
@@ -69,7 +72,7 @@ export const TrimPanel: React.FC<TrimPanelProps> = ({
   const trimmedDuration = trimEnd - trimStart;
 
   return (
-    <div className="space-y-4" data-step="trim">
+    <div className={cn('space-y-4', disabled && 'opacity-50 pointer-events-none')} data-step="trim">
       {/* Start Time */}
       <div>
         <OptionLabel tooltip={t('tool.videoStudio.trim.startTooltip')}>

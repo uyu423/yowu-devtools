@@ -1,6 +1,7 @@
 import React from 'react';
 import { OptionLabel } from '@/components/ui/OptionLabel';
 import { Select } from '@/components/ui/Select';
+import { cn } from '@/lib/utils';
 import type { AspectRatio, CropArea, CustomAspectRatio } from '../types';
 import { ASPECT_RATIO_OPTIONS } from '../constants';
 
@@ -15,6 +16,7 @@ interface CropPanelProps {
   onCropAreaChange: (area: CropArea) => void;
   onResetCrop: () => void;
   t: (key: string) => string;
+  disabled?: boolean;
 }
 
 export const CropPanel: React.FC<CropPanelProps> = ({
@@ -28,6 +30,7 @@ export const CropPanel: React.FC<CropPanelProps> = ({
   onCropAreaChange,
   onResetCrop,
   t,
+  disabled = false,
 }) => {
   const handleAspectRatioChange = (newRatio: AspectRatio) => {
     onAspectRatioChange(newRatio);
@@ -80,7 +83,7 @@ export const CropPanel: React.FC<CropPanelProps> = ({
   };
 
   return (
-    <div className="space-y-4" data-step="crop">
+    <div className={cn('space-y-4', disabled && 'opacity-50 pointer-events-none')} data-step="crop">
       {/* Aspect Ratio */}
       <div>
         <OptionLabel tooltip={t('tool.imageStudio.crop.aspectRatioTooltip')}>
@@ -94,6 +97,7 @@ export const CropPanel: React.FC<CropPanelProps> = ({
           options={ASPECT_RATIO_OPTIONS}
           className="w-full"
           triggerClassName="w-full"
+          disabled={disabled}
         />
       </div>
 

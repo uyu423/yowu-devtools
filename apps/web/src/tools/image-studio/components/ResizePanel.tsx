@@ -20,6 +20,7 @@ interface ResizePanelProps {
   onModeChange: (mode: ResizeMode) => void;
   onQualityChange: (quality: InterpolationQuality) => void;
   t: (key: string) => string;
+  disabled?: boolean;
 }
 
 export const ResizePanel: React.FC<ResizePanelProps> = ({
@@ -36,6 +37,7 @@ export const ResizePanel: React.FC<ResizePanelProps> = ({
   onModeChange,
   onQualityChange,
   t,
+  disabled = false,
 }) => {
   const aspectRatio = originalWidth / originalHeight;
 
@@ -84,7 +86,7 @@ export const ResizePanel: React.FC<ResizePanelProps> = ({
   };
 
   return (
-    <div className="space-y-4" data-step="resize">
+    <div className={cn('space-y-4', disabled && 'opacity-50 pointer-events-none')} data-step="resize">
       {/* Dimensions */}
       <div>
         <OptionLabel tooltip={t('tool.imageStudio.resize.dimensionsTooltip')}>
@@ -175,6 +177,7 @@ export const ResizePanel: React.FC<ResizePanelProps> = ({
           options={resizeModeOptions}
           className="w-full"
           triggerClassName="w-full"
+          disabled={disabled}
         />
         <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
           {resizeModeOptions.find((o) => o.value === mode)?.description}

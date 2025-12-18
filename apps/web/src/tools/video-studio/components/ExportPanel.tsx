@@ -12,6 +12,7 @@ interface ExportPanelProps {
   onQualityPresetChange: (preset: QualityPreset) => void;
   onSuffixChange: (suffix: string) => void;
   t: (key: string) => string;
+  disabled?: boolean;
 }
 
 export const ExportPanel: React.FC<ExportPanelProps> = ({
@@ -23,6 +24,7 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({
   onQualityPresetChange,
   onSuffixChange,
   t,
+  disabled = false,
 }) => {
   // Generate quality preset options with i18n translations
   const qualityPresetOptions = useMemo(
@@ -50,7 +52,7 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({
   };
 
   return (
-    <div className="space-y-4" data-step="export">
+    <div className={cn('space-y-4', disabled && 'opacity-50 pointer-events-none')} data-step="export">
       {/* Format */}
       <div>
         <OptionLabel tooltip={t('tool.videoStudio.export.formatTooltip')}>

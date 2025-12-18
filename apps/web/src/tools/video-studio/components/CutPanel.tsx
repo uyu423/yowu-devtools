@@ -14,6 +14,7 @@ interface CutPanelProps {
   onSplitCountChange: (count: number) => void;
   onSeekTo: (time: number) => void;
   t: (key: string) => string;
+  disabled?: boolean;
 }
 
 export const CutPanel: React.FC<CutPanelProps> = ({
@@ -26,6 +27,7 @@ export const CutPanel: React.FC<CutPanelProps> = ({
   onSplitCountChange,
   onSeekTo,
   t,
+  disabled = false,
 }) => {
   const handleAddSegment = () => {
     const newSegment: CutSegment = {
@@ -53,7 +55,7 @@ export const CutPanel: React.FC<CutPanelProps> = ({
   };
 
   return (
-    <div className="space-y-4" data-step="cut">
+    <div className={cn('space-y-4', disabled && 'opacity-50 pointer-events-none')} data-step="cut">
       {/* Mode Selection */}
       <div>
         <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">

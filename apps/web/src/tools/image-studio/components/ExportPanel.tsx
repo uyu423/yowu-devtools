@@ -15,6 +15,7 @@ interface ExportPanelProps {
   onQualityChange: (quality: number) => void;
   onSuffixChange: (suffix: string) => void;
   t: (key: string) => string;
+  disabled?: boolean;
 }
 
 export const ExportPanel: React.FC<ExportPanelProps> = ({
@@ -27,6 +28,7 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({
   onQualityChange,
   onSuffixChange,
   t,
+  disabled = false,
 }) => {
   const showQualitySlider = format === 'jpeg' || format === 'webp';
 
@@ -37,7 +39,7 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({
   };
 
   return (
-    <div className="space-y-4" data-step="export">
+    <div className={cn('space-y-4', disabled && 'opacity-50 pointer-events-none')} data-step="export">
       {/* Format */}
       <div>
         <OptionLabel tooltip={t('tool.imageStudio.export.formatTooltip')}>

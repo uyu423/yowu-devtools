@@ -99,6 +99,73 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
     return transforms.length > 0 ? transforms.join(' ') : undefined;
   };
 
+  // Transform mouse delta based on rotation and flip
+  // This converts screen-space mouse movement to image-space movement
+  const transformDelta = React.useCallback((deltaX: number, deltaY: number): { dx: number; dy: number } => {
+    let dx = deltaX;
+    let dy = deltaY;
+
+    // Apply rotation transformation (inverse rotation)
+    // When image is rotated, we need to counter-rotate the mouse movement
+    switch (rotation) {
+      case 90:
+        // Image rotated 90° CW: screen right = image down, screen down = image left
+        [dx, dy] = [dy, -deltaX];
+        break;
+      case 180:
+        // Image rotated 180°: screen right = image left, screen down = image up
+        [dx, dy] = [-deltaX, -deltaY];
+        break;
+      case 270:
+        // Image rotated 270° CW (90° CCW): screen right = image up, screen down = image right
+        [dx, dy] = [-dy, deltaX];
+        break;
+      // 0° rotation: no change needed
+    }
+
+    // Apply flip transformations
+    if (flipHorizontal) {
+      dx = -dx;
+    }
+    if (flipVertical) {
+      dy = -dy;
+    }
+
+    return { dx, dy };
+  }, [rotation, flipHorizontal, flipVertical]);
+
+  // Get the appropriate resize handle after transformation
+  const getTransformedHandle = React.useCallback((handle: string): string => {
+    let transformed = handle;
+    
+    // Handle rotation
+    const handleRotations: Record<string, string[]> = {
+      'nw': ['nw', 'ne', 'se', 'sw'], // 0°, 90°, 180°, 270°
+      'ne': ['ne', 'se', 'sw', 'nw'],
+      'se': ['se', 'sw', 'nw', 'ne'],
+      'sw': ['sw', 'nw', 'ne', 'se'],
+    };
+    
+    const rotationIndex = rotation / 90;
+    if (handleRotations[handle]) {
+      transformed = handleRotations[handle][rotationIndex];
+    }
+
+    // Handle flips
+    if (flipHorizontal) {
+      transformed = transformed.includes('e') 
+        ? transformed.replace('e', 'w') 
+        : transformed.replace('w', 'e');
+    }
+    if (flipVertical) {
+      transformed = transformed.includes('n') 
+        ? transformed.replace('n', 's') 
+        : transformed.replace('s', 'n');
+    }
+
+    return transformed;
+  }, [rotation, flipHorizontal, flipVertical]);
+
   // Handle crop area mouse events
   const handleCropMouseDown = (e: React.MouseEvent, handle?: string) => {
     if (!showCropOverlay || !cropArea || !containerRef.current || !metadata) return;
@@ -125,14 +192,21 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
     const scaleX = metadata.width / rect.width;
     const scaleY = metadata.height / rect.height;
 
-    const deltaX = (x - dragStart.x) * scaleX;
-    const deltaY = (y - dragStart.y) * scaleY;
+    // Calculate raw delta in screen space
+    const rawDeltaX = (x - dragStart.x) * scaleX;
+    const rawDeltaY = (y - dragStart.y) * scaleY;
+
+    // Transform delta to account for rotation and flip
+    const { dx: deltaX, dy: deltaY } = transformDelta(rawDeltaX, rawDeltaY);
 
     const newArea = { ...cropArea };
 
     if (resizeHandle) {
-      // Resizing
-      switch (resizeHandle) {
+      // Get the actual handle in image space (accounting for rotation/flip)
+      const actualHandle = getTransformedHandle(resizeHandle);
+      
+      // Resizing - use transformed handle
+      switch (actualHandle) {
         case 'nw':
           newArea.x = Math.max(0, cropArea.x + deltaX);
           newArea.y = Math.max(0, cropArea.y + deltaY);
@@ -155,7 +229,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
           break;
       }
     } else {
-      // Moving
+      // Moving - use transformed delta
       newArea.x = Math.max(0, Math.min(metadata.width - cropArea.width, cropArea.x + deltaX));
       newArea.y = Math.max(0, Math.min(metadata.height - cropArea.height, cropArea.y + deltaY));
     }
@@ -168,7 +242,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
 
     onCropAreaChange(newArea);
     setDragStart({ x, y });
-  }, [isDraggingCrop, dragStart, metadata, cropArea, resizeHandle, onCropAreaChange]);
+  }, [isDraggingCrop, dragStart, metadata, cropArea, resizeHandle, onCropAreaChange, transformDelta, getTransformedHandle]);
 
   const handleCropMouseUp = React.useCallback(() => {
     setIsDraggingCrop(false);
@@ -197,6 +271,38 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
       width: `${(cropArea.width / metadata.width) * 100}%`,
       height: `${(cropArea.height / metadata.height) * 100}%`,
     };
+  };
+
+  // Calculate clip-path for dark overlay (exclude crop area)
+  const getDarkOverlayClipPath = () => {
+    if (!cropArea || !metadata) return undefined;
+    
+    const left = (cropArea.x / metadata.width) * 100;
+    const top = (cropArea.y / metadata.height) * 100;
+    const right = ((cropArea.x + cropArea.width) / metadata.width) * 100;
+    const bottom = ((cropArea.y + cropArea.height) / metadata.height) * 100;
+    
+    // Create a polygon that covers everything EXCEPT the crop area
+    // Using the "frame" technique: outer rectangle with inner cutout
+    return `polygon(
+      0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%,
+      ${left}% ${top}%, ${left}% ${bottom}%, ${right}% ${bottom}%, ${right}% ${top}%, ${left}% ${top}%
+    )`;
+  };
+
+  // Get counter-rotation for elements that should stay upright
+  const getCounterTransformStyle = () => {
+    const transforms: string[] = [];
+    if (rotation !== 0) {
+      transforms.push(`rotate(${-rotation}deg)`);
+    }
+    if (flipHorizontal) {
+      transforms.push('scaleX(-1)');
+    }
+    if (flipVertical) {
+      transforms.push('scaleY(-1)');
+    }
+    return transforms.length > 0 ? transforms.join(' ') : undefined;
   };
 
   if (!imageUrl) {
@@ -273,8 +379,11 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
           {/* Crop overlay - now transforms with the image */}
           {showCropOverlay && cropArea && metadata && (
             <>
-              {/* Darkened area outside crop */}
-              <div className="absolute inset-0 bg-black/50 pointer-events-none" />
+              {/* Darkened area outside crop (using clip-path to exclude crop area) */}
+              <div 
+                className="absolute inset-0 bg-black/50 pointer-events-none" 
+                style={{ clipPath: getDarkOverlayClipPath() }}
+              />
               
               {/* Crop selection area */}
               <div
@@ -282,9 +391,6 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
                 style={getCropOverlayStyle()}
                 onMouseDown={(e) => handleCropMouseDown(e)}
               >
-                {/* Clear window */}
-                <div className="absolute inset-0 bg-black/0" />
-                
                 {/* Grid lines */}
                 <div className="absolute inset-0 pointer-events-none">
                   <div className="absolute left-1/3 top-0 bottom-0 w-px bg-white/50" />
@@ -308,8 +414,11 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
                   />
                 ))}
 
-                {/* Crop dimensions display */}
-                <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 px-2 py-0.5 text-xs bg-black/80 text-white rounded whitespace-nowrap">
+                {/* Crop dimensions display - counter-rotated to stay upright */}
+                <div 
+                  className="absolute -bottom-6 left-1/2 -translate-x-1/2 px-2 py-0.5 text-xs bg-black/80 text-white rounded whitespace-nowrap"
+                  style={{ transform: `translateX(-50%) ${getCounterTransformStyle() || ''}`.trim() }}
+                >
                   {Math.round(cropArea.width)} × {Math.round(cropArea.height)}
                 </div>
               </div>

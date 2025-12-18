@@ -517,6 +517,7 @@ const VideoStudioTool: React.FC = () => {
               onEndChange={(end) => updateState({ trimEnd: end })}
               onSeekTo={handleSeek}
               t={t}
+              disabled={!state.trimEnabled}
             />
 
             {/* Cut Panel */}
@@ -531,6 +532,7 @@ const VideoStudioTool: React.FC = () => {
               onSplitCountChange={(count) => updateState({ splitCount: count })}
               onSeekTo={handleSeek}
               t={t}
+              disabled={!state.cutEnabled}
             />
 
             {/* Crop Panel */}
@@ -542,6 +544,7 @@ const VideoStudioTool: React.FC = () => {
               onCropAreaChange={handleCropAreaChange}
               onResetCrop={handleResetCrop}
               t={t}
+              disabled={!state.cropEnabled}
             />
 
             {/* Resize Panel */}
@@ -558,9 +561,10 @@ const VideoStudioTool: React.FC = () => {
               onLockAspectChange={(locked) => updateState({ resizeLockAspect: locked })}
               onModeChange={(mode) => updateState({ resizeMode: mode })}
               t={t}
+              disabled={!state.resizeEnabled}
             />
 
-            {/* Export Panel */}
+            {/* Export Panel - always enabled */}
             <ExportPanel
               data-step="export"
               format={state.exportFormat}
