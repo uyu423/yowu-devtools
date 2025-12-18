@@ -1253,7 +1253,7 @@ export const koKR = {
       },
     },
     imageStudio: {
-      title: '이미지 스튜디오',
+      title: 'Image Studio',
       description: '이미지를 자르고, 크기 조정, 회전, 변환합니다. 모든 처리는 브라우저에서 이루어집니다.',
       pipeline: '파이프라인',
       stepsEnabled: '단계 활성화',
@@ -1329,7 +1329,7 @@ export const koKR = {
       },
     },
     videoStudio: {
-      title: '비디오 스튜디오',
+      title: 'Video Studio',
       description: '비디오를 자르고, 잘라내고, 크기 조정, 변환합니다. 모든 처리는 브라우저에서 이루어집니다.',
       pipeline: '파이프라인',
       stepsEnabled: '단계 활성화',
@@ -1543,12 +1543,12 @@ export const koKR = {
         '무료 온라인 API 응답 비교 도구. 두 엔드포인트를 동시에 호출하고 JSON 응답 차이를 나란히 하이라이트합니다.',
     },
     imageStudio: {
-      title: '이미지 스튜디오',
+      title: 'Image Studio',
       description:
         '무료 온라인 이미지 편집기. 이미지를 자르고, 크기 조정, 회전하고 PNG, JPEG, WebP로 변환합니다. 모든 처리는 브라우저에서 이루어집니다.',
     },
     videoStudio: {
-      title: '비디오 스튜디오',
+      title: 'Video Studio',
       description:
         '무료 온라인 비디오 편집기. 비디오를 자르고, 잘라내고, 크기 조정하고 MP4 또는 WebM으로 변환합니다. 썸네일을 추출합니다. 브라우저 기반 처리.',
     },
