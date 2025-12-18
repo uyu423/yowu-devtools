@@ -1,6 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import React from 'react';
-import { useBlocker } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import type { ToolDefinition } from '@/tools/types';
 import { Video, ExternalLink } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
@@ -122,26 +122,53 @@ const VideoStudioTool: React.FC = () => {
 
   // Navigation blocking when processing
   const isProcessingAny = processingState.isProcessing || isExtractingThumbnail;
+  const location = useLocation();
   
-  // Block SPA navigation when processing
-  const blocker = useBlocker(
-    ({ currentLocation, nextLocation }) =>
-      isProcessingAny && currentLocation.pathname !== nextLocation.pathname
-  );
-
-  // Handle blocker state changes
+  // Block SPA navigation when processing (intercept link clicks)
   React.useEffect(() => {
-    if (blocker.state === 'blocked') {
-      const confirmLeave = window.confirm(t('tool.videoStudio.leavePageWarning'));
-      if (confirmLeave) {
-        // Cancel FFmpeg and proceed with navigation
-        cancelFFmpeg();
-        blocker.proceed();
-      } else {
-        blocker.reset();
+    if (!isProcessingAny) return;
+
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const link = target.closest('a');
+      
+      if (link && link.href && !link.target) {
+        const url = new URL(link.href);
+        // Check if it's an internal navigation (same origin, different path)
+        if (url.origin === window.location.origin && url.pathname !== location.pathname) {
+          const confirmLeave = window.confirm(t('tool.videoStudio.leavePageWarning'));
+          if (!confirmLeave) {
+            e.preventDefault();
+            e.stopPropagation();
+          } else {
+            // Cancel FFmpeg before navigation
+            cancelFFmpeg();
+          }
+        }
       }
-    }
-  }, [blocker, t]);
+    };
+
+    // Handle browser back/forward buttons
+    const handlePopState = () => {
+      if (isProcessingAny) {
+        const confirmLeave = window.confirm(t('tool.videoStudio.leavePageWarning'));
+        if (!confirmLeave) {
+          // Push the current state back to prevent navigation
+          window.history.pushState(null, '', location.pathname);
+        } else {
+          cancelFFmpeg();
+        }
+      }
+    };
+
+    document.addEventListener('click', handleClick, true);
+    window.addEventListener('popstate', handlePopState);
+    
+    return () => {
+      document.removeEventListener('click', handleClick, true);
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [isProcessingAny, location.pathname, t]);
 
   // Block browser close/refresh when processing
   React.useEffect(() => {
