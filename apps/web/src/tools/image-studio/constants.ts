@@ -67,8 +67,8 @@ export const EXPORT_FORMAT_OPTIONS: { value: string; label: string; mimeType: st
 
 export const PIPELINE_STEPS: Omit<PipelineStep, 'enabled'>[] = [
   { id: 'crop', name: 'Crop', icon: Crop },
-  { id: 'resize', name: 'Resize', icon: Maximize2 },
   { id: 'rotate', name: 'Rotate / Flip', icon: RotateCw },
+  { id: 'resize', name: 'Resize', icon: Maximize2 },
   { id: 'export', name: 'Export', icon: Download },
 ];
 

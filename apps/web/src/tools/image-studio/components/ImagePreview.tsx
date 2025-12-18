@@ -256,18 +256,21 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
 
       {/* Image container with transforms */}
       <div className="flex items-center justify-center p-4 min-h-64 md:min-h-96">
-        <div className="relative max-w-full max-h-full">
+        {/* Wrapper that applies transform to both image and crop overlay */}
+        <div 
+          className="relative max-w-full max-h-full"
+          style={{ transform: getTransformStyle() }}
+        >
           <img
             src={imageUrl}
             alt="Preview"
-            className="max-w-full max-h-[60vh] object-contain"
-            style={{ transform: getTransformStyle() }}
+            className="max-w-full max-h-[60vh] object-contain block"
             onError={() => {
               // Handle broken image
             }}
           />
 
-          {/* Crop overlay */}
+          {/* Crop overlay - now transforms with the image */}
           {showCropOverlay && cropArea && metadata && (
             <>
               {/* Darkened area outside crop */}

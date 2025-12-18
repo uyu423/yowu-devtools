@@ -5,7 +5,7 @@
 // - Reuse across operations
 // - Proper cleanup on unload
 //
-// Uses multithreaded version if available, falls back to single-threaded
+// Uses local FFmpeg core files from public/ffmpeg/
 
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { toBlobURL } from '@ffmpeg/util';
@@ -16,9 +16,8 @@ let ffmpegInstance: FFmpeg | null = null;
 let isLoading = false;
 let isLoaded = false;
 
-// CDN URLs for FFmpeg core files (use unpkg as it's more reliable)
-const FFMPEG_CORE_VERSION = '0.12.9';
-const BASE_URL = `https://unpkg.com/@ffmpeg/core@${FFMPEG_CORE_VERSION}/dist/esm`;
+// Local paths for FFmpeg core files (served from public/ffmpeg/)
+const FFMPEG_BASE_URL = '/ffmpeg';
 
 /**
  * Get or create FFmpeg instance
@@ -28,11 +27,13 @@ export async function getFFmpeg(
 ): Promise<FFmpeg> {
   // Return existing instance if loaded
   if (ffmpegInstance && isLoaded) {
+    console.log('[FFmpeg] Returning cached instance');
     return ffmpegInstance;
   }
 
   // Wait if already loading
   if (isLoading) {
+    console.log('[FFmpeg] Waiting for existing load operation...');
     return new Promise((resolve, reject) => {
       const checkInterval = setInterval(() => {
         if (isLoaded && ffmpegInstance) {
@@ -48,6 +49,7 @@ export async function getFFmpeg(
 
   // Start loading
   isLoading = true;
+  console.log('[FFmpeg] Starting to load FFmpeg...');
 
   try {
     onProgress?.({
@@ -58,16 +60,14 @@ export async function getFFmpeg(
 
     ffmpegInstance = new FFmpeg();
 
-    // Set up logging
+    // Set up logging - always log for debugging
     ffmpegInstance.on('log', ({ message }) => {
-      // Only log in development mode
-      if (import.meta.env.DEV) {
-        console.log('[FFmpeg]', message);
-      }
+      console.log('[FFmpeg Log]', message);
     });
 
     // Set up progress tracking
     ffmpegInstance.on('progress', ({ progress }) => {
+      console.log('[FFmpeg Progress]', Math.round(progress * 100) + '%');
       onProgress?.({
         stage: 'processing',
         progress: Math.round(progress * 100),
@@ -77,15 +77,43 @@ export async function getFFmpeg(
 
     onProgress?.({
       stage: 'loading-engine',
-      progress: 30,
-      message: 'Downloading FFmpeg core...',
+      progress: 10,
+      message: 'Loading FFmpeg core files...',
     });
 
-    // Load FFmpeg core from CDN
-    await ffmpegInstance.load({
-      coreURL: await toBlobURL(`${BASE_URL}/ffmpeg-core.js`, 'text/javascript'),
-      wasmURL: await toBlobURL(`${BASE_URL}/ffmpeg-core.wasm`, 'application/wasm'),
+    console.log('[FFmpeg] Loading core files from:', FFMPEG_BASE_URL);
+
+    // Load FFmpeg core from local files
+    const coreURL = await toBlobURL(
+      `${FFMPEG_BASE_URL}/ffmpeg-core.js`,
+      'text/javascript'
+    );
+    console.log('[FFmpeg] Core JS loaded');
+
+    onProgress?.({
+      stage: 'loading-engine',
+      progress: 50,
+      message: 'Loading FFmpeg WASM...',
     });
+
+    const wasmURL = await toBlobURL(
+      `${FFMPEG_BASE_URL}/ffmpeg-core.wasm`,
+      'application/wasm'
+    );
+    console.log('[FFmpeg] Core WASM loaded');
+
+    onProgress?.({
+      stage: 'loading-engine',
+      progress: 80,
+      message: 'Initializing FFmpeg...',
+    });
+
+    await ffmpegInstance.load({
+      coreURL,
+      wasmURL,
+    });
+
+    console.log('[FFmpeg] FFmpeg loaded successfully!');
 
     onProgress?.({
       stage: 'loading-engine',
@@ -98,6 +126,7 @@ export async function getFFmpeg(
 
     return ffmpegInstance;
   } catch (error) {
+    console.error('[FFmpeg] Failed to load FFmpeg:', error);
     isLoading = false;
     isLoaded = false;
     ffmpegInstance = null;
