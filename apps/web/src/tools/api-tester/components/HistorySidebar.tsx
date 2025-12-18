@@ -314,7 +314,7 @@ export const HistorySidebar: React.FC<HistorySidebarProps> = ({
       {/* Sidebar */}
       <div
         className={cn(
-          'fixed right-0 top-0 h-full w-96 z-50',
+          'fixed right-0 top-0 h-full w-full sm:w-96 max-w-full z-50',
           'flex flex-col',
           'bg-white dark:bg-gray-900',
           'border-l border-gray-200 dark:border-gray-700',
