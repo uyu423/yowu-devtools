@@ -9,7 +9,7 @@ import { useShareModal } from '@/hooks/useShareModal';
 import { useTitle } from '@/hooks/useTitle';
 import { useI18n } from '@/hooks/useI18nHooks';
 import { ShareModal } from '@/components/common/ShareModal';
-import { AdsenseFooter } from '@/components/common/AdsenseFooter';
+import { GoogleAdsense } from '@/components/common/GoogleAdsense';
 import { toast } from 'sonner';
 
 import type { ImageStudioState, ImageMetadata, CropArea, ExportFormat } from './types';
@@ -528,6 +528,11 @@ const ImageStudioTool: React.FC = () => {
               <ExternalLink className="w-2.5 h-2.5" />
             </a>
           </div>
+
+          {/* Adsense */}
+          <div className="mt-8">
+            <GoogleAdsense />
+          </div>
         </div>
 
         {/* Pipeline Panel */}
@@ -611,8 +616,6 @@ const ImageStudioTool: React.FC = () => {
       </div>
 
       <ShareModal {...shareModalProps} />
-
-      <AdsenseFooter />
 
       <PipelinePresetModal
         isOpen={presetModalOpen}

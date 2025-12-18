@@ -1,5 +1,6 @@
 import { Copy, KeyRound } from 'lucide-react';
 
+import { AdsenseFooter } from '@/components/common/AdsenseFooter';
 import { OptionLabel } from '@/components/ui/OptionLabel';
 /* eslint-disable react-refresh/only-export-components */
 import React from 'react';
@@ -346,6 +347,7 @@ const UuidTool: React.FC = () => {
         </div>
       </div>
       <ShareModal {...shareModalProps} />
+      <AdsenseFooter />
     </div>
   );
 };
