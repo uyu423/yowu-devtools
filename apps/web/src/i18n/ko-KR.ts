@@ -126,6 +126,9 @@ export const koKR = {
     sortAlphabetical: '알파벳 순',
     sortAdded: '추가된 순',
     sortNewest: '최신 순',
+    // Collapse/Expand
+    collapseSidebar: '사이드바 접기',
+    expandSidebar: '사이드바 펼치기',
   },
   commandPalette: {
     searchTools: '도구 검색...',

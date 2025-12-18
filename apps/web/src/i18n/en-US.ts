@@ -124,6 +124,9 @@ export const enUS = {
     sortAlphabetical: 'Alphabetical',
     sortAdded: 'Added order',
     sortNewest: 'Newest first',
+    // Collapse/Expand
+    collapseSidebar: 'Collapse sidebar',
+    expandSidebar: 'Expand sidebar',
   },
   commandPalette: {
     searchTools: 'Search tools...',

@@ -126,6 +126,9 @@ export const jaJP = {
     sortAlphabetical: 'アルファベット順',
     sortAdded: '追加順',
     sortNewest: '新しい順',
+    // Collapse/Expand
+    collapseSidebar: 'サイドバーを折りたたむ',
+    expandSidebar: 'サイドバーを展開',
   },
   commandPalette: {
     searchTools: 'ツールを検索...',

@@ -124,6 +124,9 @@ export const zhCN = {
     sortAlphabetical: '字母顺序',
     sortAdded: '添加顺序',
     sortNewest: '最新优先',
+    // Collapse/Expand
+    collapseSidebar: '折叠侧边栏',
+    expandSidebar: '展开侧边栏',
   },
   commandPalette: {
     searchTools: '搜索工具...',

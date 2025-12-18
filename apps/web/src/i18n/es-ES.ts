@@ -128,6 +128,9 @@ export const esES = {
     sortAlphabetical: 'Alfabético',
     sortAdded: 'Orden agregado',
     sortNewest: 'Más reciente',
+    // Collapse/Expand
+    collapseSidebar: 'Contraer barra lateral',
+    expandSidebar: 'Expandir barra lateral',
   },
   commandPalette: {
     searchTools: 'Buscar herramientas...',

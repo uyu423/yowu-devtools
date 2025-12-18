@@ -1,4 +1,4 @@
-import { ArrowDownAZ, Clock, ExternalLink, Hash, Laptop, Moon, Sparkles, Star, Sun, TrendingUp, X } from 'lucide-react';
+import { ArrowDownAZ, ChevronLeft, ChevronRight, Clock, ExternalLink, Hash, Laptop, Moon, Sparkles, Star, Sun, TrendingUp, X } from 'lucide-react';
 import { getToolById, tools } from '@/tools';
 
 import { LanguageSelector } from '@/components/common/LanguageSelector';
@@ -20,9 +20,11 @@ const SORT_CYCLE: SortType[] = ['alphabetical', 'added', 'newest'];
 
 interface SidebarProps {
   onCloseMobile: () => void;
+  isCollapsed: boolean;
+  onToggleCollapse: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile, isCollapsed, onToggleCollapse }) => {
   const { theme, setTheme } = useTheme();
   const { favorites, toggleFavorite, isFavorite } = useFavorites();
   const { recentTools } = useRecentTools();
@@ -90,6 +92,122 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
     }
   }, [sortType]);
 
+  // Collapsed 상태에서 아이콘만 렌더링하는 NavItem
+  const CollapsedNavItem: React.FC<{
+    tool: typeof tools[0];
+    showFavoriteStar?: boolean;
+  }> = ({ tool, showFavoriteStar }) => (
+    <Tooltip content={tool.title} position="right" nowrap>
+      <NavLink
+        to={getLocalePath(tool.path)}
+        onClick={onCloseMobile}
+        className={({ isActive }) =>
+          cn(
+            'group flex items-center justify-center w-10 h-10 rounded-md transition-colors relative',
+            isActive
+              ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+              : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white'
+          )
+        }
+      >
+        {tool.icon && <tool.icon className="w-5 h-5" />}
+        {showFavoriteStar && isFavorite(tool.id) && (
+          <Star className="w-2 h-2 fill-yellow-400 text-yellow-400 absolute -top-0.5 -right-0.5" />
+        )}
+      </NavLink>
+    </Tooltip>
+  );
+
+  // Collapsed 상태의 사이드바 렌더링
+  if (isCollapsed) {
+    return (
+      <div className="flex flex-col h-full bg-gray-50/50 dark:bg-gray-900 dark:border-gray-800 transition-colors w-16">
+        {/* Header - Logo */}
+        <div className="h-14 flex items-center justify-center border-b shrink-0 bg-white dark:bg-gray-900 dark:border-gray-800 dark:text-white transition-colors">
+          <a
+            href="https://yowu.dev/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-8 h-8 rounded-full overflow-hidden hover:opacity-80 transition-opacity border border-gray-200 dark:border-gray-700"
+            title={t('sidebar.goToYowuDev')}
+          >
+            <img
+              src={logoImg}
+              alt="yowu"
+              className="w-full h-full object-cover"
+            />
+          </a>
+        </div>
+
+        {/* Expand button */}
+        <div className="flex justify-center py-2 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+          <Tooltip content={t('sidebar.expandSidebar')} position="right" nowrap>
+            <button
+              onClick={onToggleCollapse}
+              className="p-1.5 rounded-md text-gray-400 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-white transition-colors"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </Tooltip>
+        </div>
+
+        {/* Nav List - Icons only */}
+        <div className="flex-1 overflow-y-auto py-3">
+          <nav className="space-y-4 px-3">
+            {/* 즐겨찾기 섹션 */}
+            {favoriteTools.length > 0 && (
+              <div>
+                <Tooltip content={t('sidebar.favorites')} position="right" nowrap>
+                  <div className="flex justify-center py-1.5 text-yellow-500 dark:text-yellow-400">
+                    <Star className="w-3.5 h-3.5 fill-current" />
+                  </div>
+                </Tooltip>
+                <div className="space-y-1 mt-1 flex flex-col items-center">
+                  {favoriteTools.map((tool) => (
+                    <CollapsedNavItem key={tool.id} tool={tool} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 최근 사용한 도구 섹션 */}
+            {recentToolItems.length > 0 && (
+              <div>
+                <Tooltip content={t('sidebar.recentTools')} position="right" nowrap>
+                  <div className="flex justify-center py-1.5 text-gray-500 dark:text-gray-400">
+                    <Clock className="w-3.5 h-3.5" />
+                  </div>
+                </Tooltip>
+                <div className="space-y-1 mt-1 flex flex-col items-center">
+                  {recentToolItems.map((tool) => (
+                    <CollapsedNavItem key={tool.id} tool={tool} showFavoriteStar />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 전체 도구 리스트 */}
+            {tools.length > 0 && (
+              <div>
+                <Tooltip content={t('sidebar.allTools')} position="right" nowrap>
+                  <div className="flex justify-center py-1.5 text-gray-500 dark:text-gray-400">
+                    <div className="w-3.5 h-0.5 bg-gray-400 dark:bg-gray-500 rounded-full" />
+                  </div>
+                </Tooltip>
+                <div className="space-y-1 mt-1 flex flex-col items-center">
+                  {sortedTools.map((tool) => (
+                    <CollapsedNavItem key={tool.id} tool={tool} showFavoriteStar />
+                  ))}
+                </div>
+              </div>
+            )}
+          </nav>
+        </div>
+      </div>
+    );
+  }
+
+  // Expanded 상태의 사이드바 (기존 렌더링)
   return (
     <div className="flex flex-col h-full bg-gray-50/50 dark:bg-gray-900 dark:border-gray-800 transition-colors">
       {/* Header */}
@@ -116,12 +234,23 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
             {t('sidebar.appName')}
           </NavLink>
         </div>
-        <button
-          onClick={onCloseMobile}
-          className="lg:hidden p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded"
-        >
-          <X className="w-5 h-5" />
-        </button>
+        <div className="flex items-center gap-1">
+          {/* Collapse button - desktop only */}
+          <Tooltip content={t('sidebar.collapseSidebar')} position="bottom" nowrap>
+            <button
+              onClick={onToggleCollapse}
+              className="hidden lg:flex p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+          </Tooltip>
+          <button
+            onClick={onCloseMobile}
+            className="lg:hidden p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
       </div>
 
       {/* Nav List */}
