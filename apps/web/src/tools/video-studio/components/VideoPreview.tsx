@@ -402,17 +402,6 @@ export const VideoPreview: React.FC<VideoPreviewProps> = ({
           </>
         )}
 
-        {/* Play button overlay */}
-        {!isPlaying && (
-          <button
-            onClick={handlePlayPause}
-            className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 hover:opacity-100 transition-opacity"
-          >
-            <div className="w-16 h-16 flex items-center justify-center bg-white/90 rounded-full">
-              <Play className="w-8 h-8 text-gray-900 ml-1" />
-            </div>
-          </button>
-        )}
       </div>
 
       {/* Controls */}

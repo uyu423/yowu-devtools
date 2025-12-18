@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, Clock, Download } from 'lucide-react';
+import { Image, Clock, Download, ChevronDown, ChevronRight } from 'lucide-react';
 import { OptionLabel } from '@/components/ui/OptionLabel';
 import { cn } from '@/lib/utils';
 import { formatTime, parseTime, THUMBNAIL_FORMAT_OPTIONS } from '../constants';
@@ -38,6 +38,7 @@ export const ThumbnailPanel: React.FC<ThumbnailPanelProps> = ({
   onExtract,
   t,
 }) => {
+  const [isExpanded, setIsExpanded] = React.useState(false); // Collapsed by default
   const [inputValue, setInputValue] = React.useState(formatTime(thumbnailTime));
 
   React.useEffect(() => {
@@ -71,13 +72,17 @@ export const ThumbnailPanel: React.FC<ThumbnailPanelProps> = ({
   };
 
   return (
-    <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900/50">
-      {/* Header */}
-      <div className="flex items-center gap-2 mb-4">
+    <div className="border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900/50 overflow-hidden">
+      {/* Header - Clickable to toggle */}
+      <button
+        type="button"
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="w-full flex items-center gap-2 p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+      >
         <div className="p-1.5 rounded-md bg-amber-100 dark:bg-amber-900/30">
           <Image className="w-4 h-4 text-amber-600 dark:text-amber-400" />
         </div>
-        <div>
+        <div className="flex-1 text-left">
           <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
             {t('tool.videoStudio.thumbnail.title')}
           </h3>
@@ -85,9 +90,16 @@ export const ThumbnailPanel: React.FC<ThumbnailPanelProps> = ({
             {t('tool.videoStudio.thumbnail.description')}
           </p>
         </div>
-      </div>
+        {isExpanded ? (
+          <ChevronDown className="w-4 h-4 text-gray-400" />
+        ) : (
+          <ChevronRight className="w-4 h-4 text-gray-400" />
+        )}
+      </button>
 
-      <div className="space-y-4">
+      {/* Content - Collapsible */}
+      {isExpanded && (
+      <div className="px-4 pb-4 space-y-4">
         {/* Time Input */}
         <div>
           <OptionLabel tooltip={t('tool.videoStudio.thumbnail.timeTooltip')}>
@@ -216,6 +228,7 @@ export const ThumbnailPanel: React.FC<ThumbnailPanelProps> = ({
           </div>
         </div>
       </div>
+      )}
     </div>
   );
 };
