@@ -31,7 +31,7 @@ export const MethodSelector: React.FC<MethodSelectorProps> = ({ value, onChange,
       onChange={(e) => onChange(e.target.value as HttpMethod)}
       disabled={disabled}
       className={cn(
-        'h-10 px-3 py-2 rounded-l-lg border border-r-0 border-gray-200 dark:border-gray-700',
+        'h-10 px-2 sm:px-3 py-2 rounded-l-lg border border-r-0 border-gray-200 dark:border-gray-700 shrink-0',
         'bg-gray-50 dark:bg-gray-800',
         'font-semibold text-sm',
         'focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400',

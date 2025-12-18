@@ -158,11 +158,11 @@ export const TopSharedPanel: React.FC<TopSharedPanelProps> = ({
   return (
     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-4">
       {/* Domains Header with Extension Status and Include Cookies */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
           {t('tool.apiDiff.domains')}
         </span>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-4">
           {/* Include Cookies checkbox - only show when extension is available */}
           {extensionStatus === 'connected' && (
             <div className="flex items-center gap-1.5">
@@ -175,7 +175,7 @@ export const TopSharedPanel: React.FC<TopSharedPanelProps> = ({
                   disabled={isExecuting}
                 />
                 <Cookie className="w-4 h-4" />
-                <span>{t('tool.apiDiff.includeCookies')}</span>
+                <span className="hidden sm:inline">{t('tool.apiDiff.includeCookies')}</span>
               </label>
               <Tooltip content={t('tool.apiDiff.includeCookiesTooltip')} position="bottom">
                 <HelpCircle className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 cursor-help" />
@@ -236,11 +236,11 @@ export const TopSharedPanel: React.FC<TopSharedPanelProps> = ({
       </div>
 
       {/* Method & Path & Execute */}
-      <div className="flex gap-3">
+      <div className="flex gap-2 sm:gap-3">
         <select
           value={method}
           onChange={(e) => onMethodChange(e.target.value as HttpMethod)}
-          className="px-3 py-2 text-sm font-medium border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="px-2 sm:px-3 py-2 text-sm font-medium border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 shrink-0"
         >
           {HTTP_METHODS.map((m) => (
             <option key={m} value={m}>
@@ -255,12 +255,12 @@ export const TopSharedPanel: React.FC<TopSharedPanelProps> = ({
           onBlur={handlePathBlur}
           onKeyDown={handlePathKeyDown}
           placeholder="/api/v1/example"
-          className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+          className="flex-1 min-w-0 px-2 sm:px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
         />
         <button
           onClick={onExecute}
           className={cn(
-            'flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors',
+            'flex items-center gap-2 px-3 sm:px-4 py-2 text-sm font-medium rounded-md transition-colors shrink-0',
             isExecuting
               ? 'bg-red-600 hover:bg-red-700 text-white'
               : 'bg-blue-600 hover:bg-blue-700 text-white'

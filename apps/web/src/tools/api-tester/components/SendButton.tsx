@@ -26,7 +26,7 @@ export const SendButton: React.FC<SendButtonProps> = ({
       <button
         onClick={onCancel}
         className={cn(
-          'h-10 px-4 rounded-r-lg',
+          'h-10 px-3 sm:px-4 rounded-r-lg shrink-0',
           'bg-red-600 hover:bg-red-700',
           'text-white font-medium text-sm',
           'flex items-center gap-2',
@@ -34,7 +34,7 @@ export const SendButton: React.FC<SendButtonProps> = ({
         )}
       >
         <Square className="w-4 h-4" />
-        <span>Cancel</span>
+        <span className="hidden sm:inline">Cancel</span>
       </button>
     );
   }
@@ -44,20 +44,21 @@ export const SendButton: React.FC<SendButtonProps> = ({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        'h-10 px-4 rounded-r-lg',
+        'h-10 px-3 sm:px-4 rounded-r-lg shrink-0',
         'bg-blue-600 hover:bg-blue-700',
         'text-white font-medium text-sm',
         'flex items-center gap-2',
         'transition-colors',
         'disabled:opacity-50 disabled:cursor-not-allowed'
       )}
+      title="Send (⌘/Ctrl + Enter)"
     >
       {mode === 'extension' ? (
         <Zap className="w-4 h-4" />
       ) : (
         <Send className="w-4 h-4" />
       )}
-      <span>Send</span>
+      <span className="hidden sm:inline">Send</span>
     </button>
   );
 };

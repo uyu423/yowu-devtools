@@ -4,23 +4,40 @@
  * Compare API responses from two domains
  */
 
-import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react';
+import type {
+  ApiDiffState,
+  HttpMethod,
+  KeyValuePair,
+  ResponseTab,
+} from './types';
+import { DEFAULT_STATE, createEmptyKeyValue } from './constants';
+import {
+  HistorySidebar,
+  ResultBanner,
+  SidePanel,
+  TopSharedPanel,
+} from './components';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { compareResponses, sanitizePathAndParams } from './utils';
+import { useApiDiffExecutor, useDomainPresets, useHistory } from './hooks';
+
+import { CorsModal } from '../api-tester/components';
 import { GitCompare } from 'lucide-react';
-import { toast } from 'sonner';
-import { useToolState } from '@/hooks/useToolState';
-import { useShareModal } from '@/hooks/useShareModal';
-import { useTitle } from '@/hooks/useTitle';
-import { useI18n } from '@/hooks/useI18nHooks';
-import { ToolHeader } from '@/components/common/ToolHeader';
 import { ShareModal } from '@/components/common/ShareModal';
 import type { ToolDefinition } from '../types';
-import type { ApiDiffState, HttpMethod, KeyValuePair, ResponseTab } from './types';
-import { DEFAULT_STATE, createEmptyKeyValue } from './constants';
-import { TopSharedPanel, SidePanel, ResultBanner, HistorySidebar } from './components';
-import { compareResponses, sanitizePathAndParams } from './utils';
-import { useDomainPresets, useApiDiffExecutor, useHistory } from './hooks';
-import { CorsModal } from '../api-tester/components';
+import { ToolHeader } from '@/components/common/ToolHeader';
+import { toast } from 'sonner';
 import { useCorsAllowlist } from '../api-tester/hooks';
+import { useI18n } from '@/hooks/useI18nHooks';
+import { useShareModal } from '@/hooks/useShareModal';
+import { useTitle } from '@/hooks/useTitle';
+import { useToolState } from '@/hooks/useToolState';
 
 // Note: Data transfer from API Tester is handled via location.state in useToolState
 
@@ -56,7 +73,8 @@ const ApiDiffTool: React.FC = () => {
   } = useApiDiffExecutor();
 
   // CORS allowlist
-  const { isAllowed: isCorsAllowed, addOrigin: addCorsOrigin } = useCorsAllowlist();
+  const { isAllowed: isCorsAllowed, addOrigin: addCorsOrigin } =
+    useCorsAllowlist();
 
   // CORS modal state
   const [corsModalOpen, setCorsModalOpen] = useState(false);
@@ -72,28 +90,33 @@ const ApiDiffTool: React.FC = () => {
     loadItem: loadHistoryItem,
   } = useHistory();
 
-  const { state, updateState, copyShareLink, shareViaWebShare, getShareStateInfo } =
-    useToolState<ApiDiffState>('api-diff', DEFAULT_STATE, {
-      shareStateFilter: ({
-        method,
-        path,
-        params,
-        headers,
-        body,
-        domainA,
-        domainB,
-        includeCookies,
-      }) => ({
-        method,
-        path,
-        params: params.filter((p) => p.key.trim() || p.value.trim()),
-        headers: headers.filter((h) => h.key.trim() || h.value.trim()),
-        body,
-        domainA,
-        domainB,
-        includeCookies,
-      }),
-    });
+  const {
+    state,
+    updateState,
+    copyShareLink,
+    shareViaWebShare,
+    getShareStateInfo,
+  } = useToolState<ApiDiffState>('api-diff', DEFAULT_STATE, {
+    shareStateFilter: ({
+      method,
+      path,
+      params,
+      headers,
+      body,
+      domainA,
+      domainB,
+      includeCookies,
+    }) => ({
+      method,
+      path,
+      params: params.filter((p) => p.key.trim() || p.value.trim()),
+      headers: headers.filter((h) => h.key.trim() || h.value.trim()),
+      body,
+      domainA,
+      domainB,
+      includeCookies,
+    }),
+  });
 
   const { handleShare, shareModalProps } = useShareModal({
     copyShareLink,
@@ -110,8 +133,10 @@ const ApiDiffTool: React.FC = () => {
 
   // Check if response has CORS error (only for direct mode requests)
   const hasCorsError =
-    (state.responseA?.error?.code === 'CORS_ERROR' && state.responseA?.method === 'direct') ||
-    (state.responseB?.error?.code === 'CORS_ERROR' && state.responseB?.method === 'direct');
+    (state.responseA?.error?.code === 'CORS_ERROR' &&
+      state.responseA?.method === 'direct') ||
+    (state.responseB?.error?.code === 'CORS_ERROR' &&
+      state.responseB?.method === 'direct');
 
   // Determine which URL had CORS error
   const corsErrorUrl = useMemo(() => {
@@ -138,72 +163,98 @@ const ApiDiffTool: React.FC = () => {
   }, [hasCorsError, corsErrorUrl, pendingCorsRetry]);
 
   // Handle execute with automatic CORS bypass for allowed origins
-  const handleExecute = useCallback(async (forceExtension = false) => {
-    if (isLoading) {
-      // Cancel
-      cancelRequests();
-      updateState({ isExecuting: false });
-      return;
-    }
+  const handleExecute = useCallback(
+    async (forceExtension = false) => {
+      if (isLoading) {
+        // Cancel
+        cancelRequests();
+        updateState({ isExecuting: false });
+        return;
+      }
 
-    // Validation
-    if (!state.path.trim()) {
-      toast.error(t('tool.apiDiff.validation.pathRequired'));
-      return;
-    }
-    if (!state.domainA.trim() || !state.domainB.trim()) {
-      toast.error(t('tool.apiDiff.validation.domainsRequired'));
-      return;
-    }
+      // Validation
+      if (!state.path.trim()) {
+        toast.error(t('tool.apiDiff.validation.pathRequired'));
+        return;
+      }
+      if (!state.domainA.trim() || !state.domainB.trim()) {
+        toast.error(t('tool.apiDiff.validation.domainsRequired'));
+        return;
+      }
 
-    // Sanitize path: extract query params from path and merge with existing params
-    const { sanitizedPath, mergedParams } = sanitizePathAndParams(state.path, state.params);
-    
-    // Update state if path was sanitized (has query params in path)
-    let requestState = state;
-    if (sanitizedPath !== state.path) {
-      updateState({ path: sanitizedPath, params: mergedParams });
-      requestState = { ...state, path: sanitizedPath, params: mergedParams };
-    }
+      // Sanitize path: extract query params from path and merge with existing params
+      const { sanitizedPath, mergedParams } = sanitizePathAndParams(
+        state.path,
+        state.params
+      );
 
-    // Reset CORS retry state
-    setPendingCorsRetry(false);
+      // Update state if path was sanitized (has query params in path)
+      let requestState = state;
+      if (sanitizedPath !== state.path) {
+        updateState({ path: sanitizedPath, params: mergedParams });
+        requestState = { ...state, path: sanitizedPath, params: mergedParams };
+      }
 
-    // Check if domains are in CORS allowlist - use extension automatically
-    const shouldUseExtension =
-      forceExtension ||
-      (isCorsAllowed(requestState.domainA) && extensionStatus === 'connected') ||
-      (isCorsAllowed(requestState.domainB) && extensionStatus === 'connected');
+      // Reset CORS retry state
+      setPendingCorsRetry(false);
 
-    // Set executing state
-    updateState({
-      isExecuting: true,
-      responseA: null,
-      responseB: null,
-    });
+      // Check if domains are in CORS allowlist - use extension automatically
+      const shouldUseExtension =
+        forceExtension ||
+        (isCorsAllowed(requestState.domainA) &&
+          extensionStatus === 'connected') ||
+        (isCorsAllowed(requestState.domainB) &&
+          extensionStatus === 'connected');
 
-    try {
-      const { responseA, responseB } = await executeRequests(requestState, shouldUseExtension);
+      // Set executing state
       updateState({
-        isExecuting: false,
-        responseA,
-        responseB,
+        isExecuting: true,
+        responseA: null,
+        responseB: null,
       });
-      // Add to history on success
-      addHistoryItem(requestState);
-    } catch (error) {
-      console.error('Request execution failed:', error);
-      updateState({ isExecuting: false });
-      toast.error(error instanceof Error ? error.message : 'Request failed');
-    }
-  }, [isLoading, state, cancelRequests, executeRequests, updateState, addHistoryItem, t, isCorsAllowed, extensionStatus]);
+
+      try {
+        const { responseA, responseB } = await executeRequests(
+          requestState,
+          shouldUseExtension
+        );
+        updateState({
+          isExecuting: false,
+          responseA,
+          responseB,
+        });
+        // Add to history on success
+        addHistoryItem(requestState);
+      } catch (error) {
+        console.error('Request execution failed:', error);
+        updateState({ isExecuting: false });
+        toast.error(error instanceof Error ? error.message : 'Request failed');
+      }
+    },
+    [
+      isLoading,
+      state,
+      cancelRequests,
+      executeRequests,
+      updateState,
+      addHistoryItem,
+      t,
+      isCorsAllowed,
+      extensionStatus,
+    ]
+  );
 
   // Keyboard shortcut: Cmd+Enter (Mac) or Ctrl+Enter (Windows) to execute comparison
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
         e.preventDefault();
-        if (!isLoading && state.path.trim() && state.domainA.trim() && state.domainB.trim()) {
+        if (
+          !isLoading &&
+          state.path.trim() &&
+          state.domainA.trim() &&
+          state.domainB.trim()
+        ) {
           handleExecute();
         }
       }
@@ -362,7 +413,9 @@ const ApiDiffTool: React.FC = () => {
           onBodyChange={handleBodyChange}
           onExecute={handleExecute}
           includeCookies={state.includeCookies}
-          onIncludeCookiesChange={(includeCookies) => updateState({ includeCookies })}
+          onIncludeCookiesChange={(includeCookies) =>
+            updateState({ includeCookies })
+          }
           presets={presets}
           onAddPreset={addPreset}
           onRemovePreset={removePreset}
@@ -458,4 +511,3 @@ export const apiDiffTool: ToolDefinition<ApiDiffState> = {
 };
 
 export default ApiDiffTool;
-
