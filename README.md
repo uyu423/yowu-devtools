@@ -23,6 +23,13 @@ An open toolbox for developers who would rather keep sensitive snippets on their
 
 ### Recent Releases
 
+#### v1.5.x - Media Tools
+
+- **Image Studio** (v1.5.0): Browser-based image editing with crop, resize, rotate/flip, and format conversion.
+- **Video Studio** (v1.5.0): Video editing powered by ffmpeg.wasm—trim, cut, crop, resize, and export to MP4/WebM.
+- **Pipeline Workflow** (v1.5.0): Combine multiple operations in a single export with preset management.
+- **Pretendard Font** (v1.5.0): Added as secondary fallback font for better multilingual support.
+
 #### v1.4.x - API Testing Suite
 
 - **API Response Diff** (v1.4.2): Compare API responses from two domains side-by-side with JSON diff highlighting.
