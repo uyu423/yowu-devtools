@@ -1,0 +1,443 @@
+/* eslint-disable react-refresh/only-export-components */
+import React from 'react';
+import type { ToolDefinition } from '@/tools/types';
+import { Image } from 'lucide-react';
+import { ToolHeader } from '@/components/common/ToolHeader';
+import { ErrorBanner } from '@/components/common/ErrorBanner';
+import { useToolState } from '@/hooks/useToolState';
+import { useShareModal } from '@/hooks/useShareModal';
+import { useTitle } from '@/hooks/useTitle';
+import { useI18n } from '@/hooks/useI18nHooks';
+import { ShareModal } from '@/components/common/ShareModal';
+import { toast } from 'sonner';
+
+import type { ImageStudioState, ImageMetadata, CropArea, ExportFormat } from './types';
+import { DEFAULT_STATE, MAX_FILE_SIZE, SUPPORTED_INPUT_FORMATS } from './constants';
+import {
+  ImagePreview,
+  PipelinePanel,
+  PipelinePresetModal,
+  CropPanel,
+  ResizePanel,
+  RotatePanel,
+  ExportPanel,
+} from './components';
+import { usePipelinePresets, type ImagePipelinePreset } from './hooks/usePipelinePresets';
+
+const ImageStudioTool: React.FC = () => {
+  const { t } = useI18n();
+  useTitle(t('tool.imageStudio.title'));
+
+  const { state, updateState, resetState, copyShareLink, shareViaWebShare, getShareStateInfo } =
+    useToolState<ImageStudioState>('image-studio', DEFAULT_STATE, {
+      shareStateFilter: ({
+        cropEnabled,
+        resizeEnabled,
+        rotateEnabled,
+        cropAspectRatio,
+        cropCustomRatio,
+        resizeWidth,
+        resizeHeight,
+        resizeLockAspect,
+        resizeMode,
+        resizeQuality,
+        rotation,
+        flipHorizontal,
+        flipVertical,
+        exportFormat,
+        exportQuality,
+        exportSuffix,
+      }) => ({
+        cropEnabled,
+        resizeEnabled,
+        rotateEnabled,
+        cropAspectRatio,
+        cropCustomRatio,
+        cropArea: null, // Don't share crop area (image-specific)
+        resizeWidth,
+        resizeHeight,
+        resizeLockAspect,
+        resizeMode,
+        resizeQuality,
+        rotation,
+        flipHorizontal,
+        flipVertical,
+        exportFormat,
+        exportQuality,
+        exportSuffix,
+      }),
+    });
+
+  const { handleShare, shareModalProps } = useShareModal({
+    copyShareLink,
+    shareViaWebShare,
+    getShareStateInfo,
+    toolName: t('tool.imageStudio.title'),
+  });
+
+  // Image state
+  const [imageUrl, setImageUrl] = React.useState<string | null>(null);
+  const [imageMetadata, setImageMetadata] = React.useState<ImageMetadata | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = React.useState(false);
+
+  // Preset modal state
+  const [presetModalOpen, setPresetModalOpen] = React.useState(false);
+  const {
+    presets,
+    addPreset,
+    removePreset,
+    clearAllPresets,
+    exportPresets,
+    importPresets,
+  } = usePipelinePresets();
+
+  // Supported formats detection
+  const [supportedFormats, setSupportedFormats] = React.useState<Set<ExportFormat>>(new Set(['png', 'jpeg']));
+
+  // Check WebP support on mount
+  React.useEffect(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 1;
+    const webpSupported = canvas.toDataURL('image/webp').startsWith('data:image/webp');
+    
+    setSupportedFormats(new Set(webpSupported ? ['png', 'jpeg', 'webp'] : ['png', 'jpeg']));
+    
+    // If current format is not supported, fallback to png
+    if (!webpSupported && state.exportFormat === 'webp') {
+      updateState({ exportFormat: 'png' });
+    }
+  }, [state.exportFormat, updateState]);
+
+  // Handle file selection
+  const handleFileSelect = React.useCallback((file: File) => {
+    setError(null);
+
+    // Validate file type
+    if (!SUPPORTED_INPUT_FORMATS.includes(file.type)) {
+      setError(t('tool.imageStudio.unsupportedFormat'));
+      return;
+    }
+
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+      setError(t('tool.imageStudio.fileTooLarge'));
+      return;
+    }
+
+    // Create object URL for preview
+    const url = URL.createObjectURL(file);
+
+    // Load image to get dimensions
+    const img = new window.Image();
+    img.onload = () => {
+      // Revoke old URL if exists
+      if (imageUrl) {
+        URL.revokeObjectURL(imageUrl);
+      }
+
+      setImageUrl(url);
+      setImageMetadata({
+        fileName: file.name,
+        fileSize: file.size,
+        width: img.width,
+        height: img.height,
+        type: file.type,
+      });
+
+      // Initialize crop area to full image
+      updateState({
+        cropArea: {
+          x: 0,
+          y: 0,
+          width: img.width,
+          height: img.height,
+        },
+        resizeWidth: img.width,
+        resizeHeight: img.height,
+      });
+
+      toast.success(t('common.fileLoadedSuccess').replace('{name}', file.name));
+    };
+
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      setError(t('tool.imageStudio.failedToLoadImage'));
+    };
+
+    img.src = url;
+  }, [imageUrl, t, updateState]);
+
+  // Cleanup on unmount
+  React.useEffect(() => {
+    return () => {
+      if (imageUrl) {
+        URL.revokeObjectURL(imageUrl);
+      }
+    };
+  }, [imageUrl]);
+
+  // Toggle pipeline steps
+  const handleToggleStep = (stepId: 'crop' | 'resize' | 'rotate') => {
+    const key = `${stepId}Enabled` as keyof ImageStudioState;
+    updateState({ [key]: !state[key] });
+  };
+
+  // Handle crop area change
+  const handleCropAreaChange = (area: CropArea) => {
+    updateState({ cropArea: area });
+  };
+
+  // Reset crop to full image
+  const handleResetCrop = () => {
+    if (imageMetadata) {
+      updateState({
+        cropArea: {
+          x: 0,
+          y: 0,
+          width: imageMetadata.width,
+          height: imageMetadata.height,
+        },
+      });
+    }
+  };
+
+  // Reset transform
+  const handleResetTransform = () => {
+    updateState({
+      rotation: 0,
+      flipHorizontal: false,
+      flipVertical: false,
+    });
+  };
+
+  // Export image (placeholder - actual processing will be implemented later)
+  const handleExport = async () => {
+    if (!imageUrl || !imageMetadata) {
+      toast.error(t('tool.imageStudio.noImageLoaded'));
+      return;
+    }
+
+    setIsProcessing(true);
+    setError(null);
+
+    try {
+      // TODO: Implement actual image processing pipeline
+      // For now, just show a toast
+      toast.info(t('tool.imageStudio.exportNotImplemented'));
+      
+      // Simulate processing delay
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t('tool.imageStudio.exportFailed'));
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  // Reset all
+  const handleReset = () => {
+    if (imageUrl) {
+      URL.revokeObjectURL(imageUrl);
+    }
+    setImageUrl(null);
+    setImageMetadata(null);
+    setError(null);
+    resetState();
+  };
+
+  // Get current settings for preset
+  const getCurrentSettings = React.useCallback((): ImagePipelinePreset['settings'] => ({
+    cropEnabled: state.cropEnabled,
+    cropAspectRatio: state.cropAspectRatio,
+    cropCustomRatio: state.cropCustomRatio,
+    resizeEnabled: state.resizeEnabled,
+    resizeWidth: state.resizeWidth,
+    resizeHeight: state.resizeHeight,
+    resizeLockAspect: state.resizeLockAspect,
+    resizeMode: state.resizeMode,
+    resizeQuality: state.resizeQuality,
+    rotateEnabled: state.rotateEnabled,
+    rotation: state.rotation,
+    flipHorizontal: state.flipHorizontal,
+    flipVertical: state.flipVertical,
+    exportFormat: state.exportFormat,
+    exportQuality: state.exportQuality,
+    exportSuffix: state.exportSuffix,
+  }), [state]);
+
+  // Handle preset selection (load preset)
+  const handleSelectPreset = (preset: ImagePipelinePreset) => {
+    updateState({
+      cropEnabled: preset.settings.cropEnabled,
+      cropAspectRatio: preset.settings.cropAspectRatio,
+      cropCustomRatio: preset.settings.cropCustomRatio,
+      resizeEnabled: preset.settings.resizeEnabled,
+      resizeWidth: preset.settings.resizeWidth,
+      resizeHeight: preset.settings.resizeHeight,
+      resizeLockAspect: preset.settings.resizeLockAspect,
+      resizeMode: preset.settings.resizeMode,
+      resizeQuality: preset.settings.resizeQuality,
+      rotateEnabled: preset.settings.rotateEnabled,
+      rotation: preset.settings.rotation,
+      flipHorizontal: preset.settings.flipHorizontal,
+      flipVertical: preset.settings.flipVertical,
+      exportFormat: preset.settings.exportFormat,
+      exportQuality: preset.settings.exportQuality,
+      exportSuffix: preset.settings.exportSuffix,
+    });
+  };
+
+  return (
+    <div className="flex flex-col h-full">
+      <div className="p-4 md:p-6 border-b border-gray-200 dark:border-gray-700">
+        <ToolHeader
+          title={t('tool.imageStudio.title')}
+          description={t('tool.imageStudio.description')}
+          onReset={handleReset}
+          onShare={handleShare}
+        />
+      </div>
+
+      {error && (
+        <div className="px-4 md:px-6 pt-4">
+          <ErrorBanner message={error} />
+        </div>
+      )}
+
+      <div className="flex-1 flex flex-col lg:flex-row min-h-0 overflow-hidden">
+        {/* Preview Area */}
+        <div className="flex-1 p-4 md:p-6 overflow-auto">
+          <ImagePreview
+            imageUrl={imageUrl}
+            metadata={imageMetadata}
+            cropArea={state.cropArea}
+            rotation={state.rotation}
+            flipHorizontal={state.flipHorizontal}
+            flipVertical={state.flipVertical}
+            showCropOverlay={state.cropEnabled}
+            onFileSelect={handleFileSelect}
+            onCropAreaChange={handleCropAreaChange}
+            t={t}
+          />
+        </div>
+
+        {/* Pipeline Panel */}
+        <div className="w-full lg:w-80 xl:w-96 border-t lg:border-t-0 lg:border-l border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 overflow-y-auto">
+          <PipelinePanel
+            state={state}
+            hasImage={!!imageUrl}
+            isProcessing={isProcessing}
+            onToggleStep={handleToggleStep}
+            onExport={handleExport}
+            onOpenPresets={() => setPresetModalOpen(true)}
+            t={t}
+          >
+            {/* Crop Panel */}
+            <CropPanel
+              data-step="crop"
+              aspectRatio={state.cropAspectRatio}
+              customRatio={state.cropCustomRatio}
+              cropArea={state.cropArea}
+              imageWidth={imageMetadata?.width || 1920}
+              imageHeight={imageMetadata?.height || 1080}
+              onAspectRatioChange={(ratio) => updateState({ cropAspectRatio: ratio })}
+              onCustomRatioChange={(ratio) => updateState({ cropCustomRatio: ratio })}
+              onCropAreaChange={handleCropAreaChange}
+              onResetCrop={handleResetCrop}
+              t={t}
+            />
+
+            {/* Resize Panel */}
+            <ResizePanel
+              data-step="resize"
+              width={state.resizeWidth}
+              height={state.resizeHeight}
+              lockAspect={state.resizeLockAspect}
+              mode={state.resizeMode}
+              quality={state.resizeQuality}
+              originalWidth={imageMetadata?.width || 1920}
+              originalHeight={imageMetadata?.height || 1080}
+              onWidthChange={(width) => updateState({ resizeWidth: width })}
+              onHeightChange={(height) => updateState({ resizeHeight: height })}
+              onLockAspectChange={(locked) => updateState({ resizeLockAspect: locked })}
+              onModeChange={(mode) => updateState({ resizeMode: mode })}
+              onQualityChange={(quality) => updateState({ resizeQuality: quality })}
+              t={t}
+            />
+
+            {/* Rotate Panel */}
+            <RotatePanel
+              data-step="rotate"
+              rotation={state.rotation}
+              flipHorizontal={state.flipHorizontal}
+              flipVertical={state.flipVertical}
+              onRotationChange={(rotation) => updateState({ rotation })}
+              onFlipHorizontalChange={(flip) => updateState({ flipHorizontal: flip })}
+              onFlipVerticalChange={(flip) => updateState({ flipVertical: flip })}
+              onResetTransform={handleResetTransform}
+              t={t}
+            />
+
+            {/* Export Panel */}
+            <ExportPanel
+              data-step="export"
+              format={state.exportFormat}
+              quality={state.exportQuality}
+              suffix={state.exportSuffix}
+              originalFileName={imageMetadata?.fileName || 'image'}
+              supportedFormats={supportedFormats}
+              onFormatChange={(format) => updateState({ exportFormat: format })}
+              onQualityChange={(quality) => updateState({ exportQuality: quality })}
+              onSuffixChange={(suffix) => updateState({ exportSuffix: suffix })}
+              t={t}
+            />
+          </PipelinePanel>
+        </div>
+      </div>
+
+      <ShareModal {...shareModalProps} />
+
+      <PipelinePresetModal
+        isOpen={presetModalOpen}
+        onClose={() => setPresetModalOpen(false)}
+        presets={presets}
+        onSelect={handleSelectPreset}
+        onAddPreset={addPreset}
+        onRemovePreset={removePreset}
+        onClearAll={clearAllPresets}
+        onExport={exportPresets}
+        onImport={importPresets}
+        getCurrentSettings={getCurrentSettings}
+        t={t}
+      />
+    </div>
+  );
+};
+
+export const imageStudioTool: ToolDefinition<ImageStudioState> = {
+  id: 'image-studio',
+  title: 'Image Studio',
+  description: 'Crop, resize, rotate, and convert images',
+  path: '/image-studio',
+  icon: Image,
+  keywords: [
+    'image',
+    'photo',
+    'crop',
+    'resize',
+    'rotate',
+    'flip',
+    'convert',
+    'png',
+    'jpeg',
+    'webp',
+    'editor',
+    'compress',
+  ],
+  category: 'Media',
+  defaultState: DEFAULT_STATE,
+  Component: ImageStudioTool,
+};
+

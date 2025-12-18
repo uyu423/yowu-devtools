@@ -17,6 +17,8 @@ import { stringLengthTool } from './string-length';
 import { apiTesterTool } from './api-tester';
 import { curlParserTool } from './curl-parser';
 import { apiDiffTool } from './api-diff';
+import { imageStudioTool } from './image-studio';
+import { videoStudioTool } from './video-studio';
 
 export const tools: ToolDefinition[] = [
   jsonTool,
@@ -37,6 +39,8 @@ export const tools: ToolDefinition[] = [
   apiTesterTool,
   curlParserTool,
   apiDiffTool,
+  imageStudioTool,
+  videoStudioTool,
 ];
 
 export const getToolById = (id: string) => tools.find(t => t.id === id);
