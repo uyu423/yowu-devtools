@@ -18,6 +18,11 @@ import { ExtensionStatus } from '@/tools/api-tester/components';
 import type { ExtensionStatus as ExtensionStatusType } from '@/tools/api-tester/types';
 import { Tooltip } from '@/components/ui/Tooltip';
 
+// Detect Mac for keyboard shortcut display
+const isMac =
+  typeof navigator !== 'undefined' &&
+  /Mac|iPhone|iPad|iPod/.test(navigator.platform);
+
 interface TopSharedPanelProps {
   // Domains
   domainA: string;
@@ -257,28 +262,29 @@ export const TopSharedPanel: React.FC<TopSharedPanelProps> = ({
           placeholder="/api/v1/example"
           className="flex-1 min-w-0 px-2 sm:px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
         />
-        <button
-          onClick={onExecute}
-          className={cn(
-            'flex items-center gap-2 px-3 sm:px-4 py-2 text-sm font-medium rounded-md transition-colors shrink-0',
-            isExecuting
-              ? 'bg-red-600 hover:bg-red-700 text-white'
-              : 'bg-blue-600 hover:bg-blue-700 text-white'
-          )}
-          title={isExecuting ? t('common.cancel') : `${t('tool.apiDiff.execute')} (⌘/Ctrl + Enter)`}
-        >
-          {isExecuting ? (
-            <>
-              <Square className="w-4 h-4" />
-              <span className="hidden sm:inline">{t('common.cancel')}</span>
-            </>
-          ) : (
-            <>
-              <Play className="w-4 h-4" />
-              <span className="hidden sm:inline">{t('tool.apiDiff.execute')}</span>
-            </>
-          )}
-        </button>
+        <Tooltip content={isExecuting ? `${t('common.cancel')} (Esc)` : `${t('tool.apiDiff.execute')} (${isMac ? '⌘↵' : 'Ctrl+Enter'})`}>
+          <button
+            onClick={onExecute}
+            className={cn(
+              'flex items-center gap-2 px-3 sm:px-4 py-2 text-sm font-medium rounded-md transition-colors shrink-0',
+              isExecuting
+                ? 'bg-red-600 hover:bg-red-700 text-white'
+                : 'bg-blue-600 hover:bg-blue-700 text-white'
+            )}
+          >
+            {isExecuting ? (
+              <>
+                <Square className="w-4 h-4" />
+                <span className="hidden sm:inline">{t('common.cancel')}</span>
+              </>
+            ) : (
+              <>
+                <Play className="w-4 h-4" />
+                <span className="hidden sm:inline">{t('tool.apiDiff.execute')}</span>
+              </>
+            )}
+          </button>
+        </Tooltip>
       </div>
 
       {/* Parameters & Headers - Side by Side */}

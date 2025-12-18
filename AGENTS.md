@@ -932,6 +932,105 @@ function validateKeys(source: any, target: any, path: string = '') {
 - Worker 지원 여부 확인 (`typeof Worker !== 'undefined'`)
 - 폴백 로직 필수 (Worker 미지원 시 메인 스레드 처리)
 
+## 키보드 단축키 가이드라인
+
+모든 도구에서 일관된 키보드 단축키를 제공하여 사용자 경험을 향상시킵니다.
+
+### 공통 단축키
+
+| 기능 | Mac | Windows/Linux | 설명 |
+|------|-----|---------------|------|
+| **실행/생성** | `⌘ + Enter` | `Ctrl + Enter` | 주요 액션 실행 (Send, Generate, Execute, Export 등) |
+| **취소** | `Esc` | `Esc` | 진행 중인 작업 취소 또는 모달 닫기 |
+| **파일 열기** | `⌘ + O` | `Ctrl + O` | 파일 선택 다이얼로그 열기 (Media Studio) |
+| **파이프라인 리셋** | `⌘ + Shift + R` | `Ctrl + Shift + R` | 설정 초기화 (Media Studio) |
+| **클립보드 복사** | `⌘ + C` | `Ctrl + C` | 결과 클립보드 복사 (Image Studio) |
+
+### 도구별 단축키 구현 현황
+
+| 도구 | 실행 단축키 | 기타 단축키 |
+|------|------------|------------|
+| API Tester | `⌘/Ctrl + Enter` (Send) | - |
+| API Diff | `⌘/Ctrl + Enter` (Execute) | `Esc` (Cancel) |
+| UUID Generator | `⌘/Ctrl + Enter` (Regenerate) | - |
+| Image Studio | `⌘/Ctrl + Enter` (Export) | `⌘/Ctrl + O`, `⌘/Ctrl + Shift + R`, `⌘/Ctrl + C` |
+| Video Studio | `⌘/Ctrl + Enter` (Export) | `⌘/Ctrl + O`, `⌘/Ctrl + Shift + R`, `Esc` |
+
+### 구현 방법
+
+1. **OS 감지**:
+```typescript
+// 파일 상단에 상수 정의
+const isMac =
+  typeof navigator !== 'undefined' &&
+  /Mac|iPhone|iPad|iPod/.test(navigator.platform);
+const executeShortcut = isMac ? '⌘↵' : 'Ctrl+Enter';
+```
+
+2. **키보드 이벤트 리스너 추가**:
+```typescript
+React.useEffect(() => {
+  const handleKeyDown = (e: KeyboardEvent) => {
+    // Cmd/Ctrl + Enter: 실행
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      e.preventDefault();
+      if (!isLoading && canExecute) {
+        handleExecute();
+      }
+    }
+    // Esc: 취소
+    if (e.key === 'Escape' && isProcessing) {
+      e.preventDefault();
+      handleCancel();
+    }
+  };
+
+  window.addEventListener('keydown', handleKeyDown);
+  return () => window.removeEventListener('keydown', handleKeyDown);
+}, [handleExecute, handleCancel, isLoading, canExecute, isProcessing]);
+```
+
+3. **Tooltip으로 단축키 안내**:
+```typescript
+import { Tooltip } from '@/components/ui/Tooltip';
+
+<Tooltip content={`${t('common.execute')} (${executeShortcut})`}>
+  <button onClick={handleExecute}>
+    {t('common.execute')}
+  </button>
+</Tooltip>
+```
+
+### 주의사항
+
+1. **입력 필드 포커스 시 단축키 비활성화**: 텍스트 입력 중에는 `Enter` 단축키가 개행으로 동작해야 하므로, 입력 필드에 포커스된 경우 단축키를 비활성화합니다.
+```typescript
+const activeElement = document.activeElement;
+const isInputFocused =
+  activeElement instanceof HTMLInputElement ||
+  activeElement instanceof HTMLTextAreaElement ||
+  activeElement?.getAttribute('contenteditable') === 'true';
+
+if (isInputFocused) {
+  return; // 기본 동작 허용
+}
+```
+
+2. **useCallback으로 핸들러 메모이제이션**: `useEffect` 의존성 배열 경고를 방지하기 위해 핸들러 함수를 `useCallback`으로 감쌉니다.
+
+3. **동적 단축키 표시**: Mac과 Windows/Linux 사용자에게 적절한 단축키를 표시합니다.
+   - Mac: `⌘` (Command), `⇧` (Shift), `⌥` (Option), `↵` (Enter)
+   - Windows/Linux: `Ctrl`, `Shift`, `Alt`, `Enter`
+
+4. **i18n 불필요**: 단축키 표시 (`⌘↵`, `Ctrl+Enter` 등)는 국제 표준 기호이므로 i18n 처리가 필요하지 않습니다.
+
+### 신규 도구 추가 시 체크리스트
+
+- [ ] "실행" 버튼이 있는 경우 `⌘/Ctrl + Enter` 단축키 구현
+- [ ] 취소 기능이 있는 경우 `Esc` 단축키 구현
+- [ ] 실행 버튼에 `Tooltip`으로 단축키 안내 추가
+- [ ] OS에 따른 동적 단축키 표시 구현
+
 ## Cross-Tool Navigation Button 디자인 가이드
 
 도구 간 데이터 전달 버튼 ("Open in X", "Send to X", "Compare in X" 등)의 스타일을 통일합니다.

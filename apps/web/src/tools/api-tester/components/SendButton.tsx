@@ -5,6 +5,7 @@
 import React from 'react';
 import { Send, Square, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Tooltip } from '@/components/ui/Tooltip';
 
 interface SendButtonProps {
   onClick: () => void;
@@ -13,6 +14,12 @@ interface SendButtonProps {
   mode?: 'direct' | 'extension';
   disabled?: boolean;
 }
+
+// Detect Mac for keyboard shortcut display
+const isMac =
+  typeof navigator !== 'undefined' &&
+  /Mac|iPhone|iPad|iPod/.test(navigator.platform);
+const sendShortcut = isMac ? '⌘↵' : 'Ctrl+Enter';
 
 export const SendButton: React.FC<SendButtonProps> = ({
   onClick,
@@ -23,43 +30,46 @@ export const SendButton: React.FC<SendButtonProps> = ({
 }) => {
   if (isLoading) {
     return (
-      <button
-        onClick={onCancel}
-        className={cn(
-          'h-10 px-3 sm:px-4 rounded-r-lg shrink-0',
-          'bg-red-600 hover:bg-red-700',
-          'text-white font-medium text-sm',
-          'flex items-center gap-2',
-          'transition-colors'
-        )}
-      >
-        <Square className="w-4 h-4" />
-        <span className="hidden sm:inline">Cancel</span>
-      </button>
+      <Tooltip content={`Cancel (Esc)`}>
+        <button
+          onClick={onCancel}
+          className={cn(
+            'h-10 px-3 sm:px-4 rounded-r-lg shrink-0',
+            'bg-red-600 hover:bg-red-700',
+            'text-white font-medium text-sm',
+            'flex items-center gap-2',
+            'transition-colors'
+          )}
+        >
+          <Square className="w-4 h-4" />
+          <span className="hidden sm:inline">Cancel</span>
+        </button>
+      </Tooltip>
     );
   }
 
   return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      className={cn(
-        'h-10 px-3 sm:px-4 rounded-r-lg shrink-0',
-        'bg-blue-600 hover:bg-blue-700',
-        'text-white font-medium text-sm',
-        'flex items-center gap-2',
-        'transition-colors',
-        'disabled:opacity-50 disabled:cursor-not-allowed'
-      )}
-      title="Send (⌘/Ctrl + Enter)"
-    >
-      {mode === 'extension' ? (
-        <Zap className="w-4 h-4" />
-      ) : (
-        <Send className="w-4 h-4" />
-      )}
-      <span className="hidden sm:inline">Send</span>
-    </button>
+    <Tooltip content={`Send (${sendShortcut})`}>
+      <button
+        onClick={onClick}
+        disabled={disabled}
+        className={cn(
+          'h-10 px-3 sm:px-4 rounded-r-lg shrink-0',
+          'bg-blue-600 hover:bg-blue-700',
+          'text-white font-medium text-sm',
+          'flex items-center gap-2',
+          'transition-colors',
+          'disabled:opacity-50 disabled:cursor-not-allowed'
+        )}
+      >
+        {mode === 'extension' ? (
+          <Zap className="w-4 h-4" />
+        ) : (
+          <Send className="w-4 h-4" />
+        )}
+        <span className="hidden sm:inline">Send</span>
+      </button>
+    </Tooltip>
   );
 };
 
