@@ -236,7 +236,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
             <div>
               <div className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 flex items-center justify-between">
                 <span>{t('sidebar.allTools')}</span>
-                <Tooltip content={sortConfig[sortType].label} position="bottom" align="right">
+                <Tooltip content={sortConfig[sortType].label} position="bottom" align="right" nowrap>
                   <button
                     onClick={cycleSortType}
                     className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"

@@ -85,7 +85,7 @@ export const ExtensionStatus: React.FC<ExtensionStatusProps> = ({
 
   return (
     <div className={cn('flex items-center gap-2', className)}>
-      <Tooltip content={tooltip} position="bottom" align="left">
+      <Tooltip content={tooltip} position="bottom" align="left" nowrap={false}>
         <button
           onClick={handleClick}
           className={cn(
@@ -131,6 +131,7 @@ export const ExtensionStatus: React.FC<ExtensionStatusProps> = ({
         <Tooltip 
           content={t('tool.apiTester.installExtensionTooltip')} 
           position="bottom"
+          nowrap={false}
         >
           <a
             href={EXTENSION_STORE_URL}

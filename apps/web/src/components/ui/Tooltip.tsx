@@ -9,6 +9,8 @@ interface TooltipProps {
   position?: 'auto' | 'top' | 'bottom';
   /** Horizontal alignment - 'center' (default), 'left', or 'right' */
   align?: 'center' | 'left' | 'right';
+  /** Prevent text wrapping - default true for short labels, set false for long descriptions */
+  nowrap?: boolean;
 }
 
 export const Tooltip: React.FC<TooltipProps> = ({ 
@@ -17,6 +19,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
   className,
   position: preferredPosition = 'auto',
   align = 'center',
+  nowrap = true,
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [calculatedPosition, setCalculatedPosition] = useState<'top' | 'bottom'>('top');
@@ -97,7 +100,8 @@ export const Tooltip: React.FC<TooltipProps> = ({
         <div
           ref={tooltipRef}
           className={cn(
-            "absolute z-50 px-4 py-2.5 text-sm text-white bg-gray-900 dark:bg-gray-700 rounded-md shadow-lg whitespace-normal pointer-events-none max-w-lg",
+            "absolute z-50 px-4 py-2.5 text-sm text-white bg-gray-900 dark:bg-gray-700 rounded-md shadow-lg pointer-events-none",
+            nowrap ? "whitespace-nowrap w-max" : "whitespace-normal max-w-lg",
             getAlignmentClasses(),
             finalPosition === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'
           )}
