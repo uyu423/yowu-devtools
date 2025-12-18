@@ -35,10 +35,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
     .map(({ toolId }) => getToolById(toolId))
     .filter((tool): tool is NonNullable<typeof tool> => tool !== undefined);
 
-  // 최근 사용에 포함되지 않은 도구 목록 (즐겨찾기는 All Tools에도 표시)
-  const otherTools = tools.filter(
-    (tool) => !recentTools.some((rt) => rt.toolId === tool.id)
-  );
+  // All Tools: 모든 도구를 표시 (최근 사용/즐겨찾기와 중복 표시됨)
+  const allTools = tools;
 
   return (
     <div className="flex flex-col h-full bg-gray-50/50 dark:bg-gray-900 dark:border-gray-800 transition-colors">
@@ -188,7 +186,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
                 {t('sidebar.allTools')}
               </div>
               <div className="space-y-1 mt-1">
-                {otherTools.map((tool) => (
+                {allTools.map((tool) => (
                   <NavLink
                     key={tool.id}
                     to={getLocalePath(tool.path)}
