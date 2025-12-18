@@ -1,4 +1,5 @@
-import React, { useState, useRef, useLayoutEffect } from 'react';
+import React, { useState, useRef, useLayoutEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { cn } from '@/lib/utils';
 
 interface TooltipProps {
@@ -13,6 +14,13 @@ interface TooltipProps {
   nowrap?: boolean;
 }
 
+interface TooltipPosition {
+  top: number;
+  left: number;
+  placement: 'top' | 'bottom';
+  arrowLeft: number;
+}
+
 export const Tooltip: React.FC<TooltipProps> = ({ 
   content, 
   children, 
@@ -22,106 +30,153 @@ export const Tooltip: React.FC<TooltipProps> = ({
   nowrap = true,
 }) => {
   const [isVisible, setIsVisible] = useState(false);
-  const [calculatedPosition, setCalculatedPosition] = useState<'top' | 'bottom'>('top');
+  const [tooltipPosition, setTooltipPosition] = useState<TooltipPosition | null>(null);
+  const triggerRef = useRef<HTMLDivElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Determine final position
-  const finalPosition = preferredPosition === 'auto' ? calculatedPosition : preferredPosition;
+  const calculatePosition = useCallback(() => {
+    if (!triggerRef.current) return null;
+
+    const triggerRect = triggerRef.current.getBoundingClientRect();
+    const tooltipRect = tooltipRef.current?.getBoundingClientRect();
+    const tooltipHeight = tooltipRect?.height || 40;
+    const tooltipWidth = tooltipRect?.width || 100;
+    
+    const margin = 8;
+    const spaceAbove = triggerRect.top;
+    const spaceBelow = window.innerHeight - triggerRect.bottom;
+
+    // Determine vertical placement
+    let placement: 'top' | 'bottom';
+    if (preferredPosition === 'auto') {
+      placement = (spaceAbove < tooltipHeight + margin && spaceBelow > tooltipHeight + margin) 
+        ? 'bottom' 
+        : 'top';
+    } else {
+      placement = preferredPosition;
+    }
+
+    // Calculate top position
+    const top = placement === 'top'
+      ? triggerRect.top - tooltipHeight - margin
+      : triggerRect.bottom + margin;
+
+    // Calculate left position based on alignment
+    let left: number;
+    switch (align) {
+      case 'left':
+        left = triggerRect.left;
+        break;
+      case 'right':
+        left = triggerRect.right - tooltipWidth;
+        break;
+      default:
+        left = triggerRect.left + (triggerRect.width / 2) - (tooltipWidth / 2);
+    }
+
+    // Ensure tooltip stays within viewport horizontally
+    const viewportPadding = 8;
+    if (left < viewportPadding) {
+      left = viewportPadding;
+    } else if (left + tooltipWidth > window.innerWidth - viewportPadding) {
+      left = window.innerWidth - tooltipWidth - viewportPadding;
+    }
+
+    // Calculate arrow position relative to tooltip
+    const arrowLeft = Math.max(8, Math.min(
+      triggerRect.left + (triggerRect.width / 2) - left - 4,
+      tooltipWidth - 16
+    ));
+
+    return { top, left, placement, arrowLeft };
+  }, [preferredPosition, align]);
 
   useLayoutEffect(() => {
-    if (!isVisible || !tooltipRef.current || !containerRef.current) return;
-    if (preferredPosition !== 'auto') return; // Skip calculation if position is forced
+    if (!isVisible) return;
 
-    // tooltip이 렌더링된 후 위치 계산
+    let animationFrameId: number;
+
     const updatePosition = () => {
-      const container = containerRef.current;
-      const tooltip = tooltipRef.current;
-      if (!container || !tooltip) return;
-
-      const rect = container.getBoundingClientRect();
-      const tooltipRect = tooltip.getBoundingClientRect();
-      
-      const margin = 8;
-      const tooltipHeight = tooltipRect.height || 100;
-
-      // 위쪽 공간 확인
-      const spaceAbove = rect.top;
-      // 아래쪽 공간 확인
-      const spaceBelow = window.innerHeight - rect.bottom;
-
-      // 위쪽 공간이 부족하고 아래쪽 공간이 충분하면 아래쪽에 표시
-      if (spaceAbove < tooltipHeight + margin && spaceBelow > tooltipHeight + margin) {
-        setCalculatedPosition('bottom');
-      } else {
-        setCalculatedPosition('top');
+      const pos = calculatePosition();
+      if (pos) {
+        setTooltipPosition(pos);
       }
     };
 
-    // 즉시 실행
+    // Initial calculation
     updatePosition();
     
-    // requestAnimationFrame으로 한 프레임 후 다시 확인 (렌더링 완료 후)
-    requestAnimationFrame(updatePosition);
-  }, [isVisible, preferredPosition]);
+    // Recalculate after a frame
+    animationFrameId = requestAnimationFrame(updatePosition);
 
-  // Get alignment classes
-  const getAlignmentClasses = () => {
-    switch (align) {
-      case 'left':
-        return 'left-0';
-      case 'right':
-        return 'right-0';
-      default:
-        return 'left-1/2 transform -translate-x-1/2';
-    }
+    // Update position on scroll/resize
+    const handleScrollResize = () => {
+      animationFrameId = requestAnimationFrame(updatePosition);
+    };
+
+    window.addEventListener('scroll', handleScrollResize, true);
+    window.addEventListener('resize', handleScrollResize);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener('scroll', handleScrollResize, true);
+      window.removeEventListener('resize', handleScrollResize);
+    };
+  }, [isVisible, calculatePosition]);
+
+  const handleMouseEnter = () => {
+    setIsVisible(true);
   };
 
-  const getArrowAlignmentClasses = () => {
-    switch (align) {
-      case 'left':
-        return 'left-4';
-      case 'right':
-        return 'right-4';
-      default:
-        return 'left-1/2 transform -translate-x-1/2';
-    }
+  const handleMouseLeave = () => {
+    setIsVisible(false);
+    setTooltipPosition(null);
   };
+
+  const tooltipContent = isVisible && (
+    <div
+      ref={tooltipRef}
+      className={cn(
+        "fixed z-[9999] px-4 py-2.5 text-sm text-white bg-gray-900 dark:bg-gray-700 rounded-md shadow-lg pointer-events-none",
+        nowrap ? "whitespace-nowrap w-max" : "whitespace-normal max-w-lg",
+      )}
+      style={{
+        top: tooltipPosition?.top ?? -9999,
+        left: tooltipPosition?.left ?? -9999,
+        visibility: tooltipPosition ? 'visible' : 'hidden',
+      }}
+    >
+      {content}
+      {/* Arrow */}
+      <div 
+        className="absolute"
+        style={{
+          left: tooltipPosition?.arrowLeft ?? 0,
+          ...(tooltipPosition?.placement === 'top' 
+            ? { top: '100%', marginTop: '-1px' } 
+            : { bottom: '100%', marginBottom: '-1px' }
+          ),
+        }}
+      >
+        <div className={cn(
+          "border-4 border-transparent",
+          tooltipPosition?.placement === 'top' 
+            ? 'border-t-gray-900 dark:border-t-gray-700' 
+            : 'border-b-gray-900 dark:border-b-gray-700'
+        )} />
+      </div>
+    </div>
+  );
 
   return (
     <div 
-      ref={containerRef}
+      ref={triggerRef}
       className={cn("relative inline-flex", className)}
-      onMouseEnter={() => setIsVisible(true)}
-      onMouseLeave={() => setIsVisible(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       {children}
-      {isVisible && (
-        <div
-          ref={tooltipRef}
-          className={cn(
-            "absolute z-50 px-4 py-2.5 text-sm text-white bg-gray-900 dark:bg-gray-700 rounded-md shadow-lg pointer-events-none",
-            nowrap ? "whitespace-nowrap w-max" : "whitespace-normal max-w-lg",
-            getAlignmentClasses(),
-            finalPosition === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'
-          )}
-        >
-          {content}
-          <div className={cn(
-            "absolute",
-            getArrowAlignmentClasses(),
-            finalPosition === 'top' ? 'top-full -mt-1' : 'bottom-full -mb-1'
-          )}>
-            <div className={cn(
-              "border-4 border-transparent",
-              finalPosition === 'top' 
-                ? 'border-t-gray-900 dark:border-t-gray-700' 
-                : 'border-b-gray-900 dark:border-b-gray-700'
-            )} />
-          </div>
-        </div>
-      )}
+      {typeof document !== 'undefined' && createPortal(tooltipContent, document.body)}
     </div>
   );
 };
-
