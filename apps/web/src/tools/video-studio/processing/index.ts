@@ -18,6 +18,8 @@ export {
   isFFmpegLoaded,
   cleanupFFmpeg,
   cancel as cancelFFmpeg,
+  resetCancelledState,
+  wasCancelled,
   getMimeType,
   getFileExtension,
 } from './ffmpeg';

@@ -17,6 +17,9 @@ let isLoading = false;
 let isLoaded = false;
 let isCancelled = false;
 
+// AbortController for cancelling operations
+let currentAbortController: AbortController | null = null;
+
 // Local paths for FFmpeg core files (served from public/ffmpeg/)
 const FFMPEG_BASE_URL = '/ffmpeg';
 
@@ -244,16 +247,30 @@ export async function deleteFile(ffmpeg: FFmpeg, name: string): Promise<void> {
 }
 
 /**
- * Execute FFmpeg command
+ * Execute FFmpeg command with abort support
  */
 export async function exec(ffmpeg: FFmpeg, args: string[]): Promise<number> {
   console.log('[FFmpeg] Executing command:', args.join(' '));
-  const exitCode = await ffmpeg.exec(args);
-  console.log('[FFmpeg] Command finished with exit code:', exitCode);
-  if (exitCode !== 0) {
-    throw new Error(`FFmpeg command failed with exit code ${exitCode}`);
+  
+  // Create new AbortController for this operation
+  currentAbortController = new AbortController();
+  
+  try {
+    const exitCode = await ffmpeg.exec(args, -1, { signal: currentAbortController.signal });
+    console.log('[FFmpeg] Command finished with exit code:', exitCode);
+    if (exitCode !== 0 && !isCancelled) {
+      throw new Error(`FFmpeg command failed with exit code ${exitCode}`);
+    }
+    return exitCode;
+  } catch (error) {
+    if (isCancelled || (error instanceof Error && error.name === 'AbortError')) {
+      console.log('[FFmpeg] Command was cancelled');
+      throw new Error('Operation cancelled');
+    }
+    throw error;
+  } finally {
+    currentAbortController = null;
   }
-  return exitCode;
 }
 
 /**
@@ -308,12 +325,28 @@ export function wasCancelled(): boolean {
 }
 
 /**
+ * Reset the cancelled state (call before starting a new operation)
+ */
+export function resetCancelledState(): void {
+  isCancelled = false;
+  currentAbortController = null;
+}
+
+/**
  * Cancel ongoing FFmpeg operation
  */
 export function cancel(): void {
   console.log('[FFmpeg] Cancel requested');
   isCancelled = true;
 
+  // First, abort the current operation using AbortController
+  if (currentAbortController) {
+    console.log('[FFmpeg] Aborting current operation via AbortController');
+    currentAbortController.abort();
+    currentAbortController = null;
+  }
+
+  // Then terminate the FFmpeg instance to ensure complete cleanup
   if (ffmpegInstance) {
     try {
       // Terminate the current FFmpeg instance

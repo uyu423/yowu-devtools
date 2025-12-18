@@ -19,6 +19,8 @@ import {
   downloadResult,
   downloadThumbnail,
   cancelFFmpeg,
+  resetCancelledState,
+  wasCancelled,
   type VideoPipelineConfig,
   type ThumbnailConfig,
   type VideoProcessingProgress,
@@ -331,6 +333,9 @@ const VideoStudioTool: React.FC = () => {
       return;
     }
 
+    // Reset cancelled state before starting new operation
+    resetCancelledState();
+
     setProcessingState({
       isProcessing: true,
       progress: 0,
@@ -405,7 +410,8 @@ const VideoStudioTool: React.FC = () => {
     } catch (err) {
       // Ignore cancelled errors
       const errorMessage = err instanceof Error ? err.message : t('tool.videoStudio.exportFailed');
-      if (errorMessage === 'Operation cancelled') {
+      if (errorMessage === 'Operation cancelled' || wasCancelled()) {
+        console.log('[Export] Operation was cancelled, not showing error');
         return;
       }
       setError(errorMessage);
