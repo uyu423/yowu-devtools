@@ -482,7 +482,7 @@ const ApiTesterTool: React.FC = () => {
                     <Cookie className="w-4 h-4" />
                     <span className="hidden sm:inline">{t('tool.apiTester.includeCookies')}</span>
                   </label>
-                  <Tooltip content={t('tool.apiTester.includeCookiesTooltip')} position="bottom">
+                  <Tooltip content={t('tool.apiTester.includeCookiesTooltip')} position="bottom" nowrap={false}>
                     <HelpCircle className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 cursor-help" />
                   </Tooltip>
                 </div>

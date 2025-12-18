@@ -146,7 +146,7 @@ function HomePage() {
           {t('homepage.availableTools')}
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {tools.map((tool) => (
+          {[...tools].reverse().map((tool) => (
             <Link
               key={tool.id}
               to={getLocalePath(tool.path)}

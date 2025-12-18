@@ -16,6 +16,7 @@ export const koKR = {
     downloaded: '다운로드 완료!',
     downloadJson: 'JSON 다운로드',
     upload: '업로드',
+    changeFile: '파일 변경',
     export: '내보내기',
     import: '가져오기',
     save: '저장',
@@ -71,6 +72,73 @@ export const koKR = {
     unableToShare: '공유할 수 없습니다.',
     sharedUrlInvalid: '공유 URL이 유효하지 않습니다. 기본 상태로 복원합니다.',
     unableToCopy: '클립보드에 복사할 수 없습니다.',
+    // Pipeline/Processing
+    enable: '활성화',
+    disable: '비활성화',
+    processing: '처리 중...',
+    copying: '복사 중...',
+    load: '불러오기',
+    // Common options for Image/Video Studio
+    aspectRatio: {
+      free: '자유',
+      square: '정사각형',
+      custom: '사용자 지정',
+    },
+    resizeMode: {
+      contain: '맞춤',
+      containDesc: '경계 내에 맞춤, 여백/레터박스 가능',
+      cover: '채우기',
+      coverDesc: '경계를 채움, 가장자리 잘릴 수 있음',
+      stretch: '늘이기',
+      stretchDesc: '비율 무시',
+    },
+    quality: {
+      low: '낮음 (빠름)',
+      medium: '중간',
+      high: '높음 (최상)',
+    },
+    videoQuality: {
+      fast: '빠름',
+      fastDesc: '빠른 인코딩, 큰 파일 크기',
+      balanced: '균형',
+      balancedDesc: '속도와 품질의 균형',
+      highQuality: '고품질',
+      highQualityDesc: '최고 품질, 느린 인코딩',
+    },
+    imageFormat: {
+      png: 'PNG',
+      jpeg: 'JPEG',
+      webp: 'WebP',
+    },
+    videoFormat: {
+      mp4: 'MP4 (H.264)',
+      webm: 'WebM (VP9)',
+    },
+    // Preset Management
+    preset: {
+      managePresets: '프리셋 관리',
+      privacyNotice:
+        '프리셋은 브라우저에만 로컬로 저장됩니다. 어떤 서버로도 전송되지 않습니다. 내보내기/가져오기로 백업하거나 이전할 수 있습니다.',
+      saveCurrentSettings: '현재 설정을 프리셋으로 저장',
+      namePlaceholder: '프리셋 이름 (예: "소셜 미디어 1080p")',
+      descriptionPlaceholder: '설명 (선택사항)',
+      nameRequired: '프리셋 이름을 입력해주세요',
+      savePreset: '프리셋 저장',
+      savedPresets: '저장된 프리셋',
+      noPresets: '저장된 프리셋이 없습니다. 위에서 첫 프리셋을 저장해보세요!',
+      load: '불러오기',
+      remove: '삭제',
+      added: '프리셋이 저장되었습니다',
+      loaded: '프리셋 로드됨: {name}',
+      removed: '프리셋이 삭제되었습니다',
+      clearedAll: '모든 프리셋이 삭제되었습니다',
+      confirmClear: '다시 클릭하여 확인',
+      clearAll: '전체 삭제',
+      exportAll: '모든 프리셋을 파일로 내보내기',
+      importAll: '파일에서 프리셋 가져오기',
+      importSuccess: '{count}개 프리셋을 성공적으로 가져왔습니다',
+      importFailed: '프리셋 가져오기 실패',
+    },
   },
   shareModal: {
     title: '{toolName} 공유',
@@ -111,6 +179,7 @@ export const koKR = {
     noToolsLoaded: '도구를 불러올 수 없습니다',
     moreComingSoon: '곧 더 많은 도구가 추가됩니다...',
     suggestFeature: '기능 제안하기',
+    reportBug: '오류 및 버그 제보',
     removeFromFavorites: '즐겨찾기에서 제거',
     addToFavorites: '즐겨찾기에 추가',
     lightMode: '라이트 모드',
@@ -118,6 +187,21 @@ export const koKR = {
     darkMode: '다크 모드',
     language: '언어',
     selectLanguage: '언어 선택',
+    // License info
+    license: '라이센스',
+    sourceCode: '소스 코드',
+    noWarranty: '보증 없음',
+    // Sort options
+    sortAlphabetical: '알파벳 순',
+    sortAdded: '추가된 순',
+    sortNewest: '최신 순',
+    // Collapse/Expand
+    collapseSidebar: '사이드바 접기',
+    expandSidebar: '사이드바 펼치기',
+    // Beta badge
+    beta: 'Beta',
+    betaTooltip:
+      '이 기능은 실험적이며 불안정할 수 있습니다. 테스트 및 개선 중입니다.',
   },
   commandPalette: {
     searchTools: '도구 검색...',
@@ -486,27 +570,39 @@ export const koKR = {
         '사용자 지정 길이와 문자 규칙으로 암호학적으로 안전한 비밀번호를 생성합니다.',
       length: '길이',
       characterTypes: '문자 유형',
+      characterTypesTooltip:
+        '비밀번호에 포함할 문자 세트를 선택합니다. 여러 유형을 사용하면 보안이 강화됩니다.',
       exclusionOptions: '제외 옵션',
+      exclusionOptionsTooltip:
+        '특정 상황에서 혼동되거나 문제가 될 수 있는 문자를 제외합니다.',
       uppercase: '대문자 (A-Z)',
       lowercase: '소문자 (a-z)',
       numbers: '숫자 (0-9)',
       symbols: '기호 (!@#$...)',
       excludeSimilar: '유사 문자 제외 (i, l, 1, L, o, 0, O)',
+      excludeSimilarTooltip:
+        '서로 비슷하게 보이는 문자(i/l/1/I, o/0/O)를 제거하여 비밀번호를 읽을 때 혼동을 방지합니다.',
       excludeAmbiguous: '모호한 기호 제외',
+      excludeAmbiguousTooltip:
+        '구별하기 어렵거나 일부 시스템에서 문제를 일으킬 수 있는 기호를 제거합니다: {}[]()/\\\'"`~,;:.<>',
       count: '개수',
       regenerate: '재생성',
       generatedPasswords: '생성된 비밀번호',
       strength: '강도',
+      strengthTooltip:
+        '비밀번호 강도는 엔트로피(길이와 문자 세트 크기의 조합)를 기반으로 계산됩니다.',
       weak: '약함',
       medium: '보통',
       strong: '강함',
       veryStrong: '매우 강함',
       passwordCopied: '비밀번호가 클립보드에 복사되었습니다',
       allPasswordsCopied: '모든 비밀번호가 클립보드에 복사되었습니다',
-      atLeastOneType: '최소 하나의 문자 유형을 선택해야 합니다',
-      lengthMustBeBetween: '비밀번호 길이는 4에서 128 사이여야 합니다',
-      lengthTooltip: '비밀번호 길이 (4-128자).',
-      countTooltip: '생성할 비밀번호 개수 (1-20).',
+      atLeastOneCharType: '최소 하나의 문자 유형을 선택해야 합니다',
+      lengthError: '비밀번호 길이는 4에서 128 사이여야 합니다',
+      failedToGenerate: '비밀번호 생성 실패',
+      resultPlaceholder: '생성된 비밀번호가 여기에 표시됩니다',
+      lengthTooltip: '비밀번호 길이 (4-128자). 길수록 더 안전합니다.',
+      countTooltip: '한 번에 생성할 비밀번호 개수 (1-20).',
     },
     urlParser: {
       title: 'URL Parser',
@@ -794,14 +890,28 @@ export const koKR = {
       description:
         'JWT를 디코딩하여 헤더, 페이로드, 만료 시간을 확인하고 서명을 검증합니다.',
       jwtToken: 'JWT Token',
+      jwtTokenTooltip:
+        'JSON Web Token(JWT)은 당사자 간에 정보를 JSON 객체로 안전하게 전송하기 위한 컴팩트하고 URL에 안전한 토큰 형식입니다.',
       tokenPlaceholder:
         'JWT Token을 붙여넣으세요 (예: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...)',
       validationStatus: '검증 상태',
+      validationStatusTooltip:
+        '토큰의 만료 여부(exp), 아직 유효하지 않은지(nbf), 발급 시간(iat)을 확인합니다.',
       signatureVerification: 'Signature 검증',
+      signatureVerificationTooltip:
+        '토큰이 예상되는 키로 서명되었고 변조되지 않았는지 검증합니다.',
       header: 'Header',
+      headerTooltip:
+        '토큰 유형과 서명 알고리즘에 대한 메타데이터를 포함합니다 (예: alg, typ).',
       payload: 'Payload',
+      payloadTooltip:
+        '클레임(사용자 및 추가 데이터에 대한 정보)을 포함합니다 (예: sub, name, exp, iat).',
       signature: 'Signature',
+      signatureTooltip:
+        '토큰 무결성을 검증하기 위한 암호화 서명입니다. 헤더, 페이로드, 비밀 키를 사용하여 생성됩니다.',
       verificationKey: '검증 Key',
+      verificationKeyTooltip:
+        'HMAC(HS256/384/512)의 경우: 비밀 키를 입력하세요. RSA/ECDSA의 경우: PEM 형식의 공개 키를 입력하세요.',
       verificationKeyPlaceholder: '검증 Key를 입력하세요',
       enterVerificationKey: '검증 Key를 입력하세요',
       hmacKeyPlaceholder:
@@ -826,13 +936,19 @@ export const koKR = {
       enterKeyToVerify: 'Signature를 검증하려면 위에 Key를 입력하세요',
       invalidJwtFormat:
         '유효하지 않은 JWT 형식입니다. 점으로 구분된 3개의 부분이 필요합니다 (header.payload.signature).',
+      invalidJwtFormatDetails:
+        '유효하지 않은 JWT 형식입니다. 점으로 구분된 3개의 부분이 필요합니다 (header.payload.signature).',
       failedToDecodeHeader:
         'JWT Header Decode 실패. 유효하지 않은 Base64URL 인코딩입니다.',
       failedToDecodePayload:
         'JWT Payload Decode 실패. 유효하지 않은 Base64URL 인코딩입니다.',
+      failedToDecodeToken: 'JWT 토큰 디코딩 실패.',
       enterJwtToDecode: 'Decode할 JWT Token을 입력하세요.',
+      enterTokenToDecode: 'Decode할 JWT Token을 입력하세요.',
       signatureNote:
         '참고: Signature 검증은 수행되지 않습니다. 이 도구는 Token을 Decode만 합니다.',
+      signatureIsValid: 'Signature가 유효합니다.',
+      verificationFailed: '검증 실패',
       raw: 'Raw',
     },
     jwtEncoder: {
@@ -840,17 +956,25 @@ export const koKR = {
       description:
         '사용자 지정 헤더, 페이로드, HMAC 알고리즘으로 서명된 JWT를 생성합니다.',
       headerJson: 'Header (JSON)',
+      headerJsonTooltip:
+        'JWT 헤더는 메타데이터를 포함합니다: "alg"는 서명 알고리즘, "typ"은 보통 "JWT"입니다.',
       headerPlaceholder: '{"alg":"HS256","typ":"JWT"}',
       payloadJson: 'Payload (JSON)',
+      payloadJsonTooltip:
+        'JWT 페이로드는 클레임을 포함합니다. 일반적인 클레임: "sub"(주체), "exp"(만료), "iat"(발급 시간), "iss"(발급자).',
       payloadPlaceholder: '{"sub":"1234567890","name":"John Doe"}',
       algorithm: '알고리즘',
+      algorithmTooltip:
+        'HS256/384/512는 SHA-256/384/512를 사용하는 HMAC입니다. "none"은 서명되지 않은 토큰을 생성합니다 (프로덕션에서는 권장하지 않음).',
       algorithmNote: '(header.alg 업데이트)',
       secretKey: 'Secret Key',
+      secretKeyTooltip:
+        'JWT 서명에 사용되는 비밀 키입니다. 이 키를 안전하게 보관하세요 - 이 키가 있으면 누구나 유효한 토큰을 생성할 수 있습니다.',
       secretKeyPlaceholder: '서명을 위한 Secret Key를 입력하세요',
       encodedJwtToken: 'Encode된 JWT Token',
       noneUnsigned: 'None (서명 없음)',
-      invalidJsonHeader: 'Header의 JSON이 유효하지 않습니다',
-      invalidJsonPayload: 'Payload의 JSON이 유효하지 않습니다',
+      invalidHeaderJson: 'Header의 JSON이 유효하지 않습니다',
+      invalidPayloadJson: 'Payload의 JSON이 유효하지 않습니다',
       secretKeyRequired: '서명에 Secret Key가 필요합니다',
       unsupportedAlgorithm:
         '지원하지 않는 알고리즘: {alg}. HS256, HS384, HS512, none만 지원됩니다.',
@@ -991,8 +1115,10 @@ export const koKR = {
         '브라우저 확장 프로그램은 확장 컨텍스트에서 요청을 수행하여 CORS 제한을 우회할 수 있습니다. 이는 웹 페이지와 동일한 보안 규칙의 적용을 받지 않습니다.',
       corsRetryWithExtension: '확장 프로그램으로 재시도',
       corsInstallExtension: 'Chrome 확장 프로그램 설치',
-      corsMobileNotSupported: '모바일 환경에서는 Chrome 확장 프로그램을 사용할 수 없습니다',
-      corsMobileUseDesktop: 'CORS 제한이 있는 API에 접근하려면 데스크톱 버전의 Chrome을 사용해 주세요.',
+      corsMobileNotSupported:
+        '모바일 환경에서는 Chrome 확장 프로그램을 사용할 수 없습니다',
+      corsMobileUseDesktop:
+        'CORS 제한이 있는 API에 접근하려면 데스크톱 버전의 Chrome을 사용해 주세요.',
       corsRememberChoice: '이 도메인에 대해 기억',
       corsRememberChoiceDesc: '{origin}에 대해 자동으로 확장 프로그램 사용',
       sendToApiDiff: 'API Diff로 보내기',
@@ -1132,6 +1258,217 @@ export const koKR = {
         noMatch: '일치하는 히스토리 없음',
       },
     },
+    imageStudio: {
+      title: 'Image Studio',
+      description:
+        '이미지를 자르고, 크기 조정, 회전, 변환합니다. 모든 처리는 브라우저에서 이루어집니다.',
+      pipeline: '파이프라인',
+      stepsEnabled: '단계 활성화',
+      resetPipeline: '파이프라인 설정 초기화',
+      runExport: '실행 및 내보내기',
+      savePreset: '프리셋 저장',
+      loadPreset: '프리셋 불러오기',
+      dropImageHere: '이미지를 여기에 놓거나 클릭하여 찾아보기',
+      supportedFormats: 'PNG, JPEG, WebP, GIF, BMP 지원',
+      pasteFromClipboard: '또는 클립보드에서 붙여넣기 (Ctrl/⌘ + V)',
+      dropToReplace: '현재 이미지를 교체하려면 놓으세요',
+      unsupportedFormat: '지원하지 않는 이미지 형식',
+      fileTooLarge: '파일이 너무 큽니다. 최대 크기는 50MB입니다.',
+      failedToLoadImage: '이미지 로드 실패',
+      noImageLoaded: '로드된 이미지 없음',
+      exportNotImplemented: '내보내기 기능은 다음 단계에서 구현됩니다',
+      presetNotImplemented: '프리셋 기능은 다음 단계에서 구현됩니다',
+      exportFailed: '이미지 내보내기 실패',
+      copyToClipboard: '클립보드로 복사',
+      copiedToClipboard: '이미지가 클립보드에 복사되었습니다',
+      copyFailed: '이미지 클립보드 복사 실패',
+      crop: {
+        title: '자르기',
+        aspectRatio: '종횡비',
+        aspectRatioTooltip: '특정 종횡비로 자르기 선택 고정',
+        coordinates: '좌표',
+        width: '너비',
+        height: '높이',
+        selectAll: '전체 선택',
+      },
+      resize: {
+        title: '크기 조정',
+        dimensions: '치수',
+        dimensionsTooltip: '픽셀 단위의 출력 이미지 치수',
+        width: '너비',
+        height: '높이',
+        lockAspect: '종횡비 잠금',
+        unlockAspect: '종횡비 잠금 해제',
+        mode: '크기 조정 모드',
+        modeTooltip: '종횡비 차이를 처리하는 방법',
+        quality: '보간 품질',
+        qualityTooltip:
+          '높은 품질은 더 나은 결과를 생성하지만 시간이 더 걸립니다',
+        presets: '프리셋',
+        useOriginal: '원본 사용',
+      },
+      rotate: {
+        title: '회전 / 뒤집기',
+        rotation: '회전',
+        rotateLeft: '왼쪽으로 90° 회전',
+        rotateRight: '오른쪽으로 90° 회전',
+        left: '왼쪽',
+        right: '오른쪽',
+        flip: '뒤집기',
+        horizontal: '수평',
+        vertical: '수직',
+        resetTransform: '변환 초기화',
+      },
+      export: {
+        title: '내보내기',
+        format: '형식',
+        formatTooltip: '출력 이미지 형식',
+        formatNotSupported: '브라우저에서 지원하지 않는 형식',
+        webpNotSupported: '브라우저에서 WebP 내보내기를 지원하지 않습니다',
+        quality: '품질',
+        qualityTooltip:
+          '높은 품질은 더 큰 파일을 생성합니다 (JPEG/WebP만 해당)',
+        smaller: '작은 파일',
+        better: '높은 품질',
+        suffix: '파일명 접미사',
+        suffixTooltip: '원본 파일명에 추가할 텍스트',
+        outputFileName: '출력 파일명',
+        privacyNote: '개인정보 보호',
+        privacyDescription:
+          '모든 처리는 브라우저에서 이루어집니다. 이미지는 서버로 업로드되지 않습니다.',
+      },
+    },
+    videoStudio: {
+      title: 'Video Studio',
+      description:
+        '비디오를 자르고, 잘라내고, 크기 조정, 변환합니다. 모든 처리는 브라우저에서 이루어집니다.',
+      pipeline: '파이프라인',
+      stepsEnabled: '단계 활성화',
+      resetPipeline: '파이프라인 설정 초기화',
+      runExport: '실행 및 내보내기',
+      savePreset: '프리셋 저장',
+      loadPreset: '프리셋 불러오기',
+      dropVideoHere: '비디오 파일을 여기에 놓거나 클릭하여 찾아보기',
+      supportedFormats: 'MP4, WebM, MOV, AVI, MKV 지원',
+      dropToReplace: '현재 비디오를 교체하려면 놓으세요',
+      unsupportedFormat: '지원하지 않는 비디오 형식',
+      fileTooLarge: '파일이 너무 큽니다. 최대 크기는 500MB입니다.',
+      failedToLoadVideo: '비디오 로드 실패',
+      noVideoLoaded: '로드된 비디오 없음',
+      exportInProgress: '비디오 내보내기가 진행 중입니다. 잠시 기다려주세요.',
+      thumbnailInProgress: '썸네일 추출이 진행 중입니다. 잠시 기다려주세요.',
+      leavePageWarning:
+        '비디오 처리가 진행 중입니다. 페이지를 벗어나면 처리가 취소됩니다. 정말 이동하시겠습니까?',
+      leavePageTitle: '페이지를 떠나시겠습니까?',
+      stayOnPage: '이 페이지에 머무르기',
+      leavePage: '페이지 떠나기',
+      cancelProcessingTitle: '처리를 취소하시겠습니까?',
+      cancelProcessingWarning:
+        '비디오 처리가 진행 중입니다. 정말로 취소하시겠습니까?',
+      continueProcessing: '계속 진행',
+      cancelProcessing: '처리 취소',
+      mobileWarning:
+        '대용량 비디오 파일은 모바일 기기에서 성능 문제를 일으킬 수 있습니다.',
+      loadingEngine: '비디오 처리 엔진 로드 중...',
+      preparing: '비디오 준비 중...',
+      processing: '처리 중...',
+      finalizing: '출력 마무리 중...',
+      cancelled: '처리 취소됨',
+      exportNotImplemented:
+        '내보내기 기능은 ffmpeg.wasm 통합과 함께 구현됩니다',
+      presetNotImplemented: '프리셋 기능은 다음 단계에서 구현됩니다',
+      exportFailed: '비디오 내보내기 실패',
+      processingCancelled: '비디오 처리가 취소되었습니다',
+      thumbnail: {
+        title: '썸네일 추출',
+        description: '비디오에서 한 프레임을 이미지 파일로 추출합니다.',
+        extractAt: '추출 시점',
+        timeTooltip: '썸네일 프레임을 추출할 시간 위치',
+        start: '시작',
+        end: '끝',
+        quickSelect: '빠른 선택',
+        format: '출력 형식',
+        extractButton: '썸네일 추출',
+        extracting: '추출 중...',
+        extractNotImplemented: '썸네일 추출은 처리 단계에서 구현됩니다.',
+        extractFailed: '썸네일 추출 실패',
+        note: '썸네일 추출은 비디오 파이프라인과 별개의 작업입니다. 처리된 비디오가 아닌 이미지 파일을 출력합니다.',
+        previewHint:
+          '타임라인의 노란색 마커가 썸네일 위치를 나타냅니다. 탐색 시 미리보기가 업데이트됩니다.',
+      },
+      trim: {
+        title: '트림',
+        startTime: '시작 시간',
+        startTooltip: '유지할 비디오 구간의 시작점',
+        endTime: '종료 시간',
+        endTooltip: '유지할 비디오 구간의 끝점',
+        preview: '미리보기',
+        outputDuration: '출력 시간',
+        originalDuration: '원본 시간',
+        selectAll: '전체 선택',
+        first30s: '처음 30초',
+        last30s: '마지막 30초',
+      },
+      cut: {
+        title: '구간 제거',
+        mode: '모드',
+        removeSegment: '구간 제거',
+        splitInto: '클립으로 분할',
+        segmentsToRemove: '제거할 구간',
+        addSegment: '구간 추가',
+        noSegments:
+          '추가된 구간이 없습니다. "구간 추가"를 클릭하여 비디오의 일부를 제거하세요.',
+        numberOfClips: '클립 수',
+        clips: '클립',
+        eachClipDuration: '각 클립 시간',
+        splitNote:
+          '비디오가 동일한 길이의 클립으로 분할되어 ZIP 파일로 다운로드됩니다.',
+        removeHint:
+          '비디오에서 제거할 시간 구간을 추가합니다. 여러 구간을 한 번에 제거할 수 있습니다.',
+        splitHint:
+          '비디오를 여러 개의 동일한 길이의 클립으로 분할합니다. 각 클립은 별도로 ZIP 파일로 내보내집니다.',
+      },
+      crop: {
+        title: '자르기',
+        aspectRatio: '종횡비',
+        aspectRatioTooltip: '특정 종횡비로 자르기 선택 고정',
+        coordinates: '좌표',
+        width: '너비',
+        height: '높이',
+        selectAll: '전체 선택',
+        outputResolution: '출력 해상도',
+      },
+      resize: {
+        title: '크기 조정',
+        dimensions: '치수',
+        dimensionsTooltip: '픽셀 단위의 출력 비디오 치수',
+        width: '너비',
+        height: '높이',
+        lockAspect: '종횡비 잠금',
+        unlockAspect: '종횡비 잠금 해제',
+        mode: '크기 조정 모드',
+        modeTooltip: '종횡비 차이를 처리하는 방법',
+        presets: '프리셋',
+        useOriginal: '원본 사용',
+      },
+      export: {
+        title: '내보내기',
+        format: '형식',
+        formatTooltip: '출력 비디오 형식 및 코덱',
+        quality: '품질 프리셋',
+        qualityTooltip:
+          '높은 품질은 더 큰 파일을 생성하고 처리 시간이 더 걸립니다',
+        suffix: '파일명 접미사',
+        suffixTooltip: '원본 파일명에 추가할 텍스트',
+        outputFileName: '출력 파일명',
+        privacyNote: '개인정보 보호',
+        privacyDescription:
+          '모든 처리는 WebAssembly를 사용하여 브라우저에서 이루어집니다. 비디오는 서버로 업로드되지 않습니다.',
+        performanceNote: '성능',
+        performanceDescription:
+          '비디오 처리는 계산 집약적입니다. 대용량 파일은 처리하는 데 몇 분이 걸릴 수 있습니다.',
+      },
+    },
   },
   meta: {
     home: {
@@ -1235,9 +1572,19 @@ export const koKR = {
       description:
         '무료 온라인 API 응답 비교 도구. 두 엔드포인트를 동시에 호출하고 JSON 응답 차이를 나란히 하이라이트합니다.',
     },
+    imageStudio: {
+      title: 'Image Studio',
+      description:
+        '무료 온라인 이미지 편집기. 이미지를 자르고, 크기 조정, 회전하고 PNG, JPEG, WebP로 변환합니다. 모든 처리는 브라우저에서 이루어집니다.',
+    },
+    videoStudio: {
+      title: 'Video Studio',
+      description:
+        '무료 온라인 비디오 편집기. 비디오를 자르고, 잘라내고, 크기 조정하고 MP4 또는 WebM으로 변환합니다. 썸네일을 추출합니다. 브라우저 기반 처리.',
+    },
   },
   ads: {
     disclaimer:
-      '이 광고 수익은 Yowu\'s DevTools의 무료 운영과 유지보수에 사용됩니다. 이용해 주셔서 감사합니다.',
+      "애드센스 광고 수익은 Yowu's DevTools의 유지보수 AI Agent 비용과 개발자의 소소한 커피 값으로 사용됩니다. ☕",
   },
 } as const satisfies I18nResource;

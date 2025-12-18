@@ -861,7 +861,7 @@ const RegexTool: React.FC = () => {
   }, [matches, debouncedText, state.selectedMatchIndex]);
 
   return (
-    <div className="flex flex-col min-h-full p-4 md:p-6 max-w-[90rem] mx-auto">
+    <div className="flex flex-col h-full p-4 md:p-6 max-w-[90rem] mx-auto">
       <ToolHeader
         title={t('tool.regex.title')}
         description={t('tool.regex.description')}
@@ -1225,7 +1225,6 @@ const RegexTool: React.FC = () => {
       </div>
 
       <ShareModal {...shareModalProps} />
-
       <AdsenseFooter />
     </div>
   );

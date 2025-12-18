@@ -11,6 +11,7 @@ An open toolbox for developers who would rather keep sensitive snippets on their
 ## Highlights
 
 ### Core Features
+
 - Client-only React + Vite app with Tailwind styling and CodeMirror editors.
 - Tool registry under `apps/web/src/tools/` keeps features isolated but consistent (state storage, sharing, theming).
 - Toast-powered feedback for copy/share actions, and live conversion flows tuned for quick iteration.
@@ -22,7 +23,15 @@ An open toolbox for developers who would rather keep sensitive snippets on their
 
 ### Recent Releases
 
+#### v1.5.x - Media Tools
+
+- **Image Studio** (v1.5.0): Browser-based image editing with crop, resize, rotate/flip, and format conversion.
+- **Video Studio** (v1.5.0): Video editing powered by ffmpeg.wasm—trim, cut, crop, resize, and export to MP4/WebM.
+- **Pipeline Workflow** (v1.5.0): Combine multiple operations in a single export with preset management.
+- **Pretendard Font** (v1.5.0): Added as secondary fallback font for better multilingual support.
+
 #### v1.4.x - API Testing Suite
+
 - **API Response Diff** (v1.4.2): Compare API responses from two domains side-by-side with JSON diff highlighting.
 - **Locale-specific SEO** (v1.4.2): Language-optimized meta tags and descriptions for all tools.
 - **cURL Parser** (v1.4.1): Parse cURL commands into structured components with one-click API Tester import.
@@ -31,6 +40,7 @@ An open toolbox for developers who would rather keep sensitive snippets on their
 - **Monorepo Architecture** (v1.4.0): Migrated to pnpm + Turborepo for better build performance.
 
 #### v1.3.x - Internationalization & Polish
+
 - **Cron Parser Advanced** (v1.3.2): Multi-dialect support (UNIX, Quartz, AWS, Jenkins, K8s) with field breakdown.
 - **JSON Viewer Fullscreen** (v1.3.4): Expand result panel to full width for large JSON exploration.
 - **Share Modal UX** (v1.3.4): Confirmation modal shows what data will be shared before copying.
@@ -38,6 +48,7 @@ An open toolbox for developers who would rather keep sensitive snippets on their
 - **Sitemap Priority** (v1.3.3): SEO-optimized sitemap with tool pages prioritized over homepage.
 
 #### v1.2.x - Power User Features
+
 - **Command Palette** (v1.2.0): Fast tool navigation with `⌘K` / `Ctrl+K` keyboard shortcut.
 - **File Workflow** (v1.2.0): Drag & drop files and download results for JSON, YAML, and Diff tools.
 - **Regex Tester** (v1.2.1): Test regex patterns with match highlighting, capture groups, and replacement preview.
@@ -46,6 +57,7 @@ An open toolbox for developers who would rather keep sensitive snippets on their
 - **URL Parser** (v1.2.0): Break down URLs into protocol, host, path, query parameters, and fragment.
 
 #### v1.1.x - PWA & Performance
+
 - **Enhanced Sidebar** (v1.1.0): Recent tools and favorites for quick access.
 - **Web App support** (v1.1.0): Install as a Chrome app with offline caching.
 - **Performance optimized** (v1.1.0): Web Workers prevent UI freezing for large data.
@@ -115,3 +127,21 @@ Pushes to `main` trigger `.github/workflows/deploy.yml`, which builds `apps/web/
 - `404.html` handles SPA routing for direct URL access
 - **i18n routing** (v1.3.0): Language-prefixed URLs (`/ko-KR/json`, `/ja-JP/diff`, etc.) with locale-specific HTML files
 - **Language detection**: URL → localStorage → browser language → `en-US` fallback
+
+## License
+
+This project is licensed under the **GNU General Public License v3.0 or later** ([GPL-3.0-or-later](https://spdx.org/licenses/GPL-3.0-or-later.html)).
+
+- **Source code**: [github.com/uyu423/yowu-devtools](https://github.com/uyu423/yowu-devtools)
+- **Full license text**: [LICENSE](./LICENSE)
+
+### Summary
+
+- ✅ You may use, modify, and distribute this software freely
+- ✅ You may use this for commercial purposes
+- ⚠️ Modified versions must also be licensed under GPL-3.0 (or later) and disclose source code
+- ⚠️ No warranty is provided — see the [GPL-3.0 full text](https://www.gnu.org/licenses/gpl-3.0.html) for details
+
+### No Warranty
+
+This software is provided **"AS IS"**, without warranty of any kind, express or implied. See [Section 15–17 of the GPL-3.0](https://www.gnu.org/licenses/gpl-3.0.html#section15) for the full disclaimer.

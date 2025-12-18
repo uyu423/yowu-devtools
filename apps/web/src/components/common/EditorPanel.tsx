@@ -3,8 +3,10 @@ import CodeMirror from '@uiw/react-codemirror';
 import { EditorView, Decoration, ViewPlugin } from '@codemirror/view';
 import type { DecorationSet } from '@codemirror/view';
 import { oneDark } from '@codemirror/theme-one-dark';
+import { HelpCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useResolvedTheme } from '@/hooks/useThemeHooks';
+import { Tooltip } from '@/components/ui/Tooltip';
 
 // We'll add more extensions later based on mode
 interface HighlightRange {
@@ -21,6 +23,8 @@ interface EditorPanelProps {
   className?: string;
   placeholder?: string;
   title?: string;
+  /** Tooltip text to show next to the title */
+  titleTooltip?: string;
   status?: 'default' | 'error' | 'success';
   highlights?: HighlightRange[]; // For regex highlighting
   /** Enable vertical resizing of the editor */
@@ -130,6 +134,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
   className,
   placeholder,
   title,
+  titleTooltip,
   status = 'default',
   highlights = [],
   resizable = false,
@@ -304,8 +309,13 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
       data-mode={mode}
     >
       {title && (
-        <div className="border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-900 px-3 py-1.5 text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 shrink-0">
-          {title}
+        <div className="border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-900 px-3 py-1.5 text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 shrink-0 flex items-center gap-1.5">
+          <span>{title}</span>
+          {titleTooltip && (
+            <Tooltip content={titleTooltip} position="bottom" nowrap={false}>
+              <HelpCircle className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 cursor-help" />
+            </Tooltip>
+          )}
         </div>
       )}
       <div ref={editorContainerRef} className="flex-1 min-h-0 overflow-hidden">

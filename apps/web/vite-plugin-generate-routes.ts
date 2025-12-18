@@ -61,6 +61,8 @@ const toolIdToI18nKey: Record<string, string> = {
   'curl-parser': 'curl',
   'api-tester': 'apiTester',
   'api-diff': 'apiDiff',
+  'image-studio': 'imageStudio',
+  'video-studio': 'videoStudio',
 };
 
 // Tool ID에서 i18n meta key 가져오기
@@ -597,6 +599,69 @@ const tools: ToolInfo[] = [
       'CORS bypass via extension',
     ],
   },
+  {
+    id: 'image-studio',
+    path: '/image-studio',
+    title: 'Image Studio',
+    description: 'Crop, resize, rotate, and convert images in your browser',
+    seoDescription:
+      'Free online image editor. Crop, resize, rotate, and convert images to PNG, JPEG, or WebP. All processing happens in your browser - no uploads.',
+    keywords: [
+      'image editor',
+      'image resizer',
+      'image cropper',
+      'image converter',
+      'image compressor',
+      'online image editor',
+      'png to jpeg',
+      'webp converter',
+      'photo editor',
+      'image optimizer',
+      'resize image',
+      'crop image',
+    ],
+    features: [
+      'Crop with aspect ratio presets',
+      'Resize with quality settings',
+      'Rotate and flip images',
+      'Convert to PNG, JPEG, or WebP',
+      'Adjustable export quality',
+      'Pipeline-based workflow',
+      'Client-side processing',
+    ],
+  },
+  {
+    id: 'video-studio',
+    path: '/video-studio',
+    title: 'Video Studio',
+    description: 'Trim, cut, crop, resize, and convert videos in your browser',
+    seoDescription:
+      'Free online video editor. Trim, cut, crop, resize, and convert videos to MP4 or WebM. Extract thumbnails. All processing in your browser - no uploads.',
+    keywords: [
+      'video editor',
+      'video trimmer',
+      'video cutter',
+      'video cropper',
+      'video resizer',
+      'video converter',
+      'online video editor',
+      'mp4 converter',
+      'webm converter',
+      'video compressor',
+      'extract thumbnail',
+      'ffmpeg wasm',
+    ],
+    features: [
+      'Trim video start and end',
+      'Cut or split into clips',
+      'Crop video frame',
+      'Resize with presets',
+      'Extract thumbnail at any time',
+      'Convert to MP4 or WebM',
+      'Pipeline-based workflow',
+      'Browser-based processing',
+    ],
+  },
 ];
 
 export function generateRoutes(): Plugin {
@@ -667,8 +732,8 @@ export function generateRoutes(): Plugin {
             ? localizedDescription.substring(0, 157) + '...'
             : localizedDescription;
 
-        // HTML lang 속성용 locale 코드 (BCP 47)
-        const htmlLang = locale.toLowerCase().replace('_', '-');
+        // HTML lang 속성용 locale 코드 (BCP 47: en-US, ko-KR, ja-JP 등)
+        const htmlLang = locale;
 
         // 메타 태그 생성
         const metaTags = `
@@ -752,7 +817,8 @@ export function generateRoutes(): Plugin {
       ): string {
         const homePath = locale === DEFAULT_LOCALE ? '/' : `/${locale}`;
         const homeUrl = `https://tools.yowu.dev${homePath}`;
-        const htmlLang = locale.toLowerCase().replace('_', '-');
+        // HTML lang 속성용 locale 코드 (BCP 47: en-US, ko-KR, ja-JP 등)
+        const htmlLang = locale;
 
         // i18n 리소스에서 locale별 홈 SEO 정보 가져오기
         const i18n = i18nResources[locale];

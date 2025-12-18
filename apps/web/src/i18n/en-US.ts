@@ -14,6 +14,7 @@ export const enUS = {
     downloaded: 'Downloaded!',
     downloadJson: 'Download JSON',
     upload: 'Upload',
+    changeFile: 'Change File',
     export: 'Export',
     import: 'Import',
     save: 'Save',
@@ -69,6 +70,73 @@ export const enUS = {
     unableToShare: 'Unable to share.',
     sharedUrlInvalid: 'Shared URL is invalid. Restoring default state.',
     unableToCopy: 'Unable to copy to clipboard.',
+    // Pipeline/Processing
+    enable: 'Enable',
+    disable: 'Disable',
+    processing: 'Processing...',
+    copying: 'Copying...',
+    load: 'Load',
+    // Common options for Image/Video Studio
+    aspectRatio: {
+      free: 'Free',
+      square: 'Square',
+      custom: 'Custom',
+    },
+    resizeMode: {
+      contain: 'Contain',
+      containDesc: 'Fit within bounds, may have padding/letterbox',
+      cover: 'Cover',
+      coverDesc: 'Fill bounds, may crop edges',
+      stretch: 'Stretch',
+      stretchDesc: 'Ignore aspect ratio',
+    },
+    quality: {
+      low: 'Low (Fast)',
+      medium: 'Medium',
+      high: 'High (Best)',
+    },
+    videoQuality: {
+      fast: 'Fast',
+      fastDesc: 'Faster encoding, larger file size',
+      balanced: 'Balanced',
+      balancedDesc: 'Good balance of speed and quality',
+      highQuality: 'High Quality',
+      highQualityDesc: 'Best quality, slower encoding',
+    },
+    imageFormat: {
+      png: 'PNG',
+      jpeg: 'JPEG',
+      webp: 'WebP',
+    },
+    videoFormat: {
+      mp4: 'MP4 (H.264)',
+      webm: 'WebM (VP9)',
+    },
+    // Preset Management
+    preset: {
+      managePresets: 'Manage Presets',
+      privacyNotice:
+        'Presets are stored locally in your browser only. They are never sent to any server. Use Export/Import to back up or transfer your presets.',
+      saveCurrentSettings: 'Save Current Settings as Preset',
+      namePlaceholder: 'Preset name (e.g., "Social Media 1080p")',
+      descriptionPlaceholder: 'Description (optional)',
+      nameRequired: 'Preset name is required',
+      savePreset: 'Save Preset',
+      savedPresets: 'Saved Presets',
+      noPresets: 'No presets saved yet. Save your first preset above!',
+      load: 'Load',
+      remove: 'Remove',
+      added: 'Preset saved successfully',
+      loaded: 'Loaded preset: {name}',
+      removed: 'Preset removed',
+      clearedAll: 'All presets cleared',
+      confirmClear: 'Click again to confirm',
+      clearAll: 'Clear All',
+      exportAll: 'Export all presets to file',
+      importAll: 'Import presets from file',
+      importSuccess: 'Imported {count} presets successfully',
+      importFailed: 'Failed to import presets',
+    },
   },
   shareModal: {
     title: 'Share {toolName}',
@@ -109,6 +177,7 @@ export const enUS = {
     noToolsLoaded: 'No tools loaded',
     moreComingSoon: 'More coming soon...',
     suggestFeature: 'Suggest a feature',
+    reportBug: 'Report a bug',
     removeFromFavorites: 'Remove from favorites',
     addToFavorites: 'Add to favorites',
     lightMode: 'Light Mode',
@@ -116,6 +185,21 @@ export const enUS = {
     darkMode: 'Dark Mode',
     language: 'Language',
     selectLanguage: 'Select Language',
+    // License info
+    license: 'License',
+    sourceCode: 'Source',
+    noWarranty: 'No Warranty',
+    // Sort options
+    sortAlphabetical: 'Alphabetical',
+    sortAdded: 'Added order',
+    sortNewest: 'Newest first',
+    // Collapse/Expand
+    collapseSidebar: 'Collapse sidebar',
+    expandSidebar: 'Expand sidebar',
+    // Beta badge
+    beta: 'Beta',
+    betaTooltip:
+      'This feature is experimental and may be unstable. We are actively testing and improving it.',
   },
   commandPalette: {
     searchTools: 'Search tools...',
@@ -496,27 +580,40 @@ export const enUS = {
         'Generate cryptographically secure passwords with custom length and character rules.',
       length: 'Length',
       characterTypes: 'Character Types',
+      characterTypesTooltip:
+        'Select which character sets to include in the password. Using multiple types increases security.',
       exclusionOptions: 'Exclusion Options',
+      exclusionOptionsTooltip:
+        'Exclude characters that may be confusing or problematic in certain contexts.',
       uppercase: 'Uppercase (A-Z)',
       lowercase: 'Lowercase (a-z)',
       numbers: 'Numbers (0-9)',
       symbols: 'Symbols (!@#$...)',
       excludeSimilar: 'Exclude similar characters (i, l, 1, L, o, 0, O)',
+      excludeSimilarTooltip:
+        'Remove characters that look similar to each other (i/l/1/I, o/0/O) to avoid confusion when reading passwords.',
       excludeAmbiguous: 'Exclude ambiguous symbols',
+      excludeAmbiguousTooltip:
+        'Remove symbols that may be hard to distinguish or cause issues in some systems: {}[]()/\\\'"`~,;:.<>',
       count: 'Count',
       regenerate: 'Regenerate',
       generatedPasswords: 'Generated Passwords',
       strength: 'Strength',
+      strengthTooltip:
+        'Password strength is calculated based on entropy - the combination of length and character set size.',
       weak: 'Weak',
       medium: 'Medium',
       strong: 'Strong',
       veryStrong: 'Very Strong',
       passwordCopied: 'Password copied to clipboard',
       allPasswordsCopied: 'All passwords copied to clipboard',
-      atLeastOneType: 'At least one character type must be selected',
-      lengthMustBeBetween: 'Password length must be between 4 and 128',
-      lengthTooltip: 'Password length (4-128 characters).',
-      countTooltip: 'Number of passwords to generate (1-20).',
+      atLeastOneCharType: 'At least one character type must be selected',
+      lengthError: 'Password length must be between 4 and 128',
+      failedToGenerate: 'Failed to generate password',
+      resultPlaceholder: 'Generated password will appear here',
+      lengthTooltip:
+        'Password length (4-128 characters). Longer passwords are more secure.',
+      countTooltip: 'Number of passwords to generate at once (1-20).',
     },
     urlParser: {
       title: 'URL Parser',
@@ -821,14 +918,28 @@ export const enUS = {
       description:
         'Decode JWTs to inspect header, payload, expiration, and verify signatures.',
       jwtToken: 'JWT Token',
+      jwtTokenTooltip:
+        'JSON Web Token (JWT) is a compact, URL-safe token format used for securely transmitting information between parties as a JSON object.',
       tokenPlaceholder:
         'Paste JWT token (e.g., eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...)',
       validationStatus: 'Validation Status',
+      validationStatusTooltip:
+        'Checks if the token is expired (exp), not yet valid (nbf), and shows when it was issued (iat).',
       signatureVerification: 'Signature Verification',
+      signatureVerificationTooltip:
+        'Verifies that the token was signed with the expected key and has not been tampered with.',
       header: 'Header',
+      headerTooltip:
+        'Contains metadata about the token type and signing algorithm (e.g., alg, typ).',
       payload: 'Payload',
+      payloadTooltip:
+        'Contains the claims - statements about the user and additional data (e.g., sub, name, exp, iat).',
       signature: 'Signature',
+      signatureTooltip:
+        'Cryptographic signature to verify the token integrity. Created using the header, payload, and a secret key.',
       verificationKey: 'Verification Key',
+      verificationKeyTooltip:
+        'For HMAC (HS256/384/512): enter the secret key. For RSA/ECDSA: enter the public key in PEM format.',
       verificationKeyPlaceholder: 'Enter verification key',
       enterVerificationKey: 'Enter verification key',
       hmacKeyPlaceholder: 'Enter HMAC secret key (for HS256, HS384, HS512)',
@@ -852,13 +963,19 @@ export const enUS = {
       enterKeyToVerify: 'Enter a key above to verify the signature',
       invalidJwtFormat:
         'Invalid JWT format. Expected 3 parts separated by dots (header.payload.signature).',
+      invalidJwtFormatDetails:
+        'Invalid JWT format. Expected 3 parts separated by dots (header.payload.signature).',
       failedToDecodeHeader:
         'Failed to decode JWT header. Invalid Base64URL encoding.',
       failedToDecodePayload:
         'Failed to decode JWT payload. Invalid Base64URL encoding.',
+      failedToDecodeToken: 'Failed to decode JWT token.',
       enterJwtToDecode: 'Enter a JWT token to decode it.',
+      enterTokenToDecode: 'Enter a JWT token to decode it.',
       signatureNote:
         'Note: Signature verification is not performed. This tool only decodes the token.',
+      signatureIsValid: 'Signature is valid.',
+      verificationFailed: 'Verification failed',
       raw: 'Raw',
     },
     jwtEncoder: {
@@ -866,17 +983,25 @@ export const enUS = {
       description:
         'Create signed JWTs with custom header, payload, and HMAC algorithms.',
       headerJson: 'Header (JSON)',
+      headerJsonTooltip:
+        'JWT header contains metadata: "alg" specifies the signing algorithm, "typ" is usually "JWT".',
       headerPlaceholder: '{"alg":"HS256","typ":"JWT"}',
       payloadJson: 'Payload (JSON)',
+      payloadJsonTooltip:
+        'JWT payload contains claims. Common claims: "sub" (subject), "exp" (expiration), "iat" (issued at), "iss" (issuer).',
       payloadPlaceholder: '{"sub":"1234567890","name":"John Doe"}',
       algorithm: 'Algorithm',
+      algorithmTooltip:
+        'HS256/384/512 use HMAC with SHA-256/384/512. "none" creates an unsigned token (not recommended for production).',
       algorithmNote: '(updates header.alg)',
       secretKey: 'Secret Key',
+      secretKeyTooltip:
+        'The secret key used to sign the JWT. Keep this secure - anyone with this key can create valid tokens.',
       secretKeyPlaceholder: 'Enter secret key for signing',
       encodedJwtToken: 'Encoded JWT Token',
       noneUnsigned: 'None (unsigned)',
-      invalidJsonHeader: 'Invalid JSON in header',
-      invalidJsonPayload: 'Invalid JSON in payload',
+      invalidHeaderJson: 'Invalid JSON in header',
+      invalidPayloadJson: 'Invalid JSON in payload',
       secretKeyRequired: 'Secret key is required for signing',
       unsupportedAlgorithm:
         'Unsupported algorithm: {alg}. Only HS256, HS384, HS512, none are supported.',
@@ -1019,8 +1144,10 @@ export const enUS = {
         "The browser extension can bypass CORS restrictions by making requests from the extension context, which isn't subject to the same security rules as web pages.",
       corsRetryWithExtension: 'Retry with Extension',
       corsInstallExtension: 'Install Chrome Extension',
-      corsMobileNotSupported: 'Chrome extensions are not available on mobile devices',
-      corsMobileUseDesktop: 'Please use the desktop version of Chrome to access APIs with CORS restrictions.',
+      corsMobileNotSupported:
+        'Chrome extensions are not available on mobile devices',
+      corsMobileUseDesktop:
+        'Please use the desktop version of Chrome to access APIs with CORS restrictions.',
       corsRememberChoice: 'Remember for this domain',
       corsRememberChoiceDesc: 'Automatically use extension for {origin}',
       sendToApiDiff: 'Send to API Diff',
@@ -1160,6 +1287,220 @@ export const enUS = {
         noMatch: 'No matching history',
       },
     },
+    imageStudio: {
+      title: 'Image Studio',
+      description:
+        'Crop, resize, rotate, and convert images. All processing happens in your browser.',
+      pipeline: 'Pipeline',
+      stepsEnabled: 'steps enabled',
+      resetPipeline: 'Reset pipeline settings',
+      runExport: 'Run & Export',
+      savePreset: 'Save Preset',
+      loadPreset: 'Load Preset',
+      dropImageHere: 'Drop an image here or click to browse',
+      supportedFormats: 'PNG, JPEG, WebP, GIF, BMP supported',
+      pasteFromClipboard: 'Or paste from clipboard (Ctrl/⌘ + V)',
+      dropToReplace: 'Drop to replace current image',
+      unsupportedFormat: 'Unsupported image format',
+      fileTooLarge: 'File is too large. Maximum size is 50MB.',
+      failedToLoadImage: 'Failed to load image',
+      noImageLoaded: 'No image loaded',
+      exportNotImplemented:
+        'Export functionality will be implemented in the next phase',
+      presetNotImplemented:
+        'Preset functionality will be implemented in the next phase',
+      exportFailed: 'Failed to export image',
+      copyToClipboard: 'Copy to Clipboard',
+      copiedToClipboard: 'Image copied to clipboard',
+      copyFailed: 'Failed to copy image to clipboard',
+      crop: {
+        title: 'Crop',
+        aspectRatio: 'Aspect Ratio',
+        aspectRatioTooltip: 'Lock crop selection to a specific aspect ratio',
+        coordinates: 'Coordinates',
+        width: 'Width',
+        height: 'Height',
+        selectAll: 'Select All',
+      },
+      resize: {
+        title: 'Resize',
+        dimensions: 'Dimensions',
+        dimensionsTooltip: 'Output image dimensions in pixels',
+        width: 'Width',
+        height: 'Height',
+        lockAspect: 'Lock aspect ratio',
+        unlockAspect: 'Unlock aspect ratio',
+        mode: 'Resize Mode',
+        modeTooltip: 'How to handle aspect ratio differences',
+        quality: 'Interpolation Quality',
+        qualityTooltip:
+          'Higher quality produces better results but takes longer',
+        presets: 'Presets',
+        useOriginal: 'Use original',
+      },
+      rotate: {
+        title: 'Rotate / Flip',
+        rotation: 'Rotation',
+        rotateLeft: 'Rotate 90° left',
+        rotateRight: 'Rotate 90° right',
+        left: 'Left',
+        right: 'Right',
+        flip: 'Flip',
+        horizontal: 'Horizontal',
+        vertical: 'Vertical',
+        resetTransform: 'Reset Transform',
+      },
+      export: {
+        title: 'Export',
+        format: 'Format',
+        formatTooltip: 'Output image format',
+        formatNotSupported: 'Format not supported by your browser',
+        webpNotSupported: 'WebP export is not supported by your browser',
+        quality: 'Quality',
+        qualityTooltip: 'Higher quality produces larger files (JPEG/WebP only)',
+        smaller: 'Smaller file',
+        better: 'Better quality',
+        suffix: 'File Name Suffix',
+        suffixTooltip: 'Text to append to the original filename',
+        outputFileName: 'Output File Name',
+        privacyNote: 'Privacy',
+        privacyDescription:
+          'All processing happens in your browser. Your images are never uploaded to any server.',
+      },
+    },
+    videoStudio: {
+      title: 'Video Studio',
+      description:
+        'Trim, cut, crop, resize, and convert videos. All processing happens in your browser.',
+      pipeline: 'Pipeline',
+      stepsEnabled: 'steps enabled',
+      resetPipeline: 'Reset pipeline settings',
+      runExport: 'Run & Export',
+      savePreset: 'Save Preset',
+      loadPreset: 'Load Preset',
+      dropVideoHere: 'Drop a video file here or click to browse',
+      supportedFormats: 'MP4, WebM, MOV, AVI, MKV supported',
+      dropToReplace: 'Drop to replace current video',
+      unsupportedFormat: 'Unsupported video format',
+      fileTooLarge: 'File is too large. Maximum size is 500MB.',
+      failedToLoadVideo: 'Failed to load video',
+      noVideoLoaded: 'No video loaded',
+      exportInProgress: 'Video export is in progress. Please wait.',
+      thumbnailInProgress: 'Thumbnail extraction is in progress. Please wait.',
+      leavePageWarning:
+        'Video processing is in progress. If you leave this page, the processing will be cancelled. Are you sure you want to leave?',
+      leavePageTitle: 'Leave Page?',
+      stayOnPage: 'Stay on Page',
+      leavePage: 'Leave Page',
+      cancelProcessingTitle: 'Cancel Processing?',
+      cancelProcessingWarning:
+        'Video processing is in progress. Are you sure you want to cancel?',
+      continueProcessing: 'Continue',
+      cancelProcessing: 'Cancel Processing',
+      mobileWarning:
+        'Large video files may cause performance issues on mobile devices.',
+      loadingEngine: 'Loading video processing engine...',
+      preparing: 'Preparing video...',
+      processing: 'Processing...',
+      finalizing: 'Finalizing output...',
+      cancelled: 'Processing cancelled',
+      exportNotImplemented:
+        'Export functionality will be implemented with ffmpeg.wasm integration',
+      presetNotImplemented:
+        'Preset functionality will be implemented in the next phase',
+      exportFailed: 'Failed to export video',
+      processingCancelled: 'Video processing was cancelled',
+      thumbnail: {
+        title: 'Extract Thumbnail',
+        description: 'Extract a single frame from the video as an image file.',
+        extractAt: 'Extract at',
+        timeTooltip: 'Time position to extract the thumbnail frame',
+        start: 'Start',
+        end: 'End',
+        quickSelect: 'Quick Select',
+        format: 'Output Format',
+        extractButton: 'Extract Thumbnail',
+        extracting: 'Extracting...',
+        extractNotImplemented:
+          'Thumbnail extraction will be implemented in the processing phase.',
+        extractFailed: 'Failed to extract thumbnail',
+        note: 'Thumbnail extraction is a separate action from the video pipeline. It outputs an image file, not a processed video.',
+        previewHint:
+          'The yellow marker on the timeline shows the thumbnail position. The preview will update when you seek.',
+      },
+      trim: {
+        title: 'Trim',
+        startTime: 'Start Time',
+        startTooltip: 'Beginning of the video segment to keep',
+        endTime: 'End Time',
+        endTooltip: 'End of the video segment to keep',
+        preview: 'Preview',
+        outputDuration: 'Output Duration',
+        originalDuration: 'Original Duration',
+        selectAll: 'Select All',
+        first30s: 'First 30s',
+        last30s: 'Last 30s',
+      },
+      cut: {
+        title: 'Remove Segments',
+        mode: 'Mode',
+        removeSegment: 'Remove Segment',
+        splitInto: 'Split Into Clips',
+        segmentsToRemove: 'Segments to Remove',
+        addSegment: 'Add Segment',
+        noSegments:
+          'No segments added. Click "Add Segment" to remove parts of the video.',
+        numberOfClips: 'Number of Clips',
+        clips: 'clips',
+        eachClipDuration: 'Each clip duration',
+        splitNote:
+          'Video will be split into equal-length clips and downloaded as a ZIP file.',
+        removeHint:
+          'Add time segments you want to remove from the video. Multiple segments can be removed at once.',
+        splitHint:
+          'Split the video into multiple equal-length clips. Each clip will be exported separately as a ZIP file.',
+      },
+      crop: {
+        title: 'Crop',
+        aspectRatio: 'Aspect Ratio',
+        aspectRatioTooltip: 'Lock crop selection to a specific aspect ratio',
+        coordinates: 'Coordinates',
+        width: 'Width',
+        height: 'Height',
+        selectAll: 'Select All',
+        outputResolution: 'Output Resolution',
+      },
+      resize: {
+        title: 'Resize',
+        dimensions: 'Dimensions',
+        dimensionsTooltip: 'Output video dimensions in pixels',
+        width: 'Width',
+        height: 'Height',
+        lockAspect: 'Lock aspect ratio',
+        unlockAspect: 'Unlock aspect ratio',
+        mode: 'Resize Mode',
+        modeTooltip: 'How to handle aspect ratio differences',
+        presets: 'Presets',
+        useOriginal: 'Use original',
+      },
+      export: {
+        title: 'Export',
+        format: 'Format',
+        formatTooltip: 'Output video format and codec',
+        quality: 'Quality Preset',
+        qualityTooltip:
+          'Higher quality produces larger files and takes longer to process',
+        suffix: 'File Name Suffix',
+        suffixTooltip: 'Text to append to the original filename',
+        outputFileName: 'Output File Name',
+        privacyNote: 'Privacy',
+        privacyDescription:
+          'All processing happens in your browser using WebAssembly. Your videos are never uploaded to any server.',
+        performanceNote: 'Performance',
+        performanceDescription:
+          'Video processing is computationally intensive. Large files may take several minutes to process.',
+      },
+    },
   },
   meta: {
     home: {
@@ -1263,10 +1604,20 @@ export const enUS = {
       description:
         'Free online API response comparison tool. Call two endpoints simultaneously and highlight JSON response differences side-by-side.',
     },
+    imageStudio: {
+      title: 'Image Studio',
+      description:
+        'Free online image editor. Crop, resize, rotate, and convert images to PNG, JPEG, or WebP. All processing happens in your browser.',
+    },
+    videoStudio: {
+      title: 'Video Studio',
+      description:
+        'Free online video editor. Trim, cut, crop, resize, and convert videos. Extract thumbnails and export to MP4 or WebM. Browser-based processing.',
+    },
   },
   ads: {
     disclaimer:
-      "Ad revenue from this space helps keep Yowu's DevTools free and maintained. Thank you for your support.",
+      "AdSense revenue helps cover AI Agent costs for maintaining Yowu's DevTools and the developer's coffee fund. ☕",
   },
 } as const;
 

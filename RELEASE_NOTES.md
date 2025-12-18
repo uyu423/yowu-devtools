@@ -4,6 +4,93 @@ RELEASE_NOTES.md must be written in English.
 
 # Release Notes
 
+## v1.5.0 (December 2025) - Media Tools: Image Studio & Video Studio
+
+Major release introducing **Image Studio** and **Video Studio** tools for browser-based media processing. All processing happens locally in your browser—no data is ever sent to servers.
+
+### New Features
+
+- ✨ **Image Studio**: Complete image editing pipeline
+
+  - **Crop**: Free ratio, fixed ratios (1:1, 4:3, 16:9), custom ratio support
+  - **Resize**: Width/height input, aspect ratio lock, resize modes (Contain, Cover, Stretch)
+  - **Rotate/Flip**: 90° rotation, horizontal/vertical flip
+  - **Export**: PNG, JPEG, WebP formats with quality control
+  - Pipeline-based editing: combine multiple operations in one export
+  - Drag & drop, file picker, and clipboard paste support
+  - Real-time preview with crop overlay
+  - Preset management: save, load, export/import presets
+
+- ✨ **Video Studio**: Browser-based video editing powered by ffmpeg.wasm
+
+  - **Thumbnail Extraction**: Extract frame at any timestamp as PNG/JPEG/WebP
+  - **Trim**: Set start/end times to extract video segments
+  - **Cut (Segment Removal)**: Remove unwanted portions from video
+  - **Crop**: Crop video frame with aspect ratio presets
+  - **Resize**: Change output resolution with presets (480p, 720p, 1080p, 1440p, 4K)
+  - **Export**: MP4 (H.264) and WebM (VP9) formats with quality presets
+  - Pipeline-based editing: combine Trim + Crop + Resize in single export
+  - Progress indicator with cancel support
+  - Preset management: save, load, export/import presets
+
+- ✨ **Pipeline Workflow**: Both tools support combining multiple operations
+
+  - Enable/disable individual steps
+  - Collapsible step panels for cleaner UI
+  - Step count indicator
+  - One-click "Run & Export" execution
+
+- ✨ **Preset System**: Save and reuse your editing configurations
+  - Save current settings as named presets
+  - Load presets to restore configurations
+  - Export all presets to JSON file
+  - Import presets from JSON file
+  - Privacy-first: presets stored locally only
+
+### Enhancements
+
+- 🔧 **Pretendard Font**: Added as secondary fallback font for better multilingual support
+
+  - Font stack: NanumSquareNeo → Pretendard → Inter → system fonts
+  - Improved rendering for Latin characters when NanumSquareNeo lacks coverage
+
+- 🔧 **HTML lang Attribute**: Now dynamically updated based on current locale
+
+  - Proper BCP 47 format: `en-US`, `ko-KR`, `ja-JP`, `zh-CN`, `es-ES`
+  - Both static HTML (build) and runtime (SPA navigation) correctly set lang attribute
+  - Better accessibility and SEO for international users
+
+- 🌐 **Full i18n Support**: All Media Tools UI translated to 5 languages
+
+  - English (en-US), Korean (ko-KR), Japanese (ja-JP), Chinese (zh-CN), Spanish (es-ES)
+  - Pipeline, export, and progress status messages all localized
+
+- ⌨️ **Keyboard Shortcuts**:
+  - `⌘/Ctrl + O`: Open file
+  - `⌘/Ctrl + Enter`: Run & Export
+  - `⌘/Ctrl + Shift + R`: Reset pipeline
+  - `⌘/Ctrl + C`: Copy to clipboard (Image Studio)
+  - `Esc`: Cancel processing
+
+### Technical
+
+- **Image Processing**: Canvas API with `createImageBitmap()` for efficient decoding
+- **Video Processing**: ffmpeg.wasm (single-thread core) running in browser
+- **Memory Management**: Automatic cleanup of Blob URLs and ffmpeg FS files
+- **Singleton Pattern**: ffmpeg instance reused across operations
+- **Progress Tracking**: Real-time progress from ffmpeg logs with time parsing
+- New directories: `src/tools/image-studio/`, `src/tools/video-studio/`
+- Dependencies: `@ffmpeg/ffmpeg`, `@ffmpeg/util`, `jszip`
+
+### Privacy
+
+- 🔒 All media processing happens in your browser
+- 🔒 No files are uploaded to any server
+- 🔒 Presets stored in localStorage only
+- 🔒 Share links contain settings only (no media data)
+
+---
+
 ## v1.4.2 (December 2025) - API Response Diff & Locale-specific SEO
 
 Introducing the **API Response Diff** tool for comparing API responses from two domains, plus **locale-specific SEO** for better international search visibility.

@@ -16,6 +16,7 @@ export const jaJP = {
     downloaded: 'ダウンロード完了!',
     downloadJson: 'JSONをダウンロード',
     upload: 'アップロード',
+    changeFile: 'ファイル変更',
     export: 'エクスポート',
     import: 'インポート',
     save: '保存',
@@ -71,6 +72,74 @@ export const jaJP = {
     unableToShare: '共有できません。',
     sharedUrlInvalid: '共有URLが無効です。デフォルト状態に戻します。',
     unableToCopy: 'クリップボードにコピーできません。',
+    // Pipeline/Processing
+    enable: '有効',
+    disable: '無効',
+    processing: '処理中...',
+    copying: 'コピー中...',
+    load: '読み込み',
+    // Common options for Image/Video Studio
+    aspectRatio: {
+      free: 'フリー',
+      square: '正方形',
+      custom: 'カスタム',
+    },
+    resizeMode: {
+      contain: '収める',
+      containDesc: '境界内に収める（パディング/レターボックス）',
+      cover: '覆う',
+      coverDesc: '境界を埋める（端が切れる可能性）',
+      stretch: '引き伸ばす',
+      stretchDesc: 'アスペクト比を無視',
+    },
+    quality: {
+      low: '低（高速）',
+      medium: '中',
+      high: '高（最高品質）',
+    },
+    videoQuality: {
+      fast: '高速',
+      fastDesc: '高速エンコード、大きいファイルサイズ',
+      balanced: 'バランス',
+      balancedDesc: '速度と品質のバランス',
+      highQuality: '高品質',
+      highQualityDesc: '最高品質、遅いエンコード',
+    },
+    imageFormat: {
+      png: 'PNG',
+      jpeg: 'JPEG',
+      webp: 'WebP',
+    },
+    videoFormat: {
+      mp4: 'MP4 (H.264)',
+      webm: 'WebM (VP9)',
+    },
+    // Preset Management
+    preset: {
+      managePresets: 'プリセット管理',
+      privacyNotice:
+        'プリセットはブラウザにのみローカル保存されます。サーバーには送信されません。エクスポート/インポートでバックアップや移行ができます。',
+      saveCurrentSettings: '現在の設定をプリセットとして保存',
+      namePlaceholder: 'プリセット名（例："SNS用 1080p"）',
+      descriptionPlaceholder: '説明（任意）',
+      nameRequired: 'プリセット名を入力してください',
+      savePreset: 'プリセットを保存',
+      savedPresets: '保存済みプリセット',
+      noPresets:
+        'プリセットがまだありません。上で最初のプリセットを保存しましょう！',
+      load: '読み込み',
+      remove: '削除',
+      added: 'プリセットを保存しました',
+      loaded: 'プリセットを読み込みました: {name}',
+      removed: 'プリセットを削除しました',
+      clearedAll: 'すべてのプリセットを削除しました',
+      confirmClear: 'もう一度クリックして確認',
+      clearAll: 'すべて削除',
+      exportAll: 'すべてのプリセットをファイルにエクスポート',
+      importAll: 'ファイルからプリセットをインポート',
+      importSuccess: '{count}個のプリセットをインポートしました',
+      importFailed: 'プリセットのインポートに失敗しました',
+    },
   },
   shareModal: {
     title: '{toolName}を共有',
@@ -111,6 +180,7 @@ export const jaJP = {
     noToolsLoaded: 'ツールが読み込めません',
     moreComingSoon: 'もっと追加予定...',
     suggestFeature: '機能をリクエスト',
+    reportBug: 'バグを報告',
     removeFromFavorites: 'お気に入りから削除',
     addToFavorites: 'お気に入りに追加',
     lightMode: 'ライトモード',
@@ -118,6 +188,21 @@ export const jaJP = {
     darkMode: 'ダークモード',
     language: '言語',
     selectLanguage: '言語を選択',
+    // License info
+    license: 'ライセンス',
+    sourceCode: 'ソース',
+    noWarranty: '保証なし',
+    // Sort options
+    sortAlphabetical: 'アルファベット順',
+    sortAdded: '追加順',
+    sortNewest: '新しい順',
+    // Collapse/Expand
+    collapseSidebar: 'サイドバーを折りたたむ',
+    expandSidebar: 'サイドバーを展開',
+    // Beta badge
+    beta: 'ベータ',
+    betaTooltip:
+      'この機能は実験的であり、不安定な可能性があります。テストと改善を進めています。',
   },
   commandPalette: {
     searchTools: 'ツールを検索...',
@@ -491,27 +576,39 @@ export const jaJP = {
         'カスタム長さと文字ルールで暗号学的に安全なパスワードを生成します。',
       length: '長さ',
       characterTypes: '文字タイプ',
+      characterTypesTooltip:
+        'パスワードに含める文字セットを選択します。複数のタイプを使用するとセキュリティが向上します。',
       exclusionOptions: '除外オプション',
+      exclusionOptionsTooltip:
+        '特定の状況で混乱を招いたり問題を引き起こす可能性のある文字を除外します。',
       uppercase: '大文字 (A-Z)',
       lowercase: '小文字 (a-z)',
       numbers: '数字 (0-9)',
       symbols: '記号 (!@#$...)',
       excludeSimilar: '類似文字を除外 (i, l, 1, L, o, 0, O)',
+      excludeSimilarTooltip:
+        '互いに似ている文字(i/l/1/I, o/0/O)を削除し、パスワードを読む際の混乱を防ぎます。',
       excludeAmbiguous: '曖昧な記号を除外',
+      excludeAmbiguousTooltip:
+        '区別しにくいか一部のシステムで問題を引き起こす可能性のある記号を削除します：{}[]()/\\\'"`~,;:.<>',
       count: '数',
       regenerate: '再生成',
       generatedPasswords: '生成されたパスワード',
       strength: '強度',
+      strengthTooltip:
+        'パスワードの強度はエントロピー（長さと文字セットサイズの組み合わせ）に基づいて計算されます。',
       weak: '弱い',
       medium: '中程度',
       strong: '強い',
       veryStrong: '非常に強い',
       passwordCopied: 'パスワードをクリップボードにコピーしました',
       allPasswordsCopied: 'すべてのパスワードをクリップボードにコピーしました',
-      atLeastOneType: '少なくとも1つの文字タイプを選択する必要があります',
-      lengthMustBeBetween: 'パスワードの長さは4から128の間である必要があります',
-      lengthTooltip: 'パスワードの長さ (4-128文字)。',
-      countTooltip: '生成するパスワードの数 (1-20)。',
+      atLeastOneCharType: '少なくとも1つの文字タイプを選択する必要があります',
+      lengthError: 'パスワードの長さは4から128の間である必要があります',
+      failedToGenerate: 'パスワードの生成に失敗しました',
+      resultPlaceholder: '生成されたパスワードがここに表示されます',
+      lengthTooltip: 'パスワードの長さ (4-128文字)。長いほど安全です。',
+      countTooltip: '一度に生成するパスワードの数 (1-20)。',
     },
     urlParser: {
       title: 'URL Parser',
@@ -803,14 +900,28 @@ export const jaJP = {
       description:
         'JWTをデコードしてヘッダー、ペイロード、有効期限を確認し、署名を検証します。',
       jwtToken: 'JWT Token',
+      jwtTokenTooltip:
+        'JSON Web Token(JWT)は、JSONオブジェクトとして当事者間で安全に情報を伝送するためのコンパクトでURL安全なトークン形式です。',
       tokenPlaceholder:
         'JWT Tokenを貼り付け (例: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...)',
       validationStatus: '検証ステータス',
+      validationStatusTooltip:
+        'トークンが期限切れ(exp)、まだ有効ではない(nbf)、発行時刻(iat)を確認します。',
       signatureVerification: 'Signature検証',
+      signatureVerificationTooltip:
+        'トークンが予期されるキーで署名され、改ざんされていないことを検証します。',
       header: 'Header',
+      headerTooltip:
+        'トークンの種類と署名アルゴリズムに関するメタデータを含みます (例: alg, typ)。',
       payload: 'Payload',
+      payloadTooltip:
+        'クレーム(ユーザーと追加データに関する記述)を含みます (例: sub, name, exp, iat)。',
       signature: 'Signature',
+      signatureTooltip:
+        'トークンの整合性を検証するための暗号署名です。ヘッダー、ペイロード、秘密鍵を使用して作成されます。',
       verificationKey: '検証Key',
+      verificationKeyTooltip:
+        'HMAC(HS256/384/512)の場合：秘密鍵を入力。RSA/ECDSAの場合：PEM形式の公開鍵を入力。',
       verificationKeyPlaceholder: '検証Keyを入力',
       enterVerificationKey: '検証Keyを入力',
       hmacKeyPlaceholder: 'HMAC Secret Keyを入力 (HS256, HS384, HS512用)',
@@ -834,13 +945,19 @@ export const jaJP = {
       enterKeyToVerify: 'Signatureを検証するには上にKeyを入力してください',
       invalidJwtFormat:
         '無効なJWT形式です。ドットで区切られた3つの部分が必要です (header.payload.signature)。',
+      invalidJwtFormatDetails:
+        '無効なJWT形式です。ドットで区切られた3つの部分が必要です (header.payload.signature)。',
       failedToDecodeHeader:
         'JWT Header Decode失敗。無効なBase64URLエンコーディングです。',
       failedToDecodePayload:
         'JWT Payload Decode失敗。無効なBase64URLエンコーディングです。',
+      failedToDecodeToken: 'JWTトークンのデコードに失敗しました。',
       enterJwtToDecode: 'DecodeするJWT Tokenを入力してください。',
+      enterTokenToDecode: 'DecodeするJWT Tokenを入力してください。',
       signatureNote:
         '注: Signature検証は実行されません。このツールはTokenをDecodeするだけです。',
+      signatureIsValid: 'Signatureは有効です。',
+      verificationFailed: '検証失敗',
       raw: 'Raw',
     },
     stringLength: {
@@ -873,17 +990,25 @@ export const jaJP = {
       description:
         'カスタムヘッダー、ペイロード、HMACアルゴリズムで署名付きJWTを作成します。',
       headerJson: 'Header (JSON)',
+      headerJsonTooltip:
+        'JWTヘッダーにはメタデータが含まれます：「alg」は署名アルゴリズム、「typ」は通常「JWT」です。',
       headerPlaceholder: '{"alg":"HS256","typ":"JWT"}',
       payloadJson: 'Payload (JSON)',
+      payloadJsonTooltip:
+        'JWTペイロードにはクレームが含まれます。一般的なクレーム：「sub」(主題)、「exp」(有効期限)、「iat」(発行時刻)、「iss」(発行者)。',
       payloadPlaceholder: '{"sub":"1234567890","name":"John Doe"}',
       algorithm: 'アルゴリズム',
+      algorithmTooltip:
+        'HS256/384/512はSHA-256/384/512を使用したHMACです。「none」は署名なしのトークンを作成します（本番環境では推奨しません）。',
       algorithmNote: '(header.algを更新)',
       secretKey: 'Secret Key',
+      secretKeyTooltip:
+        'JWTに署名するために使用される秘密鍵です。この鍵を安全に保管してください。この鍵があれば誰でも有効なトークンを作成できます。',
       secretKeyPlaceholder: '署名用のSecret Keyを入力',
       encodedJwtToken: 'EncodeされたJWT Token',
       noneUnsigned: 'None (署名なし)',
-      invalidJsonHeader: 'Headerに無効なJSON',
-      invalidJsonPayload: 'Payloadに無効なJSON',
+      invalidHeaderJson: 'Headerに無効なJSON',
+      invalidPayloadJson: 'Payloadに無効なJSON',
       secretKeyRequired: '署名にはSecret Keyが必要です',
       unsupportedAlgorithm:
         'サポートされていないアルゴリズム: {alg}。HS256、HS384、HS512、noneのみサポートされています。',
@@ -1002,7 +1127,8 @@ export const jaJP = {
       corsRetryWithExtension: '拡張機能で再試行',
       corsInstallExtension: 'Chrome拡張機能をインストール',
       corsMobileNotSupported: 'モバイル端末ではChrome拡張機能を使用できません',
-      corsMobileUseDesktop: 'CORS制限のあるAPIにアクセスするには、デスクトップ版のChromeをご利用ください。',
+      corsMobileUseDesktop:
+        'CORS制限のあるAPIにアクセスするには、デスクトップ版のChromeをご利用ください。',
       corsRememberChoice: 'このドメインを記憶',
       corsRememberChoiceDesc: '{origin}に対して自動的に拡張機能を使用',
       sendToApiDiff: 'API Diffに送信',
@@ -1142,6 +1268,216 @@ export const jaJP = {
         noMatch: '一致する履歴がありません',
       },
     },
+    // TODO: Translate to Japanese
+    imageStudio: {
+      title: 'Image Studio',
+      description:
+        '画像の切り抜き、サイズ変更、回転、変換を行います。すべての処理はブラウザ内で行われます。',
+      pipeline: 'パイプライン',
+      stepsEnabled: 'ステップ有効',
+      resetPipeline: 'パイプライン設定をリセット',
+      runExport: '実行＆エクスポート',
+      savePreset: 'プリセット保存',
+      loadPreset: 'プリセット読込',
+      dropImageHere: '画像をここにドロップするか、クリックして参照',
+      supportedFormats: 'PNG, JPEG, WebP, GIF, BMP対応',
+      pasteFromClipboard: 'またはクリップボードから貼り付け (Ctrl/⌘ + V)',
+      dropToReplace: '現在の画像を置き換えるにはドロップ',
+      unsupportedFormat: 'サポートされていない画像形式',
+      fileTooLarge: 'ファイルが大きすぎます。最大サイズは50MBです。',
+      failedToLoadImage: '画像の読み込みに失敗しました',
+      noImageLoaded: '画像が読み込まれていません',
+      exportNotImplemented: 'エクスポート機能は次のフェーズで実装されます',
+      presetNotImplemented: 'プリセット機能は次のフェーズで実装されます',
+      exportFailed: '画像のエクスポートに失敗しました',
+      copyToClipboard: 'クリップボードにコピー',
+      copiedToClipboard: '画像をクリップボードにコピーしました',
+      copyFailed: '画像のクリップボードへのコピーに失敗しました',
+      crop: {
+        title: '切り抜き',
+        aspectRatio: 'アスペクト比',
+        aspectRatioTooltip: '特定のアスペクト比に切り抜き選択をロック',
+        coordinates: '座標',
+        width: '幅',
+        height: '高さ',
+        selectAll: 'すべて選択',
+      },
+      resize: {
+        title: 'サイズ変更',
+        dimensions: 'サイズ',
+        dimensionsTooltip: '出力画像のサイズ（ピクセル）',
+        width: '幅',
+        height: '高さ',
+        lockAspect: 'アスペクト比をロック',
+        unlockAspect: 'アスペクト比のロックを解除',
+        mode: 'リサイズモード',
+        modeTooltip: 'アスペクト比の違いを処理する方法',
+        quality: '補間品質',
+        qualityTooltip: '高品質ほど良い結果が得られますが、時間がかかります',
+        presets: 'プリセット',
+        useOriginal: 'オリジナルを使用',
+      },
+      rotate: {
+        title: '回転 / 反転',
+        rotation: '回転',
+        rotateLeft: '左に90°回転',
+        rotateRight: '右に90°回転',
+        left: '左',
+        right: '右',
+        flip: '反転',
+        horizontal: '水平',
+        vertical: '垂直',
+        resetTransform: '変換をリセット',
+      },
+      export: {
+        title: 'エクスポート',
+        format: '形式',
+        formatTooltip: '出力画像形式',
+        formatNotSupported: 'お使いのブラウザでサポートされていない形式',
+        webpNotSupported:
+          'お使いのブラウザではWebPエクスポートがサポートされていません',
+        quality: '品質',
+        qualityTooltip:
+          '高品質ほどファイルサイズが大きくなります（JPEG/WebPのみ）',
+        smaller: '小さいファイル',
+        better: '高品質',
+        suffix: 'ファイル名接尾辞',
+        suffixTooltip: '元のファイル名に追加するテキスト',
+        outputFileName: '出力ファイル名',
+        privacyNote: 'プライバシー',
+        privacyDescription:
+          'すべての処理はブラウザ内で行われます。画像がサーバーにアップロードされることはありません。',
+      },
+    },
+    videoStudio: {
+      title: 'Video Studio',
+      description:
+        '動画のトリミング、カット、切り抜き、サイズ変更、変換を行います。すべての処理はブラウザ内で行われます。',
+      pipeline: 'パイプライン',
+      stepsEnabled: 'ステップ有効',
+      resetPipeline: 'パイプライン設定をリセット',
+      runExport: '実行＆エクスポート',
+      savePreset: 'プリセット保存',
+      loadPreset: 'プリセット読込',
+      dropVideoHere: '動画ファイルをここにドロップするか、クリックして参照',
+      supportedFormats: 'MP4, WebM, MOV, AVI, MKV対応',
+      dropToReplace: '現在の動画を置き換えるにはドロップ',
+      unsupportedFormat: 'サポートされていない動画形式',
+      fileTooLarge: 'ファイルが大きすぎます。最大サイズは500MBです。',
+      failedToLoadVideo: '動画の読み込みに失敗しました',
+      noVideoLoaded: '動画が読み込まれていません',
+      exportInProgress: '動画のエクスポート中です。しばらくお待ちください。',
+      thumbnailInProgress: 'サムネイル抽出中です。しばらくお待ちください。',
+      leavePageWarning:
+        '動画処理中です。このページを離れると処理がキャンセルされます。本当に移動しますか？',
+      leavePageTitle: 'ページを離れますか？',
+      stayOnPage: 'このページに留まる',
+      leavePage: 'ページを離れる',
+      cancelProcessingTitle: '処理をキャンセルしますか？',
+      cancelProcessingWarning: '動画処理中です。本当にキャンセルしますか？',
+      continueProcessing: '続行',
+      cancelProcessing: '処理をキャンセル',
+      mobileWarning:
+        '大きな動画ファイルはモバイルデバイスでパフォーマンスの問題を引き起こす可能性があります。',
+      loadingEngine: '動画処理エンジンを読み込み中...',
+      preparing: '動画を準備中...',
+      processing: '処理中...',
+      finalizing: '出力を完了中...',
+      cancelled: '処理がキャンセルされました',
+      exportNotImplemented: 'エクスポート機能はffmpeg.wasm統合で実装されます',
+      presetNotImplemented: 'プリセット機能は次のフェーズで実装されます',
+      exportFailed: '動画のエクスポートに失敗しました',
+      processingCancelled: '動画処理がキャンセルされました',
+      thumbnail: {
+        title: 'サムネイル抽出',
+        description: '動画から1フレームを画像ファイルとして抽出します。',
+        extractAt: '抽出位置',
+        timeTooltip: 'サムネイルフレームを抽出する時間位置',
+        start: '開始',
+        end: '終了',
+        quickSelect: 'クイック選択',
+        format: '出力形式',
+        extractButton: 'サムネイル抽出',
+        extracting: '抽出中...',
+        extractNotImplemented: 'サムネイル抽出は処理フェーズで実装されます。',
+        extractFailed: 'サムネイル抽出に失敗しました',
+        note: 'サムネイル抽出は動画パイプラインとは別の操作です。処理済み動画ではなく、画像ファイルを出力します。',
+        previewHint:
+          'タイムラインの黄色いマーカーがサムネイル位置を示します。シーク時にプレビューが更新されます。',
+      },
+      trim: {
+        title: 'トリミング',
+        startTime: '開始時間',
+        startTooltip: '保持する動画セグメントの開始位置',
+        endTime: '終了時間',
+        endTooltip: '保持する動画セグメントの終了位置',
+        preview: 'プレビュー',
+        outputDuration: '出力時間',
+        originalDuration: '元の時間',
+        selectAll: 'すべて選択',
+        first30s: '最初の30秒',
+        last30s: '最後の30秒',
+      },
+      cut: {
+        title: 'セグメント削除',
+        mode: 'モード',
+        removeSegment: 'セグメント削除',
+        splitInto: 'クリップに分割',
+        segmentsToRemove: '削除するセグメント',
+        addSegment: 'セグメント追加',
+        noSegments:
+          'セグメントが追加されていません。「セグメント追加」をクリックして動画の一部を削除してください。',
+        numberOfClips: 'クリップ数',
+        clips: 'クリップ',
+        eachClipDuration: '各クリップの長さ',
+        splitNote:
+          '動画は等間隔のクリップに分割され、ZIPファイルとしてダウンロードされます。',
+        removeHint:
+          '動画から削除したい時間セグメントを追加します。複数のセグメントを一度に削除できます。',
+        splitHint:
+          '動画を複数の等間隔クリップに分割します。各クリップは個別にZIPファイルとしてエクスポートされます。',
+      },
+      crop: {
+        title: '切り抜き',
+        aspectRatio: 'アスペクト比',
+        aspectRatioTooltip: '特定のアスペクト比に切り抜き選択をロック',
+        coordinates: '座標',
+        width: '幅',
+        height: '高さ',
+        selectAll: 'すべて選択',
+        outputResolution: '出力解像度',
+      },
+      resize: {
+        title: 'サイズ変更',
+        dimensions: 'サイズ',
+        dimensionsTooltip: '出力動画のサイズ（ピクセル）',
+        width: '幅',
+        height: '高さ',
+        lockAspect: 'アスペクト比をロック',
+        unlockAspect: 'アスペクト比のロックを解除',
+        mode: 'リサイズモード',
+        modeTooltip: 'アスペクト比の違いを処理する方法',
+        presets: 'プリセット',
+        useOriginal: 'オリジナルを使用',
+      },
+      export: {
+        title: 'エクスポート',
+        format: '形式',
+        formatTooltip: '出力動画形式とコーデック',
+        quality: '品質プリセット',
+        qualityTooltip:
+          '高品質ほどファイルサイズが大きくなり、処理に時間がかかります',
+        suffix: 'ファイル名接尾辞',
+        suffixTooltip: '元のファイル名に追加するテキスト',
+        outputFileName: '出力ファイル名',
+        privacyNote: 'プライバシー',
+        privacyDescription:
+          'すべての処理はWebAssemblyを使用してブラウザ内で行われます。動画がサーバーにアップロードされることはありません。',
+        performanceNote: 'パフォーマンス',
+        performanceDescription:
+          '動画処理は計算負荷が高いです。大きなファイルは処理に数分かかる場合があります。',
+      },
+    },
   },
   meta: {
     home: {
@@ -1245,9 +1581,20 @@ export const jaJP = {
       description:
         '無料オンラインAPIレスポンス比較ツール。2つのエンドポイントを同時に呼び出し、JSONレスポンスの差異を並列でハイライトします。',
     },
+    // TODO: Translate to Japanese
+    imageStudio: {
+      title: 'Image Studio',
+      description:
+        '無料オンライン画像エディタ。PNG、JPEG、WebPへの切り抜き、サイズ変更、回転、変換。すべてブラウザ内で処理。',
+    },
+    videoStudio: {
+      title: 'Video Studio',
+      description:
+        '無料オンライン動画エディタ。トリミング、カット、切り抜き、サイズ変更、変換。サムネイル抽出。ブラウザベース処理。',
+    },
   },
   ads: {
     disclaimer:
-      'この広告の収益は、Yowu\'s DevToolsの無料運営と維持管理に使用されます。ご利用いただきありがとうございます。',
+      "AdSense広告収益は、Yowu's DevToolsの保守AIエージェント費用と開発者のささやかなコーヒー代に使われます。☕",
   },
 } as const satisfies I18nResource;

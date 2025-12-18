@@ -1,10 +1,11 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { useMemo } from 'react';
 import type { ToolDefinition } from '@/tools/types';
-import { Eye, Copy } from 'lucide-react';
+import { Eye, Copy, HelpCircle } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { EditorPanel } from '@/components/common/EditorPanel';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
+import { Tooltip } from '@/components/ui/Tooltip';
 import { useToolState } from '@/hooks/useToolState';
 import { useShareModal } from '@/hooks/useShareModal';
 import { useTitle } from '@/hooks/useTitle';
@@ -231,6 +232,7 @@ const JwtDecoderTool: React.FC = () => {
       <div className="flex-1 flex flex-col gap-6">
         <EditorPanel
           title={t('tool.jwtDecoder.jwtToken')}
+          titleTooltip={t('tool.jwtDecoder.jwtTokenTooltip')}
           value={state.token}
           onChange={(val) => updateState({ token: val })}
           placeholder={t('tool.jwtDecoder.tokenPlaceholder')}
@@ -246,9 +248,14 @@ const JwtDecoderTool: React.FC = () => {
             {validation && (
               <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
                 <div className="flex items-center gap-3 mb-3">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    {t('tool.jwtDecoder.validationStatus')}
-                  </h3>
+                  <div className="flex items-center gap-1.5">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {t('tool.jwtDecoder.validationStatus')}
+                    </h3>
+                    <Tooltip content={t('tool.jwtDecoder.validationStatusTooltip')} position="bottom" nowrap={false}>
+                      <HelpCircle className="w-4 h-4 text-gray-400 dark:text-gray-500 cursor-help" />
+                    </Tooltip>
+                  </div>
                   {validation.isValid && !validation.isExpired && !validation.isNotYetValid ? (
                     <span className="px-2 py-1 text-xs font-semibold rounded bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300">
                       {t('tool.jwtDecoder.valid')}
@@ -297,9 +304,14 @@ const JwtDecoderTool: React.FC = () => {
             {/* Signature Verification */}
             <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-3 mb-3">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  {t('tool.jwtDecoder.signatureVerification')}
-                </h3>
+                <div className="flex items-center gap-1.5">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    {t('tool.jwtDecoder.signatureVerification')}
+                  </h3>
+                  <Tooltip content={t('tool.jwtDecoder.signatureVerificationTooltip')} position="bottom" nowrap={false}>
+                    <HelpCircle className="w-4 h-4 text-gray-400 dark:text-gray-500 cursor-help" />
+                  </Tooltip>
+                </div>
                 {signatureVerification.verified === true && (
                   <span className="px-2 py-1 text-xs font-semibold rounded bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300">
                     {t('tool.jwtDecoder.verified')}
@@ -318,8 +330,11 @@ const JwtDecoderTool: React.FC = () => {
               </div>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {t('tool.jwtDecoder.verificationKey')}
+                  <label className="flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <span>{t('tool.jwtDecoder.verificationKey')}</span>
+                    <Tooltip content={t('tool.jwtDecoder.verificationKeyTooltip')} position="bottom" nowrap={false}>
+                      <HelpCircle className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 cursor-help" />
+                    </Tooltip>
                   </label>
                   <textarea
                     value={state.verifyKey}
@@ -360,9 +375,14 @@ const JwtDecoderTool: React.FC = () => {
             {/* Header */}
             <div className="flex flex-col gap-2">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  {t('tool.jwtDecoder.header')}
-                </h3>
+                <div className="flex items-center gap-1.5">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    {t('tool.jwtDecoder.header')}
+                  </h3>
+                  <Tooltip content={t('tool.jwtDecoder.headerTooltip')} position="bottom" nowrap={false}>
+                    <HelpCircle className="w-4 h-4 text-gray-400 dark:text-gray-500 cursor-help" />
+                  </Tooltip>
+                </div>
                 <button
                   onClick={handleCopyHeader}
                   className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
@@ -387,9 +407,14 @@ const JwtDecoderTool: React.FC = () => {
             {/* Payload */}
             <div className="flex flex-col gap-2">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  {t('tool.jwtDecoder.payload')}
-                </h3>
+                <div className="flex items-center gap-1.5">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    {t('tool.jwtDecoder.payload')}
+                  </h3>
+                  <Tooltip content={t('tool.jwtDecoder.payloadTooltip')} position="bottom" nowrap={false}>
+                    <HelpCircle className="w-4 h-4 text-gray-400 dark:text-gray-500 cursor-help" />
+                  </Tooltip>
+                </div>
                 <button
                   onClick={handleCopyPayload}
                   className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
@@ -414,9 +439,14 @@ const JwtDecoderTool: React.FC = () => {
             {/* Signature */}
             <div className="flex flex-col gap-2">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  {t('tool.jwtDecoder.signature')}
-                </h3>
+                <div className="flex items-center gap-1.5">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    {t('tool.jwtDecoder.signature')}
+                  </h3>
+                  <Tooltip content={t('tool.jwtDecoder.signatureTooltip')} position="bottom" nowrap={false}>
+                    <HelpCircle className="w-4 h-4 text-gray-400 dark:text-gray-500 cursor-help" />
+                  </Tooltip>
+                </div>
                 <button
                   onClick={handleCopySignature}
                   className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"

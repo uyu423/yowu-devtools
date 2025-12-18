@@ -1,22 +1,27 @@
 import React from 'react';
 import { Share2, RotateCcw } from 'lucide-react';
 import { useI18n } from '@/hooks/useI18nHooks';
+import { BetaBadge } from '@/components/ui/BetaBadge';
 
 interface ToolHeaderProps {
   title: string;
   description: string;
   onReset?: () => void;
   onShare?: () => void;
+  beta?: boolean;
 }
 
-export const ToolHeader: React.FC<ToolHeaderProps> = ({ title, description, onReset, onShare }) => {
+export const ToolHeader: React.FC<ToolHeaderProps> = ({ title, description, onReset, onShare, beta }) => {
   const { t } = useI18n();
   
   return (
     <div className="mb-6 pb-4 border-b dark:border-gray-800">
       <div className="flex justify-between items-start">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{title}</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            {title}
+            {beta && <BetaBadge size="md" showTooltip />}
+          </h2>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{description}</p>
         </div>
         <div className="flex space-x-2">

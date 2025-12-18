@@ -1,10 +1,11 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { useMemo } from 'react';
 import type { ToolDefinition } from '@/tools/types';
-import { Key, Copy } from 'lucide-react';
+import { Key, Copy, HelpCircle } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { EditorPanel } from '@/components/common/EditorPanel';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
+import { Tooltip } from '@/components/ui/Tooltip';
 import { useToolState } from '@/hooks/useToolState';
 import { useShareModal } from '@/hooks/useShareModal';
 import { useTitle } from '@/hooks/useTitle';
@@ -184,8 +185,11 @@ const JwtEncoderTool: React.FC = () => {
         {/* Header Input */}
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              {t('tool.jwtEncoder.headerJson')}
+            <label className="flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
+              <span>{t('tool.jwtEncoder.headerJson')}</span>
+              <Tooltip content={t('tool.jwtEncoder.headerJsonTooltip')} position="bottom" nowrap={false}>
+                <HelpCircle className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 cursor-help" />
+              </Tooltip>
             </label>
           </div>
           <EditorPanel
@@ -201,8 +205,11 @@ const JwtEncoderTool: React.FC = () => {
         {/* Payload Input */}
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              {t('tool.jwtEncoder.payloadJson')}
+            <label className="flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
+              <span>{t('tool.jwtEncoder.payloadJson')}</span>
+              <Tooltip content={t('tool.jwtEncoder.payloadJsonTooltip')} position="bottom" nowrap={false}>
+                <HelpCircle className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 cursor-help" />
+              </Tooltip>
             </label>
           </div>
           <EditorPanel
@@ -217,9 +224,12 @@ const JwtEncoderTool: React.FC = () => {
 
         {/* Algorithm Selection */}
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            {t('tool.jwtEncoder.algorithm')}
-            <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
+          <label className="flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
+            <span>{t('tool.jwtEncoder.algorithm')}</span>
+            <Tooltip content={t('tool.jwtEncoder.algorithmTooltip')} position="bottom" nowrap={false}>
+              <HelpCircle className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 cursor-help" />
+            </Tooltip>
+            <span className="ml-1 text-xs text-gray-500 dark:text-gray-400">
               {t('tool.jwtEncoder.algorithmNote')}
             </span>
           </label>
@@ -249,8 +259,11 @@ const JwtEncoderTool: React.FC = () => {
         {/* Secret Key Input (for HMAC) */}
         {state.algorithm !== 'none' && (
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              {t('tool.jwtEncoder.secretKey')}
+            <label className="flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
+              <span>{t('tool.jwtEncoder.secretKey')}</span>
+              <Tooltip content={t('tool.jwtEncoder.secretKeyTooltip')} position="bottom" nowrap={false}>
+                <HelpCircle className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 cursor-help" />
+              </Tooltip>
             </label>
             <input
               type="text"

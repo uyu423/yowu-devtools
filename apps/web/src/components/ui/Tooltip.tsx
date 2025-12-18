@@ -1,14 +1,24 @@
-import React, { useState, useRef, useLayoutEffect } from 'react';
+import React, { useState, useRef, useLayoutEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { cn } from '@/lib/utils';
 
 interface TooltipProps {
   content: string;
   children: React.ReactNode;
   className?: string;
-  /** Preferred position - 'auto' will calculate, 'top'/'bottom' will force that direction */
-  position?: 'auto' | 'top' | 'bottom';
-  /** Horizontal alignment - 'center' (default), 'left', or 'right' */
+  /** Preferred position - 'auto' will calculate, 'top'/'bottom'/'left'/'right' will force that direction */
+  position?: 'auto' | 'top' | 'bottom' | 'left' | 'right';
+  /** Horizontal alignment (for top/bottom) - 'center' (default), 'left', or 'right' */
   align?: 'center' | 'left' | 'right';
+  /** Prevent text wrapping - default true for short labels, set false for long descriptions */
+  nowrap?: boolean;
+}
+
+interface TooltipPosition {
+  top: number;
+  left: number;
+  placement: 'top' | 'bottom' | 'left' | 'right';
+  arrowPosition: number;
 }
 
 export const Tooltip: React.FC<TooltipProps> = ({ 
@@ -17,107 +27,243 @@ export const Tooltip: React.FC<TooltipProps> = ({
   className,
   position: preferredPosition = 'auto',
   align = 'center',
+  nowrap = true,
 }) => {
   const [isVisible, setIsVisible] = useState(false);
-  const [calculatedPosition, setCalculatedPosition] = useState<'top' | 'bottom'>('top');
+  const [tooltipPosition, setTooltipPosition] = useState<TooltipPosition | null>(null);
+  const triggerRef = useRef<HTMLDivElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Determine final position
-  const finalPosition = preferredPosition === 'auto' ? calculatedPosition : preferredPosition;
+  const calculatePosition = useCallback(() => {
+    if (!triggerRef.current) return null;
+
+    const triggerRect = triggerRef.current.getBoundingClientRect();
+    const tooltipRect = tooltipRef.current?.getBoundingClientRect();
+    const tooltipHeight = tooltipRect?.height || 40;
+    const tooltipWidth = tooltipRect?.width || 100;
+    
+    const margin = 8;
+    const spaceAbove = triggerRect.top;
+    const spaceBelow = window.innerHeight - triggerRect.bottom;
+    const spaceLeft = triggerRect.left;
+    const spaceRight = window.innerWidth - triggerRect.right;
+
+    // Determine placement
+    let placement: 'top' | 'bottom' | 'left' | 'right';
+    if (preferredPosition === 'auto') {
+      placement = (spaceAbove < tooltipHeight + margin && spaceBelow > tooltipHeight + margin) 
+        ? 'bottom' 
+        : 'top';
+    } else if (preferredPosition === 'left' || preferredPosition === 'right') {
+      // For left/right, check if there's enough space, otherwise flip
+      if (preferredPosition === 'right' && spaceRight < tooltipWidth + margin && spaceLeft > tooltipWidth + margin) {
+        placement = 'left';
+      } else if (preferredPosition === 'left' && spaceLeft < tooltipWidth + margin && spaceRight > tooltipWidth + margin) {
+        placement = 'right';
+      } else {
+        placement = preferredPosition;
+      }
+    } else {
+      placement = preferredPosition;
+    }
+
+    let top: number;
+    let left: number;
+    let arrowPosition: number;
+
+    if (placement === 'left' || placement === 'right') {
+      // Horizontal positioning
+      top = triggerRect.top + (triggerRect.height / 2) - (tooltipHeight / 2);
+      
+      if (placement === 'left') {
+        left = triggerRect.left - tooltipWidth - margin;
+      } else {
+        left = triggerRect.right + margin;
+      }
+
+      // Ensure tooltip stays within viewport vertically
+      const viewportPadding = 8;
+      if (top < viewportPadding) {
+        top = viewportPadding;
+      } else if (top + tooltipHeight > window.innerHeight - viewportPadding) {
+        top = window.innerHeight - tooltipHeight - viewportPadding;
+      }
+
+      // Calculate arrow position relative to tooltip (vertical)
+      arrowPosition = Math.max(8, Math.min(
+        triggerRect.top + (triggerRect.height / 2) - top - 4,
+        tooltipHeight - 16
+      ));
+    } else {
+      // Vertical positioning (top/bottom)
+      top = placement === 'top'
+        ? triggerRect.top - tooltipHeight - margin
+        : triggerRect.bottom + margin;
+
+      // Calculate left position based on alignment
+      switch (align) {
+        case 'left':
+          left = triggerRect.left;
+          break;
+        case 'right':
+          left = triggerRect.right - tooltipWidth;
+          break;
+        default:
+          left = triggerRect.left + (triggerRect.width / 2) - (tooltipWidth / 2);
+      }
+
+      // Ensure tooltip stays within viewport horizontally
+      const viewportPadding = 8;
+      if (left < viewportPadding) {
+        left = viewportPadding;
+      } else if (left + tooltipWidth > window.innerWidth - viewportPadding) {
+        left = window.innerWidth - tooltipWidth - viewportPadding;
+      }
+
+      // Calculate arrow position relative to tooltip (horizontal)
+      arrowPosition = Math.max(8, Math.min(
+        triggerRect.left + (triggerRect.width / 2) - left - 4,
+        tooltipWidth - 16
+      ));
+    }
+
+    return { top, left, placement, arrowPosition };
+  }, [preferredPosition, align]);
 
   useLayoutEffect(() => {
-    if (!isVisible || !tooltipRef.current || !containerRef.current) return;
-    if (preferredPosition !== 'auto') return; // Skip calculation if position is forced
+    if (!isVisible) return;
 
-    // tooltip이 렌더링된 후 위치 계산
+    let animationFrameId: number;
+
     const updatePosition = () => {
-      const container = containerRef.current;
-      const tooltip = tooltipRef.current;
-      if (!container || !tooltip) return;
-
-      const rect = container.getBoundingClientRect();
-      const tooltipRect = tooltip.getBoundingClientRect();
-      
-      const margin = 8;
-      const tooltipHeight = tooltipRect.height || 100;
-
-      // 위쪽 공간 확인
-      const spaceAbove = rect.top;
-      // 아래쪽 공간 확인
-      const spaceBelow = window.innerHeight - rect.bottom;
-
-      // 위쪽 공간이 부족하고 아래쪽 공간이 충분하면 아래쪽에 표시
-      if (spaceAbove < tooltipHeight + margin && spaceBelow > tooltipHeight + margin) {
-        setCalculatedPosition('bottom');
-      } else {
-        setCalculatedPosition('top');
+      const pos = calculatePosition();
+      if (pos) {
+        setTooltipPosition(pos);
       }
     };
 
-    // 즉시 실행
+    // Initial calculation
     updatePosition();
     
-    // requestAnimationFrame으로 한 프레임 후 다시 확인 (렌더링 완료 후)
-    requestAnimationFrame(updatePosition);
-  }, [isVisible, preferredPosition]);
+    // Recalculate after a frame
+    animationFrameId = requestAnimationFrame(updatePosition);
 
-  // Get alignment classes
-  const getAlignmentClasses = () => {
-    switch (align) {
+    // Update position on scroll/resize
+    const handleScrollResize = () => {
+      animationFrameId = requestAnimationFrame(updatePosition);
+    };
+
+    window.addEventListener('scroll', handleScrollResize, true);
+    window.addEventListener('resize', handleScrollResize);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener('scroll', handleScrollResize, true);
+      window.removeEventListener('resize', handleScrollResize);
+    };
+  }, [isVisible, calculatePosition]);
+
+  const handleMouseEnter = () => {
+    setIsVisible(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsVisible(false);
+    setTooltipPosition(null);
+  };
+
+  // Get arrow styles based on placement
+  const getArrowStyles = () => {
+    if (!tooltipPosition) return {};
+    
+    const { placement, arrowPosition } = tooltipPosition;
+    
+    switch (placement) {
+      case 'top':
+        return {
+          left: arrowPosition,
+          top: '100%',
+          marginTop: '-1px',
+        };
+      case 'bottom':
+        return {
+          left: arrowPosition,
+          bottom: '100%',
+          marginBottom: '-1px',
+        };
       case 'left':
-        return 'left-0';
+        return {
+          top: arrowPosition,
+          left: '100%',
+          marginLeft: '-1px',
+        };
       case 'right':
-        return 'right-0';
+        return {
+          top: arrowPosition,
+          right: '100%',
+          marginRight: '-1px',
+        };
       default:
-        return 'left-1/2 transform -translate-x-1/2';
+        return {};
     }
   };
 
-  const getArrowAlignmentClasses = () => {
-    switch (align) {
+  // Get arrow class based on placement
+  const getArrowClass = () => {
+    if (!tooltipPosition) return '';
+    
+    const { placement } = tooltipPosition;
+    
+    switch (placement) {
+      case 'top':
+        return 'border-t-gray-900 dark:border-t-gray-700';
+      case 'bottom':
+        return 'border-b-gray-900 dark:border-b-gray-700';
       case 'left':
-        return 'left-4';
+        return 'border-l-gray-900 dark:border-l-gray-700';
       case 'right':
-        return 'right-4';
+        return 'border-r-gray-900 dark:border-r-gray-700';
       default:
-        return 'left-1/2 transform -translate-x-1/2';
+        return '';
     }
   };
+
+  const tooltipContent = isVisible && (
+    <div
+      ref={tooltipRef}
+      className={cn(
+        "fixed z-[9999] px-4 py-2.5 text-sm text-white bg-gray-900 dark:bg-gray-700 rounded-md shadow-lg pointer-events-none",
+        nowrap ? "whitespace-nowrap w-max" : "whitespace-normal max-w-lg",
+      )}
+      style={{
+        top: tooltipPosition?.top ?? -9999,
+        left: tooltipPosition?.left ?? -9999,
+        visibility: tooltipPosition ? 'visible' : 'hidden',
+      }}
+    >
+      {content}
+      {/* Arrow */}
+      <div 
+        className="absolute"
+        style={getArrowStyles()}
+      >
+        <div className={cn(
+          "border-4 border-transparent",
+          getArrowClass()
+        )} />
+      </div>
+    </div>
+  );
 
   return (
     <div 
-      ref={containerRef}
+      ref={triggerRef}
       className={cn("relative inline-flex", className)}
-      onMouseEnter={() => setIsVisible(true)}
-      onMouseLeave={() => setIsVisible(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       {children}
-      {isVisible && (
-        <div
-          ref={tooltipRef}
-          className={cn(
-            "absolute z-50 px-4 py-2.5 text-sm text-white bg-gray-900 dark:bg-gray-700 rounded-md shadow-lg whitespace-normal pointer-events-none max-w-lg",
-            getAlignmentClasses(),
-            finalPosition === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'
-          )}
-        >
-          {content}
-          <div className={cn(
-            "absolute",
-            getArrowAlignmentClasses(),
-            finalPosition === 'top' ? 'top-full -mt-1' : 'bottom-full -mb-1'
-          )}>
-            <div className={cn(
-              "border-4 border-transparent",
-              finalPosition === 'top' 
-                ? 'border-t-gray-900 dark:border-t-gray-700' 
-                : 'border-b-gray-900 dark:border-b-gray-700'
-            )} />
-          </div>
-        </div>
-      )}
+      {typeof document !== 'undefined' && createPortal(tooltipContent, document.body)}
     </div>
   );
 };
-

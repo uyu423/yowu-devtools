@@ -16,6 +16,7 @@ export const esES = {
     downloaded: '¡Descargado!',
     downloadJson: 'Descargar JSON',
     upload: 'Subir',
+    changeFile: 'Cambiar archivo',
     export: 'Exportar',
     import: 'Importar',
     save: 'Guardar',
@@ -73,6 +74,75 @@ export const esES = {
     sharedUrlInvalid:
       'La URL compartida no es válida. Restaurando estado por defecto.',
     unableToCopy: 'No se pudo copiar al portapapeles.',
+    // Pipeline/Processing
+    enable: 'Habilitar',
+    disable: 'Deshabilitar',
+    processing: 'Procesando...',
+    copying: 'Copiando...',
+    load: 'Cargar',
+    // Common options for Image/Video Studio
+    aspectRatio: {
+      free: 'Libre',
+      square: 'Cuadrado',
+      custom: 'Personalizado',
+    },
+    resizeMode: {
+      contain: 'Contener',
+      containDesc:
+        'Ajustar dentro de los límites, puede tener relleno/letterbox',
+      cover: 'Cubrir',
+      coverDesc: 'Llenar límites, puede recortar bordes',
+      stretch: 'Estirar',
+      stretchDesc: 'Ignorar relación de aspecto',
+    },
+    quality: {
+      low: 'Baja (Rápida)',
+      medium: 'Media',
+      high: 'Alta (Mejor)',
+    },
+    videoQuality: {
+      fast: 'Rápido',
+      fastDesc: 'Codificación más rápida, archivo más grande',
+      balanced: 'Equilibrado',
+      balancedDesc: 'Buen equilibrio de velocidad y calidad',
+      highQuality: 'Alta calidad',
+      highQualityDesc: 'Mejor calidad, codificación más lenta',
+    },
+    imageFormat: {
+      png: 'PNG',
+      jpeg: 'JPEG',
+      webp: 'WebP',
+    },
+    videoFormat: {
+      mp4: 'MP4 (H.264)',
+      webm: 'WebM (VP9)',
+    },
+    // Preset Management
+    preset: {
+      managePresets: 'Gestionar preajustes',
+      privacyNotice:
+        'Los preajustes se almacenan solo localmente en su navegador. Nunca se envían a ningún servidor. Use Exportar/Importar para respaldar o transferir sus preajustes.',
+      saveCurrentSettings: 'Guardar configuración actual como preajuste',
+      namePlaceholder: 'Nombre del preajuste (ej: "Redes sociales 1080p")',
+      descriptionPlaceholder: 'Descripción (opcional)',
+      nameRequired: 'El nombre del preajuste es requerido',
+      savePreset: 'Guardar preajuste',
+      savedPresets: 'Preajustes guardados',
+      noPresets:
+        'Aún no hay preajustes guardados. ¡Guarde su primer preajuste arriba!',
+      load: 'Cargar',
+      remove: 'Eliminar',
+      added: 'Preajuste guardado exitosamente',
+      loaded: 'Preajuste cargado: {name}',
+      removed: 'Preajuste eliminado',
+      clearedAll: 'Todos los preajustes eliminados',
+      confirmClear: 'Clic de nuevo para confirmar',
+      clearAll: 'Eliminar todo',
+      exportAll: 'Exportar todos los preajustes a archivo',
+      importAll: 'Importar preajustes desde archivo',
+      importSuccess: '{count} preajustes importados exitosamente',
+      importFailed: 'Error al importar preajustes',
+    },
   },
   shareModal: {
     title: 'Compartir {toolName}',
@@ -113,6 +183,7 @@ export const esES = {
     noToolsLoaded: 'No se pudieron cargar herramientas',
     moreComingSoon: 'Más próximamente...',
     suggestFeature: 'Sugerir una función',
+    reportBug: 'Reportar un error',
     removeFromFavorites: 'Quitar de favoritos',
     addToFavorites: 'Añadir a favoritos',
     lightMode: 'Modo claro',
@@ -120,6 +191,21 @@ export const esES = {
     darkMode: 'Modo oscuro',
     language: 'Idioma',
     selectLanguage: 'Seleccionar idioma',
+    // License info
+    license: 'Licencia',
+    sourceCode: 'Código',
+    noWarranty: 'Sin garantía',
+    // Sort options
+    sortAlphabetical: 'Alfabético',
+    sortAdded: 'Orden agregado',
+    sortNewest: 'Más reciente',
+    // Collapse/Expand
+    collapseSidebar: 'Contraer barra lateral',
+    expandSidebar: 'Expandir barra lateral',
+    // Beta badge
+    beta: 'Beta',
+    betaTooltip:
+      'Esta función es experimental y puede ser inestable. La estamos probando y mejorando activamente.',
   },
   commandPalette: {
     searchTools: 'Buscar herramientas...',
@@ -503,28 +589,40 @@ export const esES = {
       description: 'Genera contraseñas seguras con opciones personalizables',
       length: 'Longitud',
       characterTypes: 'Tipos de caracteres',
+      characterTypesTooltip:
+        'Selecciona qué conjuntos de caracteres incluir en tu contraseña. Más tipos = mayor seguridad.',
       exclusionOptions: 'Opciones de exclusión',
+      exclusionOptionsTooltip:
+        'Excluye caracteres que pueden causar confusión o problemas en ciertos contextos.',
       uppercase: 'Mayúsculas (A-Z)',
       lowercase: 'Minúsculas (a-z)',
       numbers: 'Números (0-9)',
       symbols: 'Símbolos (!@#$...)',
       excludeSimilar: 'Excluir caracteres similares (i, l, 1, L, o, 0, O)',
+      excludeSimilarTooltip:
+        'Elimina caracteres visualmente similares (i/l/1/I, o/0/O) para evitar confusión al leer contraseñas.',
       excludeAmbiguous: 'Excluir símbolos ambiguos',
+      excludeAmbiguousTooltip:
+        'Elimina símbolos que pueden ser difíciles de distinguir o causar problemas: {}[]()/\\\'"`~,;:.<>',
       count: 'Cantidad',
       regenerate: 'Regenerar',
       generatedPasswords: 'Contraseñas generadas',
       strength: 'Fortaleza',
+      strengthTooltip:
+        'La fortaleza se basa en la entropía - una combinación de longitud y tamaño del conjunto de caracteres.',
       weak: 'Débil',
       medium: 'Media',
       strong: 'Fuerte',
       veryStrong: 'Muy fuerte',
       passwordCopied: 'Contraseña copiada al portapapeles',
       allPasswordsCopied: 'Todas las contraseñas copiadas al portapapeles',
-      atLeastOneType: 'Se debe seleccionar al menos un tipo de carácter',
-      lengthMustBeBetween:
-        'La longitud de la contraseña debe estar entre 4 y 128',
-      lengthTooltip: 'Longitud de la contraseña (4-128 caracteres).',
-      countTooltip: 'Número de contraseñas a generar (1-20).',
+      atLeastOneCharType: 'Se debe seleccionar al menos un tipo de carácter',
+      lengthError: 'La longitud de la contraseña debe estar entre 4 y 128',
+      failedToGenerate: 'Error al generar contraseña',
+      resultPlaceholder: 'Las contraseñas generadas aparecerán aquí',
+      lengthTooltip:
+        'Longitud de la contraseña (4-128 caracteres). Más largo = más seguro.',
+      countTooltip: 'Número de contraseñas a generar a la vez (1-20).',
     },
     urlParser: {
       title: 'URL Parser',
@@ -844,14 +942,28 @@ export const esES = {
       description:
         'Decodifica JSON Web Tokens para ver Header, Payload y Signature.',
       jwtToken: 'Token JWT',
+      jwtTokenTooltip:
+        'JSON Web Token (JWT) es un formato de token compacto y seguro para URL usado para transmitir información de forma segura entre partes como un objeto JSON.',
       tokenPlaceholder:
         'Pega token JWT (ej: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...)',
       validationStatus: 'Estado de validación',
+      validationStatusTooltip:
+        'Verifica si el token ha expirado (exp), aún no es válido (nbf), y muestra la hora de emisión (iat).',
       signatureVerification: 'Verificación de Signature',
+      signatureVerificationTooltip:
+        'Verifica si el token fue firmado con la clave esperada y no ha sido manipulado.',
       header: 'Header',
+      headerTooltip:
+        'Contiene metadatos sobre el tipo de token y algoritmo de firma (ej: alg, typ).',
       payload: 'Payload',
+      payloadTooltip:
+        'Contiene los claims - declaraciones sobre el usuario y datos adicionales (ej: sub, name, exp, iat).',
       signature: 'Signature',
+      signatureTooltip:
+        'Firma criptográfica usada para verificar la integridad del token. Creada usando el header, payload y secret key.',
       verificationKey: 'Key de verificación',
+      verificationKeyTooltip:
+        'Para HMAC (HS256/384/512): ingresa la clave secreta. Para RSA/ECDSA: ingresa la clave pública en formato PEM.',
       verificationKeyPlaceholder: 'Ingresa key de verificación',
       enterVerificationKey: 'Ingresa key de verificación',
       hmacKeyPlaceholder: 'Ingresa secret key HMAC (para HS256, HS384, HS512)',
@@ -875,13 +987,19 @@ export const esES = {
       enterKeyToVerify: 'Ingresa una key arriba para verificar la firma',
       invalidJwtFormat:
         'Formato JWT inválido. Se esperan 3 partes separadas por puntos (header.payload.signature).',
+      invalidJwtFormatDetails:
+        'Formato JWT inválido. Se esperan 3 partes separadas por puntos (header.payload.signature).',
       failedToDecodeHeader:
         'Error al decodificar header JWT. Codificación Base64URL inválida.',
       failedToDecodePayload:
         'Error al decodificar payload JWT. Codificación Base64URL inválida.',
+      failedToDecodeToken: 'Error al decodificar token JWT.',
       enterJwtToDecode: 'Ingresa un token JWT para decodificarlo.',
+      enterTokenToDecode: 'Ingresa un token JWT para decodificarlo.',
       signatureNote:
         'Nota: No se realiza verificación de firma. Esta herramienta solo decodifica el token.',
+      signatureIsValid: 'La firma es válida.',
+      verificationFailed: 'Verificación fallida',
       raw: 'Raw',
     },
     stringLength: {
@@ -913,17 +1031,25 @@ export const esES = {
       title: 'JWT Encoder',
       description: 'Crea JSON Web Tokens a partir de Header y Payload.',
       headerJson: 'Header (JSON)',
+      headerJsonTooltip:
+        'El header JWT contiene metadatos: "alg" especifica el algoritmo de firma, "typ" normalmente es "JWT".',
       headerPlaceholder: '{"alg":"HS256","typ":"JWT"}',
       payloadJson: 'Payload (JSON)',
+      payloadJsonTooltip:
+        'El payload JWT contiene claims. Claims comunes: "sub" (sujeto), "exp" (expiración), "iat" (emitido en), "iss" (emisor).',
       payloadPlaceholder: '{"sub":"1234567890","name":"John Doe"}',
       algorithm: 'Algoritmo',
+      algorithmTooltip:
+        'HS256/384/512 usan HMAC con SHA-256/384/512. "none" crea tokens sin firmar (no recomendado para producción).',
       algorithmNote: '(actualiza header.alg)',
       secretKey: 'Secret Key',
+      secretKeyTooltip:
+        'La clave secreta usada para firmar el JWT. Manténla segura - cualquiera con esta clave puede crear tokens válidos.',
       secretKeyPlaceholder: 'Ingresa secret key para firmar',
       encodedJwtToken: 'Token JWT codificado',
       noneUnsigned: 'None (sin firma)',
-      invalidJsonHeader: 'JSON inválido en header',
-      invalidJsonPayload: 'JSON inválido en payload',
+      invalidHeaderJson: 'JSON inválido en header',
+      invalidPayloadJson: 'JSON inválido en payload',
       secretKeyRequired: 'Se requiere secret key para firmar',
       unsupportedAlgorithm:
         'Algoritmo no soportado: {alg}. Solo se soportan HS256, HS384, HS512, none.',
@@ -1041,8 +1167,10 @@ export const esES = {
         'La extensión del navegador puede evitar restricciones CORS haciendo solicitudes desde el contexto de la extensión, que no está sujeto a las mismas reglas de seguridad que las páginas web.',
       corsRetryWithExtension: 'Reintentar con extensión',
       corsInstallExtension: 'Instalar extensión de Chrome',
-      corsMobileNotSupported: 'Las extensiones de Chrome no están disponibles en dispositivos móviles',
-      corsMobileUseDesktop: 'Por favor, use la versión de escritorio de Chrome para acceder a APIs con restricciones CORS.',
+      corsMobileNotSupported:
+        'Las extensiones de Chrome no están disponibles en dispositivos móviles',
+      corsMobileUseDesktop:
+        'Por favor, use la versión de escritorio de Chrome para acceder a APIs con restricciones CORS.',
       corsRememberChoice: 'Recordar para este dominio',
       corsRememberChoiceDesc: 'Usar extensión automáticamente para {origin}',
       sendToApiDiff: 'Enviar a API Diff',
@@ -1182,6 +1310,229 @@ export const esES = {
         noMatch: 'No hay historial coincidente',
       },
     },
+    // TODO: Translate to Spanish
+    imageStudio: {
+      title: 'Image Studio',
+      description:
+        'Recorta, redimensiona, rota y convierte imágenes. Todo el procesamiento ocurre en tu navegador.',
+      pipeline: 'Pipeline',
+      stepsEnabled: 'pasos habilitados',
+      resetPipeline: 'Restablecer configuración del pipeline',
+      runExport: 'Ejecutar y exportar',
+      savePreset: 'Guardar preset',
+      loadPreset: 'Cargar preset',
+      dropImageHere: 'Arrastra una imagen aquí o haz clic para explorar',
+      supportedFormats: 'PNG, JPEG, WebP, GIF, BMP soportados',
+      pasteFromClipboard: 'O pega desde el portapapeles (Ctrl/⌘ + V)',
+      dropToReplace: 'Arrastra para reemplazar la imagen actual',
+      unsupportedFormat: 'Formato de imagen no soportado',
+      fileTooLarge: 'El archivo es demasiado grande. El tamaño máximo es 50MB.',
+      failedToLoadImage: 'Error al cargar la imagen',
+      noImageLoaded: 'No hay imagen cargada',
+      exportNotImplemented:
+        'La funcionalidad de exportación se implementará en la próxima fase',
+      presetNotImplemented:
+        'La funcionalidad de presets se implementará en la próxima fase',
+      exportFailed: 'Error al exportar la imagen',
+      copyToClipboard: 'Copiar al portapapeles',
+      copiedToClipboard: 'Imagen copiada al portapapeles',
+      copyFailed: 'Error al copiar imagen al portapapeles',
+      crop: {
+        title: 'Recortar',
+        aspectRatio: 'Relación de aspecto',
+        aspectRatioTooltip:
+          'Bloquear la selección de recorte a una relación de aspecto específica',
+        coordinates: 'Coordenadas',
+        width: 'Ancho',
+        height: 'Alto',
+        selectAll: 'Seleccionar todo',
+      },
+      resize: {
+        title: 'Redimensionar',
+        dimensions: 'Dimensiones',
+        dimensionsTooltip: 'Dimensiones de la imagen de salida en píxeles',
+        width: 'Ancho',
+        height: 'Alto',
+        lockAspect: 'Bloquear relación de aspecto',
+        unlockAspect: 'Desbloquear relación de aspecto',
+        mode: 'Modo de redimensionamiento',
+        modeTooltip: 'Cómo manejar las diferencias de relación de aspecto',
+        quality: 'Calidad de interpolación',
+        qualityTooltip:
+          'Mayor calidad produce mejores resultados pero tarda más',
+        presets: 'Presets',
+        useOriginal: 'Usar original',
+      },
+      rotate: {
+        title: 'Rotar / Voltear',
+        rotation: 'Rotación',
+        rotateLeft: 'Rotar 90° a la izquierda',
+        rotateRight: 'Rotar 90° a la derecha',
+        left: 'Izquierda',
+        right: 'Derecha',
+        flip: 'Voltear',
+        horizontal: 'Horizontal',
+        vertical: 'Vertical',
+        resetTransform: 'Restablecer transformación',
+      },
+      export: {
+        title: 'Exportar',
+        format: 'Formato',
+        formatTooltip: 'Formato de imagen de salida',
+        formatNotSupported: 'Formato no soportado por tu navegador',
+        webpNotSupported:
+          'La exportación WebP no está soportada por tu navegador',
+        quality: 'Calidad',
+        qualityTooltip:
+          'Mayor calidad produce archivos más grandes (solo JPEG/WebP)',
+        smaller: 'Archivo más pequeño',
+        better: 'Mejor calidad',
+        suffix: 'Sufijo del nombre de archivo',
+        suffixTooltip: 'Texto para añadir al nombre de archivo original',
+        outputFileName: 'Nombre del archivo de salida',
+        privacyNote: 'Privacidad',
+        privacyDescription:
+          'Todo el procesamiento ocurre en tu navegador. Tus imágenes nunca se suben a ningún servidor.',
+      },
+    },
+    videoStudio: {
+      title: 'Video Studio',
+      description:
+        'Recorta, corta, redimensiona y convierte videos. Todo el procesamiento ocurre en tu navegador.',
+      pipeline: 'Pipeline',
+      stepsEnabled: 'pasos habilitados',
+      resetPipeline: 'Restablecer configuración del pipeline',
+      runExport: 'Ejecutar y exportar',
+      savePreset: 'Guardar preset',
+      loadPreset: 'Cargar preset',
+      dropVideoHere:
+        'Arrastra un archivo de video aquí o haz clic para explorar',
+      supportedFormats: 'MP4, WebM, MOV, AVI, MKV soportados',
+      dropToReplace: 'Arrastra para reemplazar el video actual',
+      unsupportedFormat: 'Formato de video no soportado',
+      fileTooLarge:
+        'El archivo es demasiado grande. El tamaño máximo es 500MB.',
+      failedToLoadVideo: 'Error al cargar el video',
+      noVideoLoaded: 'No hay video cargado',
+      exportInProgress: 'Exportación de video en progreso. Por favor espere.',
+      thumbnailInProgress:
+        'Extracción de miniatura en progreso. Por favor espere.',
+      leavePageWarning:
+        'El procesamiento de video está en progreso. Si abandona esta página, el procesamiento se cancelará. ¿Está seguro de que desea salir?',
+      leavePageTitle: '¿Abandonar página?',
+      stayOnPage: 'Permanecer en esta página',
+      leavePage: 'Abandonar página',
+      cancelProcessingTitle: '¿Cancelar procesamiento?',
+      cancelProcessingWarning:
+        'El procesamiento de video está en progreso. ¿Está seguro de que desea cancelar?',
+      continueProcessing: 'Continuar',
+      cancelProcessing: 'Cancelar procesamiento',
+      mobileWarning:
+        'Los archivos de video grandes pueden causar problemas de rendimiento en dispositivos móviles.',
+      loadingEngine: 'Cargando motor de procesamiento de video...',
+      preparing: 'Preparando video...',
+      processing: 'Procesando...',
+      finalizing: 'Finalizando salida...',
+      cancelled: 'Procesamiento cancelado',
+      exportNotImplemented:
+        'La funcionalidad de exportación se implementará con la integración de ffmpeg.wasm',
+      presetNotImplemented:
+        'La funcionalidad de presets se implementará en la próxima fase',
+      exportFailed: 'Error al exportar el video',
+      processingCancelled: 'El procesamiento de video fue cancelado',
+      thumbnail: {
+        title: 'Extraer miniatura',
+        description: 'Extrae un fotograma del vídeo como archivo de imagen.',
+        extractAt: 'Extraer en',
+        timeTooltip:
+          'Posición de tiempo para extraer el fotograma de la miniatura',
+        start: 'Inicio',
+        end: 'Fin',
+        quickSelect: 'Selección rápida',
+        format: 'Formato de salida',
+        extractButton: 'Extraer miniatura',
+        extracting: 'Extrayendo...',
+        extractNotImplemented:
+          'La extracción de miniaturas se implementará en la fase de procesamiento.',
+        extractFailed: 'Error al extraer la miniatura',
+        note: 'La extracción de miniaturas es una acción separada del pipeline de vídeo. Produce un archivo de imagen, no un vídeo procesado.',
+        previewHint:
+          'El marcador amarillo en la línea de tiempo muestra la posición de la miniatura. La vista previa se actualiza al buscar.',
+      },
+      trim: {
+        title: 'Recortar tiempo',
+        startTime: 'Hora de inicio',
+        startTooltip: 'Inicio del segmento de video a conservar',
+        endTime: 'Hora de fin',
+        endTooltip: 'Fin del segmento de video a conservar',
+        preview: 'Vista previa',
+        outputDuration: 'Duración de salida',
+        originalDuration: 'Duración original',
+        selectAll: 'Seleccionar todo',
+        first30s: 'Primeros 30s',
+        last30s: 'Últimos 30s',
+      },
+      cut: {
+        title: 'Eliminar segmentos',
+        mode: 'Modo',
+        removeSegment: 'Eliminar segmento',
+        splitInto: 'Dividir en clips',
+        segmentsToRemove: 'Segmentos a eliminar',
+        addSegment: 'Añadir segmento',
+        noSegments:
+          'No hay segmentos añadidos. Haz clic en "Añadir segmento" para eliminar partes del video.',
+        numberOfClips: 'Número de clips',
+        clips: 'clips',
+        eachClipDuration: 'Duración de cada clip',
+        splitNote:
+          'El video se dividirá en clips de igual duración y se descargará como archivo ZIP.',
+        removeHint:
+          'Añade segmentos de tiempo que quieras eliminar del video. Se pueden eliminar múltiples segmentos a la vez.',
+        splitHint:
+          'Divide el video en múltiples clips de igual duración. Cada clip se exportará por separado como archivo ZIP.',
+      },
+      crop: {
+        title: 'Recortar área',
+        aspectRatio: 'Relación de aspecto',
+        aspectRatioTooltip:
+          'Bloquear la selección de recorte a una relación de aspecto específica',
+        coordinates: 'Coordenadas',
+        width: 'Ancho',
+        height: 'Alto',
+        selectAll: 'Seleccionar todo',
+        outputResolution: 'Resolución de salida',
+      },
+      resize: {
+        title: 'Redimensionar',
+        dimensions: 'Dimensiones',
+        dimensionsTooltip: 'Dimensiones del video de salida en píxeles',
+        width: 'Ancho',
+        height: 'Alto',
+        lockAspect: 'Bloquear relación de aspecto',
+        unlockAspect: 'Desbloquear relación de aspecto',
+        mode: 'Modo de redimensionamiento',
+        modeTooltip: 'Cómo manejar las diferencias de relación de aspecto',
+        presets: 'Presets',
+        useOriginal: 'Usar original',
+      },
+      export: {
+        title: 'Exportar',
+        format: 'Formato',
+        formatTooltip: 'Formato y códec de video de salida',
+        quality: 'Preset de calidad',
+        qualityTooltip:
+          'Mayor calidad produce archivos más grandes y tarda más en procesar',
+        suffix: 'Sufijo del nombre de archivo',
+        suffixTooltip: 'Texto para añadir al nombre de archivo original',
+        outputFileName: 'Nombre del archivo de salida',
+        privacyNote: 'Privacidad',
+        privacyDescription:
+          'Todo el procesamiento ocurre en tu navegador usando WebAssembly. Tus videos nunca se suben a ningún servidor.',
+        performanceNote: 'Rendimiento',
+        performanceDescription:
+          'El procesamiento de video es computacionalmente intensivo. Los archivos grandes pueden tardar varios minutos en procesarse.',
+      },
+    },
   },
   meta: {
     home: {
@@ -1284,9 +1635,20 @@ export const esES = {
       description:
         'Compare respuestas de API de dos dominios lado a lado con resaltado de diferencias.',
     },
+    // TODO: Translate to Spanish
+    imageStudio: {
+      title: 'Image Studio',
+      description:
+        'Editor de imágenes en línea gratuito. Recorta, redimensiona, rota y convierte imágenes. Procesamiento en el navegador.',
+    },
+    videoStudio: {
+      title: 'Video Studio',
+      description:
+        'Editor de video en línea gratuito. Recorta, corta, redimensiona y convierte videos. Extrae miniaturas. Procesamiento en el navegador.',
+    },
   },
   ads: {
     disclaimer:
-      'Los ingresos de este anuncio ayudan a mantener Yowu\'s DevTools gratuito y actualizado. Gracias por su apoyo.',
+      "Los ingresos de AdSense ayudan a cubrir los costos del agente de IA para mantener Yowu's DevTools y el fondo de café del desarrollador. ☕",
   },
 } as const satisfies I18nResource;

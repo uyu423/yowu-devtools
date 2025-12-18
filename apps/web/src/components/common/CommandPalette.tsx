@@ -13,6 +13,7 @@ import { useFavorites } from '@/hooks/useFavorites';
 import { useRecentTools } from '@/hooks/useRecentTools';
 import { useI18n } from '@/hooks/useI18nHooks';
 import { buildLocalePath } from '@/lib/i18nUtils';
+import { BetaBadge } from '@/components/ui/BetaBadge';
 
 interface CommandPaletteProps {
   isOpen: boolean;
@@ -305,6 +306,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                         <span className="font-medium text-gray-900 dark:text-white">
                           {tool.title}
                         </span>
+                        {tool.beta && <BetaBadge size="sm" />}
                         {isRecent && (
                           <span title={t('commandPalette.recent')}>
                             <Clock className="w-3.5 h-3.5 text-gray-400" />

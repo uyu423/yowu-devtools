@@ -1,17 +1,24 @@
+import { Copy, KeyRound } from 'lucide-react';
+
+import { OptionLabel } from '@/components/ui/OptionLabel';
 /* eslint-disable react-refresh/only-export-components */
 import React from 'react';
+import { ShareModal } from '@/components/common/ShareModal';
 import type { ToolDefinition } from '@/tools/types';
-import { KeyRound, Copy } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
-import { OptionLabel } from '@/components/ui/OptionLabel';
-import { useToolState } from '@/hooks/useToolState';
-import { useShareModal } from '@/hooks/useShareModal';
-import { useTitle } from '@/hooks/useTitle';
-import { useI18n } from '@/hooks/useI18nHooks';
+import { Tooltip } from '@/components/ui/Tooltip';
 import { copyToClipboard } from '@/lib/clipboard';
 import { toast } from 'sonner';
-import { ShareModal } from '@/components/common/ShareModal';
-import { AdsenseFooter } from '@/components/common/AdsenseFooter';
+import { useI18n } from '@/hooks/useI18nHooks';
+import { useShareModal } from '@/hooks/useShareModal';
+import { useTitle } from '@/hooks/useTitle';
+import { useToolState } from '@/hooks/useToolState';
+
+// Detect Mac for keyboard shortcut display
+const isMac =
+  typeof navigator !== 'undefined' &&
+  /Mac|iPhone|iPad|iPod/.test(navigator.platform);
+const generateShortcut = isMac ? '⌘↵' : 'Ctrl+Enter';
 
 interface UuidToolState {
   type: 'uuid-v4' | 'uuid-v7' | 'ulid';
@@ -152,6 +159,19 @@ const UuidTool: React.FC = () => {
     generateIds();
   }, [generateIds]);
 
+  // Keyboard shortcut: Cmd+Enter (Mac) or Ctrl+Enter (Windows) to regenerate
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        e.preventDefault();
+        generateIds();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [generateIds]);
+
   const handleCopy = async (id?: string) => {
     const textToCopy = id || generatedIds.join('\n');
     if (textToCopy) {
@@ -163,7 +183,7 @@ const UuidTool: React.FC = () => {
   const outputText = generatedIds.join('\n');
 
   return (
-    <div className="flex flex-col min-h-full p-4 md:p-6 max-w-5xl mx-auto">
+    <div className="flex flex-col h-full p-4 md:p-6 max-w-5xl mx-auto">
       <ToolHeader
         title={t('tool.uuid.title')}
         description={t('tool.uuid.description')}
@@ -254,12 +274,14 @@ const UuidTool: React.FC = () => {
 
         {/* Generate Button */}
         <div className="mt-5 pt-4 border-t border-gray-200 dark:border-gray-700">
-          <button
-            onClick={generateIds}
-            className="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors shadow-sm"
-          >
-            {t('tool.uuid.regenerate')}
-          </button>
+          <Tooltip content={generateShortcut}>
+            <button
+              onClick={generateIds}
+              className="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors shadow-sm"
+            >
+              {t('tool.uuid.regenerate')}
+            </button>
+          </Tooltip>
         </div>
       </div>
 
@@ -324,8 +346,6 @@ const UuidTool: React.FC = () => {
         </div>
       </div>
       <ShareModal {...shareModalProps} />
-
-      <AdsenseFooter />
     </div>
   );
 };

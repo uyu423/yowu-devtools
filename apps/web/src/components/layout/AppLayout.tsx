@@ -1,9 +1,12 @@
 import React from 'react';
 import { Sidebar } from './Sidebar';
 import { Menu } from 'lucide-react';
+import { useSidebarCollapse } from '@/hooks/useSidebarCollapse';
+import { cn } from '@/lib/utils';
 
 export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
+  const { isCollapsed, toggleCollapse } = useSidebarCollapse();
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white overflow-hidden">
@@ -16,11 +19,19 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
       )}
 
       {/* Sidebar */}
-      <div className={`
-        fixed inset-y-0 left-0 z-30 w-64 bg-white dark:bg-gray-900 border-r dark:border-gray-800 transform transition-transform duration-200 ease-in-out lg:translate-x-0 lg:static
-        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
-        <Sidebar onCloseMobile={() => setIsSidebarOpen(false)} />
+      <div className={cn(
+        'fixed inset-y-0 left-0 z-30 bg-white dark:bg-gray-900 border-r dark:border-gray-800 transform transition-all duration-200 ease-in-out lg:translate-x-0 lg:static',
+        isSidebarOpen ? 'translate-x-0' : '-translate-x-full',
+        // Desktop: width based on collapse state
+        isCollapsed ? 'lg:w-16' : 'lg:w-64',
+        // Mobile: always full width when open
+        'w-64'
+      )}>
+        <Sidebar 
+          onCloseMobile={() => setIsSidebarOpen(false)} 
+          isCollapsed={isCollapsed}
+          onToggleCollapse={toggleCollapse}
+        />
       </div>
 
       {/* Main Content */}

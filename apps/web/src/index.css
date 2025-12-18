@@ -2,6 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Ensure full viewport height for layout */
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#root {
+  height: 100%;
+}
+
 /* NanumSquareNeo Variable Font */
 @font-face {
   font-family: 'NanumSquareNeo';
@@ -11,9 +23,18 @@
   font-display: swap;
 }
 
+/* Pretendard Variable Font - excellent multilingual support */
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/PretendardVariable.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  font-family: 'NanumSquareNeo', Inter, system-ui, Avenir, Helvetica, Arial,
-    sans-serif;
+  font-family: 'NanumSquareNeo', 'Pretendard', Inter, system-ui, Avenir,
+    Helvetica, Arial, sans-serif;
   line-height: 1.75; /* comfortable line spacing for CJK languages */
   word-break: keep-all; /* CJK languages: break at word boundaries */
   overflow-wrap: break-word; /* break long words if necessary */
@@ -87,6 +108,17 @@ input[type='radio']:checked::after {
 .dark input[type='radio']:checked {
   border-color: rgb(59 130 246); /* blue-500 */
   background-color: rgb(59 130 246);
+}
+
+/* Number input - hide browser default spinner buttons */
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield; /* Firefox */
 }
 
 /* react-json-view-lite 스타일 */

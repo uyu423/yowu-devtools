@@ -3,7 +3,20 @@
   "private": true,
   "packageManager": "pnpm@10.25.0",
   "pnpm": {
-    "onlyBuiltDependencies": ["esbuild"]
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  },
+  "type": "module",
+  "license": "GPL-3.0-or-later",
+  "author": {
+    "name": "Yongwoo Yu (Yowu)",
+    "email": "me@yowu.dev",
+    "url": "https://yowu.dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/uyu423/yowu-devtools.git"
   },
   "scripts": {
     "dev": "turbo run dev",
