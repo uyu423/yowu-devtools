@@ -31,11 +31,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile, isCollapsed, on
   const { recentTools } = useRecentTools();
   const { t, locale } = useI18n();
 
-  // 정렬 상태 (localStorage에서 초기값 로드, 기본값: alphabetical)
+  // 정렬 상태 (localStorage에서 초기값 로드, 기본값: newest)
   const [sortType, setSortType] = React.useState<SortType>(() => {
-    if (typeof window === 'undefined') return 'alphabetical';
+    if (typeof window === 'undefined') return 'newest';
     const saved = localStorage.getItem(SORT_STORAGE_KEY);
-    return (saved as SortType) || 'alphabetical';
+    return (saved as SortType) || 'newest';
   });
 
   // 정렬 순환 함수
