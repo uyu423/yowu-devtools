@@ -471,27 +471,39 @@ export const zhCN = {
       description: '使用可自定义选项生成安全密码',
       length: '长度',
       characterTypes: '字符类型',
+      characterTypesTooltip:
+        '选择要包含在密码中的字符集。使用多种类型可以提高安全性。',
       exclusionOptions: '排除选项',
+      exclusionOptionsTooltip:
+        '排除在某些情况下可能造成混淆或引起问题的字符。',
       uppercase: '大写字母 (A-Z)',
       lowercase: '小写字母 (a-z)',
       numbers: '数字 (0-9)',
       symbols: '符号 (!@#$...)',
       excludeSimilar: '排除相似字符 (i, l, 1, L, o, 0, O)',
+      excludeSimilarTooltip:
+        '移除外观相似的字符（i/l/1/I，o/0/O），避免阅读密码时混淆。',
       excludeAmbiguous: '排除歧义符号',
+      excludeAmbiguousTooltip:
+        '移除难以区分或在某些系统中可能导致问题的符号：{}[]()/\\\'"`~,;:.<>',
       count: '数量',
       regenerate: '重新生成',
       generatedPasswords: '生成的密码',
       strength: '强度',
+      strengthTooltip:
+        '密码强度基于熵值计算——长度和字符集大小的组合。',
       weak: '弱',
       medium: '中等',
       strong: '强',
       veryStrong: '非常强',
       passwordCopied: '密码已复制到剪贴板',
       allPasswordsCopied: '所有密码已复制到剪贴板',
-      atLeastOneType: '必须选择至少一种字符类型',
-      lengthMustBeBetween: '密码长度必须在4到128之间',
-      lengthTooltip: '密码长度（4-128个字符）。',
-      countTooltip: '要生成的密码数量（1-20）。',
+      atLeastOneCharType: '必须选择至少一种字符类型',
+      lengthError: '密码长度必须在4到128之间',
+      failedToGenerate: '密码生成失败',
+      resultPlaceholder: '生成的密码将显示在这里',
+      lengthTooltip: '密码长度（4-128个字符）。越长越安全。',
+      countTooltip: '一次生成的密码数量（1-20）。',
     },
     urlParser: {
       title: 'URL Parser',
@@ -742,14 +754,28 @@ export const zhCN = {
       title: 'JWT Decoder',
       description: '解码JSON Web Token以查看Header、Payload和Signature。',
       jwtToken: 'JWT Token',
+      jwtTokenTooltip:
+        'JSON Web Token(JWT)是一种紧凑的、URL安全的令牌格式，用于以JSON对象的形式在各方之间安全地传输信息。',
       tokenPlaceholder:
         '粘贴JWT Token（例如：eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...）',
       validationStatus: '验证状态',
+      validationStatusTooltip:
+        '检查令牌是否过期(exp)、尚未生效(nbf)，并显示签发时间(iat)。',
       signatureVerification: 'Signature验证',
+      signatureVerificationTooltip:
+        '验证令牌是否使用预期的密钥签名且未被篡改。',
       header: 'Header',
+      headerTooltip:
+        '包含关于令牌类型和签名算法的元数据（如alg、typ）。',
       payload: 'Payload',
+      payloadTooltip:
+        '包含声明——关于用户和附加数据的声明（如sub、name、exp、iat）。',
       signature: 'Signature',
+      signatureTooltip:
+        '用于验证令牌完整性的加密签名。使用header、payload和密钥创建。',
       verificationKey: '验证Key',
+      verificationKeyTooltip:
+        'HMAC(HS256/384/512)：输入密钥。RSA/ECDSA：输入PEM格式的公钥。',
       verificationKeyPlaceholder: '输入验证Key',
       enterVerificationKey: '输入验证Key',
       hmacKeyPlaceholder: '输入HMAC Secret Key（用于HS256、HS384、HS512）',
@@ -773,10 +799,16 @@ export const zhCN = {
       enterKeyToVerify: '请在上方输入Key以验证Signature',
       invalidJwtFormat:
         '无效的JWT格式。需要由点分隔的3部分（header.payload.signature）。',
+      invalidJwtFormatDetails:
+        '无效的JWT格式。需要由点分隔的3部分（header.payload.signature）。',
       failedToDecodeHeader: 'JWT Header解码失败。无效的Base64URL编码。',
       failedToDecodePayload: 'JWT Payload解码失败。无效的Base64URL编码。',
+      failedToDecodeToken: 'JWT令牌解码失败。',
       enterJwtToDecode: '请输入要解码的JWT Token。',
+      enterTokenToDecode: '请输入要解码的JWT Token。',
       signatureNote: '注意：不执行Signature验证。此工具仅解码Token。',
+      signatureIsValid: 'Signature有效。',
+      verificationFailed: '验证失败',
       raw: 'Raw',
     },
     stringLength: {
@@ -806,17 +838,25 @@ export const zhCN = {
       title: 'JWT Encoder',
       description: '从Header和Payload创建JSON Web Token。',
       headerJson: 'Header (JSON)',
+      headerJsonTooltip:
+        'JWT头部包含元数据："alg"指定签名算法，"typ"通常为"JWT"。',
       headerPlaceholder: '{"alg":"HS256","typ":"JWT"}',
       payloadJson: 'Payload (JSON)',
+      payloadJsonTooltip:
+        'JWT载荷包含声明。常见声明："sub"(主题)、"exp"(过期时间)、"iat"(签发时间)、"iss"(签发者)。',
       payloadPlaceholder: '{"sub":"1234567890","name":"John Doe"}',
       algorithm: '算法',
+      algorithmTooltip:
+        'HS256/384/512使用SHA-256/384/512的HMAC。"none"创建未签名的令牌（不建议在生产环境中使用）。',
       algorithmNote: '(更新header.alg)',
       secretKey: 'Secret Key',
+      secretKeyTooltip:
+        '用于签名JWT的密钥。请妥善保管——任何拥有此密钥的人都可以创建有效的令牌。',
       secretKeyPlaceholder: '输入用于签名的Secret Key',
       encodedJwtToken: '编码的JWT Token',
       noneUnsigned: 'None (无签名)',
-      invalidJsonHeader: 'Header中的JSON无效',
-      invalidJsonPayload: 'Payload中的JSON无效',
+      invalidHeaderJson: 'Header中的JSON无效',
+      invalidPayloadJson: 'Payload中的JSON无效',
       secretKeyRequired: '签名需要Secret Key',
       unsupportedAlgorithm:
         '不支持的算法：{alg}。仅支持HS256、HS384、HS512、none。',

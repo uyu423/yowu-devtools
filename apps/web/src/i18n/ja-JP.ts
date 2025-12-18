@@ -499,27 +499,39 @@ export const jaJP = {
         'カスタム長さと文字ルールで暗号学的に安全なパスワードを生成します。',
       length: '長さ',
       characterTypes: '文字タイプ',
+      characterTypesTooltip:
+        'パスワードに含める文字セットを選択します。複数のタイプを使用するとセキュリティが向上します。',
       exclusionOptions: '除外オプション',
+      exclusionOptionsTooltip:
+        '特定の状況で混乱を招いたり問題を引き起こす可能性のある文字を除外します。',
       uppercase: '大文字 (A-Z)',
       lowercase: '小文字 (a-z)',
       numbers: '数字 (0-9)',
       symbols: '記号 (!@#$...)',
       excludeSimilar: '類似文字を除外 (i, l, 1, L, o, 0, O)',
+      excludeSimilarTooltip:
+        '互いに似ている文字(i/l/1/I, o/0/O)を削除し、パスワードを読む際の混乱を防ぎます。',
       excludeAmbiguous: '曖昧な記号を除外',
+      excludeAmbiguousTooltip:
+        '区別しにくいか一部のシステムで問題を引き起こす可能性のある記号を削除します：{}[]()/\\\'"`~,;:.<>',
       count: '数',
       regenerate: '再生成',
       generatedPasswords: '生成されたパスワード',
       strength: '強度',
+      strengthTooltip:
+        'パスワードの強度はエントロピー（長さと文字セットサイズの組み合わせ）に基づいて計算されます。',
       weak: '弱い',
       medium: '中程度',
       strong: '強い',
       veryStrong: '非常に強い',
       passwordCopied: 'パスワードをクリップボードにコピーしました',
       allPasswordsCopied: 'すべてのパスワードをクリップボードにコピーしました',
-      atLeastOneType: '少なくとも1つの文字タイプを選択する必要があります',
-      lengthMustBeBetween: 'パスワードの長さは4から128の間である必要があります',
-      lengthTooltip: 'パスワードの長さ (4-128文字)。',
-      countTooltip: '生成するパスワードの数 (1-20)。',
+      atLeastOneCharType: '少なくとも1つの文字タイプを選択する必要があります',
+      lengthError: 'パスワードの長さは4から128の間である必要があります',
+      failedToGenerate: 'パスワードの生成に失敗しました',
+      resultPlaceholder: '生成されたパスワードがここに表示されます',
+      lengthTooltip: 'パスワードの長さ (4-128文字)。長いほど安全です。',
+      countTooltip: '一度に生成するパスワードの数 (1-20)。',
     },
     urlParser: {
       title: 'URL Parser',
@@ -811,14 +823,28 @@ export const jaJP = {
       description:
         'JWTをデコードしてヘッダー、ペイロード、有効期限を確認し、署名を検証します。',
       jwtToken: 'JWT Token',
+      jwtTokenTooltip:
+        'JSON Web Token(JWT)は、JSONオブジェクトとして当事者間で安全に情報を伝送するためのコンパクトでURL安全なトークン形式です。',
       tokenPlaceholder:
         'JWT Tokenを貼り付け (例: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...)',
       validationStatus: '検証ステータス',
+      validationStatusTooltip:
+        'トークンが期限切れ(exp)、まだ有効ではない(nbf)、発行時刻(iat)を確認します。',
       signatureVerification: 'Signature検証',
+      signatureVerificationTooltip:
+        'トークンが予期されるキーで署名され、改ざんされていないことを検証します。',
       header: 'Header',
+      headerTooltip:
+        'トークンの種類と署名アルゴリズムに関するメタデータを含みます (例: alg, typ)。',
       payload: 'Payload',
+      payloadTooltip:
+        'クレーム(ユーザーと追加データに関する記述)を含みます (例: sub, name, exp, iat)。',
       signature: 'Signature',
+      signatureTooltip:
+        'トークンの整合性を検証するための暗号署名です。ヘッダー、ペイロード、秘密鍵を使用して作成されます。',
       verificationKey: '検証Key',
+      verificationKeyTooltip:
+        'HMAC(HS256/384/512)の場合：秘密鍵を入力。RSA/ECDSAの場合：PEM形式の公開鍵を入力。',
       verificationKeyPlaceholder: '検証Keyを入力',
       enterVerificationKey: '検証Keyを入力',
       hmacKeyPlaceholder: 'HMAC Secret Keyを入力 (HS256, HS384, HS512用)',
@@ -842,13 +868,19 @@ export const jaJP = {
       enterKeyToVerify: 'Signatureを検証するには上にKeyを入力してください',
       invalidJwtFormat:
         '無効なJWT形式です。ドットで区切られた3つの部分が必要です (header.payload.signature)。',
+      invalidJwtFormatDetails:
+        '無効なJWT形式です。ドットで区切られた3つの部分が必要です (header.payload.signature)。',
       failedToDecodeHeader:
         'JWT Header Decode失敗。無効なBase64URLエンコーディングです。',
       failedToDecodePayload:
         'JWT Payload Decode失敗。無効なBase64URLエンコーディングです。',
+      failedToDecodeToken: 'JWTトークンのデコードに失敗しました。',
       enterJwtToDecode: 'DecodeするJWT Tokenを入力してください。',
+      enterTokenToDecode: 'DecodeするJWT Tokenを入力してください。',
       signatureNote:
         '注: Signature検証は実行されません。このツールはTokenをDecodeするだけです。',
+      signatureIsValid: 'Signatureは有効です。',
+      verificationFailed: '検証失敗',
       raw: 'Raw',
     },
     stringLength: {
@@ -881,17 +913,25 @@ export const jaJP = {
       description:
         'カスタムヘッダー、ペイロード、HMACアルゴリズムで署名付きJWTを作成します。',
       headerJson: 'Header (JSON)',
+      headerJsonTooltip:
+        'JWTヘッダーにはメタデータが含まれます：「alg」は署名アルゴリズム、「typ」は通常「JWT」です。',
       headerPlaceholder: '{"alg":"HS256","typ":"JWT"}',
       payloadJson: 'Payload (JSON)',
+      payloadJsonTooltip:
+        'JWTペイロードにはクレームが含まれます。一般的なクレーム：「sub」(主題)、「exp」(有効期限)、「iat」(発行時刻)、「iss」(発行者)。',
       payloadPlaceholder: '{"sub":"1234567890","name":"John Doe"}',
       algorithm: 'アルゴリズム',
+      algorithmTooltip:
+        'HS256/384/512はSHA-256/384/512を使用したHMACです。「none」は署名なしのトークンを作成します（本番環境では推奨しません）。',
       algorithmNote: '(header.algを更新)',
       secretKey: 'Secret Key',
+      secretKeyTooltip:
+        'JWTに署名するために使用される秘密鍵です。この鍵を安全に保管してください。この鍵があれば誰でも有効なトークンを作成できます。',
       secretKeyPlaceholder: '署名用のSecret Keyを入力',
       encodedJwtToken: 'EncodeされたJWT Token',
       noneUnsigned: 'None (署名なし)',
-      invalidJsonHeader: 'Headerに無効なJSON',
-      invalidJsonPayload: 'Payloadに無効なJSON',
+      invalidHeaderJson: 'Headerに無効なJSON',
+      invalidPayloadJson: 'Payloadに無効なJSON',
       secretKeyRequired: '署名にはSecret Keyが必要です',
       unsupportedAlgorithm:
         'サポートされていないアルゴリズム: {alg}。HS256、HS384、HS512、noneのみサポートされています。',

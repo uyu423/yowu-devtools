@@ -494,27 +494,39 @@ export const koKR = {
         '사용자 지정 길이와 문자 규칙으로 암호학적으로 안전한 비밀번호를 생성합니다.',
       length: '길이',
       characterTypes: '문자 유형',
+      characterTypesTooltip:
+        '비밀번호에 포함할 문자 세트를 선택합니다. 여러 유형을 사용하면 보안이 강화됩니다.',
       exclusionOptions: '제외 옵션',
+      exclusionOptionsTooltip:
+        '특정 상황에서 혼동되거나 문제가 될 수 있는 문자를 제외합니다.',
       uppercase: '대문자 (A-Z)',
       lowercase: '소문자 (a-z)',
       numbers: '숫자 (0-9)',
       symbols: '기호 (!@#$...)',
       excludeSimilar: '유사 문자 제외 (i, l, 1, L, o, 0, O)',
+      excludeSimilarTooltip:
+        '서로 비슷하게 보이는 문자(i/l/1/I, o/0/O)를 제거하여 비밀번호를 읽을 때 혼동을 방지합니다.',
       excludeAmbiguous: '모호한 기호 제외',
+      excludeAmbiguousTooltip:
+        '구별하기 어렵거나 일부 시스템에서 문제를 일으킬 수 있는 기호를 제거합니다: {}[]()/\\\'"`~,;:.<>',
       count: '개수',
       regenerate: '재생성',
       generatedPasswords: '생성된 비밀번호',
       strength: '강도',
+      strengthTooltip:
+        '비밀번호 강도는 엔트로피(길이와 문자 세트 크기의 조합)를 기반으로 계산됩니다.',
       weak: '약함',
       medium: '보통',
       strong: '강함',
       veryStrong: '매우 강함',
       passwordCopied: '비밀번호가 클립보드에 복사되었습니다',
       allPasswordsCopied: '모든 비밀번호가 클립보드에 복사되었습니다',
-      atLeastOneType: '최소 하나의 문자 유형을 선택해야 합니다',
-      lengthMustBeBetween: '비밀번호 길이는 4에서 128 사이여야 합니다',
-      lengthTooltip: '비밀번호 길이 (4-128자).',
-      countTooltip: '생성할 비밀번호 개수 (1-20).',
+      atLeastOneCharType: '최소 하나의 문자 유형을 선택해야 합니다',
+      lengthError: '비밀번호 길이는 4에서 128 사이여야 합니다',
+      failedToGenerate: '비밀번호 생성 실패',
+      resultPlaceholder: '생성된 비밀번호가 여기에 표시됩니다',
+      lengthTooltip: '비밀번호 길이 (4-128자). 길수록 더 안전합니다.',
+      countTooltip: '한 번에 생성할 비밀번호 개수 (1-20).',
     },
     urlParser: {
       title: 'URL Parser',
@@ -802,14 +814,28 @@ export const koKR = {
       description:
         'JWT를 디코딩하여 헤더, 페이로드, 만료 시간을 확인하고 서명을 검증합니다.',
       jwtToken: 'JWT Token',
+      jwtTokenTooltip:
+        'JSON Web Token(JWT)은 당사자 간에 정보를 JSON 객체로 안전하게 전송하기 위한 컴팩트하고 URL에 안전한 토큰 형식입니다.',
       tokenPlaceholder:
         'JWT Token을 붙여넣으세요 (예: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...)',
       validationStatus: '검증 상태',
+      validationStatusTooltip:
+        '토큰의 만료 여부(exp), 아직 유효하지 않은지(nbf), 발급 시간(iat)을 확인합니다.',
       signatureVerification: 'Signature 검증',
+      signatureVerificationTooltip:
+        '토큰이 예상되는 키로 서명되었고 변조되지 않았는지 검증합니다.',
       header: 'Header',
+      headerTooltip:
+        '토큰 유형과 서명 알고리즘에 대한 메타데이터를 포함합니다 (예: alg, typ).',
       payload: 'Payload',
+      payloadTooltip:
+        '클레임(사용자 및 추가 데이터에 대한 정보)을 포함합니다 (예: sub, name, exp, iat).',
       signature: 'Signature',
+      signatureTooltip:
+        '토큰 무결성을 검증하기 위한 암호화 서명입니다. 헤더, 페이로드, 비밀 키를 사용하여 생성됩니다.',
       verificationKey: '검증 Key',
+      verificationKeyTooltip:
+        'HMAC(HS256/384/512)의 경우: 비밀 키를 입력하세요. RSA/ECDSA의 경우: PEM 형식의 공개 키를 입력하세요.',
       verificationKeyPlaceholder: '검증 Key를 입력하세요',
       enterVerificationKey: '검증 Key를 입력하세요',
       hmacKeyPlaceholder:
@@ -834,13 +860,19 @@ export const koKR = {
       enterKeyToVerify: 'Signature를 검증하려면 위에 Key를 입력하세요',
       invalidJwtFormat:
         '유효하지 않은 JWT 형식입니다. 점으로 구분된 3개의 부분이 필요합니다 (header.payload.signature).',
+      invalidJwtFormatDetails:
+        '유효하지 않은 JWT 형식입니다. 점으로 구분된 3개의 부분이 필요합니다 (header.payload.signature).',
       failedToDecodeHeader:
         'JWT Header Decode 실패. 유효하지 않은 Base64URL 인코딩입니다.',
       failedToDecodePayload:
         'JWT Payload Decode 실패. 유효하지 않은 Base64URL 인코딩입니다.',
+      failedToDecodeToken: 'JWT 토큰 디코딩 실패.',
       enterJwtToDecode: 'Decode할 JWT Token을 입력하세요.',
+      enterTokenToDecode: 'Decode할 JWT Token을 입력하세요.',
       signatureNote:
         '참고: Signature 검증은 수행되지 않습니다. 이 도구는 Token을 Decode만 합니다.',
+      signatureIsValid: 'Signature가 유효합니다.',
+      verificationFailed: '검증 실패',
       raw: 'Raw',
     },
     jwtEncoder: {
@@ -848,17 +880,25 @@ export const koKR = {
       description:
         '사용자 지정 헤더, 페이로드, HMAC 알고리즘으로 서명된 JWT를 생성합니다.',
       headerJson: 'Header (JSON)',
+      headerJsonTooltip:
+        'JWT 헤더는 메타데이터를 포함합니다: "alg"는 서명 알고리즘, "typ"은 보통 "JWT"입니다.',
       headerPlaceholder: '{"alg":"HS256","typ":"JWT"}',
       payloadJson: 'Payload (JSON)',
+      payloadJsonTooltip:
+        'JWT 페이로드는 클레임을 포함합니다. 일반적인 클레임: "sub"(주체), "exp"(만료), "iat"(발급 시간), "iss"(발급자).',
       payloadPlaceholder: '{"sub":"1234567890","name":"John Doe"}',
       algorithm: '알고리즘',
+      algorithmTooltip:
+        'HS256/384/512는 SHA-256/384/512를 사용하는 HMAC입니다. "none"은 서명되지 않은 토큰을 생성합니다 (프로덕션에서는 권장하지 않음).',
       algorithmNote: '(header.alg 업데이트)',
       secretKey: 'Secret Key',
+      secretKeyTooltip:
+        'JWT 서명에 사용되는 비밀 키입니다. 이 키를 안전하게 보관하세요 - 이 키가 있으면 누구나 유효한 토큰을 생성할 수 있습니다.',
       secretKeyPlaceholder: '서명을 위한 Secret Key를 입력하세요',
       encodedJwtToken: 'Encode된 JWT Token',
       noneUnsigned: 'None (서명 없음)',
-      invalidJsonHeader: 'Header의 JSON이 유효하지 않습니다',
-      invalidJsonPayload: 'Payload의 JSON이 유효하지 않습니다',
+      invalidHeaderJson: 'Header의 JSON이 유효하지 않습니다',
+      invalidPayloadJson: 'Payload의 JSON이 유효하지 않습니다',
       secretKeyRequired: '서명에 Secret Key가 필요합니다',
       unsupportedAlgorithm:
         '지원하지 않는 알고리즘: {alg}. HS256, HS384, HS512, none만 지원됩니다.',

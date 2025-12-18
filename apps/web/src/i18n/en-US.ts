@@ -504,27 +504,39 @@ export const enUS = {
         'Generate cryptographically secure passwords with custom length and character rules.',
       length: 'Length',
       characterTypes: 'Character Types',
+      characterTypesTooltip:
+        'Select which character sets to include in the password. Using multiple types increases security.',
       exclusionOptions: 'Exclusion Options',
+      exclusionOptionsTooltip:
+        'Exclude characters that may be confusing or problematic in certain contexts.',
       uppercase: 'Uppercase (A-Z)',
       lowercase: 'Lowercase (a-z)',
       numbers: 'Numbers (0-9)',
       symbols: 'Symbols (!@#$...)',
       excludeSimilar: 'Exclude similar characters (i, l, 1, L, o, 0, O)',
+      excludeSimilarTooltip:
+        'Remove characters that look similar to each other (i/l/1/I, o/0/O) to avoid confusion when reading passwords.',
       excludeAmbiguous: 'Exclude ambiguous symbols',
+      excludeAmbiguousTooltip:
+        'Remove symbols that may be hard to distinguish or cause issues in some systems: {}[]()/\\\'"`~,;:.<>',
       count: 'Count',
       regenerate: 'Regenerate',
       generatedPasswords: 'Generated Passwords',
       strength: 'Strength',
+      strengthTooltip:
+        'Password strength is calculated based on entropy - the combination of length and character set size.',
       weak: 'Weak',
       medium: 'Medium',
       strong: 'Strong',
       veryStrong: 'Very Strong',
       passwordCopied: 'Password copied to clipboard',
       allPasswordsCopied: 'All passwords copied to clipboard',
-      atLeastOneType: 'At least one character type must be selected',
-      lengthMustBeBetween: 'Password length must be between 4 and 128',
-      lengthTooltip: 'Password length (4-128 characters).',
-      countTooltip: 'Number of passwords to generate (1-20).',
+      atLeastOneCharType: 'At least one character type must be selected',
+      lengthError: 'Password length must be between 4 and 128',
+      failedToGenerate: 'Failed to generate password',
+      resultPlaceholder: 'Generated password will appear here',
+      lengthTooltip: 'Password length (4-128 characters). Longer passwords are more secure.',
+      countTooltip: 'Number of passwords to generate at once (1-20).',
     },
     urlParser: {
       title: 'URL Parser',
@@ -829,14 +841,28 @@ export const enUS = {
       description:
         'Decode JWTs to inspect header, payload, expiration, and verify signatures.',
       jwtToken: 'JWT Token',
+      jwtTokenTooltip:
+        'JSON Web Token (JWT) is a compact, URL-safe token format used for securely transmitting information between parties as a JSON object.',
       tokenPlaceholder:
         'Paste JWT token (e.g., eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...)',
       validationStatus: 'Validation Status',
+      validationStatusTooltip:
+        'Checks if the token is expired (exp), not yet valid (nbf), and shows when it was issued (iat).',
       signatureVerification: 'Signature Verification',
+      signatureVerificationTooltip:
+        'Verifies that the token was signed with the expected key and has not been tampered with.',
       header: 'Header',
+      headerTooltip:
+        'Contains metadata about the token type and signing algorithm (e.g., alg, typ).',
       payload: 'Payload',
+      payloadTooltip:
+        'Contains the claims - statements about the user and additional data (e.g., sub, name, exp, iat).',
       signature: 'Signature',
+      signatureTooltip:
+        'Cryptographic signature to verify the token integrity. Created using the header, payload, and a secret key.',
       verificationKey: 'Verification Key',
+      verificationKeyTooltip:
+        'For HMAC (HS256/384/512): enter the secret key. For RSA/ECDSA: enter the public key in PEM format.',
       verificationKeyPlaceholder: 'Enter verification key',
       enterVerificationKey: 'Enter verification key',
       hmacKeyPlaceholder: 'Enter HMAC secret key (for HS256, HS384, HS512)',
@@ -860,13 +886,19 @@ export const enUS = {
       enterKeyToVerify: 'Enter a key above to verify the signature',
       invalidJwtFormat:
         'Invalid JWT format. Expected 3 parts separated by dots (header.payload.signature).',
+      invalidJwtFormatDetails:
+        'Invalid JWT format. Expected 3 parts separated by dots (header.payload.signature).',
       failedToDecodeHeader:
         'Failed to decode JWT header. Invalid Base64URL encoding.',
       failedToDecodePayload:
         'Failed to decode JWT payload. Invalid Base64URL encoding.',
+      failedToDecodeToken: 'Failed to decode JWT token.',
       enterJwtToDecode: 'Enter a JWT token to decode it.',
+      enterTokenToDecode: 'Enter a JWT token to decode it.',
       signatureNote:
         'Note: Signature verification is not performed. This tool only decodes the token.',
+      signatureIsValid: 'Signature is valid.',
+      verificationFailed: 'Verification failed',
       raw: 'Raw',
     },
     jwtEncoder: {
@@ -874,17 +906,25 @@ export const enUS = {
       description:
         'Create signed JWTs with custom header, payload, and HMAC algorithms.',
       headerJson: 'Header (JSON)',
+      headerJsonTooltip:
+        'JWT header contains metadata: "alg" specifies the signing algorithm, "typ" is usually "JWT".',
       headerPlaceholder: '{"alg":"HS256","typ":"JWT"}',
       payloadJson: 'Payload (JSON)',
+      payloadJsonTooltip:
+        'JWT payload contains claims. Common claims: "sub" (subject), "exp" (expiration), "iat" (issued at), "iss" (issuer).',
       payloadPlaceholder: '{"sub":"1234567890","name":"John Doe"}',
       algorithm: 'Algorithm',
+      algorithmTooltip:
+        'HS256/384/512 use HMAC with SHA-256/384/512. "none" creates an unsigned token (not recommended for production).',
       algorithmNote: '(updates header.alg)',
       secretKey: 'Secret Key',
+      secretKeyTooltip:
+        'The secret key used to sign the JWT. Keep this secure - anyone with this key can create valid tokens.',
       secretKeyPlaceholder: 'Enter secret key for signing',
       encodedJwtToken: 'Encoded JWT Token',
       noneUnsigned: 'None (unsigned)',
-      invalidJsonHeader: 'Invalid JSON in header',
-      invalidJsonPayload: 'Invalid JSON in payload',
+      invalidHeaderJson: 'Invalid JSON in header',
+      invalidPayloadJson: 'Invalid JSON in payload',
       secretKeyRequired: 'Secret key is required for signing',
       unsupportedAlgorithm:
         'Unsupported algorithm: {alg}. Only HS256, HS384, HS512, none are supported.',

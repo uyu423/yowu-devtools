@@ -511,28 +511,39 @@ export const esES = {
       description: 'Genera contraseñas seguras con opciones personalizables',
       length: 'Longitud',
       characterTypes: 'Tipos de caracteres',
+      characterTypesTooltip:
+        'Selecciona qué conjuntos de caracteres incluir en tu contraseña. Más tipos = mayor seguridad.',
       exclusionOptions: 'Opciones de exclusión',
+      exclusionOptionsTooltip:
+        'Excluye caracteres que pueden causar confusión o problemas en ciertos contextos.',
       uppercase: 'Mayúsculas (A-Z)',
       lowercase: 'Minúsculas (a-z)',
       numbers: 'Números (0-9)',
       symbols: 'Símbolos (!@#$...)',
       excludeSimilar: 'Excluir caracteres similares (i, l, 1, L, o, 0, O)',
+      excludeSimilarTooltip:
+        'Elimina caracteres visualmente similares (i/l/1/I, o/0/O) para evitar confusión al leer contraseñas.',
       excludeAmbiguous: 'Excluir símbolos ambiguos',
+      excludeAmbiguousTooltip:
+        'Elimina símbolos que pueden ser difíciles de distinguir o causar problemas: {}[]()/\\\'"`~,;:.<>',
       count: 'Cantidad',
       regenerate: 'Regenerar',
       generatedPasswords: 'Contraseñas generadas',
       strength: 'Fortaleza',
+      strengthTooltip:
+        'La fortaleza se basa en la entropía - una combinación de longitud y tamaño del conjunto de caracteres.',
       weak: 'Débil',
       medium: 'Media',
       strong: 'Fuerte',
       veryStrong: 'Muy fuerte',
       passwordCopied: 'Contraseña copiada al portapapeles',
       allPasswordsCopied: 'Todas las contraseñas copiadas al portapapeles',
-      atLeastOneType: 'Se debe seleccionar al menos un tipo de carácter',
-      lengthMustBeBetween:
-        'La longitud de la contraseña debe estar entre 4 y 128',
-      lengthTooltip: 'Longitud de la contraseña (4-128 caracteres).',
-      countTooltip: 'Número de contraseñas a generar (1-20).',
+      atLeastOneCharType: 'Se debe seleccionar al menos un tipo de carácter',
+      lengthError: 'La longitud de la contraseña debe estar entre 4 y 128',
+      failedToGenerate: 'Error al generar contraseña',
+      resultPlaceholder: 'Las contraseñas generadas aparecerán aquí',
+      lengthTooltip: 'Longitud de la contraseña (4-128 caracteres). Más largo = más seguro.',
+      countTooltip: 'Número de contraseñas a generar a la vez (1-20).',
     },
     urlParser: {
       title: 'URL Parser',
@@ -852,14 +863,28 @@ export const esES = {
       description:
         'Decodifica JSON Web Tokens para ver Header, Payload y Signature.',
       jwtToken: 'Token JWT',
+      jwtTokenTooltip:
+        'JSON Web Token (JWT) es un formato de token compacto y seguro para URL usado para transmitir información de forma segura entre partes como un objeto JSON.',
       tokenPlaceholder:
         'Pega token JWT (ej: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...)',
       validationStatus: 'Estado de validación',
+      validationStatusTooltip:
+        'Verifica si el token ha expirado (exp), aún no es válido (nbf), y muestra la hora de emisión (iat).',
       signatureVerification: 'Verificación de Signature',
+      signatureVerificationTooltip:
+        'Verifica si el token fue firmado con la clave esperada y no ha sido manipulado.',
       header: 'Header',
+      headerTooltip:
+        'Contiene metadatos sobre el tipo de token y algoritmo de firma (ej: alg, typ).',
       payload: 'Payload',
+      payloadTooltip:
+        'Contiene los claims - declaraciones sobre el usuario y datos adicionales (ej: sub, name, exp, iat).',
       signature: 'Signature',
+      signatureTooltip:
+        'Firma criptográfica usada para verificar la integridad del token. Creada usando el header, payload y secret key.',
       verificationKey: 'Key de verificación',
+      verificationKeyTooltip:
+        'Para HMAC (HS256/384/512): ingresa la clave secreta. Para RSA/ECDSA: ingresa la clave pública en formato PEM.',
       verificationKeyPlaceholder: 'Ingresa key de verificación',
       enterVerificationKey: 'Ingresa key de verificación',
       hmacKeyPlaceholder: 'Ingresa secret key HMAC (para HS256, HS384, HS512)',
@@ -883,13 +908,19 @@ export const esES = {
       enterKeyToVerify: 'Ingresa una key arriba para verificar la firma',
       invalidJwtFormat:
         'Formato JWT inválido. Se esperan 3 partes separadas por puntos (header.payload.signature).',
+      invalidJwtFormatDetails:
+        'Formato JWT inválido. Se esperan 3 partes separadas por puntos (header.payload.signature).',
       failedToDecodeHeader:
         'Error al decodificar header JWT. Codificación Base64URL inválida.',
       failedToDecodePayload:
         'Error al decodificar payload JWT. Codificación Base64URL inválida.',
+      failedToDecodeToken: 'Error al decodificar token JWT.',
       enterJwtToDecode: 'Ingresa un token JWT para decodificarlo.',
+      enterTokenToDecode: 'Ingresa un token JWT para decodificarlo.',
       signatureNote:
         'Nota: No se realiza verificación de firma. Esta herramienta solo decodifica el token.',
+      signatureIsValid: 'La firma es válida.',
+      verificationFailed: 'Verificación fallida',
       raw: 'Raw',
     },
     stringLength: {
@@ -921,17 +952,25 @@ export const esES = {
       title: 'JWT Encoder',
       description: 'Crea JSON Web Tokens a partir de Header y Payload.',
       headerJson: 'Header (JSON)',
+      headerJsonTooltip:
+        'El header JWT contiene metadatos: "alg" especifica el algoritmo de firma, "typ" normalmente es "JWT".',
       headerPlaceholder: '{"alg":"HS256","typ":"JWT"}',
       payloadJson: 'Payload (JSON)',
+      payloadJsonTooltip:
+        'El payload JWT contiene claims. Claims comunes: "sub" (sujeto), "exp" (expiración), "iat" (emitido en), "iss" (emisor).',
       payloadPlaceholder: '{"sub":"1234567890","name":"John Doe"}',
       algorithm: 'Algoritmo',
+      algorithmTooltip:
+        'HS256/384/512 usan HMAC con SHA-256/384/512. "none" crea tokens sin firmar (no recomendado para producción).',
       algorithmNote: '(actualiza header.alg)',
       secretKey: 'Secret Key',
+      secretKeyTooltip:
+        'La clave secreta usada para firmar el JWT. Manténla segura - cualquiera con esta clave puede crear tokens válidos.',
       secretKeyPlaceholder: 'Ingresa secret key para firmar',
       encodedJwtToken: 'Token JWT codificado',
       noneUnsigned: 'None (sin firma)',
-      invalidJsonHeader: 'JSON inválido en header',
-      invalidJsonPayload: 'JSON inválido en payload',
+      invalidHeaderJson: 'JSON inválido en header',
+      invalidPayloadJson: 'JSON inválido en payload',
       secretKeyRequired: 'Se requiere secret key para firmar',
       unsupportedAlgorithm:
         'Algoritmo no soportado: {alg}. Solo se soportan HS256, HS384, HS512, none.',

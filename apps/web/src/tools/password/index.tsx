@@ -1,10 +1,11 @@
 /* eslint-disable react-refresh/only-export-components */
 import React from 'react';
 import type { ToolDefinition } from '@/tools/types';
-import { Lock, Copy } from 'lucide-react';
+import { Lock, Copy, HelpCircle } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { EditorPanel } from '@/components/common/EditorPanel';
 import { OptionLabel } from '@/components/ui/OptionLabel';
+import { Tooltip } from '@/components/ui/Tooltip';
 import { useToolState } from '@/hooks/useToolState';
 import { useShareModal } from '@/hooks/useShareModal';
 import { useTitle } from '@/hooks/useTitle';
@@ -285,8 +286,11 @@ const PasswordTool: React.FC = () => {
 
         {/* Character Types */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            {t('tool.password.characterTypes')}
+          <label className="flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <span>{t('tool.password.characterTypes')}</span>
+            <Tooltip content={t('tool.password.characterTypesTooltip')} position="bottom" nowrap={false}>
+              <HelpCircle className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 cursor-help" />
+            </Tooltip>
           </label>
           <div className="flex flex-wrap gap-4">
             <label className="flex items-center gap-2 cursor-pointer">
@@ -330,8 +334,11 @@ const PasswordTool: React.FC = () => {
 
         {/* Exclusion Options */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            {t('tool.password.exclusionOptions')}
+          <label className="flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <span>{t('tool.password.exclusionOptions')}</span>
+            <Tooltip content={t('tool.password.exclusionOptionsTooltip')} position="bottom" nowrap={false}>
+              <HelpCircle className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 cursor-help" />
+            </Tooltip>
           </label>
           <div className="flex flex-wrap gap-4">
             <label className="flex items-center gap-2 cursor-pointer">
@@ -341,8 +348,11 @@ const PasswordTool: React.FC = () => {
                 onChange={(e) => updateState({ excludeSimilar: e.target.checked })}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
-              <span className="text-sm text-gray-700 dark:text-gray-300">
+              <span className="flex items-center gap-1 text-sm text-gray-700 dark:text-gray-300">
                 {t('tool.password.excludeSimilar')}
+                <Tooltip content={t('tool.password.excludeSimilarTooltip')} position="bottom" nowrap={false}>
+                  <HelpCircle className="w-3 h-3 text-gray-400 dark:text-gray-500 cursor-help" />
+                </Tooltip>
               </span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
@@ -352,8 +362,11 @@ const PasswordTool: React.FC = () => {
                 onChange={(e) => updateState({ excludeAmbiguous: e.target.checked })}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
-              <span className="text-sm text-gray-700 dark:text-gray-300">
-                {t('tool.password.excludeAmbiguous')} ({AMBIGUOUS_SYMBOLS})
+              <span className="flex items-center gap-1 text-sm text-gray-700 dark:text-gray-300">
+                {t('tool.password.excludeAmbiguous')}
+                <Tooltip content={t('tool.password.excludeAmbiguousTooltip')} position="bottom" nowrap={false}>
+                  <HelpCircle className="w-3 h-3 text-gray-400 dark:text-gray-500 cursor-help" />
+                </Tooltip>
               </span>
             </label>
           </div>
@@ -403,7 +416,13 @@ const PasswordTool: React.FC = () => {
             </label>
             {strength && state.count === 1 && (
               <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-500 dark:text-gray-400">{t('tool.password.strength')}:</span>
+                <span className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                  {t('tool.password.strength')}
+                  <Tooltip content={t('tool.password.strengthTooltip')} position="bottom" nowrap={false}>
+                    <HelpCircle className="w-3 h-3 text-gray-400 dark:text-gray-500 cursor-help" />
+                  </Tooltip>
+                  :
+                </span>
                 <div className="flex items-center gap-2">
                   <div className={cn('w-2 h-2 rounded-full', getStrengthColor(strength))} />
                   <span className={cn(
