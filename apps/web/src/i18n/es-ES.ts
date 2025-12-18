@@ -120,6 +120,10 @@ export const esES = {
     darkMode: 'Modo oscuro',
     language: 'Idioma',
     selectLanguage: 'Seleccionar idioma',
+    // License info
+    license: 'Licencia',
+    sourceCode: 'Código',
+    noWarranty: 'Sin garantía',
   },
   commandPalette: {
     searchTools: 'Buscar herramientas...',

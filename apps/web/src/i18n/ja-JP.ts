@@ -118,6 +118,10 @@ export const jaJP = {
     darkMode: 'ダークモード',
     language: '言語',
     selectLanguage: '言語を選択',
+    // License info
+    license: 'ライセンス',
+    sourceCode: 'ソース',
+    noWarranty: '保証なし',
   },
   commandPalette: {
     searchTools: 'ツールを検索...',

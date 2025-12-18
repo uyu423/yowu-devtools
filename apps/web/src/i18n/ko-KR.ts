@@ -118,6 +118,10 @@ export const koKR = {
     darkMode: '다크 모드',
     language: '언어',
     selectLanguage: '언어 선택',
+    // License info
+    license: '라이센스',
+    sourceCode: '소스 코드',
+    noWarranty: '보증 없음',
   },
   commandPalette: {
     searchTools: '도구 검색...',

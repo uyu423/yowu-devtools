@@ -261,6 +261,37 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
 
       {/* Footer / Language & Theme */}
       <div className="p-4 border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 transition-colors space-y-3">
+        {/* License Info */}
+        <div className="flex items-center justify-center gap-1.5 text-[10px] text-gray-400 dark:text-gray-500">
+          <a
+            href="https://github.com/uyu423/yowu-devtools/blob/main/LICENSE"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            title="GPL-3.0-or-later"
+          >
+            {t('sidebar.license')}
+          </a>
+          <span>·</span>
+          <a
+            href="https://github.com/uyu423/yowu-devtools"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+          >
+            {t('sidebar.sourceCode')}
+          </a>
+          <span>·</span>
+          <a
+            href="https://www.gnu.org/licenses/gpl-3.0.html#section15"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+          >
+            {t('sidebar.noWarranty')}
+          </a>
+        </div>
+
         {/* Language Selector */}
         <LanguageSelector />
 

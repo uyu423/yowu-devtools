@@ -116,6 +116,10 @@ export const zhCN = {
     darkMode: '深色模式',
     language: '语言',
     selectLanguage: '选择语言',
+    // License info
+    license: '许可证',
+    sourceCode: '源代码',
+    noWarranty: '无保证',
   },
   commandPalette: {
     searchTools: '搜索工具...',

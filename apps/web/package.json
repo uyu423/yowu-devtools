@@ -1,7 +1,7 @@
 {
   "name": "@yowu-devtools/web",
   "version": "1.4.2",
-  "license": "SEE LICENSE IN LICENSE",
+  "license": "GPL-3.0-or-later",
   "author": {
     "name": "Yongwoo Yu (Yowu)",
     "email": "me@yowu.dev",

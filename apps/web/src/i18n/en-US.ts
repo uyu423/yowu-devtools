@@ -116,6 +116,10 @@ export const enUS = {
     darkMode: 'Dark Mode',
     language: 'Language',
     selectLanguage: 'Select Language',
+    // License info
+    license: 'License',
+    sourceCode: 'Source',
+    noWarranty: 'No Warranty',
   },
   commandPalette: {
     searchTools: 'Search tools...',
