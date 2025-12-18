@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Yowu's DevTools Companion",
   "short_name": "DevTools Companion",
-  "version": "1.0.2",
+  "version": "1.0.3",
 
   "description": "Companion extension for tools.yowu.dev",
 
@@ -23,7 +23,7 @@
     "default_title": "Yowu DevTools Companion - Click for settings"
   },
 
-  "permissions": ["storage", "cookies", "declarativeNetRequest"],
+  "permissions": ["declarativeNetRequest"],
 
   "optional_host_permissions": ["http://*/*", "https://*/*"],
 

@@ -8,24 +8,6 @@ This extension enables the API Tester tool on tools.yowu.dev to bypass browser C
 
 ## Permissions
 
-### storage
-
-The extension uses Chrome's storage API to save user-granted domain permissions locally in the browser. When a user grants permission to access a specific API domain, this preference is stored locally so the user doesn't need to grant permission again for subsequent requests. All data is stored locally using `chrome.storage.local` and is never transmitted to external servers.
-
-### cookies
-
-**Why this permission is required:**
-
-This permission is required to include authentication cookies when making API requests on behalf of the user.
-
-When users test APIs that require session-based or cookie-based authentication, the extension needs to read cookies for the target domain and include them in the request. This enables users to test authenticated endpoints without manually copying and pasting cookie values.
-
-**Key points:**
-
-- Cookies are only read for domains that the user has explicitly granted permission to access
-- Cookie data is only used for API requests initiated by the user and is never stored or transmitted elsewhere
-- Users maintain full control through the optional host permissions system
-
 ### declarativeNetRequest
 
 **Why this permission is required:**
@@ -44,6 +26,14 @@ Specifically, it:
 - **No rules are applied to other websites** - only domains explicitly approved by the user are affected
 - This is a common requirement for API testing tools to function properly
 
+### Cookie Handling
+
+When the "Include Cookies" option is enabled in the API Tester, the extension uses the standard `credentials: 'include'` fetch option to include cookies in requests. This is a browser-native feature that:
+
+- Automatically includes cookies for domains the user has granted host permissions to
+- Does not require the `cookies` permission
+- Never stores or transmits cookie data to external servers
+
 ## Data Handling
 
 ### What data we collect
@@ -52,7 +42,6 @@ Specifically, it:
 
 ### What data stays on your device
 
-- User preferences and settings (via chrome.storage)
 - Granted host permissions (managed by Chrome)
 
 ### What data is transmitted
@@ -72,4 +61,4 @@ For questions about this privacy policy, please visit: https://tools.yowu.dev
 
 ---
 
-Last updated: 2025-12-17
+Last updated: 2025-12-18

@@ -4,6 +4,32 @@ All notable changes to the Chrome Extension are documented in this file.
 
 ---
 
+## v1.0.3 (December 2025) - Permission Cleanup
+
+Cleanup release to comply with Chrome Web Store policies.
+
+### Changes
+
+- 🔧 **Remove unused permissions**: Removed `storage` and `cookies` permissions from manifest
+  - These permissions were declared but not actually used in the code
+  - `declarativeNetRequest` permission is retained (actively used for CORS bypass)
+  - Cookie handling still works via `credentials: 'include'` (no `cookies` permission needed)
+
+### Technical Details
+
+- **Permissions** (updated):
+  - `declarativeNetRequest`: Modify request headers for CORS bypass
+  - ~~`storage`~~: Removed (not used)
+  - ~~`cookies`~~: Removed (not needed for `credentials: 'include'`)
+
+---
+
+## v1.0.2 (December 2025) - Bug Fixes
+
+Minor bug fixes and improvements.
+
+---
+
 ## v1.0.1 (December 2025) - API Tester Enhancement
 
 The first feature release of Yowu DevTools Companion extension, enhancing the API Tester tool with CORS bypass and cookie handling capabilities.
@@ -40,8 +66,6 @@ The first feature release of Yowu DevTools Companion extension, enhancing the AP
 - **Manifest Version**: 3
 - **Minimum Chrome Version**: 102
 - **Permissions**:
-  - `storage`: Store user preferences and granted permissions
-  - `cookies`: Include authentication cookies in API requests
   - `declarativeNetRequest`: Modify request headers for CORS bypass
 - **Optional Host Permissions**: `http://*/*`, `https://*/*` (requested per-domain)
 

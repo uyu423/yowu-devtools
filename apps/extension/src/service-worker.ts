@@ -6,7 +6,7 @@
  *
  * Design Principles:
  * - Event-driven: Only activates when messages are received
- * - Minimal state: All persistent state stored in chrome.storage
+ * - Stateless: Permissions managed via chrome.permissions API
  * - Security first: Validates all origins and messages
  */
 
@@ -44,7 +44,7 @@ function registerHandler(type: string, handler: MessageHandler): void {
 // Note: In Manifest V3, blocking webRequest listeners are only available for
 // Enterprise Policy-installed extensions. For regular extensions, we use
 // credentials: 'include' in fetch() which automatically includes cookies
-// accessible via chrome.cookies API.
+// for domains the user has granted host permissions to.
 
 // =============================================================================
 // Origin Validation
