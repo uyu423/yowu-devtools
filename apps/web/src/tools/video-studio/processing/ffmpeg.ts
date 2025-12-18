@@ -15,19 +15,62 @@ import type { VideoProcessingProgress } from './types';
 let ffmpegInstance: FFmpeg | null = null;
 let isLoading = false;
 let isLoaded = false;
+let isCancelled = false;
 
 // Local paths for FFmpeg core files (served from public/ffmpeg/)
 const FFMPEG_BASE_URL = '/ffmpeg';
 
 /**
+ * Parse time string from FFmpeg log (format: HH:MM:SS.ms or SS.ms)
+ */
+function parseTimeString(timeStr: string): number {
+  const parts = timeStr.split(':');
+  if (parts.length === 3) {
+    // HH:MM:SS.ms format
+    const hours = parseFloat(parts[0]);
+    const minutes = parseFloat(parts[1]);
+    const seconds = parseFloat(parts[2]);
+    return hours * 3600 + minutes * 60 + seconds;
+  } else if (parts.length === 2) {
+    // MM:SS.ms format
+    const minutes = parseFloat(parts[0]);
+    const seconds = parseFloat(parts[1]);
+    return minutes * 60 + seconds;
+  } else {
+    // SS.ms format
+    return parseFloat(timeStr);
+  }
+}
+
+/**
+ * Parse FFmpeg log line to extract progress time
+ */
+function parseFFmpegLogProgress(message: string): number | null {
+  // Match time=HH:MM:SS.ms or time=SS.ms pattern
+  const timeMatch = message.match(/time=(\d+:\d+:\d+\.\d+|\d+:\d+\.\d+|\d+\.\d+)/);
+  if (timeMatch) {
+    return parseTimeString(timeMatch[1]);
+  }
+  return null;
+}
+
+/**
  * Get or create FFmpeg instance
  */
 export async function getFFmpeg(
-  onProgress?: (progress: VideoProcessingProgress) => void
+  onProgress?: (progress: VideoProcessingProgress) => void,
+  totalDuration?: number
 ): Promise<FFmpeg> {
+  // Reset cancelled flag when getting new instance
+  isCancelled = false;
+
   // Return existing instance if loaded
   if (ffmpegInstance && isLoaded) {
     console.log('[FFmpeg] Returning cached instance');
+    // Re-setup progress handler with new duration
+    if (onProgress && totalDuration) {
+      setupProgressHandler(ffmpegInstance, onProgress, totalDuration);
+    }
     return ffmpegInstance;
   }
 
@@ -38,6 +81,9 @@ export async function getFFmpeg(
       const checkInterval = setInterval(() => {
         if (isLoaded && ffmpegInstance) {
           clearInterval(checkInterval);
+          if (onProgress && totalDuration) {
+            setupProgressHandler(ffmpegInstance, onProgress, totalDuration);
+          }
           resolve(ffmpegInstance);
         } else if (!isLoading && !isLoaded) {
           clearInterval(checkInterval);
@@ -60,20 +106,15 @@ export async function getFFmpeg(
 
     ffmpegInstance = new FFmpeg();
 
-    // Set up logging - always log for debugging
-    ffmpegInstance.on('log', ({ message }) => {
-      console.log('[FFmpeg Log]', message);
-    });
-
-    // Set up progress tracking
-    ffmpegInstance.on('progress', ({ progress }) => {
-      console.log('[FFmpeg Progress]', Math.round(progress * 100) + '%');
-      onProgress?.({
-        stage: 'processing',
-        progress: Math.round(progress * 100),
-        message: 'Processing video...',
+    // Set up progress handler with duration-based tracking
+    if (onProgress && totalDuration) {
+      setupProgressHandler(ffmpegInstance, onProgress, totalDuration);
+    } else {
+      // Default log handler
+      ffmpegInstance.on('log', ({ message }) => {
+        console.log('[FFmpeg Log]', message);
       });
-    });
+    }
 
     onProgress?.({
       stage: 'loading-engine',
@@ -200,16 +241,75 @@ export async function exec(ffmpeg: FFmpeg, args: string[]): Promise<void> {
 }
 
 /**
+ * Set up progress handler for FFmpeg instance
+ */
+function setupProgressHandler(
+  ffmpeg: FFmpeg,
+  onProgress: (progress: VideoProcessingProgress) => void,
+  totalDuration: number
+): void {
+  // Use log parsing for more accurate progress
+  ffmpeg.on('log', ({ message }) => {
+    console.log('[FFmpeg Log]', message);
+
+    // Parse time from log message
+    const currentTime = parseFFmpegLogProgress(message);
+    if (currentTime !== null && totalDuration > 0) {
+      const progress = Math.min(99, Math.round((currentTime / totalDuration) * 100));
+      onProgress({
+        stage: 'processing',
+        progress,
+        message: `Processing: ${formatDuration(currentTime)} / ${formatDuration(totalDuration)}`,
+      });
+    }
+  });
+
+  // Also listen to built-in progress event as fallback
+  ffmpeg.on('progress', ({ progress }) => {
+    console.log('[FFmpeg Progress Event]', Math.round(progress * 100) + '%');
+  });
+}
+
+/**
+ * Format duration in seconds to HH:MM:SS or MM:SS
+ */
+function formatDuration(seconds: number): string {
+  const hrs = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  const secs = Math.floor(seconds % 60);
+
+  if (hrs > 0) {
+    return `${hrs}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  }
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
+/**
+ * Check if operation was cancelled
+ */
+export function wasCancelled(): boolean {
+  return isCancelled;
+}
+
+/**
  * Cancel ongoing FFmpeg operation
  */
-export function cancel(ffmpeg: FFmpeg): void {
-  try {
-    ffmpeg.terminate();
-    // Reinitialize for future use
+export function cancel(): void {
+  console.log('[FFmpeg] Cancel requested');
+  isCancelled = true;
+
+  if (ffmpegInstance) {
+    try {
+      // Terminate the current FFmpeg instance
+      ffmpegInstance.terminate();
+      console.log('[FFmpeg] Instance terminated');
+    } catch (err) {
+      console.error('[FFmpeg] Error during termination:', err);
+    }
+    // Reset instance state for future use
     ffmpegInstance = null;
     isLoaded = false;
-  } catch {
-    // Ignore cancel errors
+    isLoading = false;
   }
 }
 

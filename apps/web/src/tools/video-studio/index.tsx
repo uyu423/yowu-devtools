@@ -18,6 +18,7 @@ import {
   extractThumbnail,
   downloadResult,
   downloadThumbnail,
+  cancelFFmpeg,
   type VideoPipelineConfig,
   type ThumbnailConfig,
   type VideoProcessingProgress,
@@ -367,12 +368,23 @@ const VideoStudioTool: React.FC = () => {
           ...prev,
           progress: progress.progress,
           stage: progress.stage,
-          message: getProgressMessage(progress),
+          message: progress.message || getProgressMessage(progress),
         }));
       };
 
-      // Execute pipeline
-      const result = await executeVideoPipeline(videoFile, config, handleProgress);
+      // Execute pipeline with video duration for accurate progress tracking
+      const result = await executeVideoPipeline(
+        videoFile,
+        config,
+        handleProgress,
+        videoMetadata.duration
+      );
+
+      // Check if cancelled
+      if (result.error === 'Operation cancelled') {
+        toast.info(t('tool.videoStudio.processingCancelled'));
+        return;
+      }
 
       if (result.success && result.blobs && result.blobs.length > 0) {
         downloadResult(result.blobs[0], config.export.fileName);
@@ -381,11 +393,16 @@ const VideoStudioTool: React.FC = () => {
         throw new Error(result.error || t('tool.videoStudio.exportFailed'));
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('tool.videoStudio.exportFailed'));
+      // Ignore cancelled errors
+      const errorMessage = err instanceof Error ? err.message : t('tool.videoStudio.exportFailed');
+      if (errorMessage === 'Operation cancelled') {
+        return;
+      }
+      setError(errorMessage);
       setProcessingState((prev) => ({
         ...prev,
         stage: 'error',
-        error: err instanceof Error ? err.message : 'Unknown error',
+        error: errorMessage,
       }));
       toast.error(t('tool.videoStudio.exportFailed'));
     } finally {
@@ -425,6 +442,9 @@ const VideoStudioTool: React.FC = () => {
 
   // Cancel processing
   const handleCancel = () => {
+    // Actually cancel FFmpeg operation
+    cancelFFmpeg();
+
     setProcessingState((prev) => ({
       ...prev,
       isProcessing: false,
@@ -512,6 +532,7 @@ const VideoStudioTool: React.FC = () => {
             showTrimOverlay={state.trimEnabled}
             thumbnailTime={state.thumbnailTime}
             onFileSelect={handleFileSelect}
+            onCropAreaChange={state.cropEnabled ? handleCropAreaChange : undefined}
             onSeek={handleSeek}
             t={t}
           />

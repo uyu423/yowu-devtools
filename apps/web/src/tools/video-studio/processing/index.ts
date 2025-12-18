@@ -17,6 +17,7 @@ export {
   getFFmpeg,
   isFFmpegLoaded,
   cleanupFFmpeg,
+  cancel as cancelFFmpeg,
   getMimeType,
   getFileExtension,
 } from './ffmpeg';

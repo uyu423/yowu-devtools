@@ -23,6 +23,7 @@ import {
   uint8ArrayToBlob,
   getMimeType,
   getFileExtension,
+  wasCancelled,
 } from './ffmpeg';
 
 /**
@@ -31,14 +32,21 @@ import {
 export async function executeVideoPipeline(
   videoFile: File,
   config: VideoPipelineConfig,
-  onProgress?: (progress: VideoProcessingProgress) => void
+  onProgress?: (progress: VideoProcessingProgress) => void,
+  videoDuration?: number
 ): Promise<VideoProcessingResult> {
   const inputFileName = 'input' + getInputExtension(videoFile.type);
   const outputFileName = `output${getFileExtension(config.export.format)}`;
 
+  // Calculate expected output duration based on trim settings
+  let expectedDuration = videoDuration || 0;
+  if (config.trim.enabled && config.trim.end > config.trim.start) {
+    expectedDuration = config.trim.end - config.trim.start;
+  }
+
   try {
-    // Get FFmpeg instance
-    const ffmpeg = await getFFmpeg(onProgress);
+    // Get FFmpeg instance with duration for progress tracking
+    const ffmpeg = await getFFmpeg(onProgress, expectedDuration);
 
     onProgress?.({
       stage: 'preparing',
@@ -49,6 +57,11 @@ export async function executeVideoPipeline(
     // Write input file to virtual filesystem
     const inputData = await videoFile.arrayBuffer();
     await writeFile(ffmpeg, inputFileName, arrayBufferToUint8Array(inputData));
+
+    // Check for cancellation
+    if (wasCancelled()) {
+      return { success: false, error: 'Operation cancelled' };
+    }
 
     onProgress?.({
       stage: 'preparing',
@@ -68,6 +81,11 @@ export async function executeVideoPipeline(
     // Execute FFmpeg command
     await exec(ffmpeg, args);
 
+    // Check for cancellation after exec (if terminated, this won't be reached normally)
+    if (wasCancelled()) {
+      return { success: false, error: 'Operation cancelled' };
+    }
+
     onProgress?.({
       stage: 'finalizing',
       progress: 90,
@@ -81,6 +99,11 @@ export async function executeVideoPipeline(
     // Cleanup virtual filesystem
     await deleteFile(ffmpeg, inputFileName);
     await deleteFile(ffmpeg, outputFileName);
+
+    // Final cancellation check
+    if (wasCancelled()) {
+      return { success: false, error: 'Operation cancelled' };
+    }
 
     onProgress?.({
       stage: 'complete',
@@ -97,6 +120,16 @@ export async function executeVideoPipeline(
       },
     };
   } catch (error) {
+    // Check if error was due to cancellation
+    if (wasCancelled()) {
+      onProgress?.({
+        stage: 'error',
+        progress: 0,
+        message: 'Operation cancelled',
+      });
+      return { success: false, error: 'Operation cancelled' };
+    }
+
     onProgress?.({
       stage: 'error',
       progress: 0,

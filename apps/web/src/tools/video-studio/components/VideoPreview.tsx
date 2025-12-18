@@ -13,6 +13,7 @@ interface VideoPreviewProps {
   showTrimOverlay: boolean;
   thumbnailTime: number | null;
   onFileSelect: (file: File) => void;
+  onCropAreaChange?: (area: CropArea) => void;
   onTimeUpdate?: (currentTime: number) => void;
   onSeek?: (time: number) => void;
   t: (key: string) => string;
@@ -27,17 +28,34 @@ export const VideoPreview: React.FC<VideoPreviewProps> = ({
   showTrimOverlay,
   thumbnailTime,
   onFileSelect,
+  onCropAreaChange,
   onTimeUpdate,
   onSeek,
   t,
 }) => {
   const videoRef = React.useRef<HTMLVideoElement>(null);
+  const videoContainerRef = React.useRef<HTMLDivElement>(null);
   const timelineRef = React.useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = React.useState(false);
   const [isPlaying, setIsPlaying] = React.useState(false);
   const [isMuted, setIsMuted] = React.useState(false);
   const [currentTime, setCurrentTime] = React.useState(0);
   const [showMobileWarning, setShowMobileWarning] = React.useState(false);
+
+  // Crop dragging state
+  const [cropDragState, setCropDragState] = React.useState<{
+    isDragging: boolean;
+    handle: string | null;
+    startX: number;
+    startY: number;
+    startCropArea: CropArea | null;
+  }>({
+    isDragging: false,
+    handle: null,
+    startX: 0,
+    startY: 0,
+    startCropArea: null,
+  });
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -143,6 +161,108 @@ export const VideoPreview: React.FC<VideoPreviewProps> = ({
     };
   };
 
+  // Handle crop mouse down
+  const handleCropMouseDown = (e: React.MouseEvent, handle?: string) => {
+    if (!cropArea || !metadata || !onCropAreaChange) return;
+    e.preventDefault();
+    e.stopPropagation();
+
+    setCropDragState({
+      isDragging: true,
+      handle: handle || 'move',
+      startX: e.clientX,
+      startY: e.clientY,
+      startCropArea: { ...cropArea },
+    });
+  };
+
+  // Handle crop mouse move
+  const handleCropMouseMove = React.useCallback(
+    (e: MouseEvent) => {
+      if (!cropDragState.isDragging || !cropDragState.startCropArea || !metadata || !videoContainerRef.current || !onCropAreaChange) return;
+
+      const videoElement = videoRef.current;
+      if (!videoElement) return;
+
+      const videoRect = videoElement.getBoundingClientRect();
+
+      // Calculate scale between displayed video and actual video dimensions
+      const scaleX = metadata.width / videoRect.width;
+      const scaleY = metadata.height / videoRect.height;
+
+      const deltaX = (e.clientX - cropDragState.startX) * scaleX;
+      const deltaY = (e.clientY - cropDragState.startY) * scaleY;
+
+      const startArea = cropDragState.startCropArea;
+      const newCropArea = { ...startArea };
+
+      if (cropDragState.handle === 'move') {
+        // Move the entire crop area
+        newCropArea.x = Math.max(0, Math.min(metadata.width - startArea.width, startArea.x + deltaX));
+        newCropArea.y = Math.max(0, Math.min(metadata.height - startArea.height, startArea.y + deltaY));
+      } else {
+        // Resize based on handle
+        const handle = cropDragState.handle;
+        const minSize = 50;
+
+        if (handle?.includes('w')) {
+          const newX = Math.max(0, Math.min(startArea.x + startArea.width - minSize, startArea.x + deltaX));
+          newCropArea.width = startArea.width - (newX - startArea.x);
+          newCropArea.x = newX;
+        }
+        if (handle?.includes('e')) {
+          newCropArea.width = Math.max(minSize, Math.min(metadata.width - startArea.x, startArea.width + deltaX));
+        }
+        if (handle?.includes('n')) {
+          const newY = Math.max(0, Math.min(startArea.y + startArea.height - minSize, startArea.y + deltaY));
+          newCropArea.height = startArea.height - (newY - startArea.y);
+          newCropArea.y = newY;
+        }
+        if (handle?.includes('s')) {
+          newCropArea.height = Math.max(minSize, Math.min(metadata.height - startArea.y, startArea.height + deltaY));
+        }
+      }
+
+      onCropAreaChange(newCropArea);
+    },
+    [cropDragState, metadata, onCropAreaChange]
+  );
+
+  // Handle crop mouse up
+  const handleCropMouseUp = React.useCallback(() => {
+    setCropDragState({
+      isDragging: false,
+      handle: null,
+      startX: 0,
+      startY: 0,
+      startCropArea: null,
+    });
+  }, []);
+
+  // Add/remove global mouse event listeners for crop dragging
+  React.useEffect(() => {
+    if (cropDragState.isDragging) {
+      window.addEventListener('mousemove', handleCropMouseMove);
+      window.addEventListener('mouseup', handleCropMouseUp);
+      return () => {
+        window.removeEventListener('mousemove', handleCropMouseMove);
+        window.removeEventListener('mouseup', handleCropMouseUp);
+      };
+    }
+  }, [cropDragState.isDragging, handleCropMouseMove, handleCropMouseUp]);
+
+  // Get dark overlay clip path (darkens area outside crop)
+  const getDarkOverlayClipPath = () => {
+    if (!cropArea || !metadata) return undefined;
+    const left = (cropArea.x / metadata.width) * 100;
+    const top = (cropArea.y / metadata.height) * 100;
+    const right = ((cropArea.x + cropArea.width) / metadata.width) * 100;
+    const bottom = ((cropArea.y + cropArea.height) / metadata.height) * 100;
+
+    // Polygon that covers entire area EXCEPT the crop rectangle
+    return `polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%, ${left}% ${top}%, ${left}% ${bottom}%, ${right}% ${bottom}%, ${right}% ${top}%, ${left}% ${top}%)`;
+  };
+
   if (!videoUrl) {
     return (
       <div
@@ -222,7 +342,7 @@ export const VideoPreview: React.FC<VideoPreviewProps> = ({
       )}
 
       {/* Video container */}
-      <div className="relative flex items-center justify-center">
+      <div ref={videoContainerRef} className="relative flex items-center justify-center">
         <video
           ref={videoRef}
           src={videoUrl}
@@ -237,17 +357,46 @@ export const VideoPreview: React.FC<VideoPreviewProps> = ({
         {/* Crop overlay */}
         {showCropOverlay && cropArea && metadata && (
           <>
-            <div className="absolute inset-0 bg-black/50 pointer-events-none" />
+            {/* Darkened area outside crop (using clip-path) */}
             <div
-              className="absolute border-2 border-white bg-transparent pointer-events-none"
+              className="absolute inset-0 bg-black/50 pointer-events-none"
+              style={{ clipPath: getDarkOverlayClipPath() }}
+            />
+            {/* Crop selection area - interactive */}
+            <div
+              className={cn(
+                'absolute border-2 border-white bg-transparent',
+                onCropAreaChange ? 'cursor-move' : 'pointer-events-none'
+              )}
               style={getCropOverlayStyle()}
+              onMouseDown={(e) => handleCropMouseDown(e)}
             >
               {/* Grid lines */}
-              <div className="absolute inset-0">
+              <div className="absolute inset-0 pointer-events-none">
                 <div className="absolute left-1/3 top-0 bottom-0 w-px bg-white/50" />
                 <div className="absolute left-2/3 top-0 bottom-0 w-px bg-white/50" />
                 <div className="absolute top-1/3 left-0 right-0 h-px bg-white/50" />
                 <div className="absolute top-2/3 left-0 right-0 h-px bg-white/50" />
+              </div>
+
+              {/* Resize handles */}
+              {onCropAreaChange && ['nw', 'ne', 'sw', 'se'].map((handle) => (
+                <div
+                  key={handle}
+                  className={cn(
+                    'absolute w-4 h-4 bg-white border-2 border-blue-500 rounded-sm',
+                    handle === 'nw' && '-left-2 -top-2 cursor-nw-resize',
+                    handle === 'ne' && '-right-2 -top-2 cursor-ne-resize',
+                    handle === 'sw' && '-left-2 -bottom-2 cursor-sw-resize',
+                    handle === 'se' && '-right-2 -bottom-2 cursor-se-resize'
+                  )}
+                  onMouseDown={(e) => handleCropMouseDown(e, handle)}
+                />
+              ))}
+
+              {/* Crop dimensions display */}
+              <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 px-2 py-0.5 text-xs bg-black/80 text-white rounded whitespace-nowrap">
+                {Math.round(cropArea.width)} × {Math.round(cropArea.height)}
               </div>
             </div>
           </>
