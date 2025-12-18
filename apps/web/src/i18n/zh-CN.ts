@@ -76,6 +76,7 @@ export const zhCN = {
     enable: '启用',
     disable: '禁用',
     processing: '处理中...',
+    copying: 'Copying...',
     load: '加载',
     // Common options for Image/Video Studio
     aspectRatio: {
@@ -1190,6 +1191,9 @@ export const zhCN = {
       exportNotImplemented: '导出功能将在下一阶段实现',
       presetNotImplemented: '预设功能将在下一阶段实现',
       exportFailed: '导出图片失败',
+      copyToClipboard: 'Copy to Clipboard',
+      copiedToClipboard: 'Image copied to clipboard',
+      copyFailed: 'Failed to copy image to clipboard',
       crop: {
         title: '裁剪',
         aspectRatio: '宽高比',
@@ -1260,6 +1264,9 @@ export const zhCN = {
       fileTooLarge: '文件太大。最大大小为 500MB。',
       failedToLoadVideo: '加载视频失败',
       noVideoLoaded: '未加载视频',
+      exportInProgress: 'Video export is in progress. Please wait.',
+      thumbnailInProgress: 'Thumbnail extraction is in progress. Please wait.',
+      leavePageWarning: 'Video processing is in progress. If you leave this page, the processing will be cancelled. Are you sure you want to leave?',
       mobileWarning: '大型视频文件可能会在移动设备上导致性能问题。',
       loadingEngine: '正在加载视频处理引擎...',
       preparing: '正在准备视频...',

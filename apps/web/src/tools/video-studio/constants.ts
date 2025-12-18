@@ -17,9 +17,7 @@ export const DEFAULT_STATE: VideoStudioState = {
   trimEnd: 0,
 
   // Cut settings
-  cutMode: 'remove',
   cutSegments: [],
-  splitCount: 2,
 
   // Crop settings
   cropArea: null,

@@ -13,8 +13,6 @@ export type QualityPreset = 'fast' | 'balanced' | 'high';
 
 export type ExportFormat = 'mp4' | 'webm';
 
-export type CutMode = 'remove' | 'split';
-
 export interface TimeRange {
   start: number; // seconds
   end: number; // seconds
@@ -42,9 +40,7 @@ export interface VideoStudioState {
   trimEnd: number; // seconds
 
   // Cut settings
-  cutMode: CutMode;
   cutSegments: CutSegment[];
-  splitCount: number;
 
   // Crop settings
   cropArea: CropArea | null;

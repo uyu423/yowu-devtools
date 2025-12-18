@@ -13,7 +13,7 @@ import { toast } from 'sonner';
 
 import type { ImageStudioState, ImageMetadata, CropArea, ExportFormat } from './types';
 import { DEFAULT_STATE, MAX_FILE_SIZE, SUPPORTED_INPUT_FORMATS, EXPORT_FORMAT_OPTIONS } from './constants';
-import { executeAndDownload, type PipelineConfig } from './processing';
+import { executeAndDownload, executePipeline, type PipelineConfig } from './processing';
 import {
   ImagePreview,
   PipelinePanel,
@@ -81,6 +81,7 @@ const ImageStudioTool: React.FC = () => {
   const [imageMetadata, setImageMetadata] = React.useState<ImageMetadata | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const [isProcessing, setIsProcessing] = React.useState(false);
+  const [isCopying, setIsCopying] = React.useState(false);
 
   // Preset modal state
   const [presetModalOpen, setPresetModalOpen] = React.useState(false);
@@ -297,6 +298,65 @@ const ImageStudioTool: React.FC = () => {
     }
   };
 
+  // Copy processed image to clipboard
+  const handleCopyToClipboard = async () => {
+    if (!imageUrl || !imageMetadata) {
+      toast.error(t('tool.imageStudio.noImageLoaded'));
+      return;
+    }
+
+    setIsCopying(true);
+    setError(null);
+
+    try {
+      // Build pipeline configuration - force PNG for clipboard compatibility
+      const config: PipelineConfig = {
+        crop: {
+          enabled: state.cropEnabled,
+          area: state.cropArea,
+        },
+        resize: {
+          enabled: state.resizeEnabled,
+          width: state.resizeWidth,
+          height: state.resizeHeight,
+          mode: state.resizeMode,
+          quality: state.resizeQuality,
+        },
+        rotate: {
+          enabled: state.rotateEnabled,
+          rotation: state.rotation,
+          flipHorizontal: state.flipHorizontal,
+          flipVertical: state.flipVertical,
+        },
+        export: {
+          format: 'png', // PNG for best clipboard compatibility
+          quality: 100,
+          fileName: 'clipboard',
+        },
+      };
+
+      // Execute pipeline
+      const result = await executePipeline(imageUrl, config);
+
+      if (result.success && result.blob) {
+        // Copy to clipboard
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            'image/png': result.blob,
+          }),
+        ]);
+        toast.success(t('tool.imageStudio.copiedToClipboard'));
+      } else {
+        throw new Error(result.error || t('tool.imageStudio.copyFailed'));
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t('tool.imageStudio.copyFailed'));
+      toast.error(t('tool.imageStudio.copyFailed'));
+    } finally {
+      setIsCopying(false);
+    }
+  };
+
   // Build output file name
   const buildOutputFileName = React.useCallback(() => {
     const baseName = imageMetadata?.fileName.replace(/\.[^/.]+$/, '') || 'image';
@@ -411,9 +471,11 @@ const ImageStudioTool: React.FC = () => {
             state={state}
             hasImage={!!imageUrl}
             isProcessing={isProcessing}
+            isCopying={isCopying}
             onToggleStep={handleToggleStep}
             onResetPipeline={handleResetPipeline}
             onExport={handleExport}
+            onCopyToClipboard={handleCopyToClipboard}
             onOpenPresets={() => setPresetModalOpen(true)}
             t={t}
           >

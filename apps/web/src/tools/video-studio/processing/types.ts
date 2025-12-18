@@ -5,7 +5,6 @@ import type {
   ResizeMode,
   QualityPreset,
   ExportFormat,
-  CutMode,
   CutSegment,
   ThumbnailFormat,
 } from '../types';
@@ -21,9 +20,7 @@ export interface VideoPipelineConfig {
   };
   cut: {
     enabled: boolean;
-    mode: CutMode;
     segments: CutSegment[];
-    splitCount: number;
   };
   crop: {
     enabled: boolean;

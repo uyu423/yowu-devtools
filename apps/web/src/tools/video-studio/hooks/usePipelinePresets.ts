@@ -6,7 +6,7 @@ import { useState, useCallback, useEffect } from 'react';
 
 const STORAGE_KEY = 'yowu-devtools:v1:video-studio:pipeline-presets';
 
-import type { CutMode, ResizeMode, ExportFormat, QualityPreset } from '../types';
+import type { ResizeMode, ExportFormat, QualityPreset } from '../types';
 
 export interface VideoPipelinePreset {
   id: string;
@@ -19,9 +19,6 @@ export interface VideoPipelinePreset {
     cutEnabled: boolean;
     cropEnabled: boolean;
     resizeEnabled: boolean;
-    // Cut settings
-    cutMode: CutMode;
-    splitCount: number;
     // Resize settings
     resizeWidth: number;
     resizeHeight: number;

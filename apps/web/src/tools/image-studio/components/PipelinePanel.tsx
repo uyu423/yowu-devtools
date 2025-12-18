@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronDown, ChevronRight, Power, Play, Settings, RotateCcw } from 'lucide-react';
+import { ChevronDown, ChevronRight, Power, Settings, RotateCcw, Copy, Download } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Tooltip } from '@/components/ui/Tooltip';
 import type { ImageStudioState } from '../types';
@@ -9,9 +9,11 @@ interface PipelinePanelProps {
   state: ImageStudioState;
   hasImage: boolean;
   isProcessing: boolean;
+  isCopying?: boolean;
   onToggleStep: (stepId: 'crop' | 'resize' | 'rotate') => void;
   onResetPipeline: () => void;
   onExport: () => void;
+  onCopyToClipboard?: () => void;
   onOpenPresets: () => void;
   t: (key: string) => string;
   children?: React.ReactNode;
@@ -21,9 +23,11 @@ export const PipelinePanel: React.FC<PipelinePanelProps> = ({
   state,
   hasImage,
   isProcessing,
+  isCopying = false,
   onToggleStep,
   onResetPipeline,
   onExport,
+  onCopyToClipboard,
   onOpenPresets,
   t,
   children,
@@ -184,21 +188,41 @@ export const PipelinePanel: React.FC<PipelinePanelProps> = ({
 
       {/* Actions */}
       <div className="p-4 border-t border-gray-200 dark:border-gray-700 space-y-2">
-        {/* Export Button */}
-        <button
-          type="button"
-          onClick={onExport}
-          disabled={!hasImage || isProcessing}
-          className={cn(
-            'w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors',
-            hasImage && !isProcessing
-              ? 'bg-blue-600 hover:bg-blue-700 text-white'
-              : 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+        {/* Export Buttons */}
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={onExport}
+            disabled={!hasImage || isProcessing || isCopying}
+            className={cn(
+              'flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors',
+              hasImage && !isProcessing && !isCopying
+                ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                : 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+            )}
+          >
+            <Download className="w-4 h-4" />
+            {isProcessing ? t('common.processing') : t('common.download')}
+          </button>
+          {onCopyToClipboard && (
+            <Tooltip content={t('tool.imageStudio.copyToClipboard')}>
+              <button
+                type="button"
+                onClick={onCopyToClipboard}
+                disabled={!hasImage || isProcessing || isCopying}
+                className={cn(
+                  'flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors',
+                  hasImage && !isProcessing && !isCopying
+                    ? 'bg-green-600 hover:bg-green-700 text-white'
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+                )}
+              >
+                <Copy className="w-4 h-4" />
+                {isCopying && <span className="text-sm">{t('common.copying')}</span>}
+              </button>
+            </Tooltip>
           )}
-        >
-          <Play className="w-4 h-4" />
-          {isProcessing ? t('common.processing') : t('tool.imageStudio.runExport')}
-        </button>
+        </div>
 
         {/* Presets Button */}
         <button
@@ -209,19 +233,6 @@ export const PipelinePanel: React.FC<PipelinePanelProps> = ({
           <Settings className="w-4 h-4" />
           {t('common.preset.managePresets')}
         </button>
-
-        {/* Bug Report Link */}
-        <div className="flex justify-center pt-2">
-          <a
-            href="https://github.com/uyu423/yowu-devtools/issues"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-[10px] text-gray-400 dark:text-gray-500 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
-          >
-            <span>{t('sidebar.reportBug')}</span>
-            <ExternalLink className="w-2.5 h-2.5" />
-          </a>
-        </div>
       </div>
     </div>
   );

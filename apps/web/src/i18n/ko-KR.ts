@@ -76,6 +76,7 @@ export const koKR = {
     enable: '활성화',
     disable: '비활성화',
     processing: '처리 중...',
+    copying: '복사 중...',
     load: '불러오기',
     // Common options for Image/Video Studio
     aspectRatio: {
@@ -1271,6 +1272,9 @@ export const koKR = {
       exportNotImplemented: '내보내기 기능은 다음 단계에서 구현됩니다',
       presetNotImplemented: '프리셋 기능은 다음 단계에서 구현됩니다',
       exportFailed: '이미지 내보내기 실패',
+      copyToClipboard: '클립보드로 복사',
+      copiedToClipboard: '이미지가 클립보드에 복사되었습니다',
+      copyFailed: '이미지 클립보드 복사 실패',
       crop: {
         title: '자르기',
         aspectRatio: '종횡비',
@@ -1340,6 +1344,9 @@ export const koKR = {
       fileTooLarge: '파일이 너무 큽니다. 최대 크기는 500MB입니다.',
       failedToLoadVideo: '비디오 로드 실패',
       noVideoLoaded: '로드된 비디오 없음',
+      exportInProgress: '비디오 내보내기가 진행 중입니다. 잠시 기다려주세요.',
+      thumbnailInProgress: '썸네일 추출이 진행 중입니다. 잠시 기다려주세요.',
+      leavePageWarning: '비디오 처리가 진행 중입니다. 페이지를 벗어나면 처리가 취소됩니다. 정말 이동하시겠습니까?',
       mobileWarning: '대용량 비디오 파일은 모바일 기기에서 성능 문제를 일으킬 수 있습니다.',
       loadingEngine: '비디오 처리 엔진 로드 중...',
       preparing: '비디오 준비 중...',

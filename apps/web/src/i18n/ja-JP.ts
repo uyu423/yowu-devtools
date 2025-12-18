@@ -76,6 +76,7 @@ export const jaJP = {
     enable: '有効',
     disable: '無効',
     processing: '処理中...',
+    copying: 'Copying...',
     load: '読み込み',
     // Common options for Image/Video Studio
     aspectRatio: {
@@ -1282,6 +1283,9 @@ export const jaJP = {
       exportNotImplemented: 'Export functionality will be implemented in the next phase',
       presetNotImplemented: 'Preset functionality will be implemented in the next phase',
       exportFailed: 'Failed to export image',
+      copyToClipboard: 'Copy to Clipboard',
+      copiedToClipboard: 'Image copied to clipboard',
+      copyFailed: 'Failed to copy image to clipboard',
       crop: {
         title: 'Crop',
         aspectRatio: 'Aspect Ratio',
@@ -1352,6 +1356,9 @@ export const jaJP = {
       fileTooLarge: 'File is too large. Maximum size is 500MB.',
       failedToLoadVideo: 'Failed to load video',
       noVideoLoaded: 'No video loaded',
+      exportInProgress: 'Video export is in progress. Please wait.',
+      thumbnailInProgress: 'Thumbnail extraction is in progress. Please wait.',
+      leavePageWarning: 'Video processing is in progress. If you leave this page, the processing will be cancelled. Are you sure you want to leave?',
       mobileWarning: 'Large video files may cause performance issues on mobile devices.',
       loadingEngine: 'Loading video processing engine...',
       preparing: 'Preparing video...',

@@ -252,19 +252,6 @@ export const PipelinePanel: React.FC<PipelinePanelProps> = ({
           <Settings className="w-4 h-4" />
           {t('common.preset.managePresets')}
         </button>
-
-        {/* Bug Report Link */}
-        <div className="flex justify-center pt-2">
-          <a
-            href="https://github.com/uyu423/yowu-devtools/issues"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-[10px] text-gray-400 dark:text-gray-500 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
-          >
-            <span>{t('sidebar.reportBug')}</span>
-            <ExternalLink className="w-2.5 h-2.5" />
-          </a>
-        </div>
       </div>
     </div>
   );

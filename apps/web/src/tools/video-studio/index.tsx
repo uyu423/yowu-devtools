@@ -1,5 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import React from 'react';
+import { useBlocker } from 'react-router-dom';
 import type { ToolDefinition } from '@/tools/types';
 import { Video, ExternalLink } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
@@ -62,8 +63,6 @@ const VideoStudioTool: React.FC = () => {
         resizeEnabled,
         trimStart,
         trimEnd,
-        cutMode,
-        splitCount,
         resizeWidth,
         resizeHeight,
         resizeLockAspect,
@@ -81,9 +80,7 @@ const VideoStudioTool: React.FC = () => {
         thumbnailFormat: 'jpeg' as ThumbnailFormat,
         trimStart,
         trimEnd,
-        cutMode,
         cutSegments: [], // Don't share segments (video-specific)
-        splitCount,
         cropArea: null, // Don't share crop area (video-specific)
         resizeWidth,
         resizeHeight,
@@ -122,6 +119,43 @@ const VideoStudioTool: React.FC = () => {
     exportPresets,
     importPresets,
   } = usePipelinePresets();
+
+  // Navigation blocking when processing
+  const isProcessingAny = processingState.isProcessing || isExtractingThumbnail;
+  
+  // Block SPA navigation when processing
+  const blocker = useBlocker(
+    ({ currentLocation, nextLocation }) =>
+      isProcessingAny && currentLocation.pathname !== nextLocation.pathname
+  );
+
+  // Handle blocker state changes
+  React.useEffect(() => {
+    if (blocker.state === 'blocked') {
+      const confirmLeave = window.confirm(t('tool.videoStudio.leavePageWarning'));
+      if (confirmLeave) {
+        // Cancel FFmpeg and proceed with navigation
+        cancelFFmpeg();
+        blocker.proceed();
+      } else {
+        blocker.reset();
+      }
+    }
+  }, [blocker, t]);
+
+  // Block browser close/refresh when processing
+  React.useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isProcessingAny) {
+        e.preventDefault();
+        e.returnValue = t('tool.videoStudio.leavePageWarning');
+        return e.returnValue;
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isProcessingAny, t]);
 
   // Handle file selection
   const handleFileSelect = React.useCallback(
@@ -242,9 +276,7 @@ const VideoStudioTool: React.FC = () => {
       trimStart: DEFAULT_STATE.trimStart,
       trimEnd: videoMetadata?.duration || DEFAULT_STATE.trimEnd,
       // Cut settings
-      cutMode: DEFAULT_STATE.cutMode,
       cutSegments: DEFAULT_STATE.cutSegments,
-      splitCount: DEFAULT_STATE.splitCount,
       // Crop settings
       cropArea: videoMetadata
         ? { x: 0, y: 0, width: videoMetadata.width, height: videoMetadata.height }
@@ -278,6 +310,12 @@ const VideoStudioTool: React.FC = () => {
   const handleExtractThumbnail = async () => {
     if (!videoFile || !videoMetadata) {
       toast.error(t('tool.videoStudio.noVideoLoaded'));
+      return;
+    }
+
+    // Block if video export is in progress
+    if (processingState.isProcessing) {
+      toast.error(t('tool.videoStudio.exportInProgress'));
       return;
     }
 
@@ -333,6 +371,12 @@ const VideoStudioTool: React.FC = () => {
       return;
     }
 
+    // Block if thumbnail extraction is in progress
+    if (isExtractingThumbnail) {
+      toast.error(t('tool.videoStudio.thumbnailInProgress'));
+      return;
+    }
+
     // Reset cancelled state before starting new operation
     resetCancelledState();
 
@@ -356,9 +400,7 @@ const VideoStudioTool: React.FC = () => {
         },
         cut: {
           enabled: state.cutEnabled,
-          mode: state.cutMode,
           segments: state.cutSegments,
-          splitCount: state.splitCount,
         },
         crop: {
           enabled: state.cropEnabled,
@@ -486,8 +528,6 @@ const VideoStudioTool: React.FC = () => {
   const getCurrentSettings = React.useCallback((): VideoPipelinePreset['settings'] => ({
     trimEnabled: state.trimEnabled,
     cutEnabled: state.cutEnabled,
-    cutMode: state.cutMode,
-    splitCount: state.splitCount,
     cropEnabled: state.cropEnabled,
     resizeEnabled: state.resizeEnabled,
     resizeWidth: state.resizeWidth,
@@ -504,8 +544,6 @@ const VideoStudioTool: React.FC = () => {
     updateState({
       trimEnabled: preset.settings.trimEnabled,
       cutEnabled: preset.settings.cutEnabled,
-      cutMode: preset.settings.cutMode,
-      splitCount: preset.settings.splitCount,
       cropEnabled: preset.settings.cropEnabled,
       resizeEnabled: preset.settings.resizeEnabled,
       resizeWidth: preset.settings.resizeWidth,
@@ -609,18 +647,9 @@ const VideoStudioTool: React.FC = () => {
             {/* Cut Panel */}
             <CutPanel
               data-step="cut"
-              cutMode={state.cutMode}
               cutSegments={state.cutSegments}
-              splitCount={state.splitCount}
-              videoDuration={
-                // When trim is enabled, use trimmed duration for split calculations
-                state.trimEnabled && state.trimEnd > state.trimStart
-                  ? state.trimEnd - state.trimStart
-                  : videoMetadata?.duration || 60
-              }
-              onModeChange={(mode) => updateState({ cutMode: mode })}
+              videoDuration={videoMetadata?.duration || 60}
               onSegmentsChange={handleCutSegmentsChange}
-              onSplitCountChange={(count) => updateState({ splitCount: count })}
               onSeekTo={handleSeek}
               t={t}
               disabled={!state.cutEnabled}
