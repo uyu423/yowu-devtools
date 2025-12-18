@@ -30,6 +30,7 @@ import { useApiDiffExecutor, useDomainPresets, useHistory } from './hooks';
 import { CorsModal } from '../api-tester/components';
 import { GitCompare } from 'lucide-react';
 import { ShareModal } from '@/components/common/ShareModal';
+import { AdsenseFooter } from '@/components/common/AdsenseFooter';
 import type { ToolDefinition } from '../types';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { toast } from 'sonner';
@@ -382,7 +383,7 @@ const ApiDiffTool: React.FC = () => {
   );
 
   return (
-    <div className="flex flex-col h-full p-4 md:p-6 max-w-[90rem] mx-auto">
+    <div className="flex flex-col min-h-full p-4 md:p-6 max-w-[90rem] mx-auto">
       {/* Header */}
       <ToolHeader
         title={t('tool.apiDiff.title')}
@@ -483,6 +484,8 @@ const ApiDiffTool: React.FC = () => {
         extensionStatus={extensionStatus}
         targetUrl={corsErrorUrl || undefined}
       />
+
+      <AdsenseFooter />
     </div>
   );
 };

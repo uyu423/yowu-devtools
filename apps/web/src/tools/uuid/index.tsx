@@ -11,6 +11,7 @@ import { useI18n } from '@/hooks/useI18nHooks';
 import { copyToClipboard } from '@/lib/clipboard';
 import { toast } from 'sonner';
 import { ShareModal } from '@/components/common/ShareModal';
+import { AdsenseFooter } from '@/components/common/AdsenseFooter';
 
 interface UuidToolState {
   type: 'uuid-v4' | 'uuid-v7' | 'ulid';
@@ -162,7 +163,7 @@ const UuidTool: React.FC = () => {
   const outputText = generatedIds.join('\n');
 
   return (
-    <div className="flex flex-col h-full p-4 md:p-6 max-w-5xl mx-auto">
+    <div className="flex flex-col min-h-full p-4 md:p-6 max-w-5xl mx-auto">
       <ToolHeader
         title={t('tool.uuid.title')}
         description={t('tool.uuid.description')}
@@ -323,6 +324,8 @@ const UuidTool: React.FC = () => {
         </div>
       </div>
       <ShareModal {...shareModalProps} />
+
+      <AdsenseFooter />
     </div>
   );
 };

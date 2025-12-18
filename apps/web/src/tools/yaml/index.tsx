@@ -15,6 +15,7 @@ import { useToolSetup } from '@/hooks/useToolSetup';
 import { useWebWorker, shouldUseWorkerForText } from '@/hooks/useWebWorker';
 import { copyToClipboard } from '@/lib/clipboard';
 import { ShareModal } from '@/components/common/ShareModal';
+import { AdsenseFooter } from '@/components/common/AdsenseFooter';
 import YAML from 'yaml';
 
 interface YamlToolState {
@@ -127,7 +128,7 @@ const YamlTool: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full p-4 md:p-6 max-w-[90rem] mx-auto">
+    <div className="flex flex-col min-h-full p-4 md:p-6 max-w-[90rem] mx-auto">
       <ToolHeader
         title={t('tool.yaml.title')}
         description={t('tool.yaml.description')}
@@ -252,6 +253,8 @@ const YamlTool: React.FC = () => {
           </FileDownload>
         </div>
       </ActionBar>
+
+      <AdsenseFooter />
     </div>
   );
 };

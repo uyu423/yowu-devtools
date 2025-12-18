@@ -9,6 +9,7 @@ import { ErrorBanner } from '@/components/common/ErrorBanner';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useToolSetup } from '@/hooks/useToolSetup';
 import { ShareModal } from '@/components/common/ShareModal';
+import { AdsenseFooter } from '@/components/common/AdsenseFooter';
 import { toast } from 'sonner';
 
 interface StringLengthToolState {
@@ -317,7 +318,7 @@ const StringLengthTool: React.FC = () => {
   }, [updateState, t]);
 
   return (
-    <div className="flex flex-col h-full p-4 md:p-6 max-w-5xl mx-auto">
+    <div className="flex flex-col min-h-full p-4 md:p-6 max-w-5xl mx-auto">
       <ToolHeader
         title={t('tool.stringLength.title')}
         description={t('tool.stringLength.description')}
@@ -418,6 +419,8 @@ const StringLengthTool: React.FC = () => {
             />
           </div>
         </div>
+
+        <AdsenseFooter />
       </div>
     </div>
   );

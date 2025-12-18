@@ -1,7 +1,6 @@
 import React from 'react';
 import { Sidebar } from './Sidebar';
 import { Menu } from 'lucide-react';
-import { GoogleAdsense } from '@/components/common/GoogleAdsense';
 
 export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
@@ -38,16 +37,9 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
         </div>
 
         {/* Scrollable Area */}
-        <main className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900 pb-8">
+        <main className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900">
           {children}
         </main>
-
-        {/* Footer with AdSense - Fixed at bottom */}
-        <footer className="shrink-0 bg-gray-50 dark:bg-gray-900 py-3 px-4">
-          <div className="max-w-4xl mx-auto">
-            <GoogleAdsense />
-          </div>
-        </footer>
       </div>
     </div>
   );

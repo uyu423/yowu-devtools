@@ -9,6 +9,7 @@ import { ErrorBanner } from '@/components/common/ErrorBanner';
 import { FileInput } from '@/components/common/FileInput';
 import { FileDownload } from '@/components/common/FileDownload';
 import { ShareModal } from '@/components/common/ShareModal';
+import { AdsenseFooter } from '@/components/common/AdsenseFooter';
 import { ResizablePanels } from '@/components/common/ResizablePanels';
 import { JsonTreeView } from '@/components/common/JsonTreeView';
 import { getMimeType } from '@/lib/fileUtils';
@@ -178,7 +179,7 @@ const JsonTool: React.FC = () => {
   const isValid = !!parseResult.data && !parseResult.error;
 
   return (
-    <div className="flex h-full flex-col p-4 md:p-6 max-w-[90rem] mx-auto overflow-hidden">
+    <div className="flex min-h-full flex-col p-4 md:p-6 max-w-[90rem] mx-auto overflow-hidden">
       <ToolHeader
         title={t('tool.json.title')}
         description={t('tool.json.description')}
@@ -478,6 +479,8 @@ const JsonTool: React.FC = () => {
           </FileDownload>
         </div>
       </ActionBar>
+
+      <AdsenseFooter />
     </div>
   );
 };

@@ -17,6 +17,7 @@ import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useWebWorker, shouldUseWorkerForText } from '@/hooks/useWebWorker';
 import { copyToClipboard } from '@/lib/clipboard';
 import { ShareModal } from '@/components/common/ShareModal';
+import { AdsenseFooter } from '@/components/common/AdsenseFooter';
 import DiffMatchPatch from 'diff-match-patch';
 import type { Diff } from 'diff-match-patch';
 
@@ -162,7 +163,7 @@ const DiffTool: React.FC = () => {
   }, [diffs]);
 
   return (
-    <div className="flex flex-col h-full p-4 md:p-6 max-w-[90rem] mx-auto">
+    <div className="flex flex-col min-h-full p-4 md:p-6 max-w-[90rem] mx-auto">
       <ToolHeader
         title={t('tool.diff.title')}
         description={t('tool.diff.description')}
@@ -369,6 +370,8 @@ const DiffTool: React.FC = () => {
           )}
         </div>
       </div>
+
+      <AdsenseFooter />
     </div>
   );
 };

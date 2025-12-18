@@ -14,6 +14,7 @@ import { useTitle } from '@/hooks/useTitle';
 import { useI18n } from '@/hooks/useI18nHooks';
 import { copyToClipboard } from '@/lib/clipboard';
 import { ShareModal } from '@/components/common/ShareModal';
+import { AdsenseFooter } from '@/components/common/AdsenseFooter';
 
 interface QueryStringToolState {
   input: string;
@@ -211,7 +212,7 @@ const QueryStringTool: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full p-4 md:p-6 max-w-5xl mx-auto">
+    <div className="flex flex-col min-h-full p-4 md:p-6 max-w-5xl mx-auto">
       <ToolHeader
         title={t('tool.urlParser.title')}
         description={t('tool.urlParser.description')}
@@ -428,6 +429,8 @@ const QueryStringTool: React.FC = () => {
             <p className="text-sm mt-2">{t('tool.urlParser.enterUrlWithParams')}</p>
           </div>
         )}
+
+        <AdsenseFooter />
       </div>
     </div>
   );

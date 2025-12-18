@@ -12,6 +12,7 @@ import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useToolSetup } from '@/hooks/useToolSetup';
 import { ShareModal } from '@/components/common/ShareModal';
+import { AdsenseFooter } from '@/components/common/AdsenseFooter';
 
 interface UrlToolState {
   input: string;
@@ -70,7 +71,7 @@ const UrlTool: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full p-4 md:p-6 max-w-5xl mx-auto">
+    <div className="flex flex-col min-h-full p-4 md:p-6 max-w-5xl mx-auto">
       <ToolHeader
         title={t('tool.url.title')}
         description={t('tool.url.description')}
@@ -137,6 +138,8 @@ const UrlTool: React.FC = () => {
           status={conversion.error ? 'error' : 'success'}
           className="h-40 lg:h-48"
         />
+
+        <AdsenseFooter />
       </div>
     </div>
   );

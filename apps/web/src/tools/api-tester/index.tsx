@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import type { ToolDefinition } from '@/tools/types';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { ShareModal } from '@/components/common/ShareModal';
+import { AdsenseFooter } from '@/components/common/AdsenseFooter';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { ResizablePanels } from '@/components/common/ResizablePanels';
 import { useToolState } from '@/hooks/useToolState';
@@ -429,7 +430,7 @@ const ApiTesterTool: React.FC = () => {
   const supportsBody = BODY_SUPPORTED_METHODS.includes(state.method);
 
   return (
-    <div className="flex flex-col h-full p-4 md:p-6 max-w-[90rem] mx-auto">
+    <div className="flex flex-col min-h-full p-4 md:p-6 max-w-[90rem] mx-auto">
       {/* Header */}
       <div className="flex-shrink-0 pb-3 border-b border-gray-200 dark:border-gray-700">
         <ToolHeader
@@ -658,6 +659,8 @@ const ApiTesterTool: React.FC = () => {
       />
 
       <ShareModal {...shareModalProps} />
+
+      <AdsenseFooter />
     </div>
   );
 };
