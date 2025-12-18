@@ -435,7 +435,7 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
               <>
                 {viewMode === 'tree' && (
                   <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 overflow-auto font-mono text-sm">
-                    <JsonTreeView data={parsedBody.data} expandLevel={2} isDark={isDark} />
+                    <JsonTreeView data={parsedBody.data} expandLevel={Infinity} isDark={isDark} />
                   </div>
                 )}
                 {viewMode === 'pretty' && (
