@@ -180,6 +180,7 @@ export const esES = {
     noToolsLoaded: 'No se pudieron cargar herramientas',
     moreComingSoon: 'Más próximamente...',
     suggestFeature: 'Sugerir una función',
+    reportBug: 'Reportar un error',
     removeFromFavorites: 'Quitar de favoritos',
     addToFavorites: 'Añadir a favoritos',
     lightMode: 'Modo claro',

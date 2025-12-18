@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import React from 'react';
 import type { ToolDefinition } from '@/tools/types';
-import { Video } from 'lucide-react';
+import { Video, ExternalLink } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
 import { useToolState } from '@/hooks/useToolState';
@@ -395,9 +395,8 @@ const VideoStudioTool: React.FC = () => {
         videoMetadata.duration
       );
 
-      // Check if cancelled
+      // Check if cancelled (toast is already shown in handleCancel)
       if (result.error === 'Operation cancelled') {
-        toast.info(t('tool.videoStudio.processingCancelled'));
         return;
       }
 
@@ -566,6 +565,19 @@ const VideoStudioTool: React.FC = () => {
             onExtract={handleExtractThumbnail}
             t={t}
           />
+          
+          {/* Bug Report Link */}
+          <div className="flex justify-center mt-2">
+            <a
+              href="https://github.com/uyu423/yowu-devtools/issues"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-[10px] text-gray-400 dark:text-gray-500 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+            >
+              <span>{t('sidebar.reportBug')}</span>
+              <ExternalLink className="w-2.5 h-2.5" />
+            </a>
+          </div>
         </div>
 
         {/* Pipeline Panel */}
@@ -600,7 +612,12 @@ const VideoStudioTool: React.FC = () => {
               cutMode={state.cutMode}
               cutSegments={state.cutSegments}
               splitCount={state.splitCount}
-              videoDuration={videoMetadata?.duration || 60}
+              videoDuration={
+                // When trim is enabled, use trimmed duration for split calculations
+                state.trimEnabled && state.trimEnd > state.trimStart
+                  ? state.trimEnd - state.trimStart
+                  : videoMetadata?.duration || 60
+              }
               onModeChange={(mode) => updateState({ cutMode: mode })}
               onSegmentsChange={handleCutSegmentsChange}
               onSplitCountChange={(count) => updateState({ splitCount: count })}

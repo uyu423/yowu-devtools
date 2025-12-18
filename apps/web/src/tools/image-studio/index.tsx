@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import React from 'react';
 import type { ToolDefinition } from '@/tools/types';
-import { Image } from 'lucide-react';
+import { Image, ExternalLink } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
 import { useToolState } from '@/hooks/useToolState';
@@ -390,6 +390,19 @@ const ImageStudioTool: React.FC = () => {
             onCropAreaChange={handleCropAreaChange}
             t={t}
           />
+          
+          {/* Bug Report Link */}
+          <div className="flex justify-center mt-4">
+            <a
+              href="https://github.com/uyu423/yowu-devtools/issues"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-[10px] text-gray-400 dark:text-gray-500 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+            >
+              <span>{t('sidebar.reportBug')}</span>
+              <ExternalLink className="w-2.5 h-2.5" />
+            </a>
+          </div>
         </div>
 
         {/* Pipeline Panel */}

@@ -176,6 +176,7 @@ export const enUS = {
     noToolsLoaded: 'No tools loaded',
     moreComingSoon: 'More coming soon...',
     suggestFeature: 'Suggest a feature',
+    reportBug: 'Report a bug',
     removeFromFavorites: 'Remove from favorites',
     addToFavorites: 'Add to favorites',
     lightMode: 'Light Mode',
