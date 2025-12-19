@@ -1681,7 +1681,7 @@ export const esES = {
       error: {
         concurrencyExceedsRequests: 'La concurrencia no puede exceder el total de solicitudes',
       },
-      export: { json: 'JSON', csv: 'CSV', copySummary: 'Copiar resumen' },
+      export: { json: 'JSON', csv: 'CSV', copySummary: 'Copiar resumen', copyHeyCommand: 'Copiar comando hey CLI' },
       shareLink: 'Compartir',
       warning: {
         responsibleUse: 'Aviso de uso responsable',

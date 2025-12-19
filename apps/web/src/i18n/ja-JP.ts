@@ -1626,7 +1626,7 @@ export const jaJP = {
       error: {
         concurrencyExceedsRequests: '同時リクエスト数が総リクエスト数を超えることはできません',
       },
-      export: { json: 'JSON', csv: 'CSV', copySummary: '概要をコピー' },
+      export: { json: 'JSON', csv: 'CSV', copySummary: '概要をコピー', copyHeyCommand: 'hey CLIコマンドをコピー' },
       shareLink: '共有',
       warning: {
         responsibleUse: '責任ある使用について',

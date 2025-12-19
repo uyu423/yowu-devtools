@@ -1677,6 +1677,7 @@ export const enUS = {
         json: 'JSON',
         csv: 'CSV',
         copySummary: 'Copy Summary',
+        copyHeyCommand: 'Copy hey CLI Command',
       },
       shareLink: 'Share',
       // Warnings

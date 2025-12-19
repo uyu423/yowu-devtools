@@ -1625,7 +1625,7 @@ export const koKR = {
       error: {
         concurrencyExceedsRequests: '동시 요청 수가 총 요청 수를 초과할 수 없습니다',
       },
-      export: { json: 'JSON', csv: 'CSV', copySummary: '요약 복사' },
+      export: { json: 'JSON', csv: 'CSV', copySummary: '요약 복사', copyHeyCommand: 'hey CLI 명령어 복사' },
       shareLink: '공유',
       warning: {
         responsibleUse: '책임 있는 사용 안내',

@@ -1,24 +1,94 @@
 /**
- * ExportButtons - Export results as JSON/CSV or copy summary
+ * ExportButtons - Export results as JSON/CSV or copy summary/hey command
  */
 
 import React, { useState } from 'react';
-import { Copy, FileJson, FileSpreadsheet, Check } from 'lucide-react';
+import { Copy, FileJson, FileSpreadsheet, Check, Terminal } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Tooltip } from '@/components/ui/Tooltip';
 import { useI18n } from '@/hooks/useI18nHooks';
 import { copyToClipboard } from '@/lib/clipboard';
-import type { BurstTestResults } from '../types';
+import type { ApiBurstTestState, BurstTestResults } from '../types';
 import { formatDuration, formatBytes } from '../types';
 
 interface ExportButtonsProps {
   results: BurstTestResults | null;
+  state: ApiBurstTestState;
 }
 
 export const ExportButtons: React.FC<ExportButtonsProps> = ({
   results,
+  state,
 }) => {
   const { t } = useI18n();
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<'summary' | 'hey' | null>(null);
+
+  // Generate hey CLI command from current state
+  const generateHeyCommand = (): string => {
+    const parts = ['hey'];
+    
+    // Concurrency
+    parts.push(`-c ${state.concurrency}`);
+    
+    // Load mode
+    if (state.loadMode.type === 'requests') {
+      parts.push(`-n ${state.loadMode.n}`);
+    } else {
+      parts.push(`-z ${state.loadMode.durationMs / 1000}s`);
+    }
+    
+    // Rate limit (QPS)
+    if (state.rateLimit.type !== 'none') {
+      parts.push(`-q ${state.rateLimit.qps}`);
+    }
+    
+    // Timeout
+    parts.push(`-t ${state.timeoutMs / 1000}`);
+    
+    // Method (default is GET, so only add if different)
+    if (state.method !== 'GET') {
+      parts.push(`-m ${state.method}`);
+    }
+    
+    // Headers
+    state.headers
+      .filter(h => h.enabled && h.key)
+      .forEach(h => {
+        parts.push(`-H "${h.key}: ${h.value}"`);
+      });
+    
+    // Body
+    if (state.body.text && !['GET', 'HEAD'].includes(state.method)) {
+      // Escape quotes in body
+      const escapedBody = state.body.text.replace(/"/g, '\\"');
+      parts.push(`-d "${escapedBody}"`);
+    }
+    
+    // Basic auth
+    if (state.auth?.username) {
+      parts.push(`-a ${state.auth.username}:${state.auth.password || ''}`);
+    }
+    
+    // URL (with query params)
+    let url = state.url;
+    const enabledParams = state.params.filter(p => p.enabled && p.key);
+    if (enabledParams.length > 0) {
+      const queryString = enabledParams
+        .map(p => `${encodeURIComponent(p.key)}=${encodeURIComponent(p.value)}`)
+        .join('&');
+      url += (url.includes('?') ? '&' : '?') + queryString;
+    }
+    parts.push(`"${url}"`);
+    
+    return parts.join(' ');
+  };
+
+  const handleCopyHeyCommand = async () => {
+    const command = generateHeyCommand();
+    await copyToClipboard(command);
+    setCopied('hey');
+    setTimeout(() => setCopied(null), 2000);
+  };
 
   const handleCopySummary = async () => {
     if (!results) return;
@@ -47,8 +117,8 @@ ${Object.entries(results.statusCodes)
 `.trim();
 
     await copyToClipboard(summary);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setCopied('summary');
+    setTimeout(() => setCopied(null), 2000);
   };
 
   const handleExportJson = () => {
@@ -105,32 +175,49 @@ ${Object.entries(results.statusCodes)
 
   return (
     <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-      {/* Copy Summary */}
-      <button
-        onClick={handleCopySummary}
-        disabled={disabled}
-        title={t('tool.apiBurstTest.export.copySummary')}
-        className={cn(
-          'flex items-center gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 text-sm rounded-lg',
-          'border border-gray-300 dark:border-gray-600',
-          'text-gray-700 dark:text-gray-300',
-          'hover:bg-gray-100 dark:hover:bg-gray-800',
-          'transition-colors',
-          'disabled:opacity-50 disabled:cursor-not-allowed'
-        )}
-      >
-        {copied ? (
-          <>
+      {/* Copy hey CLI Command */}
+      <Tooltip content={t('tool.apiBurstTest.export.copyHeyCommand')}>
+        <button
+          onClick={handleCopyHeyCommand}
+          disabled={!state.url}
+          className={cn(
+            'flex items-center justify-center p-2 text-sm rounded-lg',
+            'border border-gray-300 dark:border-gray-600',
+            'text-gray-700 dark:text-gray-300',
+            'hover:bg-gray-100 dark:hover:bg-gray-800',
+            'transition-colors',
+            'disabled:opacity-50 disabled:cursor-not-allowed'
+          )}
+        >
+          {copied === 'hey' ? (
             <Check className="w-4 h-4 text-emerald-500" />
-            <span className="hidden sm:inline">{t('common.copied')}</span>
-          </>
-        ) : (
-          <>
+          ) : (
+            <Terminal className="w-4 h-4" />
+          )}
+        </button>
+      </Tooltip>
+
+      {/* Copy Summary */}
+      <Tooltip content={t('tool.apiBurstTest.export.copySummary')}>
+        <button
+          onClick={handleCopySummary}
+          disabled={disabled}
+          className={cn(
+            'flex items-center justify-center p-2 text-sm rounded-lg',
+            'border border-gray-300 dark:border-gray-600',
+            'text-gray-700 dark:text-gray-300',
+            'hover:bg-gray-100 dark:hover:bg-gray-800',
+            'transition-colors',
+            'disabled:opacity-50 disabled:cursor-not-allowed'
+          )}
+        >
+          {copied === 'summary' ? (
+            <Check className="w-4 h-4 text-emerald-500" />
+          ) : (
             <Copy className="w-4 h-4" />
-            <span className="hidden sm:inline">{t('tool.apiBurstTest.export.copySummary')}</span>
-          </>
-        )}
-      </button>
+          )}
+        </button>
+      </Tooltip>
 
       {/* Export JSON */}
       <button

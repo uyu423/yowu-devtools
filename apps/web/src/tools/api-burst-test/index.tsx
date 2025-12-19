@@ -653,7 +653,7 @@ const ApiBurstTestTool: React.FC = () => {
                   {t('tool.apiBurstTest.results.details')}
                 </button>
               </div>
-              <ExportButtons results={results} />
+              <ExportButtons results={results} state={state} />
             </div>
 
             {/* Results content */}

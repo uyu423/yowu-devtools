@@ -1525,7 +1525,7 @@ export const zhCN = {
       error: {
         concurrencyExceedsRequests: '并发数不能超过总请求数',
       },
-      export: { json: 'JSON', csv: 'CSV', copySummary: '复制概要' },
+      export: { json: 'JSON', csv: 'CSV', copySummary: '复制概要', copyHeyCommand: '复制 hey CLI 命令' },
       shareLink: '分享',
       warning: {
         responsibleUse: '负责任使用须知',
