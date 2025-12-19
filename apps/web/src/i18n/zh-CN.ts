@@ -23,6 +23,8 @@ export const zhCN = {
     cancel: '取消',
     confirm: '确认',
     close: '关闭',
+    minimize: '最小化',
+    expand: '展开',
     search: '搜索',
     filter: '筛选',
     apply: '应用',

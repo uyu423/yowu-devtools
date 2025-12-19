@@ -5,19 +5,20 @@
  * Accessibility: Uses blue for success (colorblind-friendly, avoids red/green confusion)
  */
 
-import React, { useMemo } from 'react';
-import { cn } from '@/lib/utils';
 import {
+  Download,
   Loader2,
   Plug,
   PlugZap,
-  ShieldAlert,
   RefreshCw,
-  Download,
+  ShieldAlert,
 } from 'lucide-react';
-import type { ExtensionStatus as ExtensionStatusType } from '@/lib/extension';
+import React, { useMemo } from 'react';
+
 import { EXTENSION_STORE_URL } from '@/lib/extension';
+import type { ExtensionStatus as ExtensionStatusType } from '@/lib/extension';
 import { Tooltip } from '@/components/ui/Tooltip';
+import { cn } from '@/lib/utils';
 import { useI18n } from '@/hooks/useI18nHooks';
 
 interface ExtensionStatusProps {
@@ -103,12 +104,7 @@ export const ExtensionStatus: React.FC<ExtensionStatusProps> = ({
 
   return (
     <div className={cn('flex items-center gap-2', className)}>
-      <Tooltip
-        content={tooltip}
-        position="bottom"
-        align="left"
-        nowrap={false}
-      >
+      <Tooltip content={tooltip} position="bottom" align="left" nowrap={false}>
         <button
           onClick={handleClick}
           className={cn(

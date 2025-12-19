@@ -23,6 +23,8 @@ export const jaJP = {
     cancel: 'キャンセル',
     confirm: '確認',
     close: '閉じる',
+    minimize: '最小化',
+    expand: '展開',
     search: '検索',
     filter: 'フィルター',
     apply: '適用',

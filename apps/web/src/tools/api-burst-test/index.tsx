@@ -124,8 +124,7 @@ const ApiBurstTestTool: React.FC = () => {
     useExtension({ autoCheck: true });
 
   // Check if desktop (lg breakpoint = 1024px)
-  const isDesktop =
-    typeof window !== 'undefined' && window.innerWidth >= 1024;
+  const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 1024;
 
   // UI state - on mobile, collapse sections by default to save space
   const [showAcknowledgment, setShowAcknowledgment] = useState(false);

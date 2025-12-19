@@ -21,6 +21,8 @@ export const enUS = {
     cancel: 'Cancel',
     confirm: 'Confirm',
     close: 'Close',
+    minimize: 'Minimize',
+    expand: 'Expand',
     search: 'Search',
     filter: 'Filter',
     apply: 'Apply',

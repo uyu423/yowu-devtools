@@ -23,6 +23,8 @@ export const koKR = {
     cancel: '취소',
     confirm: '확인',
     close: '닫기',
+    minimize: '최소화',
+    expand: '확장',
     search: '검색',
     filter: '필터',
     apply: '적용',

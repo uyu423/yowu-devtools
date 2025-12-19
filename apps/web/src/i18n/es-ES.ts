@@ -23,6 +23,8 @@ export const esES = {
     cancel: 'Cancelar',
     confirm: 'Confirmar',
     close: 'Cerrar',
+    minimize: 'Minimizar',
+    expand: 'Expandir',
     search: 'Buscar',
     filter: 'Filtrar',
     apply: 'Aplicar',
