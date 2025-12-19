@@ -3,11 +3,11 @@
  */
 
 import React from 'react';
-import { Hash, Clock, AlertTriangle, HelpCircle, Zap } from 'lucide-react';
+import { Hash, Clock, AlertTriangle, HelpCircle, Zap, FileText, Gauge, Download } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { useI18n } from '@/hooks/useI18nHooks';
-import type { LoadMode, RateLimit } from '../types';
+import type { BodyHandlingMode, LoadMode, RateLimit } from '../types';
 import { HARD_LIMITS, SOFT_LIMITS, getMaxConcurrency, getConcurrencyWarningThreshold } from '../types';
 
 interface LoadModeFormProps {
@@ -16,11 +16,13 @@ interface LoadModeFormProps {
   loadMode: LoadMode;
   rateLimit: RateLimit;
   timeoutMs: number;
+  bodyHandling: BodyHandlingMode;
   onConcurrencyChange: (value: number) => void;
   onHttp2Change: (enabled: boolean) => void;
   onLoadModeChange: (mode: LoadMode) => void;
   onRateLimitChange: (limit: RateLimit) => void;
   onTimeoutChange: (ms: number) => void;
+  onBodyHandlingChange: (mode: BodyHandlingMode) => void;
   disabled?: boolean;
 }
 
@@ -30,11 +32,13 @@ export const LoadModeForm: React.FC<LoadModeFormProps> = ({
   loadMode,
   rateLimit,
   timeoutMs,
+  bodyHandling,
   onConcurrencyChange,
   onHttp2Change,
   onLoadModeChange,
   onRateLimitChange,
   onTimeoutChange,
+  onBodyHandlingChange,
   disabled,
 }) => {
   const { t } = useI18n();
@@ -386,6 +390,73 @@ export const LoadModeForm: React.FC<LoadModeFormProps> = ({
             {t('tool.apiBurstTest.seconds')}
           </span>
         </div>
+      </div>
+
+      {/* Body Handling Mode */}
+      <div>
+        <div className="flex items-center gap-2 mb-2">
+          <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            {t('tool.apiBurstTest.bodyHandling.label')}
+          </label>
+          <Tooltip content={t('tool.apiBurstTest.tooltip.bodyHandling')} position="right" nowrap={false}>
+            <HelpCircle className="w-3.5 h-3.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-help" />
+          </Tooltip>
+        </div>
+        <div className="flex gap-2">
+          <Tooltip content={t('tool.apiBurstTest.tooltip.bodyCancel')}>
+            <button
+              onClick={() => onBodyHandlingChange('cancel')}
+              disabled={disabled}
+              className={cn(
+                'flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg',
+                'transition-colors',
+                bodyHandling === 'cancel'
+                  ? 'bg-emerald-600 text-white'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+              )}
+            >
+              <Gauge className="w-3.5 h-3.5" />
+              {t('tool.apiBurstTest.bodyHandling.cancel')}
+            </button>
+          </Tooltip>
+          <Tooltip content={t('tool.apiBurstTest.tooltip.bodyStream')}>
+            <button
+              onClick={() => onBodyHandlingChange('stream')}
+              disabled={disabled}
+              className={cn(
+                'flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg',
+                'transition-colors',
+                bodyHandling === 'stream'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+              )}
+            >
+              <Download className="w-3.5 h-3.5" />
+              {t('tool.apiBurstTest.bodyHandling.stream')}
+            </button>
+          </Tooltip>
+          <Tooltip content={t('tool.apiBurstTest.tooltip.bodyFull')}>
+            <button
+              onClick={() => onBodyHandlingChange('full')}
+              disabled={disabled}
+              className={cn(
+                'flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg',
+                'transition-colors',
+                bodyHandling === 'full'
+                  ? 'bg-amber-600 text-white'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+              )}
+            >
+              <FileText className="w-3.5 h-3.5" />
+              {t('tool.apiBurstTest.bodyHandling.full')}
+            </button>
+          </Tooltip>
+        </div>
+        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          {bodyHandling === 'cancel' && t('tool.apiBurstTest.bodyHandling.cancelDesc')}
+          {bodyHandling === 'stream' && t('tool.apiBurstTest.bodyHandling.streamDesc')}
+          {bodyHandling === 'full' && t('tool.apiBurstTest.bodyHandling.fullDesc')}
+        </p>
       </div>
     </div>
   );

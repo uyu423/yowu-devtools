@@ -7,11 +7,13 @@
 
 import type {
   ApiBurstTestState,
+  BodyHandlingMode,
   BurstProgress,
   BurstTestResults,
   ErrorBreakdown,
   HistogramBucket,
   LatencyMetrics,
+  NetworkTimingInfo,
   RequestSample,
   TimeSeriesPoint,
 } from '../types';
@@ -191,6 +193,77 @@ function buildUrl(state: ApiBurstTestState): string {
 }
 
 /**
+ * Network timing data collected from Resource Timing API
+ */
+interface NetworkTimingSample {
+  protocol: string | null;
+  hasTimingAllowOrigin: boolean;
+  networkLatencyMs: number | null;
+  stalledMs: number | null;
+}
+
+/**
+ * Try to get network timing from Resource Timing API
+ */
+function getNetworkTiming(url: string): NetworkTimingSample | null {
+  if (typeof performance === 'undefined' || !performance.getEntriesByType) {
+    return null;
+  }
+
+  // Get recent resource timing entries for this URL
+  const entries = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
+  
+  // Find the most recent entry for this URL
+  const entry = entries
+    .filter(e => e.name === url || e.name.startsWith(url))
+    .pop();
+  
+  if (!entry) {
+    return null;
+  }
+
+  // Check if we have detailed timing (Timing-Allow-Origin was present)
+  // If responseStart is 0 for cross-origin, TAO wasn't present
+  const hasTimingAllowOrigin = entry.responseStart > 0 || entry.requestStart > 0;
+  
+  // Get protocol (h2, http/1.1, h3, etc.)
+  const protocol = entry.nextHopProtocol || null;
+  
+  // Calculate network latency (excluding browser queuing)
+  // This is requestStart to responseEnd
+  let networkLatencyMs: number | null = null;
+  let stalledMs: number | null = null;
+  
+  if (hasTimingAllowOrigin) {
+    // Stalled = fetchStart to requestStart (time waiting in browser queue)
+    if (entry.requestStart > 0) {
+      stalledMs = entry.requestStart - entry.fetchStart;
+    }
+    
+    // Network latency = requestStart to responseEnd (actual network time)
+    if (entry.requestStart > 0 && entry.responseEnd > 0) {
+      networkLatencyMs = entry.responseEnd - entry.requestStart;
+    }
+  }
+  
+  return {
+    protocol,
+    hasTimingAllowOrigin,
+    networkLatencyMs,
+    stalledMs,
+  };
+}
+
+/**
+ * Clear recent resource timing entries to avoid memory buildup
+ */
+function clearRecentResourceTimings(): void {
+  if (typeof performance !== 'undefined' && performance.clearResourceTimings) {
+    performance.clearResourceTimings();
+  }
+}
+
+/**
  * Execute a single request and return metrics
  */
 async function executeRequest(
@@ -198,17 +271,20 @@ async function executeRequest(
   options: RequestInit,
   timeoutMs: number,
   executor: RequestExecutor,
-  abortSignal: AbortSignal
+  abortSignal: AbortSignal,
+  bodyHandling: BodyHandlingMode = 'cancel'
 ): Promise<{
   latencyMs: number;
   status: number | null;
   errorType: keyof ErrorBreakdown | null;
   dataBytes: number;
+  networkTiming: NetworkTimingSample | null;
 }> {
   const startTime = performance.now();
   let status: number | null = null;
   let errorType: keyof ErrorBreakdown | null = null;
   let dataBytes = 0;
+  let networkTiming: NetworkTimingSample | null = null;
 
   try {
     if (abortSignal.aborted) {
@@ -229,13 +305,53 @@ async function executeRequest(
       errorType = httpError;
     }
 
-    // Read response body to get size (and ensure request completes)
-    try {
-      const text = await response.text();
-      dataBytes = new Blob([text]).size;
-    } catch {
-      // Body read error, ignore size
+    // Handle body based on bodyHandling mode
+    switch (bodyHandling) {
+      case 'cancel':
+        // Cancel body stream immediately for best performance
+        // This avoids downloading the response body entirely
+        if (response.body) {
+          try {
+            await response.body.cancel();
+          } catch {
+            // Ignore cancel errors
+          }
+        }
+        break;
+        
+      case 'stream':
+        // Read body as stream but don't decode
+        // This downloads the body but avoids text decoding overhead
+        if (response.body) {
+          try {
+            const reader = response.body.getReader();
+            let totalBytes = 0;
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              totalBytes += value?.length || 0;
+            }
+            dataBytes = totalBytes;
+          } catch {
+            // Stream read error, ignore size
+          }
+        }
+        break;
+        
+      case 'full':
+        // Read and decode full body (slowest, but gets accurate size)
+        try {
+          const text = await response.text();
+          dataBytes = new Blob([text]).size;
+        } catch {
+          // Body read error, ignore size
+        }
+        break;
     }
+    
+    // Try to get network timing from Resource Timing API
+    networkTiming = getNetworkTiming(url);
+    
   } catch (error) {
     const classified = classifyError(error, abortSignal.aborted);
     errorType = classified.type;
@@ -248,8 +364,12 @@ async function executeRequest(
     status,
     errorType,
     dataBytes,
+    networkTiming,
   };
 }
+
+// Progress update throttle interval in ms
+const PROGRESS_THROTTLE_MS = 100;
 
 /**
  * Run the burst test
@@ -285,12 +405,21 @@ export async function runBurstTest(config: BurstEngineConfig): Promise<BurstTest
   let failedRequests = 0;
   let totalDataBytes = 0;
   let peakRps = 0;
+  let inFlightRequests = 0;  // Track in-flight requests for effective concurrency
+
+  // Network timing collection
+  const networkTimingSamples: NetworkTimingSample[] = [];
+  let detectedProtocol: string | null = null;
+  let hasTimingAllowOrigin = false;
 
   // Time series collection (every second)
   const timeSeries: TimeSeriesPoint[] = [];
   let lastTimeSeriesUpdate = 0;
   let lastTimeSeriesRequests = 0;
   const recentLatencies: number[] = []; // For calculating avg latency per interval
+
+  // Progress throttling
+  let lastProgressUpdate = 0;
 
   // Determine test parameters
   const isRequestsMode = state.loadMode.type === 'requests';
@@ -303,6 +432,7 @@ export async function runBurstTest(config: BurstEngineConfig): Promise<BurstTest
     HARD_LIMITS.MIN_TIMEOUT_MS,
     Math.min(state.timeoutMs, HARD_LIMITS.MAX_TIMEOUT_MS)
   );
+  const bodyHandling = state.bodyHandling || 'cancel';
 
   // Setup rate limiter if enabled
   let rateLimiter: TokenBucket | null = null;
@@ -316,12 +446,23 @@ export async function runBurstTest(config: BurstEngineConfig): Promise<BurstTest
     rateLimiter = new TokenBucket(effectiveQps);
   }
 
+  // Clear resource timing entries before test
+  clearRecentResourceTimings();
+
   const startTime = performance.now();
   const startTimestamp = Date.now();
 
-  // Progress update function with time series collection
-  const updateProgress = (): void => {
-    const elapsedMs = performance.now() - startTime;
+  // Progress update function with throttling and time series collection
+  const updateProgress = (force: boolean = false): void => {
+    const now = performance.now();
+    const elapsedMs = now - startTime;
+    
+    // Throttle progress updates unless forced
+    if (!force && now - lastProgressUpdate < PROGRESS_THROTTLE_MS) {
+      return;
+    }
+    lastProgressUpdate = now;
+
     const currentRps = calculateRps(completedRequests, elapsedMs);
 
     // Track peak RPS
@@ -359,6 +500,7 @@ export async function runBurstTest(config: BurstEngineConfig): Promise<BurstTest
       durationMs: maxDurationMs,
       currentRps,
       isRunning: true,
+      effectiveConcurrency: inFlightRequests,
     });
   };
 
@@ -381,14 +523,20 @@ export async function runBurstTest(config: BurstEngineConfig): Promise<BurstTest
       // Check again after rate limit wait
       if (abortController.signal.aborted) break;
 
-      // Execute request
+      // Track in-flight requests
+      inFlightRequests++;
+
+      // Execute request with body handling mode
       const result = await executeRequest(
         url,
         requestOptions,
         timeoutMs,
         executor,
-        abortController.signal
+        abortController.signal,
+        bodyHandling
       );
+
+      inFlightRequests--;
 
       // Update metrics
       completedRequests++;
@@ -396,6 +544,21 @@ export async function runBurstTest(config: BurstEngineConfig): Promise<BurstTest
       latencyStats.add(result.latencyMs);
       totalDataBytes += result.dataBytes;
       recentLatencies.push(result.latencyMs); // For time series avg latency
+
+      // Collect network timing samples (limited)
+      if (result.networkTiming && networkTimingSamples.length < 100) {
+        networkTimingSamples.push(result.networkTiming);
+        
+        // Update detected protocol (first non-null wins)
+        if (result.networkTiming.protocol && !detectedProtocol) {
+          detectedProtocol = result.networkTiming.protocol;
+        }
+        
+        // Update TAO status
+        if (result.networkTiming.hasTimingAllowOrigin) {
+          hasTimingAllowOrigin = true;
+        }
+      }
 
       if (result.status !== null) {
         statusCodes[result.status] = (statusCodes[result.status] || 0) + 1;
@@ -422,7 +585,7 @@ export async function runBurstTest(config: BurstEngineConfig): Promise<BurstTest
         });
       }
 
-      // Update progress
+      // Update progress (throttled)
       updateProgress();
     }
   };
@@ -434,6 +597,9 @@ export async function runBurstTest(config: BurstEngineConfig): Promise<BurstTest
 
   // Wait for all workers to complete
   await Promise.all(workers);
+
+  // Force final progress update
+  updateProgress(true);
 
   const totalTimeMs = performance.now() - startTime;
   const endTimestamp = Date.now();
@@ -449,6 +615,16 @@ export async function runBurstTest(config: BurstEngineConfig): Promise<BurstTest
     peakRps = rps;
   }
 
+  // Calculate network timing summary
+  const networkTiming: NetworkTimingInfo = calculateNetworkTimingSummary(
+    networkTimingSamples,
+    detectedProtocol,
+    hasTimingAllowOrigin
+  );
+
+  // Clear resource timing entries after test
+  clearRecentResourceTimings();
+
   return {
     totalRequests: completedRequests,
     successRequests,
@@ -461,10 +637,55 @@ export async function runBurstTest(config: BurstEngineConfig): Promise<BurstTest
     startTime: startTimestamp,
     endTime: endTimestamp,
     latency,
+    networkTiming,
     histogramBuckets,
     timeSeries,
     statusCodes,
     errors,
+  };
+}
+
+/**
+ * Calculate network timing summary from samples
+ */
+function calculateNetworkTimingSummary(
+  samples: NetworkTimingSample[],
+  detectedProtocol: string | null,
+  hasTimingAllowOrigin: boolean
+): NetworkTimingInfo {
+  if (samples.length === 0) {
+    return {
+      protocol: detectedProtocol,
+      hasTimingAllowOrigin,
+      avgNetworkLatencyMs: null,
+      avgStalledMs: null,
+      sampleCount: 0,
+    };
+  }
+
+  // Calculate average network latency from samples with valid data
+  const validNetworkLatencies = samples
+    .map(s => s.networkLatencyMs)
+    .filter((v): v is number => v !== null);
+  
+  const validStalledTimes = samples
+    .map(s => s.stalledMs)
+    .filter((v): v is number => v !== null);
+
+  const avgNetworkLatencyMs = validNetworkLatencies.length > 0
+    ? validNetworkLatencies.reduce((a, b) => a + b, 0) / validNetworkLatencies.length
+    : null;
+
+  const avgStalledMs = validStalledTimes.length > 0
+    ? validStalledTimes.reduce((a, b) => a + b, 0) / validStalledTimes.length
+    : null;
+
+  return {
+    protocol: detectedProtocol,
+    hasTimingAllowOrigin,
+    avgNetworkLatencyMs,
+    avgStalledMs,
+    sampleCount: samples.length,
   };
 }
 

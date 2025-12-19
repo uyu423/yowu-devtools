@@ -190,6 +190,9 @@ export default defineConfig({
         ],
       },
       workbox: {
+        // Allow larger files to be precached (default is 2MB)
+        // Our main bundle is slightly over 2MB due to i18n and multiple tool implementations
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024, // 3MB
         // Network First 전략: 최신 버전 우선, 실패 시 캐시 사용
         runtimeCaching: [
           // version.json은 항상 네트워크에서 가져옴 (캐시 안함)

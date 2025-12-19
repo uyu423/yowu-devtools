@@ -17,6 +17,12 @@ export type LoadModeType = 'requests' | 'duration';
 // Rate limit type
 export type RateLimitType = 'none' | 'global' | 'perWorker';
 
+// Body handling mode for performance optimization
+// - 'cancel': Cancel body stream immediately (fastest, no body data)
+// - 'stream': Read body as stream but don't decode (medium)
+// - 'full': Read and decode full body (slowest, required for body size metrics)
+export type BodyHandlingMode = 'cancel' | 'stream' | 'full';
+
 // Header item for request configuration
 export interface BurstHeaderItem {
   id: string;
@@ -81,6 +87,7 @@ export interface ApiBurstTestState {
   loadMode: LoadMode;
   rateLimit: RateLimit;
   timeoutMs: number;
+  bodyHandling: BodyHandlingMode;  // How to handle response body (performance optimization)
   
   // Privacy settings
   sharePrivacy: SharePrivacy;
@@ -98,6 +105,20 @@ export interface LatencyMetrics {
   p90: number;
   p95: number;
   p99: number;
+}
+
+// Network timing information from Resource Timing API
+export interface NetworkTimingInfo {
+  // Detected protocol (h2, h3, http/1.1, or null if not available)
+  protocol: string | null;
+  // Whether Timing-Allow-Origin was present (needed for accurate cross-origin timing)
+  hasTimingAllowOrigin: boolean;
+  // Average network latency (excluding browser queuing) when available
+  avgNetworkLatencyMs: number | null;
+  // Average stalled/queuing time when available
+  avgStalledMs: number | null;
+  // Sample count for network timing
+  sampleCount: number;
 }
 
 // Error breakdown by type
@@ -140,6 +161,9 @@ export interface BurstTestResults {
   // Latency
   latency: LatencyMetrics;
   
+  // Network timing (from Resource Timing API when available)
+  networkTiming: NetworkTimingInfo;
+  
   // Histogram data for chart (buckets of latency ranges)
   histogramBuckets: HistogramBucket[];
   
@@ -167,6 +191,15 @@ export interface BurstProgress {
   durationMs: number;     // For 'duration' mode
   currentRps: number;
   isRunning: boolean;
+  // Current effective concurrency (in-flight requests)
+  effectiveConcurrency: number;
+}
+
+// Preflight warning types
+export interface PreflightWarning {
+  type: 'authorization' | 'custom-header' | 'content-type' | 'method';
+  message: string;
+  header?: string;
 }
 
 // Per-request sample (limited storage for memory efficiency)
@@ -228,12 +261,104 @@ export const DEFAULT_BURST_STATE: ApiBurstTestState = {
   loadMode: { type: 'requests', n: 100, durationMs: 10000 },
   rateLimit: { type: 'none', qps: 100 },
   timeoutMs: 10000,
+  bodyHandling: 'cancel',  // Default to cancel for best performance
   sharePrivacy: { includeHeaders: false, includeAuth: false },
   acknowledged: false,
 };
 
 // Methods that don't support body
 export const NO_BODY_METHODS: BurstHttpMethod[] = ['GET', 'HEAD'];
+
+// Simple request headers that don't trigger preflight
+// https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#simple_requests
+const SIMPLE_HEADERS = new Set([
+  'accept',
+  'accept-language',
+  'content-language',
+  'content-type',
+  // Range is simple only with specific conditions, ignoring for simplicity
+]);
+
+// Simple content-type values that don't trigger preflight
+const SIMPLE_CONTENT_TYPES = new Set([
+  'application/x-www-form-urlencoded',
+  'multipart/form-data',
+  'text/plain',
+]);
+
+// Simple methods that don't trigger preflight
+const SIMPLE_METHODS = new Set(['GET', 'HEAD', 'POST']);
+
+/**
+ * Detect headers/settings that will trigger CORS preflight
+ * Returns warnings for each preflight-triggering element
+ */
+export function detectPreflightTriggers(state: ApiBurstTestState): PreflightWarning[] {
+  const warnings: PreflightWarning[] = [];
+  
+  // Check method
+  if (!SIMPLE_METHODS.has(state.method)) {
+    warnings.push({
+      type: 'method',
+      message: `HTTP method "${state.method}" triggers preflight`,
+    });
+  }
+  
+  // Check headers
+  const enabledHeaders = state.headers.filter(h => h.enabled && h.key);
+  
+  for (const header of enabledHeaders) {
+    const headerLower = header.key.toLowerCase();
+    
+    // Check for Authorization header
+    if (headerLower === 'authorization') {
+      warnings.push({
+        type: 'authorization',
+        message: 'Authorization header triggers preflight',
+        header: header.key,
+      });
+      continue;
+    }
+    
+    // Check for non-simple headers
+    if (!SIMPLE_HEADERS.has(headerLower)) {
+      warnings.push({
+        type: 'custom-header',
+        message: `Custom header "${header.key}" triggers preflight`,
+        header: header.key,
+      });
+      continue;
+    }
+    
+    // Check Content-Type value
+    if (headerLower === 'content-type') {
+      const contentType = header.value.toLowerCase().split(';')[0].trim();
+      if (!SIMPLE_CONTENT_TYPES.has(contentType)) {
+        warnings.push({
+          type: 'content-type',
+          message: `Content-Type "${header.value}" triggers preflight`,
+          header: header.key,
+        });
+      }
+    }
+  }
+  
+  // Check body mode (implicit Content-Type)
+  if (state.body.text.trim() && !NO_BODY_METHODS.includes(state.method)) {
+    const hasExplicitContentType = enabledHeaders.some(
+      h => h.key.toLowerCase() === 'content-type'
+    );
+    
+    if (!hasExplicitContentType && state.body.mode === 'json') {
+      warnings.push({
+        type: 'content-type',
+        message: 'JSON body implies "application/json" Content-Type which triggers preflight',
+      });
+    }
+  }
+  
+  return warnings;
+}
 
 // Helper: Create a new header item
 export function createBurstHeaderItem(key = '', value = ''): BurstHeaderItem {

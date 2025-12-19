@@ -16,10 +16,13 @@ import {
   LatencyDistribution,
   LatencyHistogram,
   LoadModeForm,
+  NetworkTimingInfo,
   ParamsEditor,
+  PreflightWarning,
   RunControlBar,
   StatusCodeChart,
   SummaryCards,
+  TabVisibilityWarning,
   TimeSeriesChart,
   UrlMethodInput,
   WarningBanner,
@@ -328,6 +331,7 @@ const ApiBurstTestTool: React.FC = () => {
       durationMs: state.loadMode.durationMs,
       currentRps: 0,
       isRunning: true,
+      effectiveConcurrency: 0,
     });
     setResults(null);
 
@@ -442,6 +446,14 @@ const ApiBurstTestTool: React.FC = () => {
       {/* Warning Banner - Always visible */}
       <WarningBanner className="mb-4" />
 
+      {/* Tab Visibility Warning - Only visible when test is running and tab is hidden */}
+      <TabVisibilityWarning isRunning={isRunning} className="mb-4" />
+
+      {/* Preflight Warning - Shows when settings trigger CORS preflight */}
+      {state.url && !isRunning && (
+        <PreflightWarning state={state} className="mb-4" />
+      )}
+
       {/* Run Control Bar with Extension Status */}
       <RunControlBar
         isRunning={isRunning}
@@ -511,6 +523,7 @@ const ApiBurstTestTool: React.FC = () => {
                   loadMode={state.loadMode}
                   rateLimit={state.rateLimit}
                   timeoutMs={state.timeoutMs}
+                  bodyHandling={state.bodyHandling}
                   onConcurrencyChange={handleConcurrencyChange}
                   onHttp2Change={(enabled) =>
                     updateState({ useHttp2: enabled })
@@ -518,6 +531,9 @@ const ApiBurstTestTool: React.FC = () => {
                   onLoadModeChange={handleLoadModeChange}
                   onRateLimitChange={handleRateLimitChange}
                   onTimeoutChange={handleTimeoutChange}
+                  onBodyHandlingChange={(bodyHandling) =>
+                    updateState({ bodyHandling })
+                  }
                   disabled={isRunning}
                 />
               </div>
@@ -699,6 +715,12 @@ const ApiBurstTestTool: React.FC = () => {
                 ) : (
                   <div className="space-y-4">
                     <DetailedSummary results={results} />
+
+                    {/* Network Timing Info */}
+                    <NetworkTimingInfo
+                      networkTiming={results.networkTiming}
+                      toolLatency={results.latency}
+                    />
 
                     {/* Time series graphs */}
                     {results.timeSeries.length > 0 && (

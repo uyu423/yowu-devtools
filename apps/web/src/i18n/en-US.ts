@@ -1590,6 +1590,23 @@ export const enUS = {
         p99: '99th percentile. Only 1% of requests took longer than this. Captures tail latency.',
         rps: 'Requests per second. Measures throughput - how many requests completed each second.',
         errorRate: 'Percentage of requests that failed (timeouts, network errors, HTTP 4xx/5xx).',
+        bodyHandling: 'How to handle response body. Affects performance and memory usage.',
+        bodyCancel: 'Cancel body stream immediately (fastest). No body data captured. Best for latency testing.',
+        bodyStream: 'Read body as stream (medium). Captures size but skips text decoding.',
+        bodyFull: 'Read and decode full body (slowest). Required for content validation.',
+        networkTiming: 'Network timing from Resource Timing API. May be unavailable for cross-origin requests without Timing-Allow-Origin header.',
+        protocol: 'Detected HTTP protocol (h2, http/1.1, h3). Requires Timing-Allow-Origin header for cross-origin.',
+        stalledTime: 'Time spent waiting in browser queue before request was sent. High values indicate connection pool saturation.',
+      },
+      // Body Handling Mode
+      bodyHandling: {
+        label: 'Response Body',
+        cancel: 'Skip',
+        stream: 'Stream',
+        full: 'Full',
+        cancelDesc: 'Skip body download entirely (fastest, lowest memory)',
+        streamDesc: 'Read body size without text decoding (medium)',
+        fullDesc: 'Read and decode full body (slowest, most accurate size)',
       },
       // Headers
       headers: 'Headers',
@@ -1696,6 +1713,31 @@ export const enUS = {
         jsOverhead: 'JavaScript runtime overhead affects throughput vs native tools (hey, wrk)',
         notProduction: 'Not suitable for production load testing - use CLI tools for accurate results',
         performanceGap: '⚠️ Results may differ 5x or more from CLI tools (hey, wrk, ab) - use for quick checks only',
+        // Tab visibility warning
+        tabHidden: 'Test paused - tab is hidden',
+        tabHiddenDesc: 'Browser throttles background tabs. Keep this tab visible for accurate results.',
+        // Preflight warnings
+        preflightWarning: 'CORS Preflight Warning',
+        preflightDesc: 'These settings will trigger OPTIONS preflight requests, doubling latency:',
+        preflightMethod: 'HTTP method "{method}" triggers preflight',
+        preflightAuth: 'Authorization header triggers preflight',
+        preflightHeader: 'Custom header "{header}" triggers preflight',
+        preflightContentType: 'Content-Type "{type}" triggers preflight',
+        preflightTip: 'Tip: Use simple requests (GET/POST with text/plain) to avoid preflight, or use the Chrome Extension for CORS-free requests.',
+      },
+      // Network timing info
+      networkTiming: {
+        title: 'Network Timing',
+        protocol: 'Protocol',
+        protocolUnknown: 'Unknown',
+        protocolNote: '(requires Timing-Allow-Origin)',
+        avgNetworkLatency: 'Avg Network Latency',
+        avgStalled: 'Avg Queued Time',
+        sampleCount: 'Timing Samples',
+        noData: 'Network timing unavailable',
+        noDataNote: 'Cross-origin requests require Timing-Allow-Origin header',
+        toolLatency: 'Tool Latency',
+        toolLatencyNote: '(includes browser queue time)',
       },
       // Acknowledgment modal
       acknowledgment: {
