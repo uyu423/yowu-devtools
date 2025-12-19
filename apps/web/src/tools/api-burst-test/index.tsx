@@ -168,34 +168,63 @@ const ApiBurstTestTool: React.FC = () => {
 
     // Return extension-based executor
     return async (url: string, options: RequestInit, timeoutMs: number): Promise<Response> => {
-      const headers: Record<string, string> = {};
+      // Convert headers from Record to Array format expected by extension
+      const headersArray: Array<{ key: string; value: string; enabled: boolean }> = [];
       if (options.headers) {
         const h = options.headers as Record<string, string>;
         Object.entries(h).forEach(([key, value]) => {
-          headers[key] = value;
+          headersArray.push({ key, value, enabled: true });
         });
       }
 
-      try {
-        const responseSpec = await executeRequest({
-          method: (options.method || 'GET') as 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS',
-          url,
-          headers,
-          body: options.body ? String(options.body) : undefined,
-          timeout: timeoutMs,
-        });
+      // Build request body in RequestBody format
+      type RequestBody =
+        | { kind: 'none' }
+        | { kind: 'text'; text: string }
+        | { kind: 'json'; text: string };
 
-        // Create a Response-like object from extension response
-        const body = responseSpec.body || '';
-        return new Response(body, {
-          status: responseSpec.status,
-          statusText: responseSpec.statusText,
-          headers: new Headers(responseSpec.headers),
-        });
-      } catch (error) {
-        // Re-throw to let engine classify the error
-        throw error;
+      let requestBody: RequestBody = { kind: 'none' };
+      if (options.body) {
+        const bodyStr = String(options.body);
+        // Check if it's JSON
+        const contentType = headersArray.find(h => h.key.toLowerCase() === 'content-type')?.value || '';
+        if (contentType.includes('application/json')) {
+          requestBody = { kind: 'json', text: bodyStr };
+        } else {
+          requestBody = { kind: 'text', text: bodyStr };
+        }
       }
+
+      const responseSpec = await executeRequest({
+        id: crypto.randomUUID(),
+        method: (options.method || 'GET') as 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS',
+        url,
+        headers: headersArray,
+        body: requestBody,
+        options: {
+          timeoutMs,
+          redirect: 'follow',
+          credentials: 'omit',
+        },
+      });
+
+      // Create a Response-like object from extension response
+      // responseSpec.body is { kind: 'text' | 'base64', data: string } or undefined
+      let bodyData = '';
+      if (responseSpec.body) {
+        if (responseSpec.body.kind === 'base64') {
+          // Decode base64
+          bodyData = atob(responseSpec.body.data);
+        } else {
+          bodyData = responseSpec.body.data;
+        }
+      }
+
+      return new Response(bodyData, {
+        status: responseSpec.status,
+        statusText: responseSpec.statusText,
+        headers: new Headers(responseSpec.headers || {}),
+      });
     };
   }, [extensionStatus, executeRequest]);
 
