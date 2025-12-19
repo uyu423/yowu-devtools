@@ -1400,7 +1400,7 @@ export const zhCN = {
     },
     apiBurstTest: {
       title: 'API Burst Test',
-      description: '带有延迟分布和RPS指标的HTTP负载测试',
+      description: '简单的基于浏览器的负载测试工具',
       run: '运行',
       stop: '停止',
       reset: '重置',
@@ -1540,6 +1540,7 @@ export const zhCN = {
         maxConnections: 'HTTP/1.1: 最多{max}个连接 | HTTP/2模式: 最多{maxHttp2}个（需服务器支持）',
         jsOverhead: 'JavaScript运行时开销导致吞吐量低于原生工具（hey, wrk）',
         notProduction: '不适用于生产负载测试 - 准确结果请使用CLI工具',
+        performanceGap: '⚠️ 与CLI工具（hey, wrk, ab）相比可能有5倍以上性能差异 - 仅用于快速检查',
       },
       acknowledgment: {
         title: '需要确认',

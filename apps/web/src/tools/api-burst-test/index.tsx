@@ -122,8 +122,11 @@ const ApiBurstTestTool: React.FC = () => {
   });
 
   // Chrome extension status
-  const { status: extensionStatus, checkConnection: checkExtension, executeRequest } =
-    useExtension({ autoCheck: true });
+  const {
+    status: extensionStatus,
+    checkConnection: checkExtension,
+    executeRequest,
+  } = useExtension({ autoCheck: true });
 
   // Check if desktop (lg breakpoint = 1024px)
   const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 1024;
@@ -150,7 +153,10 @@ const ApiBurstTestTool: React.FC = () => {
     if (state.url.trim() === '') {
       return null; // URL empty is handled by disabling button
     }
-    if (state.loadMode.type === 'requests' && state.concurrency > state.loadMode.n) {
+    if (
+      state.loadMode.type === 'requests' &&
+      state.concurrency > state.loadMode.n
+    ) {
       return t('tool.apiBurstTest.error.concurrencyExceedsRequests');
     }
     return null;
@@ -169,9 +175,17 @@ const ApiBurstTestTool: React.FC = () => {
     }
 
     // Return extension-based executor
-    return async (url: string, options: RequestInit, timeoutMs: number): Promise<Response> => {
+    return async (
+      url: string,
+      options: RequestInit,
+      timeoutMs: number
+    ): Promise<Response> => {
       // Convert headers from Record to Array format expected by extension
-      const headersArray: Array<{ key: string; value: string; enabled: boolean }> = [];
+      const headersArray: Array<{
+        key: string;
+        value: string;
+        enabled: boolean;
+      }> = [];
       if (options.headers) {
         const h = options.headers as Record<string, string>;
         Object.entries(h).forEach(([key, value]) => {
@@ -189,7 +203,9 @@ const ApiBurstTestTool: React.FC = () => {
       if (options.body) {
         const bodyStr = String(options.body);
         // Check if it's JSON
-        const contentType = headersArray.find(h => h.key.toLowerCase() === 'content-type')?.value || '';
+        const contentType =
+          headersArray.find((h) => h.key.toLowerCase() === 'content-type')
+            ?.value || '';
         if (contentType.includes('application/json')) {
           requestBody = { kind: 'json', text: bodyStr };
         } else {
@@ -199,7 +215,14 @@ const ApiBurstTestTool: React.FC = () => {
 
       const responseSpec = await executeRequest({
         id: crypto.randomUUID(),
-        method: (options.method || 'GET') as 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS',
+        method: (options.method || 'GET') as
+          | 'GET'
+          | 'POST'
+          | 'PUT'
+          | 'DELETE'
+          | 'PATCH'
+          | 'HEAD'
+          | 'OPTIONS',
         url,
         headers: headersArray,
         body: requestBody,
@@ -393,7 +416,8 @@ const ApiBurstTestTool: React.FC = () => {
       if (isRunning) {
         e.preventDefault();
         // Modern browsers ignore custom messages, but this triggers the dialog
-        e.returnValue = 'Test is still running. Are you sure you want to leave?';
+        e.returnValue =
+          'Test is still running. Are you sure you want to leave?';
         return e.returnValue;
       }
     };
@@ -411,6 +435,7 @@ const ApiBurstTestTool: React.FC = () => {
           description={t('tool.apiBurstTest.description')}
           onReset={handleReset}
           onShare={handleShare}
+          beta
         />
       </div>
 
@@ -425,7 +450,9 @@ const ApiBurstTestTool: React.FC = () => {
         loadMode={state.loadMode}
         extensionStatus={extensionStatus}
         includeCookies={state.includeCookies}
-        onIncludeCookiesChange={(value) => updateState({ includeCookies: value })}
+        onIncludeCookiesChange={(value) =>
+          updateState({ includeCookies: value })
+        }
         onRun={handleRun}
         onStop={handleStop}
         onExtensionRetry={checkExtension}
@@ -485,7 +512,9 @@ const ApiBurstTestTool: React.FC = () => {
                   rateLimit={state.rateLimit}
                   timeoutMs={state.timeoutMs}
                   onConcurrencyChange={handleConcurrencyChange}
-                  onHttp2Change={(enabled) => updateState({ useHttp2: enabled })}
+                  onHttp2Change={(enabled) =>
+                    updateState({ useHttp2: enabled })
+                  }
                   onLoadModeChange={handleLoadModeChange}
                   onRateLimitChange={handleRateLimitChange}
                   onTimeoutChange={handleTimeoutChange}
@@ -670,15 +699,21 @@ const ApiBurstTestTool: React.FC = () => {
                 ) : (
                   <div className="space-y-4">
                     <DetailedSummary results={results} />
-                    
+
                     {/* Time series graphs */}
                     {results.timeSeries.length > 0 && (
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                        <TimeSeriesChart data={results.timeSeries} metric="rps" />
-                        <TimeSeriesChart data={results.timeSeries} metric="latency" />
+                        <TimeSeriesChart
+                          data={results.timeSeries}
+                          metric="rps"
+                        />
+                        <TimeSeriesChart
+                          data={results.timeSeries}
+                          metric="latency"
+                        />
                       </div>
                     )}
-                    
+
                     <LatencyDistribution latency={results.latency} />
                     <ErrorsTable
                       errors={results.errors}
@@ -743,7 +778,7 @@ export const apiBurstTestTool: ToolDefinition<ApiBurstTestState> = {
     'http',
   ],
   category: 'tester',
-  beta: false,
+  beta: true,
   defaultState: DEFAULT_BURST_STATE,
   Component: ApiBurstTestTool,
 };

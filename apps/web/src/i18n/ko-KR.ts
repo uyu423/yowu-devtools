@@ -1492,7 +1492,7 @@ export const koKR = {
     },
     apiBurstTest: {
       title: 'API Burst Test',
-      description: '지연시간 분포와 RPS 메트릭을 포함한 HTTP 부하 테스트',
+      description: '간단한 브라우저 기반 부하 테스트 도구',
       run: '실행',
       stop: '중지',
       reset: '초기화',
@@ -1640,6 +1640,7 @@ export const koKR = {
         maxConnections: 'HTTP/1.1: 최대 {max}개 연결 | HTTP/2 모드: 최대 {maxHttp2}개 (서버 지원 필요)',
         jsOverhead: 'JavaScript 런타임 오버헤드로 네이티브 도구(hey, wrk) 대비 처리량 저하',
         notProduction: '프로덕션 부하 테스트에 부적합 - 정확한 결과는 CLI 도구 사용 권장',
+        performanceGap: '⚠️ CLI 도구(hey, wrk, ab) 대비 5배 이상 성능 차이 - 간단한 확인 용도로만 사용',
       },
       acknowledgment: {
         title: '확인 필요',

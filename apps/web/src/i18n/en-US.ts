@@ -1524,7 +1524,7 @@ export const enUS = {
     },
     apiBurstTest: {
       title: 'API Burst Test',
-      description: 'HTTP load testing with latency distribution and RPS metrics',
+      description: 'Simple browser-based load testing for quick API checks',
       // Controls
       run: 'Run',
       stop: 'Stop',
@@ -1695,6 +1695,7 @@ export const enUS = {
         maxConnections: 'HTTP/1.1: max {max} connections | HTTP/2 mode: up to {maxHttp2} (requires server support)',
         jsOverhead: 'JavaScript runtime overhead affects throughput vs native tools (hey, wrk)',
         notProduction: 'Not suitable for production load testing - use CLI tools for accurate results',
+        performanceGap: '⚠️ Results may differ 5x or more from CLI tools (hey, wrk, ab) - use for quick checks only',
       },
       // Acknowledgment modal
       acknowledgment: {

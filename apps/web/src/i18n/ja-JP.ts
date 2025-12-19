@@ -1501,7 +1501,7 @@ export const jaJP = {
     },
     apiBurstTest: {
       title: 'API Burst Test',
-      description: 'レイテンシ分布とRPSメトリクスによるHTTP負荷テスト',
+      description: 'シンプルなブラウザベース負荷テストツール',
       run: '実行',
       stop: '停止',
       reset: 'リセット',
@@ -1641,6 +1641,7 @@ export const jaJP = {
         maxConnections: 'HTTP/1.1: 最大{max}接続 | HTTP/2モード: 最大{maxHttp2}（サーバーサポート必要）',
         jsOverhead: 'JavaScriptランタイムのオーバーヘッドにより、ネイティブツール（hey, wrk）と比較してスループットが低下',
         notProduction: '本番負荷テストには不向き - 正確な結果にはCLIツールを使用',
+        performanceGap: '⚠️ CLIツール（hey, wrk, ab）と比較して5倍以上の性能差 - 簡易確認のみに使用',
       },
       acknowledgment: {
         title: '確認が必要',

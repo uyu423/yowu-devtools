@@ -1556,7 +1556,7 @@ export const esES = {
     },
     apiBurstTest: {
       title: 'API Burst Test',
-      description: 'Prueba de carga HTTP con distribución de latencia y métricas RPS',
+      description: 'Herramienta simple de pruebas de carga basada en navegador',
       run: 'Ejecutar',
       stop: 'Detener',
       reset: 'Reiniciar',
@@ -1696,6 +1696,7 @@ export const esES = {
         maxConnections: 'HTTP/1.1: máx {max} conexiones | Modo HTTP/2: hasta {maxHttp2} (requiere soporte del servidor)',
         jsOverhead: 'Sobrecarga del runtime de JavaScript reduce el rendimiento vs herramientas nativas (hey, wrk)',
         notProduction: 'No apto para pruebas de carga en producción - usar herramientas CLI para resultados precisos',
+        performanceGap: '⚠️ Puede haber más de 5x diferencia vs CLI (hey, wrk, ab) - solo para verificaciones rápidas',
       },
       acknowledgment: {
         title: 'Confirmación requerida',
