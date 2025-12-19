@@ -1582,6 +1582,16 @@ export const koKR = {
         avg: '평균',
         min: '최소',
         max: '최대',
+        // Detailed summary
+        detailedSummary: '테스트 요약',
+        totalTime: '총 소요 시간',
+        fastest: '최단',
+        slowest: '최장',
+        average: '평균',
+        requestsPerSec: '초당 요청',
+        totalData: '전송 데이터',
+        sizePerRequest: '요청당 크기',
+        successFailure: '성공 / 실패',
       },
       errors: {
         type: '에러 유형',

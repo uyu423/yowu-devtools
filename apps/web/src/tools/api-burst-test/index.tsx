@@ -9,6 +9,7 @@
 import {
   AcknowledgmentModal,
   BodyEditor,
+  DetailedSummary,
   ErrorsTable,
   ExportButtons,
   HeadersEditor,
@@ -292,14 +293,8 @@ const ApiBurstTestTool: React.FC = () => {
     [updateState]
   );
 
-  // Run test
-  const handleRun = useCallback(async () => {
-    // Check acknowledgment first
-    if (!sessionAcknowledged) {
-      setShowAcknowledgment(true);
-      return;
-    }
-
+  // Execute test (internal function without acknowledgment check)
+  const executeTest = useCallback(async () => {
     setIsRunning(true);
     setProgress({
       completedRequests: 0,
@@ -336,7 +331,17 @@ const ApiBurstTestTool: React.FC = () => {
       setProgress(null);
       abortControllerRef.current = null;
     }
-  }, [state, sessionAcknowledged, createRequestExecutor]);
+  }, [state, createRequestExecutor]);
+
+  // Run test (with acknowledgment check)
+  const handleRun = useCallback(() => {
+    // Check acknowledgment first
+    if (!sessionAcknowledged) {
+      setShowAcknowledgment(true);
+      return;
+    }
+    executeTest();
+  }, [sessionAcknowledged, executeTest]);
 
   // Stop test
   const handleStop = useCallback(() => {
@@ -356,9 +361,9 @@ const ApiBurstTestTool: React.FC = () => {
   const handleAcknowledgmentConfirm = useCallback(() => {
     setSessionAcknowledged(true);
     setShowAcknowledgment(false);
-    // Trigger run after acknowledgment
-    setTimeout(() => handleRun(), 100);
-  }, [handleRun]);
+    // Execute test directly (no need to check acknowledgment again)
+    executeTest();
+  }, [executeTest]);
 
   // Keyboard shortcut: Cmd/Ctrl + Enter to run
   useEffect(() => {
@@ -658,6 +663,7 @@ const ApiBurstTestTool: React.FC = () => {
                   </div>
                 ) : (
                   <div className="space-y-4">
+                    <DetailedSummary results={results} />
                     <LatencyDistribution latency={results.latency} />
                     <ErrorsTable
                       errors={results.errors}

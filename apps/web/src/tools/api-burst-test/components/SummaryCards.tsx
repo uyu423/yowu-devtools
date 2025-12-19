@@ -23,6 +23,17 @@ interface CardProps {
   tooltip?: string;
 }
 
+/**
+ * Get appropriate font size class based on value length
+ */
+const getFontSizeClass = (value: string): string => {
+  const len = value.length;
+  if (len <= 5) return 'text-2xl'; // Short values: normal size
+  if (len <= 8) return 'text-xl';  // Medium values: slightly smaller
+  if (len <= 12) return 'text-lg'; // Long values: smaller
+  return 'text-base'; // Very long values: smallest
+};
+
 const Card: React.FC<CardProps> = ({ icon: Icon, label, value, suffix, color = 'default', tooltip }) => {
   const colorClasses = {
     default: 'text-gray-900 dark:text-white',
@@ -30,30 +41,33 @@ const Card: React.FC<CardProps> = ({ icon: Icon, label, value, suffix, color = '
     error: 'text-red-600 dark:text-red-400',
   };
 
+  const fontSizeClass = getFontSizeClass(value);
+
   return (
     <div className={cn(
       'p-4 rounded-xl',
       'bg-white dark:bg-gray-800',
       'border border-gray-200 dark:border-gray-700',
-      'shadow-sm'
+      'shadow-sm',
+      'overflow-hidden'
     )}>
       <div className="flex items-center gap-2 mb-2">
-        <Icon className="w-4 h-4 text-gray-400" />
-        <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+        <Icon className="w-4 h-4 text-gray-400 shrink-0" />
+        <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider truncate">
           {label}
         </span>
         {tooltip && (
           <Tooltip content={tooltip}>
-            <HelpCircle className="w-3 h-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-help" />
+            <HelpCircle className="w-3 h-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-help shrink-0" />
           </Tooltip>
         )}
       </div>
-      <div className="flex items-baseline gap-1">
-        <span className={cn('text-2xl font-bold', colorClasses[color])}>
+      <div className="flex items-baseline gap-1 min-w-0">
+        <span className={cn('font-bold truncate', fontSizeClass, colorClasses[color])}>
           {value}
         </span>
         {suffix && (
-          <span className="text-sm text-gray-500 dark:text-gray-400">
+          <span className="text-sm text-gray-500 dark:text-gray-400 shrink-0">
             {suffix}
           </span>
         )}

@@ -1583,6 +1583,16 @@ export const jaJP = {
         avg: '平均',
         min: '最小',
         max: '最大',
+        // Detailed summary
+        detailedSummary: 'テスト概要',
+        totalTime: '合計時間',
+        fastest: '最速',
+        slowest: '最遅',
+        average: '平均',
+        requestsPerSec: 'リクエスト/秒',
+        totalData: '合計データ',
+        sizePerRequest: 'リクエストあたりのサイズ',
+        successFailure: '成功 / 失敗',
       },
       errors: {
         type: 'エラータイプ',

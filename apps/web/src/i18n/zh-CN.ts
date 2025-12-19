@@ -1482,6 +1482,16 @@ export const zhCN = {
         avg: '平均',
         min: '最小',
         max: '最大',
+        // Detailed summary
+        detailedSummary: '测试摘要',
+        totalTime: '总时间',
+        fastest: '最快',
+        slowest: '最慢',
+        average: '平均',
+        requestsPerSec: '每秒请求数',
+        totalData: '总数据',
+        sizePerRequest: '每请求大小',
+        successFailure: '成功 / 失败',
       },
       errors: {
         type: '错误类型',

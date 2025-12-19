@@ -1627,6 +1627,16 @@ export const enUS = {
         avg: 'Average',
         min: 'Fastest',
         max: 'Slowest',
+        // Detailed summary
+        detailedSummary: 'Test Summary',
+        totalTime: 'Total Time',
+        fastest: 'Fastest',
+        slowest: 'Slowest',
+        average: 'Average',
+        requestsPerSec: 'Requests/sec',
+        totalData: 'Total Data',
+        sizePerRequest: 'Size/Request',
+        successFailure: 'Success / Failure',
       },
       // Errors
       errors: {

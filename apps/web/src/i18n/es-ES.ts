@@ -1638,6 +1638,16 @@ export const esES = {
         avg: 'Promedio',
         min: 'Mínimo',
         max: 'Máximo',
+        // Detailed summary
+        detailedSummary: 'Resumen de prueba',
+        totalTime: 'Tiempo total',
+        fastest: 'Más rápido',
+        slowest: 'Más lento',
+        average: 'Promedio',
+        requestsPerSec: 'Solicitudes/seg',
+        totalData: 'Datos totales',
+        sizePerRequest: 'Tamaño/solicitud',
+        successFailure: 'Éxito / Fracaso',
       },
       errors: {
         type: 'Tipo de error',
