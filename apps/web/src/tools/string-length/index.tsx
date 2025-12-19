@@ -338,7 +338,7 @@ const StringLengthTool: React.FC = () => {
 
       <div className="flex-1 flex flex-col gap-6">
         {/* Action Bar */}
-        <ActionBar className="flex-col items-start gap-4 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm sm:flex-row sm:items-center">
+        <ActionBar className="flex flex-wrap items-center gap-2 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 p-3 sm:p-4 shadow-sm">
           <input
             type="file"
             ref={fileInputRef}
@@ -347,26 +347,29 @@ const StringLengthTool: React.FC = () => {
             className="hidden"
           />
           <button
-            className="inline-flex items-center gap-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2.5 py-1.5 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             onClick={() => fileInputRef.current?.click()}
+            title={t('tool.stringLength.uploadFile')}
           >
-            <Upload className="h-4 w-4" />
+            <Upload className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             {t('tool.stringLength.uploadFile')}
           </button>
 
           <button
-            className="inline-flex items-center gap-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2.5 py-1.5 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             onClick={() => setIsUrlModalOpen(true)}
+            title={t('tool.stringLength.loadFromUrl')}
           >
-            <Globe className="h-4 w-4" />
+            <Globe className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             {t('tool.stringLength.loadFromUrl')}
           </button>
 
           <button
-            className="inline-flex items-center gap-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2.5 py-1.5 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             onClick={handleLoadSample}
+            title={t('tool.stringLength.loadSample')}
           >
-            <RefreshCw className="h-4 w-4" />
+            <RefreshCw className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             {t('tool.stringLength.loadSample')}
           </button>
         </ActionBar>

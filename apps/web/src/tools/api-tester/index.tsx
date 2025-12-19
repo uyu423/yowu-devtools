@@ -466,7 +466,7 @@ const ApiTesterTool: React.FC = () => {
 
           {/* Extension status, Include Cookies, and Copy as cURL */}
           <div className="flex flex-wrap items-center justify-between gap-2 mt-2">
-            <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-4 min-w-0">
               <ExtensionStatus status={extensionStatus} onRetry={checkExtension} />
               
               {/* Include Cookies checkbox - only show when extension is available */}
@@ -484,17 +484,17 @@ const ApiTesterTool: React.FC = () => {
                     <span className="hidden sm:inline">{t('tool.apiTester.includeCookies')}</span>
                   </label>
                   <Tooltip content={t('tool.apiTester.includeCookiesTooltip')} position="bottom" nowrap={false}>
-                    <HelpCircle className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 cursor-help" />
+                    <HelpCircle className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 cursor-help hidden sm:block" />
                   </Tooltip>
                 </div>
               )}
             </div>
             
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2 shrink-0">
               <button
                 onClick={handleCopyCurl}
                 className={cn(
-                  'flex items-center gap-1.5 px-2 sm:px-3 py-1.5 text-sm rounded-lg',
+                  'flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-3 py-1.5 text-sm rounded-lg',
                   'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700',
                   'transition-colors'
                 )}
@@ -519,7 +519,7 @@ const ApiTesterTool: React.FC = () => {
                   onClick={() => setApiDiffDropdownOpen(!apiDiffDropdownOpen)}
                   disabled={!state.url.trim()}
                   className={cn(
-                    'flex items-center gap-1.5 px-2 sm:px-3 py-1.5 text-xs font-medium rounded-md',
+                    'flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-3 py-1.5 text-xs font-medium rounded-md',
                     'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300',
                     'border border-blue-200 dark:border-blue-800',
                     'hover:bg-blue-100 dark:hover:bg-blue-900/30',
@@ -532,7 +532,7 @@ const ApiTesterTool: React.FC = () => {
                 >
                   <GitCompare className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">{t('tool.apiTester.sendToApiDiff')}</span>
-                  <ChevronDown className={cn('w-3 h-3 transition-transform', apiDiffDropdownOpen && 'rotate-180')} />
+                  <ChevronDown className={cn('w-3 h-3 transition-transform hidden sm:block', apiDiffDropdownOpen && 'rotate-180')} />
                 </button>
                 
                 {apiDiffDropdownOpen && (

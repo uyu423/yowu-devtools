@@ -283,7 +283,7 @@ const JsonTool: React.FC = () => {
                 status={
                   !hasInput ? 'default' : parseResult.error ? 'error' : 'success'
                 }
-                className="flex-1 min-h-0"
+                className="flex-1 min-h-[140px] lg:min-h-0"
               />
               <div className="mt-3">
                 <FileInput

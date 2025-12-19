@@ -282,7 +282,7 @@ export const HistorySidebar: React.FC<HistorySidebarProps> = ({
         onClick={onToggle}
         className={cn(
           'fixed right-0 top-1/2 -translate-y-1/2 z-40',
-          'flex items-center gap-1.5 px-2 py-3',
+          'flex items-center gap-1 px-1.5 py-2 sm:px-2 sm:py-3 sm:gap-1.5',
           'bg-white dark:bg-gray-800 border border-r-0 border-gray-200 dark:border-gray-700',
           'rounded-l-lg shadow-lg',
           'text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400',
@@ -291,11 +291,11 @@ export const HistorySidebar: React.FC<HistorySidebarProps> = ({
         title={t('tool.apiTester.showHistory')}
       >
         <History className="w-4 h-4" />
-        <span className="text-xs font-medium writing-mode-vertical">
+        <span className="hidden sm:block text-xs font-medium writing-mode-vertical">
           {t('tool.apiTester.history')}
         </span>
         {history.length > 0 && (
-          <span className="ml-0.5 px-1 py-0.5 text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded">
+          <span className="px-1 py-0.5 text-[10px] sm:text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded">
             {history.length}
           </span>
         )}

@@ -369,24 +369,24 @@ const QueryStringTool: React.FC = () => {
                 <table className="w-full">
                   <thead className="bg-gray-50 dark:bg-gray-900 border-b dark:border-gray-700">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                      <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
                         {t('tool.urlParser.key')}
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                      <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
                         {t('tool.urlParser.value')}
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 w-24">
-                        {t('tool.urlParser.actions')}
+                      <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 w-10 sm:w-16">
+                        <span className="sr-only">{t('tool.urlParser.actions')}</span>
                       </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                     {parseResult.params.map((param, index) => (
                       <tr key={`${param.key}-${index}`} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                        <td className="px-4 py-3 text-sm font-mono text-gray-900 dark:text-gray-100">
+                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-mono text-gray-900 dark:text-gray-100">
                           {param.key || <span className="text-gray-400 dark:text-gray-500 italic">({t('tool.urlParser.empty')})</span>}
                         </td>
-                        <td className="px-4 py-3 text-sm">
+                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">
                           <div className="flex flex-col gap-1">
                             {state.showDecoded && (
                               <div className="font-mono text-gray-900 dark:text-gray-100 break-all">
@@ -405,13 +405,13 @@ const QueryStringTool: React.FC = () => {
                             )}
                           </div>
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-2 sm:px-4 py-2 sm:py-3">
                           <button
                             onClick={() => handleCopyParam(param)}
-                            className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+                            className="p-1 sm:p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
                             title={t('common.copy')}
                           >
-                            <Copy className="w-4 h-4" />
+                            <Copy className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                           </button>
                         </td>
                       </tr>

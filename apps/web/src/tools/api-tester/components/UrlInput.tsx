@@ -37,7 +37,7 @@ export const UrlInput: React.FC<UrlInputProps> = ({
       placeholder={placeholder}
       disabled={disabled}
       className={cn(
-        'flex-1 h-10 px-3 py-2 border border-gray-200 dark:border-gray-700',
+        'flex-1 min-w-0 h-10 px-3 py-2 border border-gray-200 dark:border-gray-700',
         'bg-white dark:bg-gray-900',
         'text-gray-900 dark:text-gray-100',
         'placeholder:text-gray-400 dark:placeholder:text-gray-500',
