@@ -1596,6 +1596,9 @@ export const jaJP = {
         http4xx: 'HTTP 4xx',
         http5xx: 'HTTP 5xx',
       },
+      error: {
+        concurrencyExceedsRequests: '同時リクエスト数が総リクエスト数を超えることはできません',
+      },
       export: { json: 'JSON', csv: 'CSV', copySummary: '概要をコピー' },
       shareLink: '共有',
       warning: {

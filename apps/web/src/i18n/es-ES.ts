@@ -1651,6 +1651,9 @@ export const esES = {
         http4xx: 'HTTP 4xx',
         http5xx: 'HTTP 5xx',
       },
+      error: {
+        concurrencyExceedsRequests: 'La concurrencia no puede exceder el total de solicitudes',
+      },
       export: { json: 'JSON', csv: 'CSV', copySummary: 'Copiar resumen' },
       shareLink: 'Compartir',
       warning: {

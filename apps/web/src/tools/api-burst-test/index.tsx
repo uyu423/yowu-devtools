@@ -143,8 +143,19 @@ const ApiBurstTestTool: React.FC = () => {
   // Abort controller ref
   const abortControllerRef = useRef<AbortController | null>(null);
 
+  // Validation errors
+  const validationError = React.useMemo(() => {
+    if (state.url.trim() === '') {
+      return null; // URL empty is handled by disabling button
+    }
+    if (state.loadMode.type === 'requests' && state.concurrency > state.loadMode.n) {
+      return t('tool.apiBurstTest.error.concurrencyExceedsRequests');
+    }
+    return null;
+  }, [state.url, state.loadMode, state.concurrency, t]);
+
   // Check if can run
-  const canRun = state.url.trim() !== '' && !isRunning;
+  const canRun = state.url.trim() !== '' && !isRunning && !validationError;
 
   // Check if method supports body
   const methodSupportsBody = !NO_BODY_METHODS.includes(state.method);
@@ -339,6 +350,21 @@ const ApiBurstTestTool: React.FC = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [canRun, isRunning, handleRun, handleStop]);
+
+  // Warn before closing tab while test is running
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isRunning) {
+        e.preventDefault();
+        // Modern browsers ignore custom messages, but this triggers the dialog
+        e.returnValue = 'Test is still running. Are you sure you want to leave?';
+        return e.returnValue;
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isRunning]);
 
   return (
     <div className="flex flex-col h-full p-4 md:p-6 max-w-7xl mx-auto">

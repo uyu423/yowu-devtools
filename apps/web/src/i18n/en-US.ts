@@ -1641,6 +1641,10 @@ export const enUS = {
         http4xx: 'HTTP 4xx',
         http5xx: 'HTTP 5xx',
       },
+      // Validation Errors
+      error: {
+        concurrencyExceedsRequests: 'Concurrency cannot exceed total requests',
+      },
       // Export
       export: {
         json: 'JSON',

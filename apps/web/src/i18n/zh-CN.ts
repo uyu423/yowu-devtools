@@ -1495,6 +1495,9 @@ export const zhCN = {
         http4xx: 'HTTP 4xx',
         http5xx: 'HTTP 5xx',
       },
+      error: {
+        concurrencyExceedsRequests: '并发数不能超过总请求数',
+      },
       export: { json: 'JSON', csv: 'CSV', copySummary: '复制概要' },
       shareLink: '分享',
       warning: {
