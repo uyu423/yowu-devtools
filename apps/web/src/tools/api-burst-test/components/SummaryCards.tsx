@@ -25,13 +25,15 @@ interface CardProps {
 
 /**
  * Get appropriate font size class based on value length
+ * More aggressive scaling to ensure numbers fit without truncation
  */
 const getFontSizeClass = (value: string): string => {
   const len = value.length;
-  if (len <= 5) return 'text-2xl'; // Short values: normal size
-  if (len <= 8) return 'text-xl';  // Medium values: slightly smaller
-  if (len <= 12) return 'text-lg'; // Long values: smaller
-  return 'text-base'; // Very long values: smallest
+  if (len <= 4) return 'text-2xl';   // e.g., "109", "5ms"
+  if (len <= 6) return 'text-xl';    // e.g., "33,722", "0.0"
+  if (len <= 8) return 'text-lg';    // e.g., "337.81", "1,234.56"
+  if (len <= 10) return 'text-base'; // e.g., "12,345.67"
+  return 'text-sm';                   // Very long values
 };
 
 const Card: React.FC<CardProps> = ({ icon: Icon, label, value, suffix, color = 'default', tooltip }) => {
@@ -63,7 +65,7 @@ const Card: React.FC<CardProps> = ({ icon: Icon, label, value, suffix, color = '
         )}
       </div>
       <div className="flex items-baseline gap-1 min-w-0">
-        <span className={cn('font-bold truncate', fontSizeClass, colorClasses[color])}>
+        <span className={cn('font-bold whitespace-nowrap', fontSizeClass, colorClasses[color])}>
           {value}
         </span>
         {suffix && (
