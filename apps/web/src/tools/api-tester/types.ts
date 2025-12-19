@@ -90,7 +90,8 @@ export interface HistoryItem {
   };
 }
 
-export type ExtensionStatus = 'not-installed' | 'permission-required' | 'connected' | 'checking';
+// Re-export ExtensionStatus from shared lib
+export type { ExtensionStatus } from '@/lib/extension';
 
 // HTTP Methods that support request body
 export const BODY_SUPPORTED_METHODS: HttpMethod[] = ['POST', 'PUT', 'PATCH', 'DELETE'];

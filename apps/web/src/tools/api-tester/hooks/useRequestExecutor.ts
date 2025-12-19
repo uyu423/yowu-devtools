@@ -6,7 +6,7 @@
 import { useState, useCallback, useRef } from 'react';
 import type { ApiTesterState, ResponseData } from '../types';
 import { buildUrlWithParams, getBaseUrl, getContentTypeForBody, generateId } from '../utils';
-import { useExtension } from './useExtension';
+import { useExtension } from '@/hooks/useExtension';
 import type { RequestSpec } from '@yowu-devtools/shared';
 
 interface UseRequestExecutorReturn {

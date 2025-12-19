@@ -63,6 +63,7 @@ const toolIdToI18nKey: Record<string, string> = {
   'api-diff': 'apiDiff',
   'image-studio': 'imageStudio',
   'video-studio': 'videoStudio',
+  'api-burst-test': 'apiBurstTest',
 };
 
 // Tool ID에서 i18n meta key 가져오기
@@ -660,6 +661,38 @@ const tools: ToolInfo[] = [
       'Convert to MP4 or WebM',
       'Pipeline-based workflow',
       'Browser-based processing',
+    ],
+  },
+  {
+    id: 'api-burst-test',
+    path: '/api-burst-test',
+    title: 'API Burst Test',
+    description: 'HTTP load testing with latency distribution and RPS metrics',
+    seoDescription:
+      'Free online HTTP load testing tool. Measure API performance with latency percentiles (p50/p95/p99), requests per second, status code distribution. Browser-based burst testing.',
+    keywords: [
+      'api load test',
+      'http load test',
+      'api performance test',
+      'api benchmark',
+      'http benchmark',
+      'latency test',
+      'rps test',
+      'stress test',
+      'burst test',
+      'hey alternative',
+      'ab alternative',
+      'load testing tool',
+    ],
+    features: [
+      'Configurable concurrency and request count',
+      'Duration-based or request-count-based testing',
+      'Latency percentile distribution (p50/p90/p95/p99)',
+      'Status code breakdown',
+      'Error analysis and categorization',
+      'Export results as JSON/CSV',
+      'Rate limiting support',
+      'Browser-based execution',
     ],
   },
 ];

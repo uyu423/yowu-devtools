@@ -19,8 +19,8 @@ import {
 } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 
-import { EXTENSION_STORE_URL } from '../constants';
-import type { ExtensionStatus } from '../types';
+import { EXTENSION_STORE_URL } from '@/lib/extension';
+import type { ExtensionStatus } from '@/lib/extension';
 import { cn } from '@/lib/utils';
 import { useI18n } from '@/hooks/useI18nHooks';
 

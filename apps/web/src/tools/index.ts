@@ -19,6 +19,7 @@ import { curlParserTool } from './curl-parser';
 import { apiDiffTool } from './api-diff';
 import { imageStudioTool } from './image-studio';
 import { videoStudioTool } from './video-studio';
+import { apiBurstTestTool } from './api-burst-test';
 
 export const tools: ToolDefinition[] = [
   jsonTool,
@@ -41,6 +42,7 @@ export const tools: ToolDefinition[] = [
   apiDiffTool,
   imageStudioTool,
   videoStudioTool,
+  apiBurstTestTool,
 ];
 
 export const getToolById = (id: string) => tools.find(t => t.id === id);

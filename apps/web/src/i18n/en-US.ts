@@ -95,6 +95,23 @@ export const enUS = {
       medium: 'Medium',
       high: 'High (Best)',
     },
+    // Chrome Extension Status (shared across tools)
+    extension: {
+      checking: 'Checking...',
+      notConnected: 'Not Connected',
+      permissionRequired: 'Permission Required',
+      connected: 'CORS Bypass Ready',
+      tooltipChecking: 'Verifying extension connection. Please wait...',
+      tooltipNotConnected:
+        'Extension not detected. Install the CORS Helper extension to bypass CORS restrictions. Click to retry detection.',
+      tooltipPermissionRequired:
+        'Extension detected but needs permission for this domain. Click the extension icon and allow access to continue.',
+      tooltipConnected:
+        'Extension connected and ready! CORS restrictions will be bypassed automatically when needed.',
+      install: 'Install Extension',
+      installTooltip:
+        'Install extension to bypass CORS restrictions. Not needed if the API allows cross-origin requests.',
+    },
     videoQuality: {
       fast: 'Fast',
       fastDesc: 'Faster encoding, larger file size',
@@ -1501,6 +1518,160 @@ export const enUS = {
           'Video processing is computationally intensive. Large files may take several minutes to process.',
       },
     },
+    apiBurstTest: {
+      title: 'API Burst Test',
+      description: 'HTTP load testing with latency distribution and RPS metrics',
+      // Controls
+      run: 'Run',
+      stop: 'Stop',
+      reset: 'Reset',
+      running: 'Running...',
+      // Target
+      target: 'Target',
+      urlPlaceholder: 'https://api.example.com/endpoint',
+      method: 'Method',
+      // Query Parameters
+      params: 'Parameters',
+      paramKey: 'Key',
+      paramValue: 'Value',
+      addParam: 'Add Parameter',
+      maxParamsReached: 'Maximum parameters reached',
+      // Load config
+      loadConfig: 'Load Configuration',
+      concurrency: 'Concurrency',
+      loadMode: 'Load Mode',
+      mode: {
+        requests: 'Requests',
+        duration: 'Duration',
+      },
+      requestsCount: 'Total Requests',
+      duration: 'Duration',
+      seconds: 'sec',
+      maxRequests: 'Max:',
+      maxDuration: 'Max:',
+      // Rate limit
+      rateLimit: {
+        label: 'Rate Limit',
+        none: 'None',
+        global: 'Global',
+        perWorker: 'Per Worker',
+      },
+      qps: 'req/s',
+      rpsUnit: 'req/s',
+      timeoutSeconds: 'Timeout',
+      // Tooltips for technical terms
+      tooltip: {
+        concurrency:
+          'Number of parallel requests sent simultaneously. Higher values generate more load but may overwhelm the browser or target server.',
+        loadModeRequests:
+          'Send a fixed number of total requests. Test completes when all requests finish.',
+        loadModeDuration:
+          'Send requests continuously for a fixed duration. Test completes when time expires.',
+        rateLimitNone: 'No rate limiting. Requests are sent as fast as possible.',
+        rateLimitGlobal:
+          'Limit total requests per second across all workers. Provides consistent throughput.',
+        rateLimitPerWorker:
+          'Each concurrent worker is limited to this rate. Total QPS = workers × rate.',
+        timeout:
+          'Maximum time to wait for each request to complete. Requests exceeding this are marked as timeout errors.',
+        p50: '50th percentile (median). Half of requests completed faster than this.',
+        p90: '90th percentile. 90% of requests completed faster than this.',
+        p95: '95th percentile. Only 5% of requests took longer than this. Common SLA metric.',
+        p99: '99th percentile. Only 1% of requests took longer than this. Captures tail latency.',
+        rps: 'Requests per second. Measures throughput - how many requests completed each second.',
+        errorRate: 'Percentage of requests that failed (timeouts, network errors, HTTP 4xx/5xx).',
+      },
+      // Headers
+      headers: 'Headers',
+      headerKey: 'Header',
+      headerValue: 'Value',
+      addHeader: 'Add Header',
+      maxHeadersReached: 'Maximum headers reached',
+      // Body
+      body: {
+        label: 'Body',
+        placeholder: 'Request body...',
+        notSupported: 'Body is not available for GET/HEAD requests',
+        raw: 'Raw',
+        json: 'JSON',
+        form: 'Form',
+        rawHint: 'Plain text body',
+        jsonHint: 'JSON format (auto sets Content-Type)',
+        formHint: 'URL-encoded form data (key=value&...)',
+      },
+      // Auth
+      auth: {
+        basic: 'Basic Auth',
+      },
+      // Privacy
+      privacy: {
+        shareIncludeHeaders: 'Include headers in share link',
+        shareIncludeAuth: 'Include auth in share link',
+      },
+      // Results
+      results: {
+        summary: 'Summary',
+        details: 'Details',
+        totalRequests: 'Total Requests',
+        rps: 'Requests/sec',
+        p95Latency: 'p95 Latency',
+        errorRate: 'Error Rate',
+        histogram: 'Response time histogram',
+        latencyDistribution: 'Latency distribution',
+        statusCodes: 'Status code distribution',
+        errors: 'Errors breakdown',
+        noData: 'No data available',
+        noErrors: 'No errors occurred',
+        avg: 'Average',
+        min: 'Fastest',
+        max: 'Slowest',
+      },
+      // Errors
+      errors: {
+        type: 'Error Type',
+        count: 'Count',
+        percentage: '%',
+        total: 'Total',
+        timeout: 'Timeout',
+        cors: 'CORS Blocked',
+        network: 'Network Error',
+        aborted: 'Aborted',
+        http4xx: 'HTTP 4xx',
+        http5xx: 'HTTP 5xx',
+      },
+      // Export
+      export: {
+        json: 'JSON',
+        csv: 'CSV',
+        copySummary: 'Copy Summary',
+      },
+      shareLink: 'Share',
+      // Warnings
+      warning: {
+        responsibleUse: 'Responsible Use Notice',
+        responsibleUseDesc:
+          'This tool is for testing APIs you own or have explicit permission to test. Unauthorized load testing may violate terms of service or laws. All requests originate from your browser - your IP will be visible to the target server.',
+        highConcurrency: 'High concurrency may affect browser performance and target server',
+        largeRequests: 'Large number of requests. Ensure you have permission to test this endpoint.',
+        longDuration: 'Long-duration test. Monitor browser memory usage.',
+        highQps: 'High QPS may be throttled by browser or network',
+        externalDomain: 'Testing external domains may violate their terms of service',
+      },
+      // Acknowledgment modal
+      acknowledgment: {
+        title: 'Confirmation Required',
+        subtitle: 'Please acknowledge before testing',
+        warning: 'Unauthorized load testing may be illegal and violate terms of service.',
+        permission: 'I have permission to test this endpoint',
+        ipVisible: 'I understand requests will be sent from my IP address',
+        confirm: 'I Understand, Run Test',
+      },
+      // Empty state
+      emptyState: 'Configure a target URL and run the test',
+      toRun: 'to run test',
+      // CORS notice
+      corsNotice: 'CORS-enabled APIs only. Browser restrictions apply.',
+    },
   },
   meta: {
     home: {
@@ -1613,6 +1784,11 @@ export const enUS = {
       title: 'Video Studio',
       description:
         'Free online video editor. Trim, cut, crop, resize, and convert videos. Extract thumbnails and export to MP4 or WebM. Browser-based processing.',
+    },
+    apiBurstTest: {
+      title: 'API Burst Test',
+      description:
+        'Free online HTTP load testing tool. Measure API performance with latency distribution, RPS metrics, and status code analysis. Browser-based testing.',
     },
   },
 } as const;
