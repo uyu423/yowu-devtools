@@ -1506,6 +1506,7 @@ export const koKR = {
       addParam: '파라미터 추가',
       maxParamsReached: '최대 파라미터 수 도달',
       loadConfig: '부하 설정',
+      http2Mode: 'HTTP/2 모드',
       concurrency: '동시 요청 수',
       loadMode: '부하 모드',
       mode: {
@@ -1530,8 +1531,10 @@ export const koKR = {
       includeCookies: '쿠키',
       includeCookiesTooltip: '요청에 쿠키를 포함합니다. Chrome 확장 프로그램이 연결된 경우에만 사용 가능합니다. 인증된 엔드포인트 테스트에 유용합니다.',
       tooltip: {
+        http2Mode:
+          'HTTP/2 멀티플렉싱을 활성화하여 더 높은 동시성 지원. 대상 서버가 HTTP/2를 지원해야 합니다.',
         concurrency:
-          '동시에 전송되는 병렬 요청 수. 높은 값은 더 많은 부하를 생성하지만 브라우저나 대상 서버에 과부하를 줄 수 있습니다.',
+          '동시에 전송되는 병렬 요청 수. 높은 값은 더 많은 부하를 생성합니다.',
         loadModeRequests:
           '고정된 총 요청 수를 전송합니다. 모든 요청이 완료되면 테스트가 종료됩니다.',
         loadModeDuration:
@@ -1634,7 +1637,7 @@ export const koKR = {
         highQps: '높은 QPS는 브라우저 또는 네트워크에서 제한될 수 있습니다',
         externalDomain: '외부 도메인 테스트는 서비스 약관을 위반할 수 있습니다',
         browserLimitations: '브라우저 기반 제한사항',
-        maxConnections: '도메인당 최대 {max}개 동시 연결 (브라우저 HTTP/1.1 제한)',
+        maxConnections: 'HTTP/1.1: 최대 {max}개 연결 | HTTP/2 모드: 최대 {maxHttp2}개 (서버 지원 필요)',
         jsOverhead: 'JavaScript 런타임 오버헤드로 네이티브 도구(hey, wrk) 대비 처리량 저하',
         notProduction: '프로덕션 부하 테스트에 부적합 - 정확한 결과는 CLI 도구 사용 권장',
       },

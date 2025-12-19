@@ -1542,6 +1542,7 @@ export const enUS = {
       maxParamsReached: 'Maximum parameters reached',
       // Load config
       loadConfig: 'Load Configuration',
+      http2Mode: 'HTTP/2 Mode',
       concurrency: 'Concurrency',
       loadMode: 'Load Mode',
       mode: {
@@ -1568,8 +1569,10 @@ export const enUS = {
       includeCookiesTooltip: 'Include cookies in requests. Only available when Chrome Extension is connected. Useful for testing authenticated endpoints.',
       // Tooltips for technical terms
       tooltip: {
+        http2Mode:
+          'Enable HTTP/2 multiplexing for higher concurrency. Target server must support HTTP/2.',
         concurrency:
-          'Number of parallel requests sent simultaneously. Higher values generate more load but may overwhelm the browser or target server.',
+          'Number of parallel requests. Higher values generate more load.',
         loadModeRequests:
           'Send a fixed number of total requests. Test completes when all requests finish.',
         loadModeDuration:
@@ -1688,7 +1691,7 @@ export const enUS = {
         externalDomain: 'Testing external domains may violate their terms of service',
         // Browser limitations
         browserLimitations: 'Browser-Based Limitations',
-        maxConnections: 'Max {max} concurrent connections per domain (browser HTTP/1.1 limit)',
+        maxConnections: 'HTTP/1.1: max {max} connections | HTTP/2 mode: up to {maxHttp2} (requires server support)',
         jsOverhead: 'JavaScript runtime overhead affects throughput vs native tools (hey, wrk)',
         notProduction: 'Not suitable for production load testing - use CLI tools for accurate results',
       },

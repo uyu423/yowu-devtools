@@ -1570,6 +1570,7 @@ export const esES = {
       addParam: 'Añadir parámetro',
       maxParamsReached: 'Máximo de parámetros alcanzado',
       loadConfig: 'Configuración de carga',
+      http2Mode: 'Modo HTTP/2',
       concurrency: 'Concurrencia',
       loadMode: 'Modo de carga',
       mode: {
@@ -1589,8 +1590,10 @@ export const esES = {
       includeCookies: 'Cookies',
       includeCookiesTooltip: 'Incluir cookies en las solicitudes. Solo disponible cuando la extensión de Chrome está conectada. Útil para probar endpoints autenticados.',
       tooltip: {
+        http2Mode:
+          'Habilita multiplexación HTTP/2 para mayor concurrencia. El servidor destino debe soportar HTTP/2.',
         concurrency:
-          'Número de solicitudes paralelas enviadas simultáneamente. Valores más altos generan más carga pero pueden sobrecargar el navegador o el servidor de destino.',
+          'Número de solicitudes paralelas. Valores más altos generan más carga.',
         loadModeRequests:
           'Envía un número fijo de solicitudes totales. La prueba termina cuando se completan todas las solicitudes.',
         loadModeDuration:
@@ -1690,7 +1693,7 @@ export const esES = {
         highQps: 'Alto QPS puede ser limitado por el navegador o la red',
         externalDomain: 'Probar dominios externos puede violar sus términos de servicio',
         browserLimitations: 'Limitaciones del navegador',
-        maxConnections: 'Máximo {max} conexiones simultáneas por dominio (límite HTTP/1.1 del navegador)',
+        maxConnections: 'HTTP/1.1: máx {max} conexiones | Modo HTTP/2: hasta {maxHttp2} (requiere soporte del servidor)',
         jsOverhead: 'Sobrecarga del runtime de JavaScript reduce el rendimiento vs herramientas nativas (hey, wrk)',
         notProduction: 'No apto para pruebas de carga en producción - usar herramientas CLI para resultados precisos',
       },

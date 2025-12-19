@@ -107,7 +107,11 @@ export const WarningBanner: React.FC<WarningBannerProps> = ({ className }) => {
             {t('tool.apiBurstTest.warning.browserLimitations')}
           </h4>
           <ul className="mt-1 text-sm text-blue-700 dark:text-blue-300 leading-relaxed list-disc list-inside space-y-0.5">
-            <li>{t('tool.apiBurstTest.warning.maxConnections').replace('{max}', String(HARD_LIMITS.MAX_CONCURRENCY))}</li>
+            <li>
+              {t('tool.apiBurstTest.warning.maxConnections')
+                .replace('{max}', String(HARD_LIMITS.MAX_CONCURRENCY_HTTP1))
+                .replace('{maxHttp2}', String(HARD_LIMITS.MAX_CONCURRENCY_HTTP2))}
+            </li>
             <li>{t('tool.apiBurstTest.warning.jsOverhead')}</li>
             <li>{t('tool.apiBurstTest.warning.notProduction')}</li>
           </ul>

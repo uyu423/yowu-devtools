@@ -77,6 +77,7 @@ export interface ApiBurstTestState {
   
   // Load configuration
   concurrency: number;
+  useHttp2: boolean;  // Enable HTTP/2 mode for higher concurrency
   loadMode: LoadMode;
   rateLimit: RateLimit;
   timeoutMs: number;
@@ -177,9 +178,12 @@ export interface RequestSample {
 }
 
 // Hard limits to prevent abuse
-// Note: MAX_CONCURRENCY is 6 due to browser's per-domain connection limit (HTTP/1.1)
+// Note: MAX_CONCURRENCY differs by HTTP version
+// - HTTP/1.1: Browser limits to 6 concurrent connections per domain
+// - HTTP/2: Single connection with multiplexing, allows higher concurrency
 export const HARD_LIMITS = {
-  MAX_CONCURRENCY: 6,  // Browser limit: max 6 concurrent connections per domain
+  MAX_CONCURRENCY_HTTP1: 6,   // Browser HTTP/1.1 limit: max 6 connections per domain
+  MAX_CONCURRENCY_HTTP2: 50,  // HTTP/2 multiplexing allows higher concurrency
   MAX_TOTAL_REQUESTS: 10000,
   MAX_DURATION_MS: 60000,  // 60 seconds
   MAX_QPS: 1000,
@@ -193,11 +197,22 @@ export const HARD_LIMITS = {
 
 // Soft limits for warnings
 export const SOFT_LIMITS = {
-  WARN_CONCURRENCY: 4,  // Warn when approaching browser limit
+  WARN_CONCURRENCY_HTTP1: 4,   // Warn when approaching HTTP/1.1 browser limit
+  WARN_CONCURRENCY_HTTP2: 30,  // Warn for high HTTP/2 concurrency
   WARN_TOTAL_REQUESTS: 1000,
   WARN_DURATION_MS: 30000,  // 30 seconds
   WARN_QPS: 100,
 } as const;
+
+// Helper: Get max concurrency based on HTTP version
+export function getMaxConcurrency(useHttp2: boolean): number {
+  return useHttp2 ? HARD_LIMITS.MAX_CONCURRENCY_HTTP2 : HARD_LIMITS.MAX_CONCURRENCY_HTTP1;
+}
+
+// Helper: Get concurrency warning threshold based on HTTP version
+export function getConcurrencyWarningThreshold(useHttp2: boolean): number {
+  return useHttp2 ? SOFT_LIMITS.WARN_CONCURRENCY_HTTP2 : SOFT_LIMITS.WARN_CONCURRENCY_HTTP1;
+}
 
 // Default values
 export const DEFAULT_BURST_STATE: ApiBurstTestState = {
@@ -208,7 +223,8 @@ export const DEFAULT_BURST_STATE: ApiBurstTestState = {
   body: { mode: 'raw', text: '' },
   auth: null,
   includeCookies: false,
-  concurrency: 6,  // Default to browser max
+  concurrency: 5,  // Default concurrency
+  useHttp2: false, // Default to HTTP/1.1 mode
   loadMode: { type: 'requests', n: 100, durationMs: 10000 },
   rateLimit: { type: 'none', qps: 100 },
   timeoutMs: 10000,

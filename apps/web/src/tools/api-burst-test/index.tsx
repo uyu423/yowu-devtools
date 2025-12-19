@@ -480,10 +480,12 @@ const ApiBurstTestTool: React.FC = () => {
               <div className="px-4 pb-4">
                 <LoadModeForm
                   concurrency={state.concurrency}
+                  useHttp2={state.useHttp2}
                   loadMode={state.loadMode}
                   rateLimit={state.rateLimit}
                   timeoutMs={state.timeoutMs}
                   onConcurrencyChange={handleConcurrencyChange}
+                  onHttp2Change={(enabled) => updateState({ useHttp2: enabled })}
                   onLoadModeChange={handleLoadModeChange}
                   onRateLimitChange={handleRateLimitChange}
                   onTimeoutChange={handleTimeoutChange}

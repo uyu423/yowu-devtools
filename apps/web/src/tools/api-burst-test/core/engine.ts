@@ -15,7 +15,7 @@ import type {
   RequestSample,
   TimeSeriesPoint,
 } from '../types';
-import { HARD_LIMITS, NO_BODY_METHODS } from '../types';
+import { HARD_LIMITS, NO_BODY_METHODS, getMaxConcurrency } from '../types';
 import {
   ReservoirSampler,
   RunningStats,
@@ -298,7 +298,7 @@ export async function runBurstTest(config: BurstEngineConfig): Promise<BurstTest
     ? Math.min(state.loadMode.n, HARD_LIMITS.MAX_TOTAL_REQUESTS)
     : HARD_LIMITS.MAX_TOTAL_REQUESTS; // Upper bound for duration mode
   const maxDurationMs = Math.min(state.loadMode.durationMs, HARD_LIMITS.MAX_DURATION_MS);
-  const concurrency = Math.min(state.concurrency, HARD_LIMITS.MAX_CONCURRENCY);
+  const concurrency = Math.min(state.concurrency, getMaxConcurrency(state.useHttp2));
   const timeoutMs = Math.max(
     HARD_LIMITS.MIN_TIMEOUT_MS,
     Math.min(state.timeoutMs, HARD_LIMITS.MAX_TIMEOUT_MS)

@@ -3,19 +3,21 @@
  */
 
 import React from 'react';
-import { Hash, Clock, AlertTriangle, HelpCircle } from 'lucide-react';
+import { Hash, Clock, AlertTriangle, HelpCircle, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { useI18n } from '@/hooks/useI18nHooks';
 import type { LoadMode, RateLimit } from '../types';
-import { HARD_LIMITS, SOFT_LIMITS } from '../types';
+import { HARD_LIMITS, SOFT_LIMITS, getMaxConcurrency, getConcurrencyWarningThreshold } from '../types';
 
 interface LoadModeFormProps {
   concurrency: number;
+  useHttp2: boolean;
   loadMode: LoadMode;
   rateLimit: RateLimit;
   timeoutMs: number;
   onConcurrencyChange: (value: number) => void;
+  onHttp2Change: (enabled: boolean) => void;
   onLoadModeChange: (mode: LoadMode) => void;
   onRateLimitChange: (limit: RateLimit) => void;
   onTimeoutChange: (ms: number) => void;
@@ -24,10 +26,12 @@ interface LoadModeFormProps {
 
 export const LoadModeForm: React.FC<LoadModeFormProps> = ({
   concurrency,
+  useHttp2,
   loadMode,
   rateLimit,
   timeoutMs,
   onConcurrencyChange,
+  onHttp2Change,
   onLoadModeChange,
   onRateLimitChange,
   onTimeoutChange,
@@ -35,13 +39,65 @@ export const LoadModeForm: React.FC<LoadModeFormProps> = ({
 }) => {
   const { t } = useI18n();
 
-  const showConcurrencyWarning = concurrency > SOFT_LIMITS.WARN_CONCURRENCY;
+  const maxConcurrency = getMaxConcurrency(useHttp2);
+  const warnConcurrency = getConcurrencyWarningThreshold(useHttp2);
+  const showConcurrencyWarning = concurrency > warnConcurrency;
   const showRequestsWarning = loadMode.type === 'requests' && loadMode.n > SOFT_LIMITS.WARN_TOTAL_REQUESTS;
   const showDurationWarning = loadMode.type === 'duration' && loadMode.durationMs > SOFT_LIMITS.WARN_DURATION_MS;
   const showQpsWarning = rateLimit.type !== 'none' && rateLimit.qps > SOFT_LIMITS.WARN_QPS;
 
+  // Handle HTTP/2 toggle - adjust concurrency if needed
+  const handleHttp2Change = (enabled: boolean) => {
+    onHttp2Change(enabled);
+    // If switching to HTTP/1.1 and concurrency exceeds limit, clamp it
+    if (!enabled && concurrency > HARD_LIMITS.MAX_CONCURRENCY_HTTP1) {
+      onConcurrencyChange(HARD_LIMITS.MAX_CONCURRENCY_HTTP1);
+    }
+  };
+
   return (
     <div className="space-y-4">
+      {/* HTTP/2 Mode Toggle */}
+      <div className={cn(
+        'flex items-center justify-between p-3 rounded-lg',
+        'bg-gray-50 dark:bg-gray-800/50',
+        'border border-gray-200 dark:border-gray-700'
+      )}>
+        <div className="flex items-center gap-2">
+          <Zap className={cn(
+            'w-4 h-4',
+            useHttp2 ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400'
+          )} />
+          <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            {t('tool.apiBurstTest.http2Mode')}
+          </label>
+          <Tooltip content={t('tool.apiBurstTest.tooltip.http2Mode')} position="right" nowrap={false}>
+            <HelpCircle className="w-3.5 h-3.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-help" />
+          </Tooltip>
+        </div>
+        <button
+          onClick={() => handleHttp2Change(!useHttp2)}
+          disabled={disabled}
+          className={cn(
+            'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full',
+            'border-2 border-transparent transition-colors duration-200',
+            'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2',
+            'disabled:opacity-50 disabled:cursor-not-allowed',
+            useHttp2 ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-700'
+          )}
+          role="switch"
+          aria-checked={useHttp2}
+        >
+          <span
+            className={cn(
+              'pointer-events-none inline-block h-5 w-5 transform rounded-full',
+              'bg-white shadow ring-0 transition duration-200',
+              useHttp2 ? 'translate-x-5' : 'translate-x-0'
+            )}
+          />
+        </button>
+      </div>
+
       {/* Concurrency */}
       <div>
         <div className="flex items-center gap-2 mb-2">
@@ -56,13 +112,16 @@ export const LoadModeForm: React.FC<LoadModeFormProps> = ({
               <AlertTriangle className="w-4 h-4 text-amber-500" />
             </Tooltip>
           )}
+          <span className="text-xs text-gray-500 dark:text-gray-400">
+            (max: {maxConcurrency})
+          </span>
         </div>
         <div className="flex items-center gap-3">
           <input
             type="range"
             min={1}
-            max={HARD_LIMITS.MAX_CONCURRENCY}
-            value={concurrency}
+            max={maxConcurrency}
+            value={Math.min(concurrency, maxConcurrency)}
             onChange={(e) => onConcurrencyChange(Number(e.target.value))}
             disabled={disabled}
             className={cn(
@@ -74,9 +133,9 @@ export const LoadModeForm: React.FC<LoadModeFormProps> = ({
           <input
             type="number"
             min={1}
-            max={HARD_LIMITS.MAX_CONCURRENCY}
+            max={maxConcurrency}
             value={concurrency}
-            onChange={(e) => onConcurrencyChange(Math.min(HARD_LIMITS.MAX_CONCURRENCY, Math.max(1, Number(e.target.value))))}
+            onChange={(e) => onConcurrencyChange(Math.min(maxConcurrency, Math.max(1, Number(e.target.value))))}
             disabled={disabled}
             className={cn(
               'w-20 h-9 px-2 text-center text-sm rounded-lg border',

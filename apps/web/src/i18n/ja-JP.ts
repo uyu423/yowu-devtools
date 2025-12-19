@@ -1515,6 +1515,7 @@ export const jaJP = {
       addParam: 'パラメータ追加',
       maxParamsReached: '最大パラメータ数に達しました',
       loadConfig: '負荷設定',
+      http2Mode: 'HTTP/2モード',
       concurrency: '同時接続数',
       loadMode: '負荷モード',
       mode: {
@@ -1534,8 +1535,10 @@ export const jaJP = {
       includeCookies: 'Cookie',
       includeCookiesTooltip: 'リクエストにCookieを含めます。Chrome拡張機能が接続されている場合のみ利用可能です。認証が必要なエンドポイントのテストに便利です。',
       tooltip: {
+        http2Mode:
+          'HTTP/2マルチプレクシングを有効にして高い同時接続数をサポート。ターゲットサーバーがHTTP/2をサポートしている必要があります。',
         concurrency:
-          '同時に送信される並列リクエスト数。値が高いほど負荷が増しますが、ブラウザやターゲットサーバーに過負荷をかける可能性があります。',
+          '同時に送信される並列リクエスト数。値が高いほど負荷が増します。',
         loadModeRequests:
           '固定された総リクエスト数を送信します。すべてのリクエストが完了するとテストが終了します。',
         loadModeDuration:
@@ -1635,7 +1638,7 @@ export const jaJP = {
         highQps: '高いQPSはブラウザまたはネットワークで制限される可能性があります',
         externalDomain: '外部ドメインのテストは利用規約に違反する可能性があります',
         browserLimitations: 'ブラウザベースの制限',
-        maxConnections: 'ドメインあたり最大{max}同時接続（ブラウザHTTP/1.1制限）',
+        maxConnections: 'HTTP/1.1: 最大{max}接続 | HTTP/2モード: 最大{maxHttp2}（サーバーサポート必要）',
         jsOverhead: 'JavaScriptランタイムのオーバーヘッドにより、ネイティブツール（hey, wrk）と比較してスループットが低下',
         notProduction: '本番負荷テストには不向き - 正確な結果にはCLIツールを使用',
       },

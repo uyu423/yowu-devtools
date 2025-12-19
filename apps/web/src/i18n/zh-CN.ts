@@ -1414,6 +1414,7 @@ export const zhCN = {
       addParam: '添加参数',
       maxParamsReached: '已达到最大参数数',
       loadConfig: '负载配置',
+      http2Mode: 'HTTP/2模式',
       concurrency: '并发数',
       loadMode: '负载模式',
       mode: {
@@ -1433,8 +1434,10 @@ export const zhCN = {
       includeCookies: 'Cookie',
       includeCookiesTooltip: '在请求中包含Cookie。仅在Chrome扩展程序连接时可用。适用于测试需要身份验证的端点。',
       tooltip: {
+        http2Mode:
+          '启用HTTP/2多路复用以支持更高并发。目标服务器必须支持HTTP/2。',
         concurrency:
-          '同时发送的并行请求数。值越高产生的负载越大，但可能会使浏览器或目标服务器过载。',
+          '同时发送的并行请求数。值越高产生的负载越大。',
         loadModeRequests:
           '发送固定数量的总请求。所有请求完成后测试结束。',
         loadModeDuration:
@@ -1534,7 +1537,7 @@ export const zhCN = {
         highQps: '高QPS可能被浏览器或网络限制',
         externalDomain: '测试外部域名可能违反其服务条款',
         browserLimitations: '浏览器限制',
-        maxConnections: '每个域名最多{max}个并发连接（浏览器HTTP/1.1限制）',
+        maxConnections: 'HTTP/1.1: 最多{max}个连接 | HTTP/2模式: 最多{maxHttp2}个（需服务器支持）',
         jsOverhead: 'JavaScript运行时开销导致吞吐量低于原生工具（hey, wrk）',
         notProduction: '不适用于生产负载测试 - 准确结果请使用CLI工具',
       },
