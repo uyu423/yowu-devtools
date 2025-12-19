@@ -1,25 +1,25 @@
 import type { ToolDefinition } from './types';
-import { jsonTool } from './json';
-import { urlTool } from './url';
+import { apiBurstTestTool } from './api-burst-test';
+import { apiDiffTool } from './api-diff';
+import { apiTesterTool } from './api-tester';
 import { base64Tool } from './base64';
-import { timeTool } from './time';
-import { yamlTool } from './yaml';
-import { diffTool } from './diff';
 import { cronTool } from './cron';
+import { curlParserTool } from './curl-parser';
+import { diffTool } from './diff';
+import { hashTool } from './hash';
+import { imageStudioTool } from './image-studio';
+import { jsonTool } from './json';
 import { jwtDecoderTool } from './jwt-decoder';
 import { jwtEncoderTool } from './jwt-encoder';
-import { hashTool } from './hash';
-import { uuidTool } from './uuid';
 import { passwordTool } from './password';
 import { queryStringTool } from './query-string';
 import { regexTool } from './regex';
 import { stringLengthTool } from './string-length';
-import { apiTesterTool } from './api-tester';
-import { curlParserTool } from './curl-parser';
-import { apiDiffTool } from './api-diff';
-import { imageStudioTool } from './image-studio';
+import { timeTool } from './time';
+import { urlTool } from './url';
+import { uuidTool } from './uuid';
 import { videoStudioTool } from './video-studio';
-import { apiBurstTestTool } from './api-burst-test';
+import { yamlTool } from './yaml';
 
 export const tools: ToolDefinition[] = [
   jsonTool,
@@ -45,8 +45,9 @@ export const tools: ToolDefinition[] = [
   apiBurstTestTool,
 ];
 
-export const getToolById = (id: string) => tools.find(t => t.id === id);
-export const getToolByPath = (path: string) => tools.find(t => t.path === path);
+export const getToolById = (id: string) => tools.find((t) => t.id === id);
+export const getToolByPath = (path: string) =>
+  tools.find((t) => t.path === path);
 
 /**
  * Get the i18n key for a tool.

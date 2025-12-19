@@ -101,7 +101,6 @@ export const RunControlBar: React.FC<RunControlBarProps> = ({
           <ExtensionStatus
             status={extensionStatus}
             onRetry={onExtensionRetry}
-            compact
           />
         </div>
 

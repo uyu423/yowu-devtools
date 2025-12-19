@@ -43,13 +43,12 @@ import type { ToolDefinition } from '@/tools/types';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { cn } from '@/lib/utils';
+// Import extension hook from shared hooks
+import { useExtension } from '@/hooks/useExtension';
 import { useI18n } from '@/hooks/useI18nHooks';
 import { useShareModal } from '@/hooks/useShareModal';
 import { useTitle } from '@/hooks/useTitle';
 import { useToolState } from '@/hooks/useToolState';
-
-// Import extension hook from shared hooks
-import { useExtension } from '@/hooks/useExtension';
 
 // Detect OS for keyboard shortcut
 const isMac =
@@ -124,16 +123,20 @@ const ApiBurstTestTool: React.FC = () => {
   const { status: extensionStatus, checkConnection: checkExtension } =
     useExtension({ autoCheck: true });
 
-  // UI state
+  // Check if desktop (lg breakpoint = 1024px)
+  const isDesktop =
+    typeof window !== 'undefined' && window.innerWidth >= 1024;
+
+  // UI state - on mobile, collapse sections by default to save space
   const [showAcknowledgment, setShowAcknowledgment] = useState(false);
   const [sessionAcknowledged, setSessionAcknowledged] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
   const [progress, setProgress] = useState<BurstProgress | null>(null);
   const [results, setResults] = useState<BurstTestResults | null>(null);
-  const [loadConfigExpanded, setLoadConfigExpanded] = useState(true);
-  const [paramsExpanded, setParamsExpanded] = useState(true);
-  const [headersExpanded, setHeadersExpanded] = useState(true);
-  const [bodyExpanded, setBodyExpanded] = useState(true);
+  const [loadConfigExpanded, setLoadConfigExpanded] = useState(isDesktop);
+  const [paramsExpanded, setParamsExpanded] = useState(false);
+  const [headersExpanded, setHeadersExpanded] = useState(false);
+  const [bodyExpanded, setBodyExpanded] = useState(false);
   const [resultsTab, setResultsTab] = useState<'summary' | 'details'>(
     'summary'
   );
@@ -546,9 +549,9 @@ const ApiBurstTestTool: React.FC = () => {
       />
 
       {/* Main content - 2 column layout */}
-      <div className="flex-1 flex flex-col lg:flex-row gap-6 mt-4 overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row gap-4 lg:gap-6 mt-4 min-h-0">
         {/* Left: Request Configuration */}
-        <div className="w-full lg:w-1/2 flex flex-col gap-4 overflow-y-auto">
+        <div className="w-full lg:w-1/2 flex flex-col gap-3 lg:gap-4 lg:overflow-y-auto">
           {/* URL and Method */}
           <div
             className={cn(
@@ -727,17 +730,18 @@ const ApiBurstTestTool: React.FC = () => {
         </div>
 
         {/* Right: Results */}
-        <div className="w-full lg:w-1/2 flex flex-col gap-4 overflow-y-auto">
+        <div className="w-full lg:w-1/2 flex flex-col gap-3 lg:gap-4 lg:overflow-y-auto">
           {/* Results Section */}
           <div
             className={cn(
-              'flex-1 rounded-xl overflow-hidden',
+              'rounded-xl',
               'bg-white dark:bg-gray-800',
-              'border border-gray-200 dark:border-gray-700'
+              'border border-gray-200 dark:border-gray-700',
+              'lg:flex-1 lg:overflow-hidden lg:flex lg:flex-col'
             )}
           >
             {/* Results tabs header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 border-b border-gray-200 dark:border-gray-700">
               <div className="flex gap-1">
                 <button
                   onClick={() => setResultsTab('summary')}
@@ -768,7 +772,7 @@ const ApiBurstTestTool: React.FC = () => {
             </div>
 
             {/* Results content */}
-            <div className="p-4 overflow-y-auto">
+            <div className="p-4 lg:flex-1 lg:overflow-y-auto">
               {results ? (
                 resultsTab === 'summary' ? (
                   <div className="space-y-4">

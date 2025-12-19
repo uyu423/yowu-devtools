@@ -104,13 +104,14 @@ ${Object.entries(results.statusCodes)
   const disabled = !results;
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
       {/* Copy Summary */}
       <button
         onClick={handleCopySummary}
         disabled={disabled}
+        title={t('tool.apiBurstTest.export.copySummary')}
         className={cn(
-          'flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg',
+          'flex items-center gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 text-sm rounded-lg',
           'border border-gray-300 dark:border-gray-600',
           'text-gray-700 dark:text-gray-300',
           'hover:bg-gray-100 dark:hover:bg-gray-800',
@@ -121,12 +122,12 @@ ${Object.entries(results.statusCodes)
         {copied ? (
           <>
             <Check className="w-4 h-4 text-emerald-500" />
-            <span>{t('common.copied')}</span>
+            <span className="hidden sm:inline">{t('common.copied')}</span>
           </>
         ) : (
           <>
             <Copy className="w-4 h-4" />
-            <span>{t('tool.apiBurstTest.export.copySummary')}</span>
+            <span className="hidden sm:inline">{t('tool.apiBurstTest.export.copySummary')}</span>
           </>
         )}
       </button>
@@ -135,8 +136,9 @@ ${Object.entries(results.statusCodes)
       <button
         onClick={handleExportJson}
         disabled={disabled}
+        title={t('tool.apiBurstTest.export.json')}
         className={cn(
-          'flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg',
+          'flex items-center gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 text-sm rounded-lg',
           'border border-gray-300 dark:border-gray-600',
           'text-gray-700 dark:text-gray-300',
           'hover:bg-gray-100 dark:hover:bg-gray-800',
@@ -152,8 +154,9 @@ ${Object.entries(results.statusCodes)
       <button
         onClick={handleExportCsv}
         disabled={disabled}
+        title={t('tool.apiBurstTest.export.csv')}
         className={cn(
-          'flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg',
+          'flex items-center gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 text-sm rounded-lg',
           'border border-gray-300 dark:border-gray-600',
           'text-gray-700 dark:text-gray-300',
           'hover:bg-gray-100 dark:hover:bg-gray-800',

@@ -12,8 +12,8 @@ import { cn } from '@/lib/utils';
 import type { ToolDefinition } from '@/tools/types';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { ShareModal } from '@/components/common/ShareModal';
-import { Tooltip } from '@/components/ui/Tooltip';
 import { ResizablePanels } from '@/components/common/ResizablePanels';
+import { Tooltip } from '@/components/ui/Tooltip';
 import { useToolState } from '@/hooks/useToolState';
 import { useShareModal } from '@/hooks/useShareModal';
 import { useTitle } from '@/hooks/useTitle';
@@ -32,10 +32,10 @@ import {
   BodyEditor,
   ResponseViewer,
   HistorySidebar,
-  ExtensionStatus,
   CollapsibleSection,
   CorsModal,
 } from './components';
+import { ExtensionStatus } from '@/components/common/ExtensionStatus';
 import { useRequestExecutor, useApiHistory, useCorsAllowlist } from './hooks';
 import { getStoredApiTesterState, clearStoredApiTesterState, convertToApiTesterState } from '@/lib/curl/convertToApiTester';
 import { isCurlCommand } from '@/lib/curl/detectCurl';
@@ -476,10 +476,10 @@ const ApiTesterTool: React.FC = () => {
                       type="checkbox"
                       checked={state.includeCookies}
                       onChange={(e) => updateState({ includeCookies: e.target.checked })}
-                      className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-0"
                       disabled={isLoading}
+                      className="w-3.5 h-3.5 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-0"
                     />
-                    <Cookie className="w-4 h-4" />
+                    <Cookie className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">{t('tool.apiTester.includeCookies')}</span>
                   </label>
                   <Tooltip content={t('tool.apiTester.includeCookiesTooltip')} position="bottom" nowrap={false}>
