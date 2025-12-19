@@ -1173,6 +1173,8 @@ export const enUS = {
       setAsDomainA: 'Set as Domain A',
       setAsDomainB: 'Set as Domain B',
       sentToApiDiff: 'Sent to API Diff as Domain {domain}',
+      sendToBurstTest: 'Burst Test',
+      sentToBurstTest: 'Sent to API Burst Test',
       learnMoreCors: 'Learn more about CORS',
       corsAllowedOrigins: 'Allowed Origins',
       corsManageAllowlist: 'Manage',

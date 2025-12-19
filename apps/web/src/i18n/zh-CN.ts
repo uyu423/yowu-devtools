@@ -1067,6 +1067,8 @@ export const zhCN = {
       setAsDomainA: '设为 Domain A',
       setAsDomainB: '设为 Domain B',
       sentToApiDiff: '已发送到 API Diff 的 Domain {domain}',
+      sendToBurstTest: '负载测试',
+      sentToBurstTest: '已发送到 API Burst Test',
       learnMoreCors: '了解更多关于CORS',
       corsAllowedOrigins: '允许的域',
       corsManageAllowlist: '管理',

@@ -1196,6 +1196,8 @@ export const esES = {
       setAsDomainA: 'Establecer como Domain A',
       setAsDomainB: 'Establecer como Domain B',
       sentToApiDiff: 'Enviado a API Diff como Domain {domain}',
+      sendToBurstTest: 'Prueba de carga',
+      sentToBurstTest: 'Enviado a API Burst Test',
       learnMoreCors: 'Más información sobre CORS',
       corsAllowedOrigins: 'Dominios permitidos',
       corsManageAllowlist: 'Gestionar',

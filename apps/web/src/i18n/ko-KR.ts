@@ -1144,6 +1144,8 @@ export const koKR = {
       setAsDomainA: 'Domain A로 설정',
       setAsDomainB: 'Domain B로 설정',
       sentToApiDiff: 'API Diff의 Domain {domain}으로 전송됨',
+      sendToBurstTest: '부하 테스트',
+      sentToBurstTest: 'API Burst Test로 전송됨',
       learnMoreCors: 'CORS에 대해 자세히 알아보기',
       corsAllowedOrigins: '허용된 도메인',
       corsManageAllowlist: '관리',

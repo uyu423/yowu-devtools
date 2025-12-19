@@ -1154,6 +1154,8 @@ export const jaJP = {
       setAsDomainA: 'Domain Aとして設定',
       setAsDomainB: 'Domain Bとして設定',
       sentToApiDiff: 'API DiffのDomain {domain}に送信されました',
+      sendToBurstTest: '負荷テスト',
+      sentToBurstTest: 'API Burst Testに送信されました',
       learnMoreCors: 'CORSについて詳しく',
       corsAllowedOrigins: '許可されたドメイン',
       corsManageAllowlist: '管理',
