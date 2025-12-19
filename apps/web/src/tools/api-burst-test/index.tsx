@@ -20,6 +20,7 @@ import {
   RunControlBar,
   StatusCodeChart,
   SummaryCards,
+  TimeSeriesChart,
   UrlMethodInput,
   WarningBanner,
 } from './components';
@@ -205,7 +206,8 @@ const ApiBurstTestTool: React.FC = () => {
         options: {
           timeoutMs,
           redirect: 'follow',
-          credentials: 'omit',
+          credentials: state.includeCookies ? 'include' : 'omit',
+          includeCookies: state.includeCookies,
         },
       });
 
@@ -227,7 +229,7 @@ const ApiBurstTestTool: React.FC = () => {
         headers: new Headers(responseSpec.headers || {}),
       });
     };
-  }, [extensionStatus, executeRequest]);
+  }, [extensionStatus, executeRequest, state.includeCookies]);
 
   // Handlers
   const handleUrlChange = useCallback(
@@ -422,6 +424,8 @@ const ApiBurstTestTool: React.FC = () => {
         progress={progress}
         loadMode={state.loadMode}
         extensionStatus={extensionStatus}
+        includeCookies={state.includeCookies}
+        onIncludeCookiesChange={(value) => updateState({ includeCookies: value })}
         onRun={handleRun}
         onStop={handleStop}
         onExtensionRetry={checkExtension}
@@ -664,6 +668,15 @@ const ApiBurstTestTool: React.FC = () => {
                 ) : (
                   <div className="space-y-4">
                     <DetailedSummary results={results} />
+                    
+                    {/* Time series graphs */}
+                    {results.timeSeries.length > 0 && (
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <TimeSeriesChart data={results.timeSeries} metric="rps" />
+                        <TimeSeriesChart data={results.timeSeries} metric="latency" />
+                      </div>
+                    )}
+                    
                     <LatencyDistribution latency={results.latency} />
                     <ErrorsTable
                       errors={results.errors}

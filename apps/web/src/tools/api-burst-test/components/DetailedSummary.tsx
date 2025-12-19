@@ -1,14 +1,24 @@
 /**
  * DetailedSummary - Detailed test results summary
- * Shows: Total time, Slowest, Fastest, Average, Total data, Size/request
+ * Shows: Total time, Slowest, Fastest, Average, Total data, Size/request, Peak RPS, Start/End time
  */
 
 import React from 'react';
-import { Timer, Gauge, Database, FileText, TrendingUp, TrendingDown, Activity } from 'lucide-react';
+import { Timer, Gauge, Database, TrendingUp, TrendingDown, Activity, Clock, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useI18n } from '@/hooks/useI18nHooks';
 import type { BurstTestResults } from '../types';
 import { formatDuration, formatBytes, formatNumber } from '../types';
+
+// Format timestamp to HH:MM:SS
+const formatTimestamp = (timestamp: number): string => {
+  const date = new Date(timestamp);
+  return date.toLocaleTimeString(undefined, {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  });
+};
 
 interface DetailedSummaryProps {
   results: BurstTestResults;
@@ -77,6 +87,20 @@ export const DetailedSummary: React.FC<DetailedSummaryProps> = ({ results }) => 
         {t('tool.apiBurstTest.results.detailedSummary')}
       </h3>
 
+      {/* Time info row */}
+      <div className="flex flex-wrap gap-4 mb-4 pb-3 border-b border-gray-100 dark:border-gray-700">
+        <div className="flex items-center gap-2 text-sm">
+          <Clock className="w-4 h-4 text-gray-400" />
+          <span className="text-gray-500 dark:text-gray-400">{t('tool.apiBurstTest.results.startTime')}:</span>
+          <span className="font-medium text-gray-700 dark:text-gray-300">{formatTimestamp(results.startTime)}</span>
+        </div>
+        <div className="flex items-center gap-2 text-sm">
+          <Clock className="w-4 h-4 text-gray-400" />
+          <span className="text-gray-500 dark:text-gray-400">{t('tool.apiBurstTest.results.endTime')}:</span>
+          <span className="font-medium text-gray-700 dark:text-gray-300">{formatTimestamp(results.endTime)}</span>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 divide-y sm:divide-y-0 divide-gray-100 dark:divide-gray-700">
         {/* Left column - Time stats */}
         <div className="space-y-1">
@@ -113,14 +137,16 @@ export const DetailedSummary: React.FC<DetailedSummaryProps> = ({ results }) => 
             subValue="req/s"
           />
           <StatItem
+            icon={Zap}
+            label={t('tool.apiBurstTest.results.peakRps')}
+            value={results.peakRps.toFixed(2)}
+            subValue="req/s"
+            variant="success"
+          />
+          <StatItem
             icon={Database}
             label={t('tool.apiBurstTest.results.totalData')}
             value={formatBytes(results.totalDataBytes)}
-          />
-          <StatItem
-            icon={FileText}
-            label={t('tool.apiBurstTest.results.sizePerRequest')}
-            value={formatBytes(results.avgSizeBytes)}
           />
           <StatItem
             icon={Activity}

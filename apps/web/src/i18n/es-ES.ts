@@ -1585,6 +1585,9 @@ export const esES = {
       qps: 'req/s',
       rpsUnit: 'req/s',
       timeoutSeconds: 'Tiempo de espera',
+      // Cookie option
+      includeCookies: 'Cookies',
+      includeCookiesTooltip: 'Incluir cookies en las solicitudes. Solo disponible cuando la extensión de Chrome está conectada. Útil para probar endpoints autenticados.',
       tooltip: {
         concurrency:
           'Número de solicitudes paralelas enviadas simultáneamente. Valores más altos generan más carga pero pueden sobrecargar el navegador o el servidor de destino.',
@@ -1646,10 +1649,19 @@ export const esES = {
         fastest: 'Más rápido',
         slowest: 'Más lento',
         average: 'Promedio',
-        requestsPerSec: 'Solicitudes/seg',
+        requestsPerSec: 'RPS Promedio',
         totalData: 'Datos totales',
         sizePerRequest: 'Tamaño/solicitud',
         successFailure: 'Éxito / Fracaso',
+        startTime: 'Inicio',
+        endTime: 'Fin',
+        peakRps: 'RPS Máximo',
+      },
+      // Time series graphs
+      graph: {
+        rps: 'RPS a lo largo del tiempo',
+        latency: 'Latencia a lo largo del tiempo',
+        errors: 'Errores a lo largo del tiempo',
       },
       errors: {
         type: 'Tipo de error',

@@ -17,4 +17,5 @@ export { StatusCodeChart } from './StatusCodeChart';
 export { ErrorsTable } from './ErrorsTable';
 export { ExportButtons } from './ExportButtons';
 export { DetailedSummary } from './DetailedSummary';
+export { TimeSeriesChart } from './TimeSeriesChart';
 

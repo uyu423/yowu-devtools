@@ -401,6 +401,7 @@ const ApiTesterTool: React.FC = () => {
       headers: headers.length > 0 ? headers : [],
       body: { mode: bodyMode, text: bodyText },
       auth: null,
+      includeCookies: state.includeCookies,
       concurrency: 10,
       loadMode: { type: 'requests', n: 100, durationMs: 10000 },
       rateLimit: { type: 'none', qps: 100 },

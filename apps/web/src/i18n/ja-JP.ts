@@ -1530,6 +1530,9 @@ export const jaJP = {
       qps: 'req/s',
       rpsUnit: 'req/s',
       timeoutSeconds: 'タイムアウト',
+      // Cookie option
+      includeCookies: 'Cookie',
+      includeCookiesTooltip: 'リクエストにCookieを含めます。Chrome拡張機能が接続されている場合のみ利用可能です。認証が必要なエンドポイントのテストに便利です。',
       tooltip: {
         concurrency:
           '同時に送信される並列リクエスト数。値が高いほど負荷が増しますが、ブラウザやターゲットサーバーに過負荷をかける可能性があります。',
@@ -1591,10 +1594,19 @@ export const jaJP = {
         fastest: '最速',
         slowest: '最遅',
         average: '平均',
-        requestsPerSec: 'リクエスト/秒',
+        requestsPerSec: '平均RPS',
         totalData: '合計データ',
         sizePerRequest: 'リクエストあたりのサイズ',
         successFailure: '成功 / 失敗',
+        startTime: '開始',
+        endTime: '終了',
+        peakRps: 'ピークRPS',
+      },
+      // Time series graphs
+      graph: {
+        rps: 'RPS推移',
+        latency: 'レイテンシ推移',
+        errors: 'エラー推移',
       },
       errors: {
         type: 'エラータイプ',

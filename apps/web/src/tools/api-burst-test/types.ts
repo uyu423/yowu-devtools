@@ -73,6 +73,7 @@ export interface ApiBurstTestState {
   headers: BurstHeaderItem[];
   body: BurstBody;
   auth: BasicAuth | null;
+  includeCookies: boolean;  // Include cookies in requests (requires extension)
   
   // Load configuration
   concurrency: number;
@@ -111,6 +112,14 @@ export interface ErrorBreakdown {
 // Status code distribution
 export type StatusCodeDistribution = Map<number, number>;
 
+// Time series data point for graphs
+export interface TimeSeriesPoint {
+  timestamp: number;  // ms since test start
+  rps: number;        // requests per second at this point
+  avgLatencyMs: number;  // average latency at this point
+  errorCount: number;    // cumulative errors at this point
+}
+
 // Full test results
 export interface BurstTestResults {
   // Summary
@@ -119,14 +128,22 @@ export interface BurstTestResults {
   failedRequests: number;
   totalTimeMs: number;
   rps: number;
+  peakRps: number;      // Maximum RPS observed during test
   totalDataBytes: number;
   avgSizeBytes: number;
+  
+  // Timing
+  startTime: number;    // Unix timestamp when test started
+  endTime: number;      // Unix timestamp when test ended
   
   // Latency
   latency: LatencyMetrics;
   
   // Histogram data for chart (buckets of latency ranges)
   histogramBuckets: HistogramBucket[];
+  
+  // Time series data for graphs (sampled every second)
+  timeSeries: TimeSeriesPoint[];
   
   // Distribution
   statusCodes: Record<number, number>;
@@ -189,6 +206,7 @@ export const DEFAULT_BURST_STATE: ApiBurstTestState = {
   headers: [],
   body: { mode: 'raw', text: '' },
   auth: null,
+  includeCookies: false,
   concurrency: 10,
   loadMode: { type: 'requests', n: 100, durationMs: 10000 },
   rateLimit: { type: 'none', qps: 100 },

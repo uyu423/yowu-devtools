@@ -1563,6 +1563,9 @@ export const enUS = {
       qps: 'req/s',
       rpsUnit: 'req/s',
       timeoutSeconds: 'Timeout',
+      // Cookie option
+      includeCookies: 'Cookies',
+      includeCookiesTooltip: 'Include cookies in requests. Only available when Chrome Extension is connected. Useful for testing authenticated endpoints.',
       // Tooltips for technical terms
       tooltip: {
         concurrency:
@@ -1635,10 +1638,19 @@ export const enUS = {
         fastest: 'Fastest',
         slowest: 'Slowest',
         average: 'Average',
-        requestsPerSec: 'Requests/sec',
+        requestsPerSec: 'Avg RPS',
+        peakRps: 'Peak RPS',
         totalData: 'Total Data',
         sizePerRequest: 'Size/Request',
         successFailure: 'Success / Failure',
+        startTime: 'Start',
+        endTime: 'End',
+      },
+      // Time series graphs
+      graph: {
+        rps: 'RPS Over Time',
+        latency: 'Latency Over Time',
+        errors: 'Errors Over Time',
       },
       // Errors
       errors: {

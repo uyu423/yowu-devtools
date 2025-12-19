@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { Play, Square, Loader2 } from 'lucide-react';
+import { Play, Square, Loader2, Cookie, HelpCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { useI18n } from '@/hooks/useI18nHooks';
@@ -18,6 +18,8 @@ interface RunControlBarProps {
   progress: BurstProgress | null;
   loadMode: LoadMode;
   extensionStatus: ExtensionStatusType;
+  includeCookies: boolean;
+  onIncludeCookiesChange: (value: boolean) => void;
   onRun: () => void;
   onStop: () => void;
   onExtensionRetry?: () => void;
@@ -33,6 +35,8 @@ export const RunControlBar: React.FC<RunControlBarProps> = ({
   progress,
   loadMode,
   extensionStatus,
+  includeCookies,
+  onIncludeCookiesChange,
   onRun,
   onStop,
   onExtensionRetry,
@@ -102,6 +106,26 @@ export const RunControlBar: React.FC<RunControlBarProps> = ({
             status={extensionStatus}
             onRetry={onExtensionRetry}
           />
+          
+          {/* Include Cookies checkbox - only show when extension is connected */}
+          {extensionStatus === 'connected' && (
+            <div className="flex items-center gap-1.5">
+              <label className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={includeCookies}
+                  onChange={(e) => onIncludeCookiesChange(e.target.checked)}
+                  disabled={isRunning}
+                  className="w-3.5 h-3.5 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-0"
+                />
+                <Cookie className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">{t('tool.apiBurstTest.includeCookies')}</span>
+              </label>
+              <Tooltip content={t('tool.apiBurstTest.includeCookiesTooltip')} position="bottom" nowrap={false}>
+                <HelpCircle className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 cursor-help" />
+              </Tooltip>
+            </div>
+          )}
         </div>
 
         {/* Right: Progress info */}

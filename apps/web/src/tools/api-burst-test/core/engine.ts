@@ -13,6 +13,7 @@ import type {
   HistogramBucket,
   LatencyMetrics,
   RequestSample,
+  TimeSeriesPoint,
 } from '../types';
 import { HARD_LIMITS, NO_BODY_METHODS } from '../types';
 import {
@@ -283,6 +284,13 @@ export async function runBurstTest(config: BurstEngineConfig): Promise<BurstTest
   let successRequests = 0;
   let failedRequests = 0;
   let totalDataBytes = 0;
+  let peakRps = 0;
+
+  // Time series collection (every second)
+  const timeSeries: TimeSeriesPoint[] = [];
+  let lastTimeSeriesUpdate = 0;
+  let lastTimeSeriesRequests = 0;
+  const recentLatencies: number[] = []; // For calculating avg latency per interval
 
   // Determine test parameters
   const isRequestsMode = state.loadMode.type === 'requests';
@@ -309,13 +317,40 @@ export async function runBurstTest(config: BurstEngineConfig): Promise<BurstTest
   }
 
   const startTime = performance.now();
+  const startTimestamp = Date.now();
 
-  // Progress update function
+  // Progress update function with time series collection
   const updateProgress = (): void => {
-    if (!onProgress) return;
-
     const elapsedMs = performance.now() - startTime;
     const currentRps = calculateRps(completedRequests, elapsedMs);
+
+    // Track peak RPS
+    if (currentRps > peakRps) {
+      peakRps = currentRps;
+    }
+
+    // Collect time series data every second
+    const secondElapsed = Math.floor(elapsedMs / 1000);
+    if (secondElapsed > lastTimeSeriesUpdate && completedRequests > lastTimeSeriesRequests) {
+      const intervalRequests = completedRequests - lastTimeSeriesRequests;
+      const intervalRps = intervalRequests; // requests in this 1-second interval
+      const avgLatency = recentLatencies.length > 0
+        ? recentLatencies.reduce((a, b) => a + b, 0) / recentLatencies.length
+        : 0;
+      
+      timeSeries.push({
+        timestamp: secondElapsed * 1000,
+        rps: intervalRps,
+        avgLatencyMs: avgLatency,
+        errorCount: failedRequests,
+      });
+
+      lastTimeSeriesUpdate = secondElapsed;
+      lastTimeSeriesRequests = completedRequests;
+      recentLatencies.length = 0; // Clear for next interval
+    }
+
+    if (!onProgress) return;
 
     onProgress({
       completedRequests,
@@ -360,6 +395,7 @@ export async function runBurstTest(config: BurstEngineConfig): Promise<BurstTest
       latencySampler.add(result.latencyMs);
       latencyStats.add(result.latencyMs);
       totalDataBytes += result.dataBytes;
+      recentLatencies.push(result.latencyMs); // For time series avg latency
 
       if (result.status !== null) {
         statusCodes[result.status] = (statusCodes[result.status] || 0) + 1;
@@ -400,6 +436,7 @@ export async function runBurstTest(config: BurstEngineConfig): Promise<BurstTest
   await Promise.all(workers);
 
   const totalTimeMs = performance.now() - startTime;
+  const endTimestamp = Date.now();
 
   // Calculate final metrics
   const latencySamples = latencySampler.getSamples();
@@ -407,16 +444,25 @@ export async function runBurstTest(config: BurstEngineConfig): Promise<BurstTest
   const histogramBuckets: HistogramBucket[] = generateHistogramBuckets(latencySamples);
   const rps = calculateRps(completedRequests, totalTimeMs);
 
+  // Ensure peakRps is at least as high as average rps
+  if (peakRps < rps) {
+    peakRps = rps;
+  }
+
   return {
     totalRequests: completedRequests,
     successRequests,
     failedRequests,
     totalTimeMs,
     rps,
+    peakRps,
     totalDataBytes,
     avgSizeBytes: completedRequests > 0 ? totalDataBytes / completedRequests : 0,
+    startTime: startTimestamp,
+    endTime: endTimestamp,
     latency,
     histogramBuckets,
+    timeSeries,
     statusCodes,
     errors,
   };

@@ -1429,6 +1429,9 @@ export const zhCN = {
       qps: 'req/s',
       rpsUnit: 'req/s',
       timeoutSeconds: '超时',
+      // Cookie option
+      includeCookies: 'Cookie',
+      includeCookiesTooltip: '在请求中包含Cookie。仅在Chrome扩展程序连接时可用。适用于测试需要身份验证的端点。',
       tooltip: {
         concurrency:
           '同时发送的并行请求数。值越高产生的负载越大，但可能会使浏览器或目标服务器过载。',
@@ -1490,10 +1493,19 @@ export const zhCN = {
         fastest: '最快',
         slowest: '最慢',
         average: '平均',
-        requestsPerSec: '每秒请求数',
+        requestsPerSec: '平均RPS',
         totalData: '总数据',
         sizePerRequest: '每请求大小',
         successFailure: '成功 / 失败',
+        startTime: '开始',
+        endTime: '结束',
+        peakRps: '峰值RPS',
+      },
+      // Time series graphs
+      graph: {
+        rps: 'RPS趋势',
+        latency: '延迟趋势',
+        errors: '错误趋势',
       },
       errors: {
         type: '错误类型',

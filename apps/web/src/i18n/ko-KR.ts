@@ -1526,6 +1526,9 @@ export const koKR = {
       qps: 'req/s',
       rpsUnit: 'req/s',
       timeoutSeconds: '타임아웃',
+      // Cookie option
+      includeCookies: '쿠키',
+      includeCookiesTooltip: '요청에 쿠키를 포함합니다. Chrome 확장 프로그램이 연결된 경우에만 사용 가능합니다. 인증된 엔드포인트 테스트에 유용합니다.',
       tooltip: {
         concurrency:
           '동시에 전송되는 병렬 요청 수. 높은 값은 더 많은 부하를 생성하지만 브라우저나 대상 서버에 과부하를 줄 수 있습니다.',
@@ -1590,10 +1593,19 @@ export const koKR = {
         fastest: '최단',
         slowest: '최장',
         average: '평균',
-        requestsPerSec: '초당 요청',
+        requestsPerSec: '평균 RPS',
         totalData: '전송 데이터',
         sizePerRequest: '요청당 크기',
         successFailure: '성공 / 실패',
+        startTime: '시작',
+        endTime: '종료',
+        peakRps: '최고 RPS',
+      },
+      // Time series graphs
+      graph: {
+        rps: 'RPS 추이',
+        latency: '지연시간 추이',
+        errors: '에러 추이',
       },
       errors: {
         type: '에러 유형',
