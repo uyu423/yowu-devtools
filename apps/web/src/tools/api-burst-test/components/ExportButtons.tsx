@@ -65,16 +65,22 @@ export const ExportButtons: React.FC<ExportButtonsProps> = ({
       parts.push(`-m ${state.method}`);
     }
     
+    // Helper function to escape shell special characters in double-quoted strings
+    const escapeShellArg = (str: string): string => {
+      // Escape backslashes first, then double quotes
+      return str.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+    };
+    
     // Headers: -H (can be specified multiple times)
     const enabledHeaders = state.headers.filter(h => h.enabled && h.key);
     enabledHeaders.forEach(h => {
-      parts.push(`-H "${h.key}: ${h.value}"`);
+      const escapedValue = escapeShellArg(h.value);
+      parts.push(`-H "${h.key}: ${escapedValue}"`);
     });
     
     // Body: -d (request body)
     if (state.body.text && !['GET', 'HEAD'].includes(state.method)) {
-      // Escape quotes in body
-      const escapedBody = state.body.text.replace(/"/g, '\\"');
+      const escapedBody = escapeShellArg(state.body.text);
       parts.push(`-d "${escapedBody}"`);
       
       // Content-Type: -T (if not set in headers and body mode is json)
@@ -91,8 +97,11 @@ export const ExportButtons: React.FC<ExportButtonsProps> = ({
     }
     
     // Basic auth: -a (username:password)
+    // Note: If username or password contains special chars, they should be escaped
     if (state.auth?.username) {
-      parts.push(`-a ${state.auth.username}:${state.auth.password || ''}`);
+      const escapedUser = escapeShellArg(state.auth.username);
+      const escapedPass = escapeShellArg(state.auth.password || '');
+      parts.push(`-a "${escapedUser}:${escapedPass}"`);
     }
     
     // URL (with query params) - must be last
