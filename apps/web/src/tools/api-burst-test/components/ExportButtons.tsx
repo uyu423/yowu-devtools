@@ -27,49 +27,75 @@ export const ExportButtons: React.FC<ExportButtonsProps> = ({
   const generateHeyCommand = (): string => {
     const parts = ['hey'];
     
-    // Concurrency
-    parts.push(`-c ${state.concurrency}`);
-    
-    // Load mode
-    if (state.loadMode.type === 'requests') {
-      parts.push(`-n ${state.loadMode.n}`);
-    } else {
+    // Load mode: -n (requests) or -z (duration)
+    // Note: When -z is specified, -n is ignored in hey
+    if (state.loadMode.type === 'duration') {
       parts.push(`-z ${state.loadMode.durationMs / 1000}s`);
+    } else {
+      parts.push(`-n ${state.loadMode.n}`);
     }
     
-    // Rate limit (QPS)
-    if (state.rateLimit.type !== 'none') {
+    // Concurrency: -c (workers)
+    parts.push(`-c ${state.concurrency}`);
+    
+    // Rate limit: -q (QPS per worker)
+    // hey's -q is "per worker", so:
+    // - If global: divide by concurrency
+    // - If perWorker: use as is
+    if (state.rateLimit.type === 'global') {
+      const qpsPerWorker = Math.ceil(state.rateLimit.qps / state.concurrency);
+      parts.push(`-q ${qpsPerWorker}`);
+    } else if (state.rateLimit.type === 'perWorker') {
       parts.push(`-q ${state.rateLimit.qps}`);
     }
     
-    // Timeout
-    parts.push(`-t ${state.timeoutMs / 1000}`);
+    // Timeout: -t (seconds, default is 20)
+    const timeoutSec = state.timeoutMs / 1000;
+    if (timeoutSec !== 20) {
+      parts.push(`-t ${timeoutSec}`);
+    }
     
-    // Method (default is GET, so only add if different)
+    // HTTP/2: -h2
+    if (state.useHttp2) {
+      parts.push('-h2');
+    }
+    
+    // Method: -m (default is GET)
     if (state.method !== 'GET') {
       parts.push(`-m ${state.method}`);
     }
     
-    // Headers
-    state.headers
-      .filter(h => h.enabled && h.key)
-      .forEach(h => {
-        parts.push(`-H "${h.key}: ${h.value}"`);
-      });
+    // Headers: -H (can be specified multiple times)
+    const enabledHeaders = state.headers.filter(h => h.enabled && h.key);
+    enabledHeaders.forEach(h => {
+      parts.push(`-H "${h.key}: ${h.value}"`);
+    });
     
-    // Body
+    // Body: -d (request body)
     if (state.body.text && !['GET', 'HEAD'].includes(state.method)) {
       // Escape quotes in body
       const escapedBody = state.body.text.replace(/"/g, '\\"');
       parts.push(`-d "${escapedBody}"`);
+      
+      // Content-Type: -T (if not set in headers and body mode is json)
+      const hasContentType = enabledHeaders.some(
+        h => h.key.toLowerCase() === 'content-type'
+      );
+      if (!hasContentType) {
+        if (state.body.mode === 'json') {
+          parts.push('-T "application/json"');
+        } else if (state.body.mode === 'form') {
+          parts.push('-T "application/x-www-form-urlencoded"');
+        }
+      }
     }
     
-    // Basic auth
+    // Basic auth: -a (username:password)
     if (state.auth?.username) {
       parts.push(`-a ${state.auth.username}:${state.auth.password || ''}`);
     }
     
-    // URL (with query params)
+    // URL (with query params) - must be last
     let url = state.url;
     const enabledParams = state.params.filter(p => p.enabled && p.key);
     if (enabledParams.length > 0) {
