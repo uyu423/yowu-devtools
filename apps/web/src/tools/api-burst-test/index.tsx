@@ -30,13 +30,13 @@ import type {
   BurstParamItem,
   BurstProgress,
   BurstTestResults,
-  HistogramBucket,
   LoadMode,
   RateLimit,
 } from './types';
 import { ChevronDown, ChevronUp, Flame, Info } from 'lucide-react';
 import { DEFAULT_BURST_STATE, NO_BODY_METHODS } from './types';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { runBurstTest, type RequestExecutor } from './core';
 
 import { ShareModal } from '@/components/common/ShareModal';
 import type { ToolDefinition } from '@/tools/types';
@@ -120,7 +120,7 @@ const ApiBurstTestTool: React.FC = () => {
   });
 
   // Chrome extension status
-  const { status: extensionStatus, checkConnection: checkExtension } =
+  const { status: extensionStatus, checkConnection: checkExtension, executeRequest } =
     useExtension({ autoCheck: true });
 
   // Check if desktop (lg breakpoint = 1024px)
@@ -149,30 +149,44 @@ const ApiBurstTestTool: React.FC = () => {
   // Check if method supports body
   const methodSupportsBody = !NO_BODY_METHODS.includes(state.method);
 
-  // Build URL with params
-  const buildUrlWithParams = useCallback(
-    (baseUrl: string, params: BurstParamItem[]): string => {
-      const enabledParams = params.filter((p) => p.enabled && p.key);
-      if (enabledParams.length === 0) return baseUrl;
+  // Create request executor that uses extension when connected
+  const createRequestExecutor = useCallback((): RequestExecutor | undefined => {
+    if (extensionStatus !== 'connected') {
+      return undefined; // Use default fetch
+    }
+
+    // Return extension-based executor
+    return async (url: string, options: RequestInit, timeoutMs: number): Promise<Response> => {
+      const headers: Record<string, string> = {};
+      if (options.headers) {
+        const h = options.headers as Record<string, string>;
+        Object.entries(h).forEach(([key, value]) => {
+          headers[key] = value;
+        });
+      }
 
       try {
-        const url = new URL(baseUrl);
-        enabledParams.forEach((p) => {
-          url.searchParams.append(p.key, p.value);
+        const responseSpec = await executeRequest({
+          method: (options.method || 'GET') as 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS',
+          url,
+          headers,
+          body: options.body ? String(options.body) : undefined,
+          timeout: timeoutMs,
         });
-        return url.toString();
-      } catch {
-        // If URL parsing fails, append manually
-        const queryString = enabledParams
-          .map(
-            (p) => `${encodeURIComponent(p.key)}=${encodeURIComponent(p.value)}`
-          )
-          .join('&');
-        return baseUrl + (baseUrl.includes('?') ? '&' : '?') + queryString;
+
+        // Create a Response-like object from extension response
+        const body = responseSpec.body || '';
+        return new Response(body, {
+          status: responseSpec.status,
+          statusText: responseSpec.statusText,
+          headers: new Headers(responseSpec.headers),
+        });
+      } catch (error) {
+        // Re-throw to let engine classify the error
+        throw error;
       }
-    },
-    []
-  );
+    };
+  }, [extensionStatus, executeRequest]);
 
   // Handlers
   const handleUrlChange = useCallback(
@@ -261,214 +275,20 @@ const ApiBurstTestTool: React.FC = () => {
     abortControllerRef.current = controller;
 
     try {
-      // Build final URL with params
-      const finalUrl = buildUrlWithParams(state.url, state.params);
+      // Get request executor (extension-based if connected, otherwise default fetch)
+      const requestExecutor = createRequestExecutor();
 
-      // Simulate burst test (placeholder - actual implementation would use Web Worker)
-      const startTime = performance.now();
-      const samples: number[] = [];
-      const statusCounts: Record<number, number> = {};
-      let completedRequests = 0;
-      let successRequests = 0;
-      let failedRequests = 0;
-      let totalDataBytes = 0;
-
-      const totalRequests =
-        state.loadMode.type === 'requests' ? state.loadMode.n : 1000; // Estimate for duration mode
-      const concurrency = state.concurrency;
-
-      // Create promise queue for concurrent requests
-      const executeRequest = async (): Promise<void> => {
-        if (controller.signal.aborted) return;
-
-        const requestStart = performance.now();
-        try {
-          const headers: Record<string, string> = {};
-          state.headers
-            .filter((h) => h.enabled && h.key)
-            .forEach((h) => {
-              headers[h.key] = h.value;
-            });
-
-          // Build request options
-          const options: RequestInit = {
-            method: state.method,
-            headers,
-            signal: controller.signal,
-          };
-
-          // Add body for methods that support it
-          if (methodSupportsBody && state.body.text.trim()) {
-            options.body = state.body.text;
-            if (state.body.mode === 'json' && !headers['Content-Type']) {
-              headers['Content-Type'] = 'application/json';
-            } else if (state.body.mode === 'form' && !headers['Content-Type']) {
-              headers['Content-Type'] = 'application/x-www-form-urlencoded';
-            }
-          }
-
-          // Add basic auth
-          if (state.auth) {
-            headers['Authorization'] = `Basic ${btoa(
-              `${state.auth.username}:${state.auth.password}`
-            )}`;
-          }
-
-          const response = await fetch(finalUrl, options);
-          const latencyMs = performance.now() - requestStart;
-          samples.push(latencyMs);
-
-          // Count status codes
-          statusCounts[response.status] =
-            (statusCounts[response.status] || 0) + 1;
-
-          if (response.ok) {
-            successRequests++;
-          } else {
-            failedRequests++;
-          }
-
-          // Get response size
-          const text = await response.text();
-          totalDataBytes += new Blob([text]).size;
-        } catch (error) {
-          const latencyMs = performance.now() - requestStart;
-          samples.push(latencyMs);
-          failedRequests++;
-
-          // Classify error
-          if (error instanceof DOMException && error.name === 'AbortError') {
-            // Aborted
-          } else if (error instanceof TypeError) {
-            // Network/CORS error
-          }
-        }
-
-        completedRequests++;
-
-        // Update progress
-        const elapsedMs = performance.now() - startTime;
-        const currentRps = completedRequests / (elapsedMs / 1000);
-        setProgress({
-          completedRequests,
-          totalRequests:
-            state.loadMode.type === 'requests'
-              ? state.loadMode.n
-              : totalRequests,
-          elapsedMs,
-          durationMs: state.loadMode.durationMs,
-          currentRps,
-          isRunning: true,
-        });
-      };
-
-      // Execute requests with concurrency
-      const runBatch = async () => {
-        const isRequestsMode = state.loadMode.type === 'requests';
-        const targetRequests = isRequestsMode
-          ? state.loadMode.n
-          : totalRequests;
-        const maxDurationMs = state.loadMode.durationMs;
-
-        while (
-          completedRequests < targetRequests &&
-          !controller.signal.aborted
-        ) {
-          // Check duration limit
-          if (
-            !isRequestsMode &&
-            performance.now() - startTime >= maxDurationMs
-          ) {
-            break;
-          }
-
-          // Create batch of concurrent requests
-          const batchSize = Math.min(
-            concurrency,
-            targetRequests - completedRequests
-          );
-          const batch = Array(batchSize)
-            .fill(null)
-            .map(() => executeRequest());
-          await Promise.all(batch);
-
-          // Rate limiting (simple delay)
-          if (state.rateLimit.type !== 'none') {
-            const targetDelay = 1000 / state.rateLimit.qps;
-            await new Promise((resolve) => setTimeout(resolve, targetDelay));
-          }
-        }
-      };
-
-      await runBatch();
-
-      const totalTimeMs = performance.now() - startTime;
-
-      // Calculate results
-      samples.sort((a, b) => a - b);
-      const percentile = (p: number) => {
-        const index = Math.ceil((p / 100) * samples.length) - 1;
-        return samples[Math.max(0, index)] || 0;
-      };
-
-      // Generate histogram buckets
-      const bucketCount = 10;
-      const maxLatency = samples[samples.length - 1] || 1000;
-      const bucketSize = maxLatency / bucketCount;
-      const histogramBuckets: HistogramBucket[] = [];
-
-      for (let i = 0; i < bucketCount; i++) {
-        const rangeStart = i * bucketSize;
-        const rangeEnd = (i + 1) * bucketSize;
-        const count = samples.filter(
-          (s) => s >= rangeStart && s < rangeEnd
-        ).length;
-        histogramBuckets.push({
-          rangeStart,
-          rangeEnd,
-          count,
-          label: `${(rangeStart / 1000).toFixed(3)}s`,
-        });
-      }
-
-      const finalResults: BurstTestResults = {
-        totalRequests: completedRequests,
-        successRequests,
-        failedRequests,
-        totalTimeMs,
-        rps: completedRequests / (totalTimeMs / 1000),
-        totalDataBytes,
-        avgSizeBytes:
-          completedRequests > 0 ? totalDataBytes / completedRequests : 0,
-        latency: {
-          avg:
-            samples.length > 0
-              ? samples.reduce((a, b) => a + b, 0) / samples.length
-              : 0,
-          min: samples[0] || 0,
-          max: samples[samples.length - 1] || 0,
-          p50: percentile(50),
-          p90: percentile(90),
-          p95: percentile(95),
-          p99: percentile(99),
+      // Run the burst test using the engine
+      const testResults = await runBurstTest({
+        state,
+        abortController: controller,
+        requestExecutor,
+        onProgress: (progressUpdate) => {
+          setProgress(progressUpdate);
         },
-        histogramBuckets,
-        statusCodes: statusCounts,
-        errors: {
-          timeout: 0,
-          cors: 0,
-          network: 0,
-          aborted: 0,
-          http4xx: Object.entries(statusCounts)
-            .filter(([code]) => Number(code) >= 400 && Number(code) < 500)
-            .reduce((sum, [, count]) => sum + count, 0),
-          http5xx: Object.entries(statusCounts)
-            .filter(([code]) => Number(code) >= 500)
-            .reduce((sum, [, count]) => sum + count, 0),
-        },
-      };
+      });
 
-      setResults(finalResults);
+      setResults(testResults);
     } catch (error) {
       console.error('Burst test error:', error);
     } finally {
@@ -476,7 +296,7 @@ const ApiBurstTestTool: React.FC = () => {
       setProgress(null);
       abortControllerRef.current = null;
     }
-  }, [state, sessionAcknowledged, methodSupportsBody, buildUrlWithParams]);
+  }, [state, sessionAcknowledged, createRequestExecutor]);
 
   // Stop test
   const handleStop = useCallback(() => {
