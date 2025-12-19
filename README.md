@@ -23,8 +23,9 @@ An open toolbox for developers who would rather keep sensitive snippets on their
 
 ### Recent Releases
 
-#### v1.5.x - Media Tools
+#### v1.5.x - Media Tools & Load Testing
 
+- **API Burst Test** (v1.5.1): Browser-based HTTP load testing with latency distribution, RPS metrics, and status code analysis. Chrome Extension integration for CORS bypass.
 - **Image Studio** (v1.5.0): Browser-based image editing with crop, resize, rotate/flip, and format conversion.
 - **Video Studio** (v1.5.0): Video editing powered by ffmpeg.wasm—trim, cut, crop, resize, and export to MP4/WebM.
 - **Pipeline Workflow** (v1.5.0): Combine multiple operations in a single export with preset management.

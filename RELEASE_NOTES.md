@@ -4,6 +4,58 @@ RELEASE_NOTES.md must be written in English.
 
 # Release Notes
 
+## v1.5.1 (December 2025) - API Burst Test
+
+Introducing **API Burst Test**, a browser-based HTTP load testing tool for quick API performance checks. All requests originate from your browser—no server proxy required.
+
+### New Features
+
+- ✨ **API Burst Test Tool**: Simple browser-based load testing
+
+  - **Load Modes**: Total requests (N) or duration (Z seconds) with configurable concurrency
+  - **Rate Limiting**: Global QPS or per-worker QPS control
+  - **Metrics Collection**: RPS, latency distribution (p50/p90/p95/p99), status codes, error breakdown
+  - **Time Series Charts**: RPS, latency, and errors over time visualization
+  - **hey CLI Integration**: Copy test configuration as `hey` command for CLI comparison
+  - **Chrome Extension**: CORS bypass and cookie inclusion support
+  - **Export Options**: JSON, CSV, and summary copy to clipboard
+
+- ✨ **Responsible Use Safeguards**:
+
+  - Required acknowledgment before first test execution
+  - Hard limits: max 6 concurrent connections (HTTP/1.1), 50 (HTTP/2), 10,000 requests, 60s duration
+  - Collapsible warning banners for responsible use notice and browser limitations
+  - Clear performance gap warning (5x+ difference vs CLI tools)
+
+- ✨ **API Tester Integration**:
+  - "Send to Burst Test" button in API Tester
+  - Transfers URL, method, headers, body, and cookie settings
+
+### Enhancements
+
+- 🔧 **HTTP/2 Mode**: Toggle to increase max concurrency from 6 to 50 (requires server support)
+- 🔧 **Beta Badge**: Added to tool header indicating experimental status
+- 🔧 **Collapsible Warnings**: Each warning section (Responsible Use, Browser Limitations) collapses independently
+- 🌐 **Full i18n Support**: All UI translated to 5 languages (en-US, ko-KR, ja-JP, zh-CN, es-ES)
+
+### Technical
+
+- Core engine with token bucket rate limiter and concurrent request executor
+- Metrics calculation: percentiles, histogram buckets, reservoir sampling
+- Error classification: timeout, CORS, network, aborted, HTTP 4xx/5xx
+- AbortController for clean test cancellation
+- Time series data collection at 1-second intervals
+- New directories: `src/tools/api-burst-test/`, `src/tools/api-burst-test/core/`
+
+### Privacy & Limitations
+
+- 🔒 All requests sent directly from your browser (your IP visible to target server)
+- ⚠️ Browser-based: Results may differ 5x+ from CLI tools (hey, wrk, ab)
+- ⚠️ Not suitable for production load testing—use CLI tools for accurate benchmarks
+- ⚠️ HTTP/1.1 limited to 6 concurrent connections per domain (browser restriction)
+
+---
+
 ## v1.5.0 (December 2025) - Media Tools: Image Studio & Video Studio
 
 Major release introducing **Image Studio** and **Video Studio** tools for browser-based media processing. All processing happens locally in your browser—no data is ever sent to servers.
