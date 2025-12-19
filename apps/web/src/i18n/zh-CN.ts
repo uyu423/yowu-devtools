@@ -1533,6 +1533,10 @@ export const zhCN = {
         longDuration: '长时间测试。请监控浏览器内存使用情况。',
         highQps: '高QPS可能被浏览器或网络限制',
         externalDomain: '测试外部域名可能违反其服务条款',
+        browserLimitations: '浏览器限制',
+        maxConnections: '每个域名最多{max}个并发连接（浏览器HTTP/1.1限制）',
+        jsOverhead: 'JavaScript运行时开销导致吞吐量低于原生工具（hey, wrk）',
+        notProduction: '不适用于生产负载测试 - 准确结果请使用CLI工具',
       },
       acknowledgment: {
         title: '需要确认',

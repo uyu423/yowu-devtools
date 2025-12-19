@@ -1633,6 +1633,10 @@ export const koKR = {
         longDuration: '장시간 테스트입니다. 브라우저 메모리 사용량을 모니터링하세요.',
         highQps: '높은 QPS는 브라우저 또는 네트워크에서 제한될 수 있습니다',
         externalDomain: '외부 도메인 테스트는 서비스 약관을 위반할 수 있습니다',
+        browserLimitations: '브라우저 기반 제한사항',
+        maxConnections: '도메인당 최대 {max}개 동시 연결 (브라우저 HTTP/1.1 제한)',
+        jsOverhead: 'JavaScript 런타임 오버헤드로 네이티브 도구(hey, wrk) 대비 처리량 저하',
+        notProduction: '프로덕션 부하 테스트에 부적합 - 정확한 결과는 CLI 도구 사용 권장',
       },
       acknowledgment: {
         title: '확인 필요',

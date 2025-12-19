@@ -1634,6 +1634,10 @@ export const jaJP = {
         longDuration: '長時間のテストです。ブラウザのメモリ使用量を監視してください。',
         highQps: '高いQPSはブラウザまたはネットワークで制限される可能性があります',
         externalDomain: '外部ドメインのテストは利用規約に違反する可能性があります',
+        browserLimitations: 'ブラウザベースの制限',
+        maxConnections: 'ドメインあたり最大{max}同時接続（ブラウザHTTP/1.1制限）',
+        jsOverhead: 'JavaScriptランタイムのオーバーヘッドにより、ネイティブツール（hey, wrk）と比較してスループットが低下',
+        notProduction: '本番負荷テストには不向き - 正確な結果にはCLIツールを使用',
       },
       acknowledgment: {
         title: '確認が必要',

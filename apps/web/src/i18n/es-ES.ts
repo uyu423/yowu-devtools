@@ -1689,6 +1689,10 @@ export const esES = {
         longDuration: 'Prueba de larga duración. Monitorea el uso de memoria del navegador.',
         highQps: 'Alto QPS puede ser limitado por el navegador o la red',
         externalDomain: 'Probar dominios externos puede violar sus términos de servicio',
+        browserLimitations: 'Limitaciones del navegador',
+        maxConnections: 'Máximo {max} conexiones simultáneas por dominio (límite HTTP/1.1 del navegador)',
+        jsOverhead: 'Sobrecarga del runtime de JavaScript reduce el rendimiento vs herramientas nativas (hey, wrk)',
+        notProduction: 'No apto para pruebas de carga en producción - usar herramientas CLI para resultados precisos',
       },
       acknowledgment: {
         title: 'Confirmación requerida',

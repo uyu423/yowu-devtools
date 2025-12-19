@@ -177,8 +177,9 @@ export interface RequestSample {
 }
 
 // Hard limits to prevent abuse
+// Note: MAX_CONCURRENCY is 6 due to browser's per-domain connection limit (HTTP/1.1)
 export const HARD_LIMITS = {
-  MAX_CONCURRENCY: 50,
+  MAX_CONCURRENCY: 6,  // Browser limit: max 6 concurrent connections per domain
   MAX_TOTAL_REQUESTS: 10000,
   MAX_DURATION_MS: 60000,  // 60 seconds
   MAX_QPS: 1000,
@@ -192,7 +193,7 @@ export const HARD_LIMITS = {
 
 // Soft limits for warnings
 export const SOFT_LIMITS = {
-  WARN_CONCURRENCY: 20,
+  WARN_CONCURRENCY: 4,  // Warn when approaching browser limit
   WARN_TOTAL_REQUESTS: 1000,
   WARN_DURATION_MS: 30000,  // 30 seconds
   WARN_QPS: 100,
@@ -207,7 +208,7 @@ export const DEFAULT_BURST_STATE: ApiBurstTestState = {
   body: { mode: 'raw', text: '' },
   auth: null,
   includeCookies: false,
-  concurrency: 10,
+  concurrency: 6,  // Default to browser max
   loadMode: { type: 'requests', n: 100, durationMs: 10000 },
   rateLimit: { type: 'none', qps: 100 },
   timeoutMs: 10000,

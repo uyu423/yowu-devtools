@@ -1,11 +1,12 @@
 /**
- * WarningBanner - Responsible use notice banner (collapsible)
+ * WarningBanner - Responsible use notice banner with browser limitations (collapsible)
  */
 
 import React, { useState, useEffect } from 'react';
-import { AlertTriangle, ChevronDown, ChevronUp } from 'lucide-react';
+import { AlertTriangle, ChevronDown, ChevronUp, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useI18n } from '@/hooks/useI18nHooks';
+import { HARD_LIMITS } from '../types';
 
 const STORAGE_KEY = 'yowu-devtools:v1:api-burst-test:warningDismissed';
 
@@ -57,38 +58,61 @@ export const WarningBanner: React.FC<WarningBannerProps> = ({ className }) => {
     );
   }
 
-  // Expanded state - full banner
+  // Expanded state - full banner with two sections
   return (
-    <div
-      className={cn(
-        'flex items-start gap-3 p-4 rounded-lg relative',
-        'bg-amber-50 dark:bg-amber-900/20',
-        'border-l-4 border-amber-500',
-        className
-      )}
-    >
-      <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
-      <div className="flex-1 min-w-0 pr-8">
-        <h4 className="text-sm font-semibold text-amber-800 dark:text-amber-200">
-          {t('tool.apiBurstTest.warning.responsibleUse')}
-        </h4>
-        <p className="mt-1 text-sm text-amber-700 dark:text-amber-300 leading-relaxed">
-          {t('tool.apiBurstTest.warning.responsibleUseDesc')}
-        </p>
-      </div>
-      <button
-        onClick={handleDismiss}
+    <div className={cn('space-y-2', className)}>
+      {/* Responsible Use Warning */}
+      <div
         className={cn(
-          'absolute top-3 right-3',
-          'p-1 rounded-md',
-          'text-amber-500 dark:text-amber-400',
-          'hover:bg-amber-200/50 dark:hover:bg-amber-800/50',
-          'transition-colors'
+          'flex items-start gap-3 p-4 rounded-lg relative',
+          'bg-amber-50 dark:bg-amber-900/20',
+          'border-l-4 border-amber-500'
         )}
-        title={t('common.minimize')}
       >
-        <ChevronUp className="w-4 h-4" />
-      </button>
+        <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+        <div className="flex-1 min-w-0 pr-8">
+          <h4 className="text-sm font-semibold text-amber-800 dark:text-amber-200">
+            {t('tool.apiBurstTest.warning.responsibleUse')}
+          </h4>
+          <p className="mt-1 text-sm text-amber-700 dark:text-amber-300 leading-relaxed">
+            {t('tool.apiBurstTest.warning.responsibleUseDesc')}
+          </p>
+        </div>
+        <button
+          onClick={handleDismiss}
+          className={cn(
+            'absolute top-3 right-3',
+            'p-1 rounded-md',
+            'text-amber-500 dark:text-amber-400',
+            'hover:bg-amber-200/50 dark:hover:bg-amber-800/50',
+            'transition-colors'
+          )}
+          title={t('common.minimize')}
+        >
+          <ChevronUp className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* Browser Limitations Info */}
+      <div
+        className={cn(
+          'flex items-start gap-3 p-4 rounded-lg',
+          'bg-blue-50 dark:bg-blue-900/20',
+          'border-l-4 border-blue-500'
+        )}
+      >
+        <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+        <div className="flex-1 min-w-0">
+          <h4 className="text-sm font-semibold text-blue-800 dark:text-blue-200">
+            {t('tool.apiBurstTest.warning.browserLimitations')}
+          </h4>
+          <ul className="mt-1 text-sm text-blue-700 dark:text-blue-300 leading-relaxed list-disc list-inside space-y-0.5">
+            <li>{t('tool.apiBurstTest.warning.maxConnections').replace('{max}', String(HARD_LIMITS.MAX_CONCURRENCY))}</li>
+            <li>{t('tool.apiBurstTest.warning.jsOverhead')}</li>
+            <li>{t('tool.apiBurstTest.warning.notProduction')}</li>
+          </ul>
+        </div>
+      </div>
     </div>
   );
 };

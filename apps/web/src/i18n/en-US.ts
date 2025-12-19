@@ -1686,6 +1686,11 @@ export const enUS = {
         longDuration: 'Long-duration test. Monitor browser memory usage.',
         highQps: 'High QPS may be throttled by browser or network',
         externalDomain: 'Testing external domains may violate their terms of service',
+        // Browser limitations
+        browserLimitations: 'Browser-Based Limitations',
+        maxConnections: 'Max {max} concurrent connections per domain (browser HTTP/1.1 limit)',
+        jsOverhead: 'JavaScript runtime overhead affects throughput vs native tools (hey, wrk)',
+        notProduction: 'Not suitable for production load testing - use CLI tools for accurate results',
       },
       // Acknowledgment modal
       acknowledgment: {
