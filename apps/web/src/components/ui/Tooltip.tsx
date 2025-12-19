@@ -233,7 +233,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
       ref={tooltipRef}
       className={cn(
         "fixed z-[9999] px-4 py-2.5 text-sm text-white bg-gray-900 dark:bg-gray-700 rounded-md shadow-lg pointer-events-none",
-        nowrap ? "whitespace-nowrap w-max" : "whitespace-normal max-w-lg",
+        nowrap ? "whitespace-nowrap w-max" : "whitespace-normal max-w-[calc(100vw-16px)] sm:max-w-lg",
       )}
       style={{
         top: tooltipPosition?.top ?? -9999,

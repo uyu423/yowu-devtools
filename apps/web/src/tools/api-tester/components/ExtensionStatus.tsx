@@ -4,13 +4,20 @@
  * Accessibility: Uses blue for success (colorblind-friendly, avoids red/green confusion)
  */
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { Loader2, Plug, PlugZap, ShieldAlert, RefreshCw, Download } from 'lucide-react';
+import { Loader2, Plug, PlugZap, ShieldAlert, RefreshCw, Download, Smartphone } from 'lucide-react';
 import type { ExtensionStatus as ExtensionStatusType } from '../types';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { useI18n } from '@/hooks/useI18nHooks';
 import { EXTENSION_STORE_URL } from '../constants';
+
+// Detect mobile device
+const detectMobile = () => {
+  if (typeof window === 'undefined') return false;
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+    (window.innerWidth <= 768);
+};
 
 interface ExtensionStatusProps {
   status: ExtensionStatusType;
@@ -69,19 +76,52 @@ export const ExtensionStatus: React.FC<ExtensionStatusProps> = ({
   className,
 }) => {
   const { t } = useI18n();
+  const [isMobile, setIsMobile] = useState(detectMobile);
+  
+  // Update mobile detection on resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(detectMobile());
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const config = STATUS_CONFIG[status];
   const Icon = config.icon;
 
   const label = useMemo(() => t(`tool.apiTester.${config.labelKey}`), [t, config.labelKey]);
   const tooltip = useMemo(() => t(`tool.apiTester.${config.tooltipKey}`), [t, config.tooltipKey]);
+  const mobileTooltip = useMemo(() => t('tool.apiTester.corsMobileNotSupported'), [t]);
 
   const handleClick = () => {
-    if (config.clickable && onRetry) {
+    if (!isMobile && config.clickable && onRetry) {
       onRetry();
     }
   };
 
   const isNotInstalled = status === 'not-installed';
+
+  // Mobile: Show disabled state with mobile-specific message
+  if (isMobile) {
+    return (
+      <div className={cn('flex items-center gap-2', className)}>
+        <Tooltip content={mobileTooltip} position="bottom" align="left" nowrap={false}>
+          <div
+            className={cn(
+              'group relative flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium',
+              'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500',
+              'border border-gray-200 dark:border-gray-700',
+              'cursor-not-allowed opacity-60'
+            )}
+          >
+            <Smartphone className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">{t('tool.apiTester.extensionNotConnected')}</span>
+          </div>
+        </Tooltip>
+      </div>
+    );
+  }
 
   return (
     <div className={cn('flex items-center gap-2', className)}>
@@ -126,7 +166,7 @@ export const ExtensionStatus: React.FC<ExtensionStatusProps> = ({
         </button>
       </Tooltip>
 
-      {/* Install button - only show when extension is not installed */}
+      {/* Install button - only show when extension is not installed (desktop only) */}
       {isNotInstalled && (
         <Tooltip 
           content={t('tool.apiTester.installExtensionTooltip')} 
