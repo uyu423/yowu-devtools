@@ -807,7 +807,7 @@ const VideoStudioTool: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col min-h-full lg:h-full">
       <div className="p-4 md:p-6 border-b border-gray-200 dark:border-gray-700">
         <ToolHeader
           title={t('tool.videoStudio.title')}
@@ -824,7 +824,7 @@ const VideoStudioTool: React.FC = () => {
         </div>
       )}
 
-      <div className="flex-1 flex flex-col lg:flex-row min-h-0 overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row min-h-0 lg:overflow-hidden">
         {/* Preview Area */}
         <div className="flex-1 p-4 md:p-6 overflow-auto space-y-4">
           <VideoPreview

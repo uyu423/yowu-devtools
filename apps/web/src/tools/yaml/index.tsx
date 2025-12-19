@@ -138,7 +138,7 @@ const YamlTool: React.FC = () => {
       <ShareModal {...shareModalProps} />
 
       <div className="flex-1 flex flex-col lg:flex-row gap-4 min-h-0">
-        <div className="flex-1 flex flex-col min-h-0">
+        <div className="flex-1 flex flex-col min-h-[200px] lg:min-h-0">
           <EditorPanel
             title={
               state.direction === 'yaml2json' ? t('tool.yaml.yamlInput') : t('tool.yaml.jsonInput')
@@ -170,7 +170,7 @@ const YamlTool: React.FC = () => {
             <ArrowRightLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
           </button>
         </div>
-        <div className="flex-1 flex flex-col min-h-0">
+        <div className="flex-1 flex flex-col min-h-[200px] lg:min-h-0">
           {isProcessing && (
             <div className="flex-1 flex items-center justify-center p-4 text-sm text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800">
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 dark:border-gray-600 border-t-blue-600 dark:border-t-blue-400 mr-2"></div>
