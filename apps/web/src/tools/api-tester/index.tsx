@@ -20,6 +20,7 @@ import { useShareModal } from '@/hooks/useShareModal';
 import { useTitle } from '@/hooks/useTitle';
 import { useI18n } from '@/hooks/useI18nHooks';
 import { copyToClipboard } from '@/lib/clipboard';
+import { buildLocalePath } from '@/lib/i18nUtils';
 
 import type { ApiTesterState, HttpMethod, HistoryItem } from './types';
 import { COMMON_HEADERS, COMMON_CONTENT_TYPES, BODY_SUPPORTED_METHODS } from './types';
@@ -58,7 +59,7 @@ const DEFAULT_STATE: ApiTesterState = {
 };
 
 const ApiTesterTool: React.FC = () => {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const navigate = useNavigate();
   useTitle(t('tool.apiTester.title'));
 
@@ -406,9 +407,9 @@ const ApiTesterTool: React.FC = () => {
     };
     
     // Navigate to API Diff with state
-    navigate('/api-diff', { state: apiDiffState });
+    navigate(buildLocalePath(locale, '/api-diff'), { state: apiDiffState });
     toast.success(t('tool.apiTester.sentToApiDiff').replace('{domain}', targetDomain));
-  }, [state, navigate, t]);
+  }, [state, navigate, t, locale]);
 
   // Close dropdown when clicking outside
   useEffect(() => {

@@ -13,6 +13,7 @@ import { copyToClipboard } from '@/lib/clipboard';
 import { useResolvedTheme } from '@/hooks/useThemeHooks';
 import { useI18n } from '@/hooks/useI18nHooks';
 import { JsonTreeView } from '@/components/common/JsonTreeView';
+import { buildLocalePath } from '@/lib/i18nUtils';
 import CodeMirror from '@uiw/react-codemirror';
 import { oneDark } from '@codemirror/theme-one-dark';
 
@@ -35,7 +36,7 @@ const ERROR_MESSAGE_KEYS: Record<string, string> = {
 };
 
 export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoading }) => {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabType>('body');
   const [viewMode, setViewMode] = useState<ViewMode>('tree');
@@ -142,12 +143,14 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
       };
       
       // Use React Router state instead of URL parameter for faster navigation
-      navigate('/json', { state: shareState });
+      // Include locale in path to prevent redirect that would lose state
+      const targetPath = buildLocalePath(locale, '/json');
+      navigate(targetPath, { state: shareState });
     } catch (error) {
       console.error('Failed to navigate to JSON Viewer:', error);
       setIsNavigating(null);
     }
-  }, [parsedBody, navigate, isNavigating]);
+  }, [parsedBody, navigate, isNavigating, locale]);
 
   // Navigate to YAML Converter with data
   const handleOpenInYamlConverter = useCallback(() => {
@@ -164,12 +167,14 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
       };
       
       // Use React Router state instead of URL parameter for faster navigation
-      navigate('/yaml', { state: shareState });
+      // Include locale in path to prevent redirect that would lose state
+      const targetPath = buildLocalePath(locale, '/yaml');
+      navigate(targetPath, { state: shareState });
     } catch (error) {
       console.error('Failed to navigate to YAML Converter:', error);
       setIsNavigating(null);
     }
-  }, [parsedBody, navigate, isNavigating]);
+  }, [parsedBody, navigate, isNavigating, locale]);
 
   // Calculate body size
   const bodySize = useMemo(() => {

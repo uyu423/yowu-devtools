@@ -8,8 +8,16 @@
  * - i18n support
  */
 
-import { AlertTriangle, Check, ExternalLink, Info, Monitor, X, Zap } from 'lucide-react';
-import React, { useState, useMemo } from 'react';
+import {
+  AlertTriangle,
+  Check,
+  ExternalLink,
+  Info,
+  Monitor,
+  X,
+  Zap,
+} from 'lucide-react';
+import React, { useMemo, useState } from 'react';
 
 import { EXTENSION_STORE_URL } from '../constants';
 import type { ExtensionStatus } from '../types';
@@ -139,14 +147,20 @@ export const CorsModal: React.FC<CorsModalProps> = ({
 
           {/* Remember choice checkbox */}
           {!isMobile && isExtensionAvailable && origin && (
-            <label className="flex items-start gap-3 p-3 rounded-md bg-gray-50 dark:bg-gray-700/50 cursor-pointer group">
+            <div
+              className="flex items-start gap-3 p-3 rounded-md bg-gray-50 dark:bg-gray-700/50 cursor-pointer group"
+              onClick={() => setRememberChoice(!rememberChoice)}
+              role="checkbox"
+              aria-checked={rememberChoice}
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === ' ' || e.key === 'Enter') {
+                  e.preventDefault();
+                  setRememberChoice(!rememberChoice);
+                }
+              }}
+            >
               <div className="relative flex items-center justify-center mt-0.5">
-                <input
-                  type="checkbox"
-                  checked={rememberChoice}
-                  onChange={(e) => setRememberChoice(e.target.checked)}
-                  className="sr-only peer"
-                />
                 <div
                   className={cn(
                     'w-4 h-4 rounded border-2 flex items-center justify-center transition-colors',
@@ -169,7 +183,7 @@ export const CorsModal: React.FC<CorsModalProps> = ({
                   )}
                 </span>
               </div>
-            </label>
+            </div>
           )}
 
           {/* Learn more link */}
@@ -194,8 +208,8 @@ export const CorsModal: React.FC<CorsModalProps> = ({
           >
             {isMobile ? t('common.ok') : t('common.cancel')}
           </button>
-          {!isMobile && (
-            isExtensionAvailable ? (
+          {!isMobile &&
+            (isExtensionAvailable ? (
               <button
                 onClick={handleRetry}
                 className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 rounded-md transition-colors"
@@ -213,8 +227,7 @@ export const CorsModal: React.FC<CorsModalProps> = ({
                 {t('tool.apiTester.corsInstallExtension')}
                 <ExternalLink className="w-4 h-4" />
               </a>
-            )
-          )}
+            ))}
         </div>
       </div>
     </div>

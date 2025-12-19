@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
   compressToEncodedURIComponent,
@@ -29,6 +29,17 @@ function cloneState<T>(state: T): T {
   return JSON.parse(JSON.stringify(state)) as T;
 }
 
+/**
+ * Check if location.state has meaningful data (not empty object)
+ */
+function hasValidLocationState(locationState: unknown): boolean {
+  if (!locationState || typeof locationState !== 'object') {
+    return false;
+  }
+  // Empty object {} is not valid state data
+  return Object.keys(locationState as object).length > 0;
+}
+
 function getInitialState<T>(
   toolId: string,
   defaultState: T,
@@ -40,7 +51,8 @@ function getInitialState<T>(
   }
 
   // Priority 1: Check location.state (direct navigation from API Tester)
-  if (locationState && typeof locationState === 'object') {
+  // Skip empty objects that may result from history.replaceState({})
+  if (hasValidLocationState(locationState)) {
     try {
       const stateData = locationState as Partial<T> & { tool?: string };
       // Validate that it's for the correct tool (if toolId is in state)
@@ -102,11 +114,16 @@ export function useToolState<T extends object>(
     getInitialState(toolId, defaultState, location.search, location.state)
   );
 
+  // Track if we've already applied location.state to prevent re-applying
+  // after history.replaceState clears it
+  const appliedLocationStateRef = useRef(false);
+
   // Update state when URL search params or location state change
   // Priority: location.state > URL param > localStorage
   useEffect(() => {
     // Priority 1: Check location.state (direct navigation from API Tester)
-    if (location.state && typeof location.state === 'object') {
+    // Skip if we've already applied it or if it's an empty object
+    if (hasValidLocationState(location.state) && !appliedLocationStateRef.current) {
       try {
         const stateData = location.state as Partial<T> & { tool?: string };
         // Validate that it's for the correct tool (if toolId is in state)
@@ -115,13 +132,15 @@ export function useToolState<T extends object>(
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { tool, ...rest } = stateData;
           setState({ ...cloneState(defaultState), ...rest });
-          // Clear location.state after use to prevent re-applying on re-render
+          // Mark as applied and clear location.state to prevent re-applying on re-render
+          appliedLocationStateRef.current = true;
           window.history.replaceState({}, '', location.pathname + location.search);
           return;
         } else if (!('tool' in stateData)) {
           // If no tool field, assume it's direct state data
           setState({ ...cloneState(defaultState), ...stateData });
-          // Clear location.state after use
+          // Mark as applied and clear location.state
+          appliedLocationStateRef.current = true;
           window.history.replaceState({}, '', location.pathname + location.search);
           return;
         }
@@ -142,8 +161,10 @@ export function useToolState<T extends object>(
     }
 
     // Priority 3: Restore from localStorage if available
-    // Only restore from localStorage if there's no URL param to avoid overwriting shared state
-    if (!payload) {
+    // Only restore from localStorage if:
+    // - there's no URL param
+    // - we haven't already applied location.state (to prevent overwriting state from navigation)
+    if (!payload && !appliedLocationStateRef.current) {
       const raw = window.localStorage.getItem(`${STORAGE_PREFIX}${toolId}`);
       if (raw) {
         try {
