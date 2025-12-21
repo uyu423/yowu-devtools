@@ -260,7 +260,7 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
   return (
     <div className="flex flex-col h-full">
       {/* Status bar */}
-      <div className="flex items-center gap-4 px-4 py-2 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-4 px-4 py-2 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
         {/* Status code */}
         <div className={cn('font-semibold', getStatusColor(response.status))}>
           {response.status} {getStatusText(response.status, response.statusText)}
@@ -285,8 +285,8 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
         {/* Content-Type */}
         {response.headers?.['content-type'] && (
           <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
-            <FileType className="w-4 h-4" />
-            <span className="truncate max-w-xs">
+            <FileType className="w-4 h-4 shrink-0" />
+            <span className="truncate max-w-[120px] sm:max-w-xs">
               {response.headers['content-type'].split(';')[0]}
             </span>
           </div>
@@ -301,11 +301,11 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-1 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+      <div className="flex flex-wrap items-center gap-1 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
         <button
           onClick={() => setActiveTab('body')}
           className={cn(
-            'px-3 py-1 text-sm rounded-md transition-colors',
+            'px-2 sm:px-3 py-1 text-sm rounded-md transition-colors',
             activeTab === 'body'
               ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
               : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
@@ -316,7 +316,7 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
         <button
           onClick={() => setActiveTab('headers')}
           className={cn(
-            'px-3 py-1 text-sm rounded-md transition-colors',
+            'px-2 sm:px-3 py-1 text-sm rounded-md transition-colors',
             activeTab === 'headers'
               ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
               : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
@@ -326,7 +326,7 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
         </button>
 
         {/* View mode and action buttons */}
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex items-center gap-1 sm:gap-2">
           {/* View mode (only for body tab with JSON) */}
           {activeTab === 'body' && parsedBody?.type === 'json' && (
             <div className="flex items-center gap-1">
@@ -358,7 +358,7 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
               onClick={handleOpenInJsonViewer}
               disabled={isNavigating !== null}
               className={cn(
-                'flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md',
+                'flex items-center gap-1 sm:gap-1.5 p-1.5 sm:px-3 sm:py-1.5 text-xs font-medium rounded-md',
                 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300',
                 'border border-blue-200 dark:border-blue-800',
                 'hover:bg-blue-100 dark:hover:bg-blue-900/30',
@@ -368,17 +368,15 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
                 isNavigating === 'json' && 'opacity-75 cursor-wait',
                 isNavigating !== null && isNavigating !== 'json' && 'opacity-50 cursor-not-allowed'
               )}
+              title={t('tool.apiTester.openInJsonViewer')}
             >
               {isNavigating === 'json' ? (
-                <>
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  <span>{t('tool.apiTester.processing')}</span>
-                </>
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
               ) : (
                 <>
                   <FileJson className="w-3.5 h-3.5" />
-                  <span>{t('tool.apiTester.openInJsonViewer')}</span>
-                  <ExternalLink className="w-3 h-3 opacity-70" />
+                  <span className="hidden sm:inline">{t('tool.apiTester.openInJsonViewer')}</span>
+                  <ExternalLink className="w-3 h-3 opacity-70 hidden sm:inline" />
                 </>
               )}
             </button>
@@ -390,7 +388,7 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
               onClick={handleOpenInYamlConverter}
               disabled={isNavigating !== null}
               className={cn(
-                'flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md',
+                'flex items-center gap-1 sm:gap-1.5 p-1.5 sm:px-3 sm:py-1.5 text-xs font-medium rounded-md',
                 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300',
                 'border border-blue-200 dark:border-blue-800',
                 'hover:bg-blue-100 dark:hover:bg-blue-900/30',
@@ -400,17 +398,15 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ response, isLoad
                 isNavigating === 'yaml' && 'opacity-75 cursor-wait',
                 isNavigating !== null && isNavigating !== 'yaml' && 'opacity-50 cursor-not-allowed'
               )}
+              title={t('tool.apiTester.openInYamlConverter')}
             >
               {isNavigating === 'yaml' ? (
-                <>
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  <span>{t('tool.apiTester.processing')}</span>
-                </>
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
               ) : (
                 <>
                   <FileCode2 className="w-3.5 h-3.5" />
-                  <span>{t('tool.apiTester.openInYamlConverter')}</span>
-                  <ExternalLink className="w-3 h-3 opacity-70" />
+                  <span className="hidden sm:inline">{t('tool.apiTester.openInYamlConverter')}</span>
+                  <ExternalLink className="w-3 h-3 opacity-70 hidden sm:inline" />
                 </>
               )}
             </button>

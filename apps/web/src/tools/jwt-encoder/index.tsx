@@ -12,6 +12,7 @@ import { useTitle } from '@/hooks/useTitle';
 import { useI18n } from '@/hooks/useI18nHooks';
 import { copyToClipboard } from '@/lib/clipboard';
 import { ShareModal } from '@/components/common/ShareModal';
+import { AdsenseFooter } from '@/components/common/AdsenseFooter';
 import { base64UrlEncode } from '@/lib/jwtUtils';
 
 interface JwtEncoderState {
@@ -172,7 +173,7 @@ const JwtEncoderTool: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full p-4 md:p-6 max-w-5xl mx-auto">
+    <div className="flex flex-col min-h-full p-4 md:p-6 max-w-5xl mx-auto">
       <ToolHeader
         title={t('tool.jwtEncoder.title')}
         description={t('tool.jwtEncoder.description')}
@@ -303,6 +304,8 @@ const JwtEncoderTool: React.FC = () => {
         )}
       </div>
       <ShareModal {...shareModalProps} />
+
+      <AdsenseFooter />
     </div>
   );
 };

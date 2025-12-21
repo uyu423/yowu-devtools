@@ -14,6 +14,7 @@ import { copyToClipboard } from '@/lib/clipboard';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { ShareModal } from '@/components/common/ShareModal';
+import { AdsenseFooter } from '@/components/common/AdsenseFooter';
 
 interface PasswordToolState {
   length: number;
@@ -241,7 +242,7 @@ const PasswordTool: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full p-4 md:p-6 max-w-5xl mx-auto">
+    <div className="flex flex-col min-h-full p-4 md:p-6 max-w-5xl mx-auto">
       <ToolHeader
         title={t('tool.password.title')}
         description={t('tool.password.description')}
@@ -498,6 +499,8 @@ const PasswordTool: React.FC = () => {
         </div>
       </div>
       <ShareModal {...shareModalProps} />
+
+      <AdsenseFooter />
     </div>
   );
 };

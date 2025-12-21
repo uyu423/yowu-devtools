@@ -214,7 +214,7 @@ const ToolComponent: React.FC = () => {
   // 로직 구현...
   
   return (
-    <div className="flex flex-col h-full p-4 md:p-6 max-w-5xl mx-auto">
+    <div className="flex flex-col min-h-full p-4 md:p-6 max-w-5xl mx-auto">
       <ToolHeader
         title="Tool Title"
         description="Tool description"
@@ -222,6 +222,9 @@ const ToolComponent: React.FC = () => {
         onShare={shareState}
       />
       {/* 도구 UI */}
+      <ShareModal {...shareModalProps} />
+      
+      <AdsenseFooter />
     </div>
   );
 };
@@ -269,6 +272,7 @@ export const tools: ToolDefinition[] = [
 3. **ActionBar**: 액션 버튼 그룹
 4. **ErrorBanner**: 에러 메시지 표시
 5. **OptionLabel**: 옵션 라벨 + Tooltip
+6. **AdsenseFooter**: 도구 하단 광고 Footer (v1.4.3)
 
 ### Width 전략
 
@@ -465,6 +469,8 @@ npm run preview   # 빌드 결과 미리보기
 - [ ] 큰 데이터 처리 시 Web Worker를 사용하는가? (v1.1.0, 필요시)
 - [ ] Worker 폴백 로직이 구현되었는가? (v1.1.0, Worker 사용 시)
 - [ ] 사이드바 기능(localStorage)이 올바른 키 네임스페이스를 사용하는가? (v1.1.0)
+- [ ] AdsenseFooter가 도구 하단에 추가되었는가? (v1.4.3, 신규 도구인 경우)
+- [ ] 컨테이너 클래스가 `min-h-full`을 사용하는가? (v1.4.3, AdSense 사용 시)
 - [ ] **작업 완료 후 `npm run build`를 실행하여 빌드가 성공하는지 확인했는가?**
 
 ---

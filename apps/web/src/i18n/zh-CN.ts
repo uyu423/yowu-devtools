@@ -1706,4 +1706,8 @@ export const zhCN = {
         '免费在线HTTP负载测试工具。通过延迟分布、RPS指标和状态码分析测量API性能。基于浏览器测试。',
     },
   },
+  ads: {
+    disclaimer:
+      "AdSense广告收入用于支付Yowu's DevTools的AI维护代理费用和开发者的咖啡基金。☕",
+  },
 } as const satisfies I18nResource;

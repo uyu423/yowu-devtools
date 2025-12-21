@@ -742,6 +742,64 @@ if (shouldUseWorker(input)) {
 }
 ```
 
+## AdSense Footer 가이드 (v1.4.3)
+
+모든 도구 하단에 Google AdSense 광고를 표시합니다. 광고 수익은 Yowu's DevTools의 무료 운영 및 유지보수에 사용됩니다.
+
+### 공통 컴포넌트
+
+- **GoogleAdsense** (`src/components/common/GoogleAdsense.tsx`): 실제 AdSense 광고 단위 및 면책 조항
+- **AdsenseFooter** (`src/components/common/AdsenseFooter.tsx`): 도구에 쉽게 추가할 수 있는 래퍼 컴포넌트
+
+### 새 도구에 AdSense 추가하기
+
+1. **import 추가**:
+```typescript
+import { AdsenseFooter } from '@/components/common/AdsenseFooter';
+```
+
+2. **컨테이너 클래스 변경**: `h-full` → `min-h-full`
+```typescript
+// Before
+<div className="flex flex-col h-full p-4 md:p-6 max-w-5xl mx-auto">
+
+// After
+<div className="flex flex-col min-h-full p-4 md:p-6 max-w-5xl mx-auto">
+```
+
+3. **return문 마지막에 AdsenseFooter 추가**:
+```tsx
+const MyTool: React.FC = () => {
+  return (
+    <div className="flex flex-col min-h-full p-4 md:p-6 max-w-5xl mx-auto">
+      <ToolHeader ... />
+      {/* 도구 콘텐츠 */}
+      <ShareModal {...shareModalProps} />
+
+      <AdsenseFooter />
+    </div>
+  );
+};
+```
+
+### 동작 방식
+
+| 상황 | AdSense 위치 |
+|------|--------------|
+| 콘텐츠가 뷰포트보다 **작을 때** | 화면 바닥에 붙음 (`mt-auto`) |
+| 콘텐츠가 뷰포트보다 **클 때** | 스크롤 맨 끝에 표시 |
+
+### 핵심 CSS 설명
+
+- `min-h-full`: 컨테이너가 최소 뷰포트 높이를 차지하되 더 길어질 수 있음
+- `mt-auto`: flexbox에서 남은 공간을 위쪽으로 밀어서 AdSense를 바닥에 배치
+
+### 주의사항
+
+- **localhost에서는 AdSense가 표시되지 않음**: Google의 도메인 검증 및 보안 정책으로 인해 로컬 개발 환경에서는 광고가 로드되지 않습니다.
+- **i18n 지원**: 면책 조항 텍스트는 `ads.disclaimer` 키로 i18n 리소스에서 관리됩니다.
+- **다크 모드 지원**: `useResolvedTheme` 훅을 사용하여 광고 배경색이 테마에 맞게 조정됩니다.
+
 ## 문서 구조
 
 ### Root 디렉토리 (즉시 참고 문서)

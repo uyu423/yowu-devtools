@@ -1867,4 +1867,8 @@ export const esES = {
         'Herramienta de prueba de carga HTTP en línea gratuita. Mide el rendimiento de API con distribución de latencia, métricas RPS y análisis de códigos de estado. Pruebas basadas en navegador.',
     },
   },
+  ads: {
+    disclaimer:
+      "Los ingresos de AdSense ayudan a cubrir los costos del agente de IA para mantener Yowu's DevTools y el fondo de café del desarrollador. ☕",
+  },
 } as const satisfies I18nResource;

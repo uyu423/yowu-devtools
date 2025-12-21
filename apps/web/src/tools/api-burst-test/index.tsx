@@ -44,6 +44,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { runBurstTest, type RequestExecutor } from './core';
 
 import { ShareModal } from '@/components/common/ShareModal';
+import { AdsenseFooter } from '@/components/common/AdsenseFooter';
 import type { ToolDefinition } from '@/tools/types';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { Tooltip } from '@/components/ui/Tooltip';
@@ -431,7 +432,7 @@ const ApiBurstTestTool: React.FC = () => {
   }, [isRunning]);
 
   return (
-    <div className="flex flex-col h-full p-4 md:p-6 max-w-7xl mx-auto">
+    <div className="flex flex-col min-h-full p-4 md:p-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex-shrink-0 mb-4">
         <ToolHeader
@@ -777,6 +778,8 @@ const ApiBurstTestTool: React.FC = () => {
       />
 
       <ShareModal {...shareModalProps} />
+
+      <AdsenseFooter />
     </div>
   );
 };

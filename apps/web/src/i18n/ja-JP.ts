@@ -1813,4 +1813,8 @@ export const jaJP = {
         '無料オンラインHTTP負荷テストツール。レイテンシ分布、RPSメトリクス、ステータスコード分析でAPIパフォーマンスを測定。ブラウザベーステスト。',
     },
   },
+  ads: {
+    disclaimer:
+      "AdSense広告収益は、Yowu's DevToolsの保守AIエージェント費用と開発者のささやかなコーヒー代に使われます。☕",
+  },
 } as const satisfies I18nResource;

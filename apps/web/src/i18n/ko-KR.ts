@@ -1811,4 +1811,8 @@ export const koKR = {
         '무료 온라인 HTTP 부하 테스트 도구. 지연시간 분포, RPS 메트릭, 상태 코드 분석으로 API 성능을 측정합니다. 브라우저 기반 테스트.',
     },
   },
+  ads: {
+    disclaimer:
+      "애드센스 광고 수익은 Yowu's DevTools의 유지보수 AI Agent 비용과 개발자의 소소한 커피 값으로 사용됩니다. ☕",
+  },
 } as const satisfies I18nResource;

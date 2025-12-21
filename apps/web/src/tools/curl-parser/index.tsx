@@ -16,6 +16,7 @@ import { EditorPanel } from '@/components/common/EditorPanel';
 import { ActionBar } from '@/components/common/ActionBar';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
 import { ShareModal } from '@/components/common/ShareModal';
+import { AdsenseFooter } from '@/components/common/AdsenseFooter';
 import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
 import { useTitle } from '@/hooks/useTitle';
@@ -94,7 +95,7 @@ const CurlParserTool: React.FC = () => {
   }, [parseResult.result, locale, navigate]);
 
   return (
-    <div className="flex flex-col h-full p-4 md:p-6 max-w-5xl mx-auto">
+    <div className="flex flex-col min-h-full p-4 md:p-6 max-w-5xl mx-auto">
       <ToolHeader
         title={t('tool.curl.title')}
         description={t('tool.curl.description')}
@@ -214,6 +215,8 @@ const CurlParserTool: React.FC = () => {
             <p>{t('tool.curl.emptyState')}</p>
           </div>
         )}
+
+        <AdsenseFooter />
       </div>
     </div>
   );

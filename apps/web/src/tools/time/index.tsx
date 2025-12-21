@@ -4,6 +4,7 @@ import type { ToolDefinition } from '@/tools/types';
 import { Clock, Copy } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
+import { AdsenseFooter } from '@/components/common/AdsenseFooter';
 import { OptionLabel } from '@/components/ui/OptionLabel';
 import { RadioGroup } from '@/components/ui/RadioGroup';
 import { Tooltip } from '@/components/ui/Tooltip';
@@ -218,7 +219,7 @@ const TimeTool: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full p-4 md:p-6 max-w-3xl mx-auto">
+    <div className="flex flex-col min-h-full p-4 md:p-6 max-w-3xl mx-auto">
       <ToolHeader
         title={t('tool.time.title')}
         description={t('tool.time.description')}
@@ -531,6 +532,8 @@ const TimeTool: React.FC = () => {
           </div>
         </div>
       </div>
+
+      <AdsenseFooter />
     </div>
   );
 };

@@ -12,6 +12,7 @@ import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useToolSetup } from '@/hooks/useToolSetup';
 import { ShareModal } from '@/components/common/ShareModal';
+import { AdsenseFooter } from '@/components/common/AdsenseFooter';
 
 interface Base64State {
   input: string;
@@ -63,7 +64,7 @@ const Base64Tool: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full p-4 md:p-6 max-w-5xl mx-auto">
+    <div className="flex flex-col min-h-full p-4 md:p-6 max-w-5xl mx-auto">
       <ToolHeader
         title={t('tool.base64.title')}
         description={t('tool.base64.description')}
@@ -137,6 +138,8 @@ const Base64Tool: React.FC = () => {
           status={conversion.error ? 'error' : 'success'}
           className="h-40 lg:h-56"
         />
+
+        <AdsenseFooter />
       </div>
     </div>
   );

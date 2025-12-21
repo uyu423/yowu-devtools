@@ -1,5 +1,6 @@
 import { Copy, KeyRound } from 'lucide-react';
 
+import { AdsenseFooter } from '@/components/common/AdsenseFooter';
 import { OptionLabel } from '@/components/ui/OptionLabel';
 /* eslint-disable react-refresh/only-export-components */
 import React from 'react';
@@ -183,7 +184,7 @@ const UuidTool: React.FC = () => {
   const outputText = generatedIds.join('\n');
 
   return (
-    <div className="flex flex-col h-full p-4 md:p-6 max-w-5xl mx-auto">
+    <div className="flex flex-col min-h-full p-4 md:p-6 max-w-5xl mx-auto">
       <ToolHeader
         title={t('tool.uuid.title')}
         description={t('tool.uuid.description')}
@@ -346,6 +347,7 @@ const UuidTool: React.FC = () => {
         </div>
       </div>
       <ShareModal {...shareModalProps} />
+      <AdsenseFooter />
     </div>
   );
 };

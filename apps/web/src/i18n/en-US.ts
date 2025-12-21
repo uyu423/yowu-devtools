@@ -1873,6 +1873,10 @@ export const enUS = {
         'Free online HTTP load testing tool. Measure API performance with latency distribution, RPS metrics, and status code analysis. Browser-based testing.',
     },
   },
+  ads: {
+    disclaimer:
+      "AdSense revenue helps cover AI Agent costs for maintaining Yowu's DevTools and the developer's coffee fund. ☕",
+  },
 } as const;
 
 // Helper type to convert literal string types to string
