@@ -13,6 +13,9 @@ dist-ssr
 dev-dist
 *.local
 
+# Turborepo
+.turbo
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

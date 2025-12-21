@@ -4,11 +4,332 @@ RELEASE_NOTES.md must be written in English.
 
 # Release Notes
 
+## v1.5.1 (December 2025) - API Burst Test
+
+Introducing **API Burst Test**, a browser-based HTTP load testing tool for quick API performance checks. All requests originate from your browser—no server proxy required.
+
+### New Features
+
+- ✨ **API Burst Test Tool**: Simple browser-based load testing
+
+  - **Load Modes**: Total requests (N) or duration (Z seconds) with configurable concurrency
+  - **Rate Limiting**: Global QPS or per-worker QPS control
+  - **Metrics Collection**: RPS, latency distribution (p50/p90/p95/p99), status codes, error breakdown
+  - **Time Series Charts**: RPS, latency, and errors over time visualization
+  - **hey CLI Integration**: Copy test configuration as `hey` command for CLI comparison
+  - **Chrome Extension**: CORS bypass and cookie inclusion support
+  - **Export Options**: JSON, CSV, and summary copy to clipboard
+
+- ✨ **Responsible Use Safeguards**:
+
+  - Required acknowledgment before first test execution
+  - Hard limits: max 6 concurrent connections (HTTP/1.1), 50 (HTTP/2), 10,000 requests, 60s duration
+  - Collapsible warning banners for responsible use notice and browser limitations
+  - Clear performance gap warning (5x+ difference vs CLI tools)
+
+- ✨ **API Tester Integration**:
+  - "Send to Burst Test" button in API Tester
+  - Transfers URL, method, headers, body, and cookie settings
+
+### Enhancements
+
+- 🔧 **HTTP/2 Mode**: Toggle to increase max concurrency from 6 to 50 (requires server support)
+- 🔧 **Beta Badge**: Added to tool header indicating experimental status
+- 🔧 **Collapsible Warnings**: Each warning section (Responsible Use, Browser Limitations) collapses independently
+- 🌐 **Full i18n Support**: All UI translated to 5 languages (en-US, ko-KR, ja-JP, zh-CN, es-ES)
+
+### Technical
+
+- Core engine with token bucket rate limiter and concurrent request executor
+- Metrics calculation: percentiles, histogram buckets, reservoir sampling
+- Error classification: timeout, CORS, network, aborted, HTTP 4xx/5xx
+- AbortController for clean test cancellation
+- Time series data collection at 1-second intervals
+- New directories: `src/tools/api-burst-test/`, `src/tools/api-burst-test/core/`
+
+### Privacy & Limitations
+
+- 🔒 All requests sent directly from your browser (your IP visible to target server)
+- ⚠️ Browser-based: Results may differ 5x+ from CLI tools (hey, wrk, ab)
+- ⚠️ Not suitable for production load testing—use CLI tools for accurate benchmarks
+- ⚠️ HTTP/1.1 limited to 6 concurrent connections per domain (browser restriction)
+
+---
+
+## v1.5.0 (December 2025) - Media Tools: Image Studio & Video Studio
+
+Major release introducing **Image Studio** and **Video Studio** tools for browser-based media processing. All processing happens locally in your browser—no data is ever sent to servers.
+
+### New Features
+
+- ✨ **Image Studio**: Complete image editing pipeline
+
+  - **Crop**: Free ratio, fixed ratios (1:1, 4:3, 16:9), custom ratio support
+  - **Resize**: Width/height input, aspect ratio lock, resize modes (Contain, Cover, Stretch)
+  - **Rotate/Flip**: 90° rotation, horizontal/vertical flip
+  - **Export**: PNG, JPEG, WebP formats with quality control
+  - Pipeline-based editing: combine multiple operations in one export
+  - Drag & drop, file picker, and clipboard paste support
+  - Real-time preview with crop overlay
+  - Preset management: save, load, export/import presets
+
+- ✨ **Video Studio**: Browser-based video editing powered by ffmpeg.wasm
+
+  - **Thumbnail Extraction**: Extract frame at any timestamp as PNG/JPEG/WebP
+  - **Trim**: Set start/end times to extract video segments
+  - **Cut (Segment Removal)**: Remove unwanted portions from video
+  - **Crop**: Crop video frame with aspect ratio presets
+  - **Resize**: Change output resolution with presets (480p, 720p, 1080p, 1440p, 4K)
+  - **Export**: MP4 (H.264) and WebM (VP9) formats with quality presets
+  - Pipeline-based editing: combine Trim + Crop + Resize in single export
+  - Progress indicator with cancel support
+  - Preset management: save, load, export/import presets
+
+- ✨ **Pipeline Workflow**: Both tools support combining multiple operations
+
+  - Enable/disable individual steps
+  - Collapsible step panels for cleaner UI
+  - Step count indicator
+  - One-click "Run & Export" execution
+
+- ✨ **Preset System**: Save and reuse your editing configurations
+  - Save current settings as named presets
+  - Load presets to restore configurations
+  - Export all presets to JSON file
+  - Import presets from JSON file
+  - Privacy-first: presets stored locally only
+
+### Enhancements
+
+- 🔧 **Pretendard Font**: Added as secondary fallback font for better multilingual support
+
+  - Font stack: NanumSquareNeo → Pretendard → Inter → system fonts
+  - Improved rendering for Latin characters when NanumSquareNeo lacks coverage
+
+- 🔧 **HTML lang Attribute**: Now dynamically updated based on current locale
+
+  - Proper BCP 47 format: `en-US`, `ko-KR`, `ja-JP`, `zh-CN`, `es-ES`
+  - Both static HTML (build) and runtime (SPA navigation) correctly set lang attribute
+  - Better accessibility and SEO for international users
+
+- 🌐 **Full i18n Support**: All Media Tools UI translated to 5 languages
+
+  - English (en-US), Korean (ko-KR), Japanese (ja-JP), Chinese (zh-CN), Spanish (es-ES)
+  - Pipeline, export, and progress status messages all localized
+
+- ⌨️ **Keyboard Shortcuts**:
+  - `⌘/Ctrl + O`: Open file
+  - `⌘/Ctrl + Enter`: Run & Export
+  - `⌘/Ctrl + Shift + R`: Reset pipeline
+  - `⌘/Ctrl + C`: Copy to clipboard (Image Studio)
+  - `Esc`: Cancel processing
+
+### Technical
+
+- **Image Processing**: Canvas API with `createImageBitmap()` for efficient decoding
+- **Video Processing**: ffmpeg.wasm (single-thread core) running in browser
+- **Memory Management**: Automatic cleanup of Blob URLs and ffmpeg FS files
+- **Singleton Pattern**: ffmpeg instance reused across operations
+- **Progress Tracking**: Real-time progress from ffmpeg logs with time parsing
+- New directories: `src/tools/image-studio/`, `src/tools/video-studio/`
+- Dependencies: `@ffmpeg/ffmpeg`, `@ffmpeg/util`, `jszip`
+
+### Privacy
+
+- 🔒 All media processing happens in your browser
+- 🔒 No files are uploaded to any server
+- 🔒 Presets stored in localStorage only
+- 🔒 Share links contain settings only (no media data)
+
+---
+
+## v1.4.2 (December 2025) - API Response Diff & Locale-specific SEO
+
+Introducing the **API Response Diff** tool for comparing API responses from two domains, plus **locale-specific SEO** for better international search visibility.
+
+### New Features
+
+- ✨ **API Response Diff Tool**: Compare API responses from two domains
+
+  - Send identical requests to Domain A and Domain B simultaneously
+  - JSON response comparison with deep equality (ignoring key order)
+  - Side-by-side diff view with field highlighting (yellow for different, red for missing)
+  - Diff table showing only different fields with field path and values
+  - Response metadata display (Status, Elapsed time, Size)
+  - Multiple tabs: Body (JSON Viewer), Headers, Raw, cURL
+  - **Domain Presets**: Save, load, export/import domain configurations
+  - Chrome Extension integration for CORS bypass (same as API Tester)
+  - History management (last 30 executions)
+  - URL sharing with current configuration
+
+- ✨ **Locale-specific SEO**: Language-optimized SEO for all tools
+
+  - Tool descriptions and meta tags in 5 languages (en-US, ko-KR, ja-JP, zh-CN, es-ES)
+  - Each locale's HTML files include localized meta descriptions
+  - Improved search visibility for international users
+  - Home page SEO also localized per language
+
+### Enhancements
+
+- 🔧 **Updated Tool Descriptions**: All tool descriptions refined to highlight main features
+- 🔧 **i18n Meta Integration**: Build system now imports i18n resources for SEO generation
+- 🔧 **Tool ID to i18n Key Mapping**: Automatic mapping between tool IDs and i18n keys
+
+### Technical
+
+- New tool directory: `src/tools/api-diff/`
+- Reuses `useExtension` and Extension mode from API Tester
+- Comparison utilities: `deepEqualIgnoringKeyOrder`, `findDifferentFields`
+- Domain presets stored in localStorage with export/import support
+- `vite-plugin-generate-routes.ts` extended to use i18n for locale-specific SEO
+- i18n `meta.home` section added for home page SEO
+
+---
+
+## v1.4.1 (December 2025) - cURL Parser & API Tester Integration
+
+Introducing the **cURL Parser** tool and enhanced cURL integration with API Tester.
+
+### New Features
+
+- ✨ **cURL Parser Tool**: Parse and analyze cURL commands
+
+  - Paste cURL commands and view structured breakdown
+  - Request Summary with method and URL
+  - Query Parameters table with enable/disable toggles
+  - Headers table with copy functionality
+  - Cookies section with raw string and parsed key-value table
+  - Body viewer with JSON pretty formatting
+  - Options display (follow redirects, compressed, insecure TLS, basic auth)
+  - Warnings for unsupported features (file uploads, shell variables, config files)
+
+- ✨ **"Open in API Tester" Button**: One-click transfer of parsed cURL to API Tester
+
+  - Preserves locale prefix (e.g., `/ko-KR/curl` → `/ko-KR/api-tester`)
+  - Automatically fills method, URL, headers, body, and options
+
+- ✨ **API Tester cURL Paste Support**: Paste cURL directly in URL input
+
+  - Auto-detects cURL commands vs regular URLs
+  - Automatically parses and fills the form
+  - Toast notification on success/failure
+  - "Paste as URL" fallback option on parse failure
+  - Undo functionality to restore previous state
+
+### Enhancements
+
+- 🔧 **JSON Viewer Integration**: Values that look like JSON show "Open in JSON Viewer" button
+- 🔧 **Clickable URLs**: URL values in parsed results are now clickable links
+- 🔧 **Collapsible Raw Cookie**: Raw cookie section collapsed by default (expandable)
+- 🔧 **URL Decode Display Option**: Toggle to show URL-decoded values
+- 🌐 **i18n**: Full internationalization support for cURL Parser (5 languages)
+
+### Technical
+
+- New cURL parsing library at `src/lib/curl/`
+- Shell-like tokenizer with quote handling and line continuation
+- Supports `-H`, `-d`, `-X`, `-b`, `-F`, `--data-urlencode`, and more
+- State transfer via sessionStorage for API Tester integration
+
+---
+
+## v1.4.0 (December 2025) - API Tester & Monorepo Architecture
+
+Major release introducing the **API Tester** tool and migrating to a **pnpm + Turborepo monorepo** architecture.
+
+### New Features
+
+- ✨ **API Tester Tool**: Full-featured HTTP client for testing APIs
+
+  - Support for all HTTP methods (GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS)
+  - Request builder with query params, headers, and body
+  - Multiple body types: none, JSON, form-data, x-www-form-urlencoded, raw
+  - Response viewer with syntax highlighting
+  - HTTP status code with status text display (e.g., "200 OK", "404 Not Found")
+  - **Direct Mode**: Standard fetch requests (subject to CORS)
+  - **Extension Mode**: CORS bypass via Chrome Extension
+
+- ✨ **Chrome Extension Integration**
+
+  - Companion extension for CORS bypass
+  - Permission management per domain
+  - "Include Cookies" option for authenticated requests
+  - Extension install button when not detected
+  - Detailed error view for debugging
+
+- ✨ **Copy as cURL**: Export requests as cURL commands
+
+### Architecture
+
+- 📦 **Monorepo Migration**: Migrated from single-package to pnpm + Turborepo monorepo
+  - `apps/web`: Main web application
+  - `apps/extension`: Chrome Extension
+  - `packages/shared`: Shared types and utilities
+  - Turborepo for efficient build caching
+
+### Enhancements
+
+- 🔧 **Response Viewer**: Show HTTP status text alongside status code
+- 🔧 **Extension Status Badge**: Visual indicator of extension connection
+- 🔧 **CORS Modal**: Clear guidance on CORS restrictions and solutions
+- 🌐 **i18n**: Full internationalization support for API Tester (5 languages)
+- 🔀 **Resizable Panels in API Tester**: Drag to resize request/response panels horizontally
+- 📤 **Open in Viewer**: Send JSON/YAML responses directly to JSON Viewer or YAML Converter
+- 💾 **History Sidebar State Persistence**: Remember open/closed state of history sidebar
+- 🔗 **Clickable URLs in JSON Viewer Tree**: URL strings in tree view are now clickable links
+
+### Technical
+
+- Uses `http-status-codes` library for HTTP status text
+- Extension uses Manifest V3 with Service Worker
+- Shared types between web and extension via `packages/shared`
+
+---
+
+## Extension v1.0.1 (December 2025) - API Tester Enhancement
+
+The first feature release of **Yowu DevTools Companion** Chrome Extension, enhancing the API Tester tool with CORS bypass and cookie handling capabilities.
+
+**New Features:**
+
+- ✨ **CORS Bypass**: Execute cross-origin API requests that would otherwise be blocked by browser security policies
+
+  - Requests executed in extension context, bypassing CORS restrictions
+  - Automatic header modification via `declarativeNetRequest` API
+
+- ✨ **Include Cookies Option**: Optionally include browser cookies in API requests
+
+  - Toggle "Include Cookies" checkbox in API Tester (Extension mode only)
+  - Uses `credentials: 'include'` for automatic cookie handling
+  - i18n support for tooltip (all 5 languages)
+
+- ✨ **Permission Management**: Granular host permission control
+
+  - Explicit permission grant per domain
+  - Permission caching in localStorage
+
+- ✨ **Error Details View**: Detailed error information for debugging
+  - Collapsible "Show Details" section in response area
+  - Includes: error code, message, request URL, method, headers
+
+**Bug Fixes:**
+
+- 🔧 Fixed "Invalid name" error when sending requests with empty header keys
+
+**Technical:**
+
+- Manifest V3 with Service Worker architecture
+- Permissions: `storage`, `cookies`, `declarativeNetRequest`
+- See `apps/extension/CHANGELOG.md` for full details
+
+---
+
 ## v1.3.4 (December 2025) - JSON Viewer & Share UX Improvements
 
 **New Features:**
 
 - ✨ **JSON Viewer Fullscreen Mode**:
+
   - Added fullscreen toggle button next to the copy button
   - Right panel expands to full width for better viewing of large JSON
   - Press ESC or click toggle again to exit fullscreen
@@ -20,11 +341,13 @@ RELEASE_NOTES.md must be written in English.
 **Enhancements:**
 
 - 🔧 **Share Modal on Web**:
+
   - Web browser now shows confirmation modal before copying share link (same as mobile)
   - Modal displays what data will be included in the shared URL
   - Different button text: "Copy Link" (web) vs "Generate Share Link" (mobile)
 
 - 🎨 **Sidebar Design Improvements**:
+
   - "More coming soon" badge is now center-aligned
   - Added "Suggest a feature" link below the badge
   - Links to [GitHub Issues](https://github.com/uyu423/yowu-devtools/issues) for feature requests

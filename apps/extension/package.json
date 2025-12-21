@@ -1,0 +1,36 @@
+{
+  "name": "@yowu-devtools/extension",
+  "version": "1.0.4",
+  "license": "GPL-3.0-or-later",
+  "author": {
+    "name": "Yongwoo Yu (Yowu)",
+    "email": "me@yowu.dev",
+    "url": "https://yowu.dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/uyu423/yowu-devtools.git"
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "vite build --watch --mode development",
+    "build": "tsc && vite build --mode production",
+    "build:dev": "tsc && vite build --mode development",
+    "build:prod": "tsc && vite build --mode production",
+    "lint": "eslint .",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@yowu-devtools/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "^2.0.0-beta.32",
+    "@eslint/js": "^9.0.0",
+    "@types/chrome": "^0.0.287",
+    "eslint": "^9.0.0",
+    "globals": "^16.0.0",
+    "typescript": "~5.8.3",
+    "typescript-eslint": "^8.0.0",
+    "vite": "^6.3.5"
+  }
+}

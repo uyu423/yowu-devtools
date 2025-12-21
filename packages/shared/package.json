@@ -1,0 +1,27 @@
+{
+  "name": "@yowu-devtools/shared",
+  "version": "1.0.0",
+  "license": "GPL-3.0-or-later",
+  "author": {
+    "name": "Yongwoo Yu (Yowu)",
+    "email": "me@yowu.dev",
+    "url": "https://yowu.dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/uyu423/yowu-devtools.git"
+  },
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./types": "./src/types/index.ts"
+  },
+  "scripts": {
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3"
+  }
+}

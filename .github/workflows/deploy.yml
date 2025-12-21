@@ -4,17 +4,12 @@ on:
   push:
     branches: ['main']
     paths:
-      - 'src/**'
-      - 'public/**'
-      - 'index.html'
-      - 'vite.config.ts'
-      - 'vite-plugin-generate-routes.ts'
-      - 'tailwind.config.js'
-      - 'tsconfig*.json'
-      - 'postcss.config.js'
+      - 'apps/web/**'
+      - 'packages/**'
+      - 'pnpm-workspace.yaml'
+      - 'turbo.json'
       - 'package.json'
-      - 'package-lock.json'
-      - 'eslint.config.js'
+      - 'pnpm-lock.yaml'
   workflow_dispatch:
 
 permissions:
@@ -33,37 +28,44 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: npm
+          cache: pnpm
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Lint code
-        run: npm run lint
+        run: pnpm run lint
 
       - name: Build project
-        run: npm run build
+        env:
+          VITE_EXTENSION_ID: ${{ secrets.VITE_EXTENSION_ID }}
+        run: pnpm run build:web
 
       - name: Verify build output
         run: |
-          if [ ! -d "dist" ]; then
-            echo "Error: dist directory not found"
+          if [ ! -d "apps/web/dist" ]; then
+            echo "Error: apps/web/dist directory not found"
             exit 1
           fi
-          if [ ! -f "dist/index.html" ]; then
-            echo "Error: dist/index.html not found"
+          if [ ! -f "apps/web/dist/index.html" ]; then
+            echo "Error: apps/web/dist/index.html not found"
             exit 1
           fi
-          if [ ! -f "dist/404.html" ]; then
-            echo "Error: dist/404.html not found"
+          if [ ! -f "apps/web/dist/404.html" ]; then
+            echo "Error: apps/web/dist/404.html not found"
             exit 1
           fi
-          if [ ! -f "dist/sitemap.xml" ]; then
-            echo "Error: dist/sitemap.xml not found"
+          if [ ! -f "apps/web/dist/sitemap.xml" ]; then
+            echo "Error: apps/web/dist/sitemap.xml not found"
             exit 1
           fi
           echo "✅ Build output verified"
@@ -71,7 +73,7 @@ jobs:
       - name: Upload static files
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: apps/web/dist
 
   deploy:
     needs: build

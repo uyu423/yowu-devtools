@@ -1,0 +1,46 @@
+{
+  "manifest_version": 3,
+  "name": "Yowu's DevTools Companion",
+  "short_name": "DevTools Companion",
+  "version": "1.0.4",
+
+  "description": "Companion extension for tools.yowu.dev",
+
+  "homepage_url": "https://tools.yowu.dev",
+
+  "icons": {
+    "16": "icons/icon-16.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+
+  "action": {
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    },
+    "default_title": "Yowu DevTools Companion - Click for settings"
+  },
+
+  "permissions": ["declarativeNetRequest"],
+
+  "optional_host_permissions": ["http://*/*", "https://*/*"],
+
+  "background": {
+    "service_worker": "src/service-worker.ts",
+    "type": "module"
+  },
+
+  "options_page": "src/options/options.html",
+
+  "externally_connectable": {
+    "matches": ["https://tools.yowu.dev/*", "http://localhost:5173/*"]
+  },
+
+  "minimum_chrome_version": "102",
+
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}

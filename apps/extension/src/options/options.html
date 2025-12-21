@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yowu DevTools Companion - Settings</title>
+  <style>
+    :root {
+      --bg-primary: #ffffff;
+      --bg-secondary: #f5f5f5;
+      --text-primary: #1a1a1a;
+      --text-secondary: #666666;
+      --text-muted: #999999;
+      --border-color: #e0e0e0;
+      --accent-color: #3b82f6;
+      --accent-hover: #2563eb;
+      --danger-color: #ef4444;
+      --danger-hover: #dc2626;
+      --success-color: #10b981;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-primary: #1a1a1a;
+        --bg-secondary: #2d2d2d;
+        --text-primary: #f5f5f5;
+        --text-secondary: #a0a0a0;
+        --text-muted: #666666;
+        --border-color: #404040;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-width: 400px;
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    h1 img {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+    }
+
+    h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    section {
+      margin-bottom: 32px;
+    }
+
+    .card {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .domains-list {
+      list-style: none;
+    }
+
+    .domains-list li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .domains-list li:last-child {
+      border-bottom: none;
+    }
+
+    .domain-url {
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+      font-size: 0.875rem;
+      color: var(--text-primary);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 24px;
+      color: var(--text-muted);
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 8px 16px;
+      transition: background-color 0.15s ease;
+    }
+
+    .btn-primary {
+      background-color: var(--accent-color);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--accent-hover);
+    }
+
+    .btn-danger {
+      background-color: var(--danger-color);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background-color: var(--danger-hover);
+    }
+
+    .btn-secondary {
+      background-color: transparent;
+      color: var(--danger-color);
+      border: 1px solid var(--danger-color);
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--danger-color);
+      color: white;
+    }
+
+    .btn-link {
+      background: none;
+      color: var(--accent-color);
+      padding: 0;
+      text-decoration: underline;
+    }
+
+    .btn-link:hover {
+      color: var(--accent-hover);
+    }
+
+    .actions {
+      margin-top: 16px;
+      display: flex;
+      gap: 12px;
+    }
+
+    .info-section p {
+      margin-bottom: 12px;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+
+    .info-section ul {
+      list-style: none;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+
+    .info-section li {
+      padding: 4px 0;
+      padding-left: 20px;
+      position: relative;
+    }
+
+    .info-section li::before {
+      content: '•';
+      position: absolute;
+      left: 4px;
+      color: var(--success-color);
+    }
+
+    .version {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-top: 8px;
+    }
+
+    .footer {
+      display: flex;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .footer a {
+      color: var(--accent-color);
+      text-decoration: none;
+      font-size: 0.875rem;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 16px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      background-color: var(--bg-secondary);
+    }
+
+    .status-badge.connected {
+      background-color: rgba(16, 185, 129, 0.1);
+      color: var(--success-color);
+    }
+
+    .status-badge .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: currentColor;
+    }
+
+    .loading {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: var(--text-primary);
+      color: var(--bg-primary);
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>
+      <img src="/icons/icon-48.png" alt="Logo">
+      Yowu DevTools Companion
+    </h1>
+
+    <section>
+      <h2>Granted Domains</h2>
+      <div class="card">
+        <ul class="domains-list" id="domains-list">
+          <li class="empty-state" id="empty-state">No domains granted yet</li>
+        </ul>
+        <div class="actions" id="actions" style="display: none;">
+          <button class="btn-secondary" id="remove-all-btn">Remove All Permissions</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="info-section">
+      <h2>About</h2>
+      <p>
+        This extension enables <strong>tools.yowu.dev</strong> to make API requests
+        that would otherwise be blocked by CORS (Cross-Origin Resource Sharing).
+      </p>
+
+      <h2>Privacy</h2>
+      <ul>
+        <li>No data is sent to any server</li>
+        <li>Request history is stored locally in your browser</li>
+        <li>Domain permissions can be revoked at any time</li>
+      </ul>
+
+      <p class="version" id="version">Version: loading...</p>
+
+      <div class="footer">
+        <a href="https://tools.yowu.dev" target="_blank">Visit tools.yowu.dev</a>
+        <a href="https://github.com/yowu/yowu-devtools/issues" target="_blank">Report Issue</a>
+      </div>
+    </section>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="options.js" type="module"></script>
+</body>
+</html>
+
