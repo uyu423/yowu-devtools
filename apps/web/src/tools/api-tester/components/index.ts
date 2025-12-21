@@ -9,6 +9,8 @@ export { KeyValueEditor } from './KeyValueEditor';
 export { BodyEditor } from './BodyEditor';
 export { ResponseViewer } from './ResponseViewer';
 export { HistorySidebar } from './HistorySidebar';
-export { ExtensionStatus } from './ExtensionStatus';
 export { CollapsibleSection } from './CollapsibleSection';
 export { CorsModal } from './CorsModal';
+
+// Re-export shared components for backwards compatibility
+export { ExtensionStatus } from '@/components/common/ExtensionStatus';

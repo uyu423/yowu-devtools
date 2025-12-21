@@ -6,15 +6,15 @@
  */
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { Globe, Check, Terminal, Cookie, HelpCircle, GitCompare, ChevronDown } from 'lucide-react';
+import { Globe, Check, Terminal, Cookie, HelpCircle, GitCompare, ChevronDown, Flame } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import type { ToolDefinition } from '@/tools/types';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { ShareModal } from '@/components/common/ShareModal';
 import { AdsenseFooter } from '@/components/common/AdsenseFooter';
-import { Tooltip } from '@/components/ui/Tooltip';
 import { ResizablePanels } from '@/components/common/ResizablePanels';
+import { Tooltip } from '@/components/ui/Tooltip';
 import { useToolState } from '@/hooks/useToolState';
 import { useShareModal } from '@/hooks/useShareModal';
 import { useTitle } from '@/hooks/useTitle';
@@ -33,10 +33,10 @@ import {
   BodyEditor,
   ResponseViewer,
   HistorySidebar,
-  ExtensionStatus,
   CollapsibleSection,
   CorsModal,
 } from './components';
+import { ExtensionStatus } from '@/components/common/ExtensionStatus';
 import { useRequestExecutor, useApiHistory, useCorsAllowlist } from './hooks';
 import { getStoredApiTesterState, clearStoredApiTesterState, convertToApiTesterState } from '@/lib/curl/convertToApiTester';
 import { isCurlCommand } from '@/lib/curl/detectCurl';
@@ -349,6 +349,72 @@ const ApiTesterTool: React.FC = () => {
     setTimeout(() => setCurlCopied(false), 2000);
   }, [state]);
 
+  // Send to API Burst Test
+  const handleSendToBurstTest = useCallback(() => {
+    // Map method to supported burst test methods (GET, POST, PUT, DELETE, HEAD, OPTIONS)
+    const supportedMethods = ['GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'OPTIONS'];
+    const method = supportedMethods.includes(state.method) ? state.method : 'GET';
+    
+    // Convert headers to burst test format
+    const headers = state.headers
+      .filter((h) => h.enabled && h.key)
+      .map((h) => ({ 
+        id: crypto.randomUUID(), 
+        key: h.key, 
+        value: h.value,
+        enabled: true,
+      }));
+    
+    // Convert query params to burst test format
+    const params = state.queryParams
+      .filter((p) => p.enabled && p.key)
+      .map((p) => ({ 
+        id: crypto.randomUUID(), 
+        key: p.key, 
+        value: p.value,
+        enabled: true,
+      }));
+    
+    // Convert body to burst test format
+    let bodyMode: 'raw' | 'json' | 'form' = 'raw';
+    let bodyText = '';
+    
+    if (state.body.kind === 'json') {
+      bodyMode = 'json';
+      bodyText = state.body.text || '';
+    } else if (state.body.kind === 'text') {
+      bodyMode = 'raw';
+      bodyText = state.body.text || '';
+    } else if (state.body.kind === 'urlencoded') {
+      bodyMode = 'form';
+      bodyText = state.body.items
+        .filter((i) => i.enabled && i.key)
+        .map((i) => `${encodeURIComponent(i.key)}=${encodeURIComponent(i.value)}`)
+        .join('&');
+    }
+    
+    // Build state data for API Burst Test
+    const burstTestState = {
+      tool: 'api-burst-test',
+      url: state.url,
+      method,
+      params: params.length > 0 ? params : [],
+      headers: headers.length > 0 ? headers : [],
+      body: { mode: bodyMode, text: bodyText },
+      auth: null,
+      includeCookies: state.includeCookies,
+      concurrency: 10,
+      loadMode: { type: 'requests', n: 100, durationMs: 10000 },
+      rateLimit: { type: 'none', qps: 100 },
+      timeoutMs: 10000,
+      sharePrivacy: { includeHeaders: false, includeAuth: false },
+      acknowledged: false,
+    };
+    
+    navigate(buildLocalePath(locale, '/api-burst-test'), { state: burstTestState });
+    toast.success(t('tool.apiTester.sentToBurstTest'));
+  }, [state, navigate, t, locale]);
+
   // Send to API Diff
   const handleSendToApiDiff = useCallback((targetDomain: 'A' | 'B') => {
     setApiDiffDropdownOpen(false);
@@ -477,10 +543,10 @@ const ApiTesterTool: React.FC = () => {
                       type="checkbox"
                       checked={state.includeCookies}
                       onChange={(e) => updateState({ includeCookies: e.target.checked })}
-                      className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-0"
                       disabled={isLoading}
+                      className="w-3.5 h-3.5 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-0"
                     />
-                    <Cookie className="w-4 h-4" />
+                    <Cookie className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">{t('tool.apiTester.includeCookies')}</span>
                   </label>
                   <Tooltip content={t('tool.apiTester.includeCookiesTooltip')} position="bottom" nowrap={false}>
@@ -511,6 +577,26 @@ const ApiTesterTool: React.FC = () => {
                     <span className="hidden sm:inline">Copy as cURL</span>
                   </>
                 )}
+              </button>
+              
+              {/* Send to API Burst Test */}
+              <button
+                onClick={handleSendToBurstTest}
+                disabled={!state.url.trim()}
+                className={cn(
+                  'flex items-center gap-1.5 px-2 sm:px-3 py-1.5 text-xs font-medium rounded-md',
+                  'bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300',
+                  'border border-orange-200 dark:border-orange-800',
+                  'hover:bg-orange-100 dark:hover:bg-orange-900/30',
+                  'hover:border-orange-300 dark:hover:border-orange-700',
+                  'transition-all duration-200',
+                  'shadow-sm hover:shadow',
+                  !state.url.trim() && 'opacity-50 cursor-not-allowed'
+                )}
+                title={t('tool.apiTester.sendToBurstTest')}
+              >
+                <Flame className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">{t('tool.apiTester.sendToBurstTest')}</span>
               </button>
               
               {/* Send to API Diff dropdown */}
