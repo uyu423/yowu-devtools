@@ -88,6 +88,10 @@ async function addDynamicRuleForDomain(origin: string): Promise<void> {
     console.log('[Extension] Adding dynamic rule for domain:', domain, 'ruleId:', ruleId);
 
     // Remove existing rule with same ID first (if any)
+    // IMPORTANT: initiatorDomains limits the rule to only apply when requests
+    // originate from tools.yowu.dev or localhost. Without this, the rule would
+    // affect ALL sites making requests to the target domain, causing CORS errors
+    // on legitimate sites like shopping.naver.com.
     await chrome.declarativeNetRequest.updateDynamicRules({
       removeRuleIds: [ruleId],
       addRules: [
@@ -104,6 +108,9 @@ async function addDynamicRuleForDomain(origin: string): Promise<void> {
           },
           condition: {
             requestDomains: [domain],
+            // Only apply this rule when the request originates from our allowed domains
+            // This prevents affecting requests from other sites (e.g., shopping.naver.com)
+            initiatorDomains: ['tools.yowu.dev', 'localhost'],
             resourceTypes: [
               chrome.declarativeNetRequest.ResourceType.XMLHTTPREQUEST,
               chrome.declarativeNetRequest.ResourceType.OTHER,
