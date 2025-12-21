@@ -32,9 +32,17 @@ function useProvideI18n(): I18nContextValue {
     [location.pathname]
   );
 
-  // Redirect to locale-prefixed URL if needed
-  // This ensures URL matches the stored locale preference
+  // Redirect to locale-prefixed URL if needed (but skip for search engine bots)
+  // This ensures URL matches the stored locale preference while avoiding SEO issues
   useEffect(() => {
+    // Skip redirect for search engine bots to prevent Google Search Console errors
+    const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent.toLowerCase() : '';
+    const isSearchEngineBot = /googlebot|bingbot|slurp|duckduckbot|baiduspider|yandexbot|sogou|exabot|facebot|ia_archiver/i.test(userAgent);
+    
+    if (isSearchEngineBot) {
+      return; // Don't redirect for bots
+    }
+
     const urlLocale = getLocaleFromUrl(location.pathname);
     const storedLocale = getStoredLocale();
 
