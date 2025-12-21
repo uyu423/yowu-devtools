@@ -10,6 +10,11 @@
  * - Security first: Validates all origins and messages
  */
 
+// Build-time constant injected by Vite
+// - dev build: true (includes localhost in initiatorDomains)
+// - prod build: false (excludes localhost to avoid affecting other developers)
+declare const __INCLUDE_LOCALHOST__: boolean;
+
 import {
   type WebAppMessage,
   type ExtensionResponse,
@@ -110,7 +115,10 @@ async function addDynamicRuleForDomain(origin: string): Promise<void> {
             requestDomains: [domain],
             // Only apply this rule when the request originates from our allowed domains
             // This prevents affecting requests from other sites (e.g., shopping.naver.com)
-            initiatorDomains: ['tools.yowu.dev', 'localhost'],
+            // Note: localhost is only included in dev builds to avoid affecting other developers
+            initiatorDomains: __INCLUDE_LOCALHOST__
+              ? ['tools.yowu.dev', 'localhost']
+              : ['tools.yowu.dev'],
             resourceTypes: [
               chrome.declarativeNetRequest.ResourceType.XMLHTTPREQUEST,
               chrome.declarativeNetRequest.ResourceType.OTHER,
