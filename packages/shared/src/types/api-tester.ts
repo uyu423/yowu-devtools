@@ -107,7 +107,10 @@ export type ExtensionResponse =
   | { type: 'RESPONSE'; payload: ResponseSpec }
   | { type: 'PERMISSION_STATUS'; payload: { granted: boolean; origin: string } }
   | { type: 'GRANTED_ORIGINS'; payload: { origins: string[] } }
-  | { type: 'PERMISSION_REVOKED'; payload: { origin: string; success: boolean } }
+  | {
+      type: 'PERMISSION_REVOKED';
+      payload: { origin: string; success: boolean };
+    }
   | { type: 'ERROR'; error: { code: string; message: string } };
 
 // =============================================================================
@@ -180,4 +183,3 @@ export const ALLOWED_ORIGINS = [
   'https://tools.yowu.dev',
   'http://localhost:5173',
 ] as const;
-

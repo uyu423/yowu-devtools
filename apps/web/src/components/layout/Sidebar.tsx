@@ -1,11 +1,25 @@
-import { ArrowDownAZ, ChevronLeft, ChevronRight, Clock, ExternalLink, Hash, Laptop, Moon, Sparkles, Star, Sun, TrendingUp, X } from 'lucide-react';
+import {
+  ArrowDownAZ,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  ExternalLink,
+  Hash,
+  Laptop,
+  Moon,
+  Sparkles,
+  Star,
+  Sun,
+  TrendingUp,
+  X,
+} from 'lucide-react';
 import { getToolById, tools } from '@/tools';
 
 import { BetaBadge } from '@/components/ui/BetaBadge';
 import { LanguageSelector } from '@/components/common/LanguageSelector';
-import { Tooltip } from '@/components/ui/Tooltip';
 import { NavLink } from 'react-router-dom';
 import React from 'react';
+import { Tooltip } from '@/components/ui/Tooltip';
 import { buildLocalePath } from '@/lib/i18nUtils';
 import { cn } from '@/lib/utils';
 import logoImg from '@/assets/yowu-logo.jpeg';
@@ -25,7 +39,11 @@ interface SidebarProps {
   onToggleCollapse: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile, isCollapsed, onToggleCollapse }) => {
+export const Sidebar: React.FC<SidebarProps> = ({
+  onCloseMobile,
+  isCollapsed,
+  onToggleCollapse,
+}) => {
   const { theme, setTheme } = useTheme();
   const { favorites, toggleFavorite, isFavorite } = useFavorites();
   const { recentTools } = useRecentTools();
@@ -95,10 +113,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile, isCollapsed, on
 
   // Collapsed 상태에서 아이콘만 렌더링하는 NavItem
   const CollapsedNavItem: React.FC<{
-    tool: typeof tools[0];
+    tool: (typeof tools)[0];
     showFavoriteStar?: boolean;
   }> = ({ tool, showFavoriteStar }) => (
-    <Tooltip content={tool.beta ? `${tool.title} (${t('sidebar.beta')})` : tool.title} position="right" nowrap>
+    <Tooltip content={tool.title} position="right" nowrap>
       <NavLink
         to={getLocalePath(tool.path)}
         onClick={onCloseMobile}
@@ -114,9 +132,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile, isCollapsed, on
         {tool.icon && <tool.icon className="w-5 h-5" />}
         {showFavoriteStar && isFavorite(tool.id) && (
           <Star className="w-2 h-2 fill-yellow-400 text-yellow-400 absolute -top-0.5 -right-0.5" />
-        )}
-        {tool.beta && (
-          <BetaBadge dotOnly className="absolute -bottom-0.5 -right-0.5 w-2 h-2" />
         )}
       </NavLink>
     </Tooltip>
@@ -161,7 +176,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile, isCollapsed, on
             {/* 즐겨찾기 섹션 */}
             {favoriteTools.length > 0 && (
               <div>
-                <Tooltip content={t('sidebar.favorites')} position="right" nowrap>
+                <Tooltip
+                  content={t('sidebar.favorites')}
+                  position="right"
+                  nowrap
+                >
                   <div className="flex justify-center py-1.5 text-yellow-500 dark:text-yellow-400">
                     <Star className="w-3.5 h-3.5 fill-current" />
                   </div>
@@ -177,14 +196,22 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile, isCollapsed, on
             {/* 최근 사용한 도구 섹션 */}
             {recentToolItems.length > 0 && (
               <div>
-                <Tooltip content={t('sidebar.recentTools')} position="right" nowrap>
+                <Tooltip
+                  content={t('sidebar.recentTools')}
+                  position="right"
+                  nowrap
+                >
                   <div className="flex justify-center py-1.5 text-gray-500 dark:text-gray-400">
                     <Clock className="w-3.5 h-3.5" />
                   </div>
                 </Tooltip>
                 <div className="space-y-1 mt-1 flex flex-col items-center">
                   {recentToolItems.map((tool) => (
-                    <CollapsedNavItem key={tool.id} tool={tool} showFavoriteStar />
+                    <CollapsedNavItem
+                      key={tool.id}
+                      tool={tool}
+                      showFavoriteStar
+                    />
                   ))}
                 </div>
               </div>
@@ -193,14 +220,22 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile, isCollapsed, on
             {/* 전체 도구 리스트 */}
             {tools.length > 0 && (
               <div>
-                <Tooltip content={t('sidebar.allTools')} position="right" nowrap>
+                <Tooltip
+                  content={t('sidebar.allTools')}
+                  position="right"
+                  nowrap
+                >
                   <div className="flex justify-center py-1.5 text-gray-500 dark:text-gray-400">
                     <div className="w-3.5 h-0.5 bg-gray-400 dark:bg-gray-500 rounded-full" />
                   </div>
                 </Tooltip>
                 <div className="space-y-1 mt-1 flex flex-col items-center">
                   {sortedTools.map((tool) => (
-                    <CollapsedNavItem key={tool.id} tool={tool} showFavoriteStar />
+                    <CollapsedNavItem
+                      key={tool.id}
+                      tool={tool}
+                      showFavoriteStar
+                    />
                   ))}
                 </div>
               </div>
@@ -240,7 +275,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile, isCollapsed, on
         </div>
         <div className="flex items-center gap-1">
           {/* Collapse button - desktop only */}
-          <Tooltip content={t('sidebar.collapseSidebar')} position="bottom" nowrap>
+          <Tooltip
+            content={t('sidebar.collapseSidebar')}
+            position="bottom"
+            nowrap
+          >
             <button
               onClick={onToggleCollapse}
               className="hidden lg:flex p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
@@ -283,19 +322,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile, isCollapsed, on
                     }
                   >
                     {tool.icon && (
-                      <tool.icon className="w-4 h-4 mr-3 opacity-70" />
+                      <tool.icon className="w-4 h-4 mr-3 opacity-70 flex-shrink-0" />
                     )}
-                    <span className="flex-1 flex items-center gap-1.5">
-                      {tool.title}
-                      {tool.beta && <BetaBadge size="sm" />}
-                    </span>
+                    <span className="flex-1">{tool.title}</span>
+                    {tool.beta && <BetaBadge size="sm" />}
                     <button
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
                         toggleFavorite(tool.id);
                       }}
-                      className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-opacity"
+                      className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-opacity flex-shrink-0"
                       title={t('sidebar.removeFromFavorites')}
                     >
                       <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
@@ -329,12 +366,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile, isCollapsed, on
                     }
                   >
                     {tool.icon && (
-                      <tool.icon className="w-4 h-4 mr-3 opacity-70" />
+                      <tool.icon className="w-4 h-4 mr-3 opacity-70 flex-shrink-0" />
                     )}
-                    <span className="flex-1 flex items-center gap-1.5">
-                      {tool.title}
-                      {tool.beta && <BetaBadge size="sm" />}
-                    </span>
+                    <span className="flex-1">{tool.title}</span>
+                    {tool.beta && <BetaBadge size="sm" />}
                     <button
                       onClick={(e) => {
                         e.preventDefault();
@@ -342,7 +377,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile, isCollapsed, on
                         toggleFavorite(tool.id);
                       }}
                       className={cn(
-                        'opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-opacity',
+                        'opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-opacity flex-shrink-0',
                         isFavorite(tool.id) && 'opacity-100'
                       )}
                       title={
@@ -375,12 +410,19 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile, isCollapsed, on
             <div>
               <div className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 flex items-center justify-between">
                 <span>{t('sidebar.allTools')}</span>
-                <Tooltip content={sortConfig[sortType].label} position="bottom" align="right" nowrap>
+                <Tooltip
+                  content={sortConfig[sortType].label}
+                  position="bottom"
+                  align="right"
+                  nowrap
+                >
                   <button
                     onClick={cycleSortType}
                     className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                   >
-                    {React.createElement(sortConfig[sortType].icon, { className: 'w-3 h-3' })}
+                    {React.createElement(sortConfig[sortType].icon, {
+                      className: 'w-3 h-3',
+                    })}
                   </button>
                 </Tooltip>
               </div>
@@ -400,12 +442,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile, isCollapsed, on
                     }
                   >
                     {tool.icon && (
-                      <tool.icon className="w-4 h-4 mr-3 opacity-70" />
+                      <tool.icon className="w-4 h-4 mr-3 opacity-70 flex-shrink-0" />
                     )}
-                    <span className="flex-1 flex items-center gap-1.5">
-                      {tool.title}
-                      {tool.beta && <BetaBadge size="sm" />}
-                    </span>
+                    <span className="flex-1">{tool.title}</span>
+                    {tool.beta && <BetaBadge size="sm" />}
                     <button
                       onClick={(e) => {
                         e.preventDefault();
@@ -413,7 +453,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile, isCollapsed, on
                         toggleFavorite(tool.id);
                       }}
                       className={cn(
-                        'opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-opacity',
+                        'opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-opacity flex-shrink-0',
                         isFavorite(tool.id) && 'opacity-100'
                       )}
                       title={

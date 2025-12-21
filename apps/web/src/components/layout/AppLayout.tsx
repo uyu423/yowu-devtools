@@ -23,9 +23,9 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
         'fixed inset-y-0 left-0 z-30 bg-white dark:bg-gray-900 border-r dark:border-gray-800 transform transition-all duration-200 ease-in-out lg:translate-x-0 lg:static',
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full',
         // Desktop: width based on collapse state
-        isCollapsed ? 'lg:w-16' : 'lg:w-64',
+        isCollapsed ? 'lg:w-16' : 'lg:w-72',
         // Mobile: always full width when open
-        'w-64'
+        'w-72'
       )}>
         <Sidebar 
           onCloseMobile={() => setIsSidebarOpen(false)} 

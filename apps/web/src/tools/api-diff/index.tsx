@@ -27,10 +27,10 @@ import React, {
 import { compareResponses, sanitizePathAndParams } from './utils';
 import { useApiDiffExecutor, useDomainPresets, useHistory } from './hooks';
 
+import { AdsenseFooter } from '@/components/common/AdsenseFooter';
 import { CorsModal } from '../api-tester/components';
 import { GitCompare } from 'lucide-react';
 import { ShareModal } from '@/components/common/ShareModal';
-import { AdsenseFooter } from '@/components/common/AdsenseFooter';
 import type { ToolDefinition } from '../types';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { toast } from 'sonner';
@@ -390,6 +390,7 @@ const ApiDiffTool: React.FC = () => {
         description={t('tool.apiDiff.description')}
         onReset={handleReset}
         onShare={handleShare}
+        beta={true}
       />
       <ShareModal {...shareModalProps} />
 
@@ -511,6 +512,7 @@ export const apiDiffTool: ToolDefinition<ApiDiffState> = {
   category: 'api',
   defaultState: DEFAULT_STATE,
   Component: ApiDiffTool,
+  beta: true,
 };
 
 export default ApiDiffTool;
