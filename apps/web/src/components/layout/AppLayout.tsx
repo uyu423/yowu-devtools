@@ -3,6 +3,7 @@ import { Sidebar } from './Sidebar';
 import { Menu } from 'lucide-react';
 import { useSidebarCollapse } from '@/hooks/useSidebarCollapse';
 import { cn } from '@/lib/utils';
+import { NavigationProgress } from '@/components/ui/NavigationProgress';
 
 export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
@@ -10,6 +11,9 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white overflow-hidden">
+      {/* Navigation Progress Bar */}
+      <NavigationProgress />
+
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div 
