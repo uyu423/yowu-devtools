@@ -756,6 +756,26 @@ export function generateRoutes(): Plugin {
           inLanguage: locale,
         };
 
+        // Breadcrumb 구조화된 데이터 생성
+        const breadcrumbData = {
+          '@context': 'https://schema.org',
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            {
+              '@type': 'ListItem',
+              position: 1,
+              name: 'Home',
+              item: 'https://tools.yowu.dev/',
+            },
+            {
+              '@type': 'ListItem',
+              position: 2,
+              name: localizedTitle,
+              item: toolUrl,
+            },
+          ],
+        };
+
         // SEO 최적화된 title 생성 (50-60자 권장)
         const seoTitle = `${localizedTitle} | Yowu's DevTools`;
 
@@ -768,12 +788,23 @@ export function generateRoutes(): Plugin {
         // HTML lang 속성용 locale 코드 (BCP 47: en-US, ko-KR, ja-JP 등)
         const htmlLang = locale;
 
+        // hreflang 링크 생성 (다국어 페이지 관계 명시)
+        const hreflangLinks = SUPPORTED_LOCALES.map((loc) => {
+          const hrefLang =
+            loc.code === DEFAULT_LOCALE ? 'en' : loc.code.split('-')[0].toLowerCase();
+          const hrefUrl =
+            loc.code === DEFAULT_LOCALE ? tool.path : `/${loc.code}${tool.path}`;
+          return `<link rel="alternate" hreflang="${hrefLang}" href="https://tools.yowu.dev${hrefUrl}" />`;
+        }).join('\n    ');
+
         // 메타 태그 생성
         const metaTags = `
     <title>${seoTitle}</title>
     <meta name="description" content="${optimizedDescription}" />
     <meta name="keywords" content="${keywordsStr}" />
     <link rel="canonical" href="${toolUrl}" />
+    ${hreflangLinks}
+    <link rel="alternate" hreflang="x-default" href="https://tools.yowu.dev${tool.path}" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="${toolUrl}" />
     <meta property="og:title" content="${seoTitle}" />
@@ -789,6 +820,11 @@ export function generateRoutes(): Plugin {
     <meta name="twitter:image:alt" content="${localizedTitle} | Yowu's DevTools" />
     <script type="application/ld+json">${JSON.stringify(
       structuredData,
+      null,
+      2
+    )}</script>
+    <script type="application/ld+json">${JSON.stringify(
+      breadcrumbData,
       null,
       2
     )}</script>
@@ -862,10 +898,20 @@ export function generateRoutes(): Plugin {
         const homeTitle = `${homeMeta.title} | Developer Tools`;
         const homeDescription = homeMeta.description;
 
+        // hreflang 링크 생성 (다국어 페이지 관계 명시)
+        const hreflangLinks = SUPPORTED_LOCALES.map((loc) => {
+          const hrefLang =
+            loc.code === DEFAULT_LOCALE ? 'en' : loc.code.split('-')[0].toLowerCase();
+          const hrefUrl = loc.code === DEFAULT_LOCALE ? '/' : `/${loc.code}`;
+          return `<link rel="alternate" hreflang="${hrefLang}" href="https://tools.yowu.dev${hrefUrl}" />`;
+        }).join('\n    ');
+
         const metaTags = `
     <title>${homeTitle}</title>
     <meta name="description" content="${homeDescription}" />
     <link rel="canonical" href="${homeUrl}" />
+    ${hreflangLinks}
+    <link rel="alternate" hreflang="x-default" href="https://tools.yowu.dev/" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="${homeUrl}" />
     <meta property="og:title" content="${homeTitle}" />
@@ -1033,9 +1079,17 @@ export function generateRoutes(): Plugin {
       fs.writeFileSync(path.join(distDir, '404.html'), redirectScript, 'utf-8');
       console.log('✅ Generated: 404.html');
 
-      // sitemap.xml 생성 (모든 locale 포함)
+      // sitemap.xml 생성 (모든 locale 포함, hreflang 정보 포함)
       const sitemapUrls: string[] = [];
       const lastmod = new Date().toISOString().split('T')[0];
+
+      // 홈 페이지 hreflang 링크 생성 (모든 언어 버전)
+      const homeHreflangLinks = SUPPORTED_LOCALES.map((loc) => {
+        const hrefLang =
+          loc.code === DEFAULT_LOCALE ? 'en' : loc.code.split('-')[0].toLowerCase();
+        const hrefUrl = loc.code === DEFAULT_LOCALE ? '/' : `/${loc.code}`;
+        return `    <xhtml:link rel="alternate" hreflang="${hrefLang}" href="https://tools.yowu.dev${hrefUrl}"/>`;
+      }).join('\n');
 
       // 홈 페이지 (모든 locale) - priority: 0.8
       SUPPORTED_LOCALES.forEach((localeInfo) => {
@@ -1043,6 +1097,8 @@ export function generateRoutes(): Plugin {
         const homePath = locale === DEFAULT_LOCALE ? '/' : `/${locale}`;
         sitemapUrls.push(`  <url>
     <loc>https://tools.yowu.dev${homePath}</loc>
+${homeHreflangLinks}
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tools.yowu.dev/"/>
     <lastmod>${lastmod}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>${HOME_PRIORITY.toFixed(1)}</priority>
@@ -1052,15 +1108,26 @@ export function generateRoutes(): Plugin {
       // 각 도구 (모든 locale)
       // 개발자들은 "json formatter", "base64 decode" 등으로 직접 검색하므로
       // 개별 도구 페이지가 홈페이지보다 priority가 높음
-      SUPPORTED_LOCALES.forEach((localeInfo) => {
-        const locale = localeInfo.code;
-        const priority =
-          locale === DEFAULT_LOCALE ? TOOL_PRIORITY : TOOL_LOCALE_PRIORITY;
-        tools.forEach((tool) => {
+      tools.forEach((tool) => {
+        // 각 도구별로 hreflang 링크 생성
+        const toolHreflangLinks = SUPPORTED_LOCALES.map((loc) => {
+          const hrefLang =
+            loc.code === DEFAULT_LOCALE ? 'en' : loc.code.split('-')[0].toLowerCase();
+          const hrefUrl =
+            loc.code === DEFAULT_LOCALE ? tool.path : `/${loc.code}${tool.path}`;
+          return `    <xhtml:link rel="alternate" hreflang="${hrefLang}" href="https://tools.yowu.dev${hrefUrl}"/>`;
+        }).join('\n');
+
+        SUPPORTED_LOCALES.forEach((localeInfo) => {
+          const locale = localeInfo.code;
+          const priority =
+            locale === DEFAULT_LOCALE ? TOOL_PRIORITY : TOOL_LOCALE_PRIORITY;
           const toolPath =
             locale === DEFAULT_LOCALE ? tool.path : `/${locale}${tool.path}`;
           sitemapUrls.push(`  <url>
     <loc>https://tools.yowu.dev${toolPath}</loc>
+${toolHreflangLinks}
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tools.yowu.dev${tool.path}"/>
     <lastmod>${lastmod}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>${priority.toFixed(1)}</priority>
