@@ -1502,7 +1502,8 @@ export const jaJP = {
     iconConverter: {
       // TODO: Translate to Japanese
       title: 'Icon Converter',
-      description: 'Convert SVG/images to ICO, PNG, WebP, JPEG with multi-size presets',
+      description:
+        'Convert SVG/images to ICO, PNG, WebP, JPEG with multi-size presets',
       input: {
         dropHere: 'Drop image here or click to browse',
         pickFile: 'Pick File',
@@ -1585,9 +1586,11 @@ export const jaJP = {
         of: 'of',
       },
       error: {
-        unsupportedFormat: 'Unsupported format: {type}. Please use SVG, PNG, JPG, WebP, or AVIF.',
+        unsupportedFormat:
+          'Unsupported format: {type}. Please use SVG, PNG, JPG, WebP, or AVIF.',
         fileTooLarge: 'File too large: {size}MB. Maximum: {max}MB.',
-        svgExternalRefBlocked: 'SVG contains external resources (blocked for security)',
+        svgExternalRefBlocked:
+          'SVG contains external resources (blocked for security)',
         decodeFailed: 'Failed to decode image',
         renderFailed: 'Failed to render image',
         noSizeSelected: 'Please select at least one size',
@@ -1630,13 +1633,19 @@ export const jaJP = {
       seconds: '秒',
       maxRequests: '最大:',
       maxDuration: '最大:',
-      rateLimit: { label: 'レート制限', none: 'なし', global: 'グローバル', perWorker: 'ワーカーごと' },
+      rateLimit: {
+        label: 'レート制限',
+        none: 'なし',
+        global: 'グローバル',
+        perWorker: 'ワーカーごと',
+      },
       qps: 'req/s',
       rpsUnit: 'req/s',
       timeoutSeconds: 'タイムアウト',
       // Cookie option
       includeCookies: 'Cookie',
-      includeCookiesTooltip: 'リクエストにCookieを含めます。Chrome拡張機能が接続されている場合のみ利用可能です。認証が必要なエンドポイントのテストに便利です。',
+      includeCookiesTooltip:
+        'リクエストにCookieを含めます。Chrome拡張機能が接続されている場合のみ利用可能です。認証が必要なエンドポイントのテストに便利です。',
       tooltip: {
         http2Mode:
           'HTTP/2マルチプレクシングを有効にして高い同時接続数をサポート。ターゲットサーバーがHTTP/2をサポートしている必要があります。',
@@ -1646,7 +1655,8 @@ export const jaJP = {
           '固定された総リクエスト数を送信します。すべてのリクエストが完了するとテストが終了します。',
         loadModeDuration:
           '固定された期間中、継続的にリクエストを送信します。時間が経過するとテストが終了します。',
-        rateLimitNone: 'レート制限なし。可能な限り高速でリクエストを送信します。',
+        rateLimitNone:
+          'レート制限なし。可能な限り高速でリクエストを送信します。',
         rateLimitGlobal:
           'すべてのワーカー全体で1秒あたりの総リクエスト数を制限します。一貫したスループットを提供します。',
         rateLimitPerWorker:
@@ -1658,14 +1668,22 @@ export const jaJP = {
         p95: '95パーセンタイル。リクエストの5%だけがこれより長くかかりました。一般的なSLA指標です。',
         p99: '99パーセンタイル。リクエストの1%だけがこれより長くかかりました。テールレイテンシを捉えます。',
         rps: '1秒あたりのリクエスト数。スループット測定 - 毎秒完了したリクエスト数。',
-        errorRate: '失敗したリクエストの割合（タイムアウト、ネットワークエラー、HTTP 4xx/5xx）。',
-        bodyHandling: 'レスポンスボディの処理方法。パフォーマンスとメモリ使用量に影響します。',
-        bodyCancel: 'ボディストリームを即座にキャンセル（最速）。ボディデータなし。レイテンシテストに最適。',
-        bodyStream: 'ストリームとしてボディを読み取り（中間）。サイズは取得できますがテキストデコードをスキップ。',
-        bodyFull: 'フルボディを読み取りデコード（最遅）。コンテンツ検証に必要。',
-        networkTiming: 'Resource Timing APIからのネットワークタイミング。Timing-Allow-Originヘッダーのないクロスオリジンリクエストでは利用できない場合があります。',
-        protocol: '検出されたHTTPプロトコル（h2、http/1.1、h3）。クロスオリジンはTiming-Allow-Originヘッダーが必要。',
-        stalledTime: 'リクエストが送信される前にブラウザキューで待機した時間。高い値は接続プール飽和を示します。',
+        errorRate:
+          '失敗したリクエストの割合（タイムアウト、ネットワークエラー、HTTP 4xx/5xx）。',
+        bodyHandling:
+          'レスポンスボディの処理方法。パフォーマンスとメモリ使用量に影響します。',
+        bodyCancel:
+          'ボディストリームを即座にキャンセル（最速）。ボディデータなし。レイテンシテストに最適。',
+        bodyStream:
+          'ストリームとしてボディを読み取り（中間）。サイズは取得できますがテキストデコードをスキップ。',
+        bodyFull:
+          'フルボディを読み取りデコード（最遅）。コンテンツ検証に必要。',
+        networkTiming:
+          'Resource Timing APIからのネットワークタイミング。Timing-Allow-Originヘッダーのないクロスオリジンリクエストでは利用できない場合があります。',
+        protocol:
+          '検出されたHTTPプロトコル（h2、http/1.1、h3）。クロスオリジンはTiming-Allow-Originヘッダーが必要。',
+        stalledTime:
+          'リクエストが送信される前にブラウザキューで待機した時間。高い値は接続プール飽和を示します。',
       },
       bodyHandling: {
         label: 'レスポンスボディ',
@@ -1693,7 +1711,10 @@ export const jaJP = {
         formHint: 'URLエンコードフォームデータ（key=value&...）',
       },
       auth: { basic: 'Basic Auth' },
-      privacy: { shareIncludeHeaders: '共有リンクにヘッダーを含める', shareIncludeAuth: '共有リンクに認証情報を含める' },
+      privacy: {
+        shareIncludeHeaders: '共有リンクにヘッダーを含める',
+        shareIncludeAuth: '共有リンクに認証情報を含める',
+      },
       results: {
         summary: '概要',
         details: '詳細',
@@ -1743,33 +1764,53 @@ export const jaJP = {
         http5xx: 'HTTP 5xx',
       },
       error: {
-        concurrencyExceedsRequests: '同時リクエスト数が総リクエスト数を超えることはできません',
+        concurrencyExceedsRequests:
+          '同時リクエスト数が総リクエスト数を超えることはできません',
       },
-      export: { json: 'JSON', csv: 'CSV', copySummary: '概要をコピー', copyHeyCommand: 'hey CLIコマンドをコピー' },
+      export: {
+        json: 'JSON',
+        csv: 'CSV',
+        copySummary: '概要をコピー',
+        copyHeyCommand: 'hey CLIコマンドをコピー',
+      },
       shareLink: '共有',
       warning: {
         responsibleUse: '責任ある使用について',
         responsibleUseDesc:
           'このツールは、所有または明示的な許可があるAPIのテスト用です。無許可の負荷テストは利用規約または法律に違反する可能性があります。すべてのリクエストはブラウザから発信され、IPがターゲットサーバーに公開されます。',
-        highConcurrency: '高い同時接続数はブラウザとターゲットサーバーに影響を与える可能性があります',
-        largeRequests: '大量のリクエストです。このエンドポイントをテストする権限があることを確認してください。',
-        longDuration: '長時間のテストです。ブラウザのメモリ使用量を監視してください。',
-        highQps: '高いQPSはブラウザまたはネットワークで制限される可能性があります',
-        externalDomain: '外部ドメインのテストは利用規約に違反する可能性があります',
+        highConcurrency:
+          '高い同時接続数はブラウザとターゲットサーバーに影響を与える可能性があります',
+        largeRequests:
+          '大量のリクエストです。このエンドポイントをテストする権限があることを確認してください。',
+        longDuration:
+          '長時間のテストです。ブラウザのメモリ使用量を監視してください。',
+        highQps:
+          '高いQPSはブラウザまたはネットワークで制限される可能性があります',
+        externalDomain:
+          '外部ドメインのテストは利用規約に違反する可能性があります',
         browserLimitations: 'ブラウザベースの制限',
-        maxConnections: 'HTTP/1.1: 最大{max}接続 | HTTP/2モード: 最大{maxHttp2}（サーバーサポート必要）',
-        jsOverhead: 'JavaScriptランタイムのオーバーヘッドにより、ネイティブツール（hey, wrk）と比較してスループットが低下',
-        notProduction: '本番負荷テストには不向き - 正確な結果にはCLIツールを使用',
-        performanceGap: '⚠️ CLIツール（hey, wrk, ab）と比較して5倍以上の性能差 - 簡易確認のみに使用',
+        maxConnections:
+          'HTTP/1.1: 最大{max}接続 | HTTP/2モード: 最大{maxHttp2}（サーバーサポート必要）',
+        jsOverhead:
+          'JavaScriptランタイムのオーバーヘッドにより、ネイティブツール（hey, wrk）と比較してスループットが低下',
+        notProduction:
+          '本番負荷テストには不向き - 正確な結果にはCLIツールを使用',
+        performanceGap:
+          '⚠️ CLIツール（hey, wrk, ab）と比較して5倍以上の性能差 - 簡易確認のみに使用',
         tabHidden: 'テスト一時停止 - タブが非表示',
-        tabHiddenDesc: 'ブラウザはバックグラウンドタブを制限します。正確な結果を得るために、このタブを表示状態に保ってください。',
+        tabHiddenDesc:
+          'ブラウザはバックグラウンドタブを制限します。正確な結果を得るために、このタブを表示状態に保ってください。',
         preflightWarning: 'CORS Preflight警告',
-        preflightDesc: 'これらの設定はOPTIONS preflightリクエストを発生させ、レイテンシが2倍になります:',
+        preflightDesc:
+          'これらの設定はOPTIONS preflightリクエストを発生させ、レイテンシが2倍になります:',
         preflightMethod: 'HTTPメソッド "{method}" がpreflightを引き起こします',
         preflightAuth: 'Authorizationヘッダーがpreflightを引き起こします',
-        preflightHeader: 'カスタムヘッダー "{header}" がpreflightを引き起こします',
-        preflightContentType: 'Content-Type "{type}" がpreflightを引き起こします',
-        preflightTip: 'ヒント: preflightを避けるには、シンプルなリクエスト（GET/POSTとtext/plain）を使用するか、CORS-freeリクエストにはChrome拡張機能を使用してください。',
+        preflightHeader:
+          'カスタムヘッダー "{header}" がpreflightを引き起こします',
+        preflightContentType:
+          'Content-Type "{type}" がpreflightを引き起こします',
+        preflightTip:
+          'ヒント: preflightを避けるには、シンプルなリクエスト（GET/POSTとtext/plain）を使用するか、CORS-freeリクエストにはChrome拡張機能を使用してください。',
       },
       networkTiming: {
         title: 'ネットワークタイミング',
@@ -1780,16 +1821,19 @@ export const jaJP = {
         avgStalled: '平均キュー時間',
         sampleCount: 'タイミングサンプル',
         noData: 'ネットワークタイミング利用不可',
-        noDataNote: 'クロスオリジンリクエストはTiming-Allow-Originヘッダーが必要',
+        noDataNote:
+          'クロスオリジンリクエストはTiming-Allow-Originヘッダーが必要',
         toolLatency: 'ツールレイテンシ',
         toolLatencyNote: '(ブラウザキュー時間を含む)',
       },
       acknowledgment: {
         title: '確認が必要',
         subtitle: 'テスト前に確認してください',
-        warning: '無許可の負荷テストは違法であり、利用規約に違反する可能性があります。',
+        warning:
+          '無許可の負荷テストは違法であり、利用規約に違反する可能性があります。',
         permission: 'このエンドポイントをテストする権限があります',
-        ipVisible: '私のIPアドレスからリクエストが送信されることを理解しています',
+        ipVisible:
+          '私のIPアドレスからリクエストが送信されることを理解しています',
         confirm: '理解しました、テスト実行',
       },
       emptyState: 'ターゲットURLを設定してテストを実行してください',

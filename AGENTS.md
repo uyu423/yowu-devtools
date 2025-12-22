@@ -754,26 +754,28 @@ if (shouldUseWorker(input)) {
 ### 새 도구에 AdSense 추가하기
 
 1. **import 추가**:
+
 ```typescript
 import { GoogleAdsenseBlock } from '@/components/common/GoogleAdsenseBlock';
 ```
 
 2. **적절한 위치에 광고 블록 추가**:
+
 ```tsx
 const MyTool: React.FC = () => {
   return (
     <div className="flex flex-col min-h-full p-4 md:p-6 max-w-5xl mx-auto">
       <ToolHeader ... />
-      
+
       {/* 입력 섹션 */}
       <EditorPanel ... />
-      
+
       {/* 광고 - 입력과 출력 사이 자연스러운 위치 */}
       <GoogleAdsenseBlock />
-      
+
       {/* 출력 섹션 */}
       <ResultPanel ... />
-      
+
       <ShareModal {...shareModalProps} />
     </div>
   );
@@ -792,13 +794,13 @@ const MyTool: React.FC = () => {
 
 ### 도구별 광고 배치 예시
 
-| 도구 | 광고 위치 | 배치 이유 |
-|------|-----------|-----------|
-| JSON Viewer | 파일 업로드 박스 하단 | 입력 완료 후 자연스러운 휴지점 |
-| API Tester | Request Body 하단 | 요청 설정 완료 후 전송 전 |
-| Hash Generator | Hash Result 상단 | 입력 완료 후 결과 확인 전 |
-| Text Diff | View 선택 블록 상단 | 옵션 설정 전 자연스러운 위치 |
-| Regex Tester | Security Note 하단 | 입력 섹션과 Pattern Features 사이 |
+| 도구           | 광고 위치             | 배치 이유                         |
+| -------------- | --------------------- | --------------------------------- |
+| JSON Viewer    | 파일 업로드 박스 하단 | 입력 완료 후 자연스러운 휴지점    |
+| API Tester     | Request Body 하단     | 요청 설정 완료 후 전송 전         |
+| Hash Generator | Hash Result 상단      | 입력 완료 후 결과 확인 전         |
+| Text Diff      | View 선택 블록 상단   | 옵션 설정 전 자연스러운 위치      |
+| Regex Tester   | Security Note 하단    | 입력 섹션과 Pattern Features 사이 |
 
 ### 핵심 CSS 설명
 
