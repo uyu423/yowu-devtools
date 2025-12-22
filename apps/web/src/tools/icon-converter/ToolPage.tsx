@@ -83,25 +83,82 @@ export const IconConverterToolPage: React.FC = () => {
     img.src = objectUrl;
   };
 
-  // 생성 핸들러 (임시 구현)
+  // Worker 인스턴스
+  const workerRef = React.useRef<Worker | null>(null);
+
+  // Worker 초기화
+  React.useEffect(() => {
+    workerRef.current = new Worker(
+      new URL('./logic/iconWorker.ts', import.meta.url),
+      { type: 'module' }
+    );
+
+    return () => {
+      workerRef.current?.terminate();
+    };
+  }, []);
+
+  // 생성 핸들러
   const handleGenerate = async () => {
-    if (!inputFile) return;
+    if (!inputFile || !workerRef.current) return;
 
     setIsGenerating(true);
     setProgress(0);
     setGeneratedBlobs([]);
     setOutputBlob(null);
-
-    // TODO: 실제 변환 로직 구현
-    // 임시로 진행률만 표시
-    for (let i = 0; i < state.sizes.length; i++) {
-      setCurrentSize(state.sizes[i]);
-      setProgress(((i + 1) / state.sizes.length) * 100);
-      await new Promise((resolve) => setTimeout(resolve, 300));
-    }
-
-    setIsGenerating(false);
     setCurrentSize(null);
+
+    const requestId = crypto.randomUUID();
+
+    // Worker 메시지 핸들러
+    const handleMessage = (e: MessageEvent) => {
+      const response = e.data;
+
+      if (response.id !== requestId) return;
+
+      if (response.type === 'progress') {
+        const progressPercent = (response.current / response.total) * 100;
+        setProgress(progressPercent);
+        // message에서 current size를 추출할 수 있다면 설정
+      } else if (response.type === 'success') {
+        // 성공: 결과를 state에 저장
+        const blobs = response.results.map((r: any) => ({
+          size: r.size,
+          blob: r.blob,
+          dataUrl: r.url,
+        }));
+        setGeneratedBlobs(blobs);
+        setOutputBlob(response.downloadBlob || null);
+        setProgress(100);
+        setIsGenerating(false);
+        setCurrentSize(null);
+        workerRef.current?.removeEventListener('message', handleMessage);
+      } else if (response.type === 'error') {
+        // 에러 처리
+        console.error('Worker error:', response.message, response.details);
+        setIsGenerating(false);
+        setCurrentSize(null);
+        workerRef.current?.removeEventListener('message', handleMessage);
+        // TODO: Toast 알림으로 에러 표시
+      }
+    };
+
+    workerRef.current.addEventListener('message', handleMessage);
+
+    // Worker에 변환 요청 전송
+    workerRef.current.postMessage({
+      id: requestId,
+      type: 'convert',
+      file: inputFile,
+      selectedSizes: state.sizes,
+      outputFormat: state.outputFormat,
+      renderOptions: {
+        fit: state.fit,
+        padding: state.padding,
+        background: state.background,
+        jpegQuality: state.quality / 100,
+      },
+    });
   };
 
   // Reset 핸들러
