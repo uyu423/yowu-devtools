@@ -1522,6 +1522,120 @@ export const enUS = {
           'Video processing is computationally intensive. Large files may take several minutes to process.',
       },
     },
+    iconConverter: {
+      title: 'Icon Converter',
+      description: 'Convert SVG/images to ICO, PNG, WebP, JPEG with multi-size presets',
+      // Input
+      input: {
+        dropHere: 'Drop image here or click to browse',
+        pickFile: 'Pick File',
+        fileMeta: {
+          name: 'File Name',
+          type: 'Format',
+          size: 'Size',
+          dimensions: 'Dimensions',
+          hasAlpha: 'Transparency',
+        },
+      },
+      // Output format
+      output: {
+        format: 'Output Format',
+        ico: 'ICO',
+        icoDescription: 'Multi-size icon (recommended)',
+        png: 'PNG',
+        pngDescription: 'Lossless, supports transparency',
+        webp: 'WebP',
+        webpDescription: 'Modern, smaller file size',
+        jpeg: 'JPEG',
+        jpegDescription: 'Best for photos, no transparency',
+        exportZip: 'Export as ZIP',
+        exportZipDescription: 'Bundle all sizes into a single archive',
+      },
+      // Presets
+      preset: {
+        label: 'Preset',
+        windowsStandard: 'Windows Standard',
+        windowsStandardDescription: '16, 24, 32, 48, 64, 128, 256 px',
+        faviconLegacy: 'Favicon Legacy',
+        faviconLegacyDescription: '16, 32, 48 px',
+        custom: 'Custom',
+        customDescription: 'Select sizes manually',
+      },
+      // Sizes
+      sizes: {
+        label: 'Sizes',
+        autoSelected: '(Auto-selected by preset)',
+        selectAll: 'Select All',
+        deselectAll: 'Deselect All',
+        selected: 'selected',
+        size: 'size',
+      },
+      // Rendering options
+      options: {
+        title: 'Rendering Options',
+        fit: 'Fit Mode',
+        contain: 'Contain',
+        containDescription: 'Keep ratio, add padding',
+        cover: 'Cover',
+        coverDescription: 'Keep ratio, may crop',
+        stretch: 'Stretch',
+        stretchDescription: 'Fill canvas, ignore ratio',
+        padding: 'Padding',
+        background: 'Background',
+        transparent: 'Transparent',
+        solidColor: 'Solid Color',
+        quality: 'Quality',
+        qualityLow: 'Low (smaller file)',
+        qualityHigh: 'High (better quality)',
+      },
+      // ICO mode
+      ico: {
+        mode: 'ICO Mode',
+        modernPng: 'Modern PNG (Recommended)',
+        compat: 'Compatibility (Coming soon)',
+      },
+      // Actions
+      generate: 'Generate',
+      generating: 'Generating...',
+      progress: '{current} / {total} completed',
+      processingSize: 'Processing {size}×{size}...',
+      // Download
+      download: {
+        title: 'Download',
+        ico: 'Download ICO',
+        png: 'Download PNG',
+        webp: 'Download WebP',
+        jpeg: 'Download JPEG',
+        zip: 'Download ZIP',
+      },
+      // Preview
+      preview: {
+        title: 'Preview',
+        noPreview: 'No preview available',
+        generateToSee: 'Generate icons to see preview',
+        of: 'of',
+      },
+      // Errors
+      error: {
+        unsupportedFormat: 'Unsupported format: {type}. Please use SVG, PNG, JPG, WebP, or AVIF.',
+        fileTooLarge: 'File too large: {size}MB. Maximum: {max}MB.',
+        svgExternalRefBlocked: 'SVG contains external resources (blocked for security)',
+        decodeFailed: 'Failed to decode image',
+        renderFailed: 'Failed to render image',
+        noSizeSelected: 'Please select at least one size',
+        invalidSize: 'Size must be between 1 and 256',
+      },
+      // Warnings
+      warning: {
+        largeImage: 'Large image may cause performance issues',
+        upscale: 'Upscaling from {original}px to {target}px may reduce quality',
+        svgComplexity: 'Complex SVG may not render correctly in all browsers',
+      },
+      // File info
+      fileInfo: 'File Information',
+      yes: 'Yes',
+      no: 'No',
+    },
     apiBurstTest: {
       title: 'API Burst Test',
       description: 'Simple browser-based load testing for quick API checks',
@@ -1866,6 +1980,11 @@ export const enUS = {
       title: 'Video Studio',
       description:
         'Free online video editor. Trim, cut, crop, resize, and convert videos. Extract thumbnails and export to MP4 or WebM. Browser-based processing.',
+    },
+    iconConverter: {
+      title: 'Icon Converter',
+      description:
+        'Free online icon converter. Convert SVG, PNG, JPG to ICO, PNG, WebP, JPEG with multi-size presets. Generate Windows app icons, favicons, and more. All processing happens in your browser - no data sent to servers.',
     },
     apiBurstTest: {
       title: 'API Burst Test',
