@@ -16,7 +16,7 @@ import { EditorPanel } from '@/components/common/EditorPanel';
 import { ActionBar } from '@/components/common/ActionBar';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
 import { ShareModal } from '@/components/common/ShareModal';
-import { AdsenseFooter } from '@/components/common/AdsenseFooter';
+import { GoogleAdsenseBlock } from '@/components/common/GoogleAdsenseBlock';
 import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useToolState } from '@/hooks/useToolState';
 import { useTitle } from '@/hooks/useTitle';
@@ -161,6 +161,9 @@ const CurlParserTool: React.FC = () => {
           )}
         </ActionBar>
 
+        {/* AdSense - After URL Decode Block */}
+        <GoogleAdsenseBlock />
+
         {/* Error display */}
         {parseResult.error && (
           <ErrorBanner message={t('tool.curl.parseFailed')} details={parseResult.error} />
@@ -215,8 +218,6 @@ const CurlParserTool: React.FC = () => {
             <p>{t('tool.curl.emptyState')}</p>
           </div>
         )}
-
-        <AdsenseFooter />
       </div>
     </div>
   );

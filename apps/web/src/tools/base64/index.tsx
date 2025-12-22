@@ -12,7 +12,7 @@ import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useToolSetup } from '@/hooks/useToolSetup';
 import { ShareModal } from '@/components/common/ShareModal';
-import { AdsenseFooter } from '@/components/common/AdsenseFooter';
+import { GoogleAdsenseBlock } from '@/components/common/GoogleAdsenseBlock';
 
 interface Base64State {
   input: string;
@@ -129,6 +129,9 @@ const Base64Tool: React.FC = () => {
           />
         )}
 
+        {/* AdSense - Before Result Block */}
+        <GoogleAdsenseBlock />
+
         <ResultPanel
           title={t('common.result')}
           value={conversion.result}
@@ -138,8 +141,6 @@ const Base64Tool: React.FC = () => {
           status={conversion.error ? 'error' : 'success'}
           className="h-40 lg:h-56"
         />
-
-        <AdsenseFooter />
       </div>
     </div>
   );

@@ -14,7 +14,7 @@ import { useI18n } from '@/hooks/useI18nHooks';
 import { copyToClipboard } from '@/lib/clipboard';
 import { toast } from 'sonner';
 import { ShareModal } from '@/components/common/ShareModal';
-import { AdsenseFooter } from '@/components/common/AdsenseFooter';
+import { GoogleAdsenseBlock } from '@/components/common/GoogleAdsenseBlock';
 import { cn } from '@/lib/utils';
 import CryptoJS from 'crypto-js';
 
@@ -741,6 +741,9 @@ const HashTool: React.FC = () => {
         )}
       </div>
 
+      {/* AdSense - Before Hash Result */}
+      <GoogleAdsenseBlock />
+
       {/* Output */}
       <div className="mb-4 flex-1 min-h-0">
         <div className="flex items-center justify-between mb-2">
@@ -812,8 +815,6 @@ const HashTool: React.FC = () => {
       )}
 
       <ShareModal {...shareModalProps} />
-
-      <AdsenseFooter />
     </div>
   );
 };

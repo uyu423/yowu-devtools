@@ -1,6 +1,6 @@
 import { Copy, KeyRound } from 'lucide-react';
 
-import { AdsenseFooter } from '@/components/common/AdsenseFooter';
+import { GoogleAdsenseBlock } from '@/components/common/GoogleAdsenseBlock';
 import { OptionLabel } from '@/components/ui/OptionLabel';
 /* eslint-disable react-refresh/only-export-components */
 import React from 'react';
@@ -286,6 +286,9 @@ const UuidTool: React.FC = () => {
         </div>
       </div>
 
+      {/* AdSense - Before Generated IDs */}
+      <GoogleAdsenseBlock />
+
       {/* Output */}
       <div className="flex-1 min-h-0">
         <div className="flex items-center justify-between mb-3">
@@ -347,7 +350,6 @@ const UuidTool: React.FC = () => {
         </div>
       </div>
       <ShareModal {...shareModalProps} />
-      <AdsenseFooter />
     </div>
   );
 };

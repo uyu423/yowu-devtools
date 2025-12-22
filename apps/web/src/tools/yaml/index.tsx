@@ -15,7 +15,7 @@ import { useToolSetup } from '@/hooks/useToolSetup';
 import { useWebWorker, shouldUseWorkerForText } from '@/hooks/useWebWorker';
 import { copyToClipboard } from '@/lib/clipboard';
 import { ShareModal } from '@/components/common/ShareModal';
-import { AdsenseFooter } from '@/components/common/AdsenseFooter';
+import { GoogleAdsenseBlock } from '@/components/common/GoogleAdsenseBlock';
 import YAML from 'yaml';
 
 interface YamlToolState {
@@ -218,6 +218,9 @@ const YamlTool: React.FC = () => {
         </div>
       </div>
 
+      {/* AdSense - After File Inputs */}
+      <GoogleAdsenseBlock />
+
       {!isProcessing && conversion.error && (
         <ErrorBanner
           className="mt-4"
@@ -253,8 +256,6 @@ const YamlTool: React.FC = () => {
           </FileDownload>
         </div>
       </ActionBar>
-
-      <AdsenseFooter />
     </div>
   );
 };

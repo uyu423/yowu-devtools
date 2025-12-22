@@ -46,7 +46,7 @@ import {
 } from './utils';
 import { useApiHistory, useCorsAllowlist, useRequestExecutor } from './hooks';
 
-import { AdsenseFooter } from '@/components/common/AdsenseFooter';
+import { GoogleAdsenseBlock } from '@/components/common/GoogleAdsenseBlock';
 import { ExtensionStatus } from '@/components/common/ExtensionStatus';
 import { ResizablePanels } from '@/components/common/ResizablePanels';
 import { ShareModal } from '@/components/common/ShareModal';
@@ -872,6 +872,9 @@ const ApiTesterTool: React.FC = () => {
                     />
                   </div>
                 )}
+
+                {/* AdSense - After Request Body Block */}
+                <GoogleAdsenseBlock />
               </div>
             </div>
           }
@@ -910,8 +913,6 @@ const ApiTesterTool: React.FC = () => {
       />
 
       <ShareModal {...shareModalProps} />
-
-      <AdsenseFooter />
     </div>
   );
 };

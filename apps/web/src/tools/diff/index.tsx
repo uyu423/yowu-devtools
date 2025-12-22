@@ -17,7 +17,7 @@ import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useWebWorker, shouldUseWorkerForText } from '@/hooks/useWebWorker';
 import { copyToClipboard } from '@/lib/clipboard';
 import { ShareModal } from '@/components/common/ShareModal';
-import { AdsenseFooter } from '@/components/common/AdsenseFooter';
+import { GoogleAdsenseBlock } from '@/components/common/GoogleAdsenseBlock';
 import DiffMatchPatch from 'diff-match-patch';
 import type { Diff } from 'diff-match-patch';
 
@@ -218,6 +218,9 @@ const DiffTool: React.FC = () => {
           </div>
         </div>
 
+        {/* AdSense - Before View Selection */}
+        <GoogleAdsenseBlock />
+
         <ActionBar className="flex flex-wrap items-center justify-between rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm">
           <ModeToggle
             options={[
@@ -370,8 +373,6 @@ const DiffTool: React.FC = () => {
           )}
         </div>
       </div>
-
-      <AdsenseFooter />
     </div>
   );
 };

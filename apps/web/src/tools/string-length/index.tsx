@@ -9,7 +9,7 @@ import { ErrorBanner } from '@/components/common/ErrorBanner';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useToolSetup } from '@/hooks/useToolSetup';
 import { ShareModal } from '@/components/common/ShareModal';
-import { AdsenseFooter } from '@/components/common/AdsenseFooter';
+import { GoogleAdsenseBlock } from '@/components/common/GoogleAdsenseBlock';
 import { toast } from 'sonner';
 
 interface StringLengthToolState {
@@ -393,6 +393,9 @@ const StringLengthTool: React.FC = () => {
           heightStorageKey="string-length-input-height"
         />
 
+        {/* AdSense - Before Statistics */}
+        <GoogleAdsenseBlock />
+
         {/* Statistics Panel */}
         <div className="rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm">
           <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
@@ -422,8 +425,6 @@ const StringLengthTool: React.FC = () => {
             />
           </div>
         </div>
-
-        <AdsenseFooter />
       </div>
     </div>
   );

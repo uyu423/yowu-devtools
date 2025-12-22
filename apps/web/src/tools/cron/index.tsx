@@ -19,7 +19,7 @@ import 'cronstrue/locales/ja';
 import 'cronstrue/locales/zh_CN';
 import 'cronstrue/locales/es';
 import { ShareModal } from '@/components/common/ShareModal';
-import { AdsenseFooter } from '@/components/common/AdsenseFooter';
+import { GoogleAdsenseBlock } from '@/components/common/GoogleAdsenseBlock';
 import { useI18n } from '@/hooks/useI18nHooks';
 import { toast } from 'sonner';
 import { copyToClipboard } from '@/lib/clipboard';
@@ -507,6 +507,9 @@ const CronTool: React.FC = () => {
           </div>
         )}
 
+        {/* AdSense - After Field Breakdown */}
+        <GoogleAdsenseBlock />
+
         {/* Next Scheduled Dates */}
         {!cronResult.error && cronResult.nextRuns.length > 0 && (
           <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-800">
@@ -574,8 +577,6 @@ const CronTool: React.FC = () => {
             </ul>
           </div>
         )}
-
-        <AdsenseFooter />
       </div>
     </div>
   );

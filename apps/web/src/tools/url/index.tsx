@@ -12,7 +12,7 @@ import { OptionLabel } from '@/components/ui/OptionLabel';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useToolSetup } from '@/hooks/useToolSetup';
 import { ShareModal } from '@/components/common/ShareModal';
-import { AdsenseFooter } from '@/components/common/AdsenseFooter';
+import { GoogleAdsenseBlock } from '@/components/common/GoogleAdsenseBlock';
 
 interface UrlToolState {
   input: string;
@@ -129,6 +129,9 @@ const UrlTool: React.FC = () => {
           <ErrorBanner message={t('tool.url.decodingFailed')} details={conversion.error} />
         )}
 
+        {/* AdSense - Before Result Block */}
+        <GoogleAdsenseBlock />
+
         <ResultPanel
           title={t('common.result')}
           value={conversion.result}
@@ -138,8 +141,6 @@ const UrlTool: React.FC = () => {
           status={conversion.error ? 'error' : 'success'}
           className="h-40 lg:h-48"
         />
-
-        <AdsenseFooter />
       </div>
     </div>
   );

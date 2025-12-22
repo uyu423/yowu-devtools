@@ -14,7 +14,7 @@ import { copyToClipboard } from '@/lib/clipboard';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { ShareModal } from '@/components/common/ShareModal';
-import { AdsenseFooter } from '@/components/common/AdsenseFooter';
+import { GoogleAdsenseBlock } from '@/components/common/GoogleAdsenseBlock';
 
 interface PasswordToolState {
   length: number;
@@ -449,6 +449,10 @@ const PasswordTool: React.FC = () => {
             </button>
           )}
         </div>
+
+        {/* AdSense - Before Generated Password */}
+        <GoogleAdsenseBlock />
+
         <div className="h-full overflow-auto">
           {state.count === 1 ? (
             <EditorPanel
@@ -499,8 +503,6 @@ const PasswordTool: React.FC = () => {
         </div>
       </div>
       <ShareModal {...shareModalProps} />
-
-      <AdsenseFooter />
     </div>
   );
 };

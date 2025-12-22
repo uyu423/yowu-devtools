@@ -9,7 +9,7 @@ import { ErrorBanner } from '@/components/common/ErrorBanner';
 import { FileInput } from '@/components/common/FileInput';
 import { FileDownload } from '@/components/common/FileDownload';
 import { ShareModal } from '@/components/common/ShareModal';
-import { AdsenseFooter } from '@/components/common/AdsenseFooter';
+import { GoogleAdsenseBlock } from '@/components/common/GoogleAdsenseBlock';
 import { ResizablePanels } from '@/components/common/ResizablePanels';
 import { JsonTreeView } from '@/components/common/JsonTreeView';
 import { getMimeType } from '@/lib/fileUtils';
@@ -295,6 +295,11 @@ const JsonTool: React.FC = () => {
                   className="w-full"
                 />
               </div>
+
+              {/* AdSense - After File Upload Box */}
+              <div className="mt-4">
+                <GoogleAdsenseBlock />
+              </div>
             </div>
           </div>
         }
@@ -479,8 +484,6 @@ const JsonTool: React.FC = () => {
           </FileDownload>
         </div>
       </ActionBar>
-
-      <AdsenseFooter />
     </div>
   );
 };

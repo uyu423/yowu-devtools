@@ -14,7 +14,7 @@ import { useI18n } from '@/hooks/useI18nHooks';
 import { copyToClipboard } from '@/lib/clipboard';
 import { toast } from 'sonner';
 import { ShareModal } from '@/components/common/ShareModal';
-import { AdsenseFooter } from '@/components/common/AdsenseFooter';
+import { GoogleAdsenseBlock } from '@/components/common/GoogleAdsenseBlock';
 import { cn } from '@/lib/utils';
 import regexSpecs from './regex-specs.json';
 import { REGEX_PRESETS, type RegexPreset } from './regex-presets';
@@ -1088,6 +1088,9 @@ const RegexTool: React.FC = () => {
             </p>
           </div>
 
+          {/* AdSense - Before Pattern Features */}
+          <GoogleAdsenseBlock />
+
           {/* Feature Detection & Explanation - Compact collapsible version */}
           {detectedFeatures.length > 0 && (
             <div className="mb-4">
@@ -1225,7 +1228,6 @@ const RegexTool: React.FC = () => {
       </div>
 
       <ShareModal {...shareModalProps} />
-      <AdsenseFooter />
     </div>
   );
 };

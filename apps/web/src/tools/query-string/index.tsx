@@ -14,7 +14,7 @@ import { useTitle } from '@/hooks/useTitle';
 import { useI18n } from '@/hooks/useI18nHooks';
 import { copyToClipboard } from '@/lib/clipboard';
 import { ShareModal } from '@/components/common/ShareModal';
-import { AdsenseFooter } from '@/components/common/AdsenseFooter';
+import { GoogleAdsenseBlock } from '@/components/common/GoogleAdsenseBlock';
 
 interface QueryStringToolState {
   input: string;
@@ -260,6 +260,9 @@ const QueryStringTool: React.FC = () => {
           </label>
         </ActionBar>
 
+        {/* AdSense - After Show Decoded Values Block */}
+        <GoogleAdsenseBlock />
+
         {parseResult.error && (
           <ErrorBanner message={t('tool.urlParser.parsingFailed')} details={parseResult.error} />
         )}
@@ -429,8 +432,6 @@ const QueryStringTool: React.FC = () => {
             <p className="text-sm mt-2">{t('tool.urlParser.enterUrlWithParams')}</p>
           </div>
         )}
-
-        <AdsenseFooter />
       </div>
     </div>
   );

@@ -12,7 +12,7 @@ import { useTitle } from '@/hooks/useTitle';
 import { useI18n } from '@/hooks/useI18nHooks';
 import { copyToClipboard } from '@/lib/clipboard';
 import { ShareModal } from '@/components/common/ShareModal';
-import { AdsenseFooter } from '@/components/common/AdsenseFooter';
+import { GoogleAdsenseBlock } from '@/components/common/GoogleAdsenseBlock';
 import { base64UrlEncode } from '@/lib/jwtUtils';
 
 interface JwtEncoderState {
@@ -277,6 +277,9 @@ const JwtEncoderTool: React.FC = () => {
 
         {encodeError && <ErrorBanner message={encodeError} />}
 
+        {/* AdSense - Before Encoded JWT Token */}
+        <GoogleAdsenseBlock />
+
         {/* Encoded Token Output */}
         {finalToken && (
           <div className="flex flex-col gap-2">
@@ -304,8 +307,6 @@ const JwtEncoderTool: React.FC = () => {
         )}
       </div>
       <ShareModal {...shareModalProps} />
-
-      <AdsenseFooter />
     </div>
   );
 };

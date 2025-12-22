@@ -27,7 +27,7 @@ import React, {
 import { compareResponses, sanitizePathAndParams } from './utils';
 import { useApiDiffExecutor, useDomainPresets, useHistory } from './hooks';
 
-import { AdsenseFooter } from '@/components/common/AdsenseFooter';
+import { GoogleAdsenseBlock } from '@/components/common/GoogleAdsenseBlock';
 import { CorsModal } from '../api-tester/components';
 import { GitCompare } from 'lucide-react';
 import { ShareModal } from '@/components/common/ShareModal';
@@ -428,6 +428,9 @@ const ApiDiffTool: React.FC = () => {
           onCheckExtension={checkExtension}
         />
 
+        {/* AdSense - After Domains Block */}
+        <GoogleAdsenseBlock />
+
         {/* Result Banner - between input and response panels */}
         <ResultBanner
           comparison={comparison}
@@ -485,8 +488,6 @@ const ApiDiffTool: React.FC = () => {
         extensionStatus={extensionStatus}
         targetUrl={corsErrorUrl || undefined}
       />
-
-      <AdsenseFooter />
     </div>
   );
 };

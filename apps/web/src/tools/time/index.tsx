@@ -4,7 +4,7 @@ import type { ToolDefinition } from '@/tools/types';
 import { Clock, Copy } from 'lucide-react';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { ErrorBanner } from '@/components/common/ErrorBanner';
-import { AdsenseFooter } from '@/components/common/AdsenseFooter';
+import { GoogleAdsenseBlock } from '@/components/common/GoogleAdsenseBlock';
 import { OptionLabel } from '@/components/ui/OptionLabel';
 import { RadioGroup } from '@/components/ui/RadioGroup';
 import { Tooltip } from '@/components/ui/Tooltip';
@@ -334,6 +334,9 @@ const TimeTool: React.FC = () => {
           )}
         </div>
 
+        {/* AdSense - Before Basic Format Block */}
+        <GoogleAdsenseBlock />
+
         <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
           {/* Basic Formats Section */}
           <div className="px-4 py-3 bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700">
@@ -532,8 +535,6 @@ const TimeTool: React.FC = () => {
           </div>
         </div>
       </div>
-
-      <AdsenseFooter />
     </div>
   );
 };

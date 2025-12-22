@@ -13,7 +13,7 @@ import { useI18n } from '@/hooks/useI18nHooks';
 import { useResolvedTheme } from '@/hooks/useThemeHooks';
 import { copyToClipboard } from '@/lib/clipboard';
 import { ShareModal } from '@/components/common/ShareModal';
-import { AdsenseFooter } from '@/components/common/AdsenseFooter';
+import { GoogleAdsenseBlock } from '@/components/common/GoogleAdsenseBlock';
 import { JsonView, defaultStyles } from 'react-json-view-lite';
 import 'react-json-view-lite/dist/index.css';
 import { base64UrlDecode, verifyJwtSignature } from '@/lib/jwtUtils';
@@ -239,6 +239,9 @@ const JwtDecoderTool: React.FC = () => {
           className="h-32"
           status={error ? 'error' : 'default'}
         />
+
+        {/* AdSense - After JWT Token Input */}
+        <GoogleAdsenseBlock />
 
         {error && <ErrorBanner message={error} />}
 
@@ -474,8 +477,6 @@ const JwtDecoderTool: React.FC = () => {
         )}
       </div>
       <ShareModal {...shareModalProps} />
-
-      <AdsenseFooter />
     </div>
   );
 };
