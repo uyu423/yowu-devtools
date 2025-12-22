@@ -7,7 +7,7 @@ import type {
   RenderBackground,
 } from './constants';
 import { decodeImage } from './decodeImage';
-import { renderResizedBitmap, batchRenderSizes } from './renderResizedBitmap';
+import { batchRenderSizes } from './renderResizedBitmap';
 import { exportAsIco } from './exportIco';
 import { exportAsZip } from './exportZip';
 

@@ -6,6 +6,10 @@ export type FitMode = 'contain' | 'cover' | 'stretch';
 export type BackgroundType = 'transparent' | 'solid';
 export type IcoMode = 'modern_png' | 'compat';
 
+// Type aliases for render functions
+export type RenderFit = 'contain' | 'cover' | 'fill';
+export type RenderBackground = 'transparent' | string; // CSS color string
+
 export interface IconConverterSettings {
   // 출력 포맷
   outputFormat: OutputFormat;

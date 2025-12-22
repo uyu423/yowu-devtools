@@ -133,7 +133,7 @@ export async function validateAndSanitizeSvg(
   try {
     const text = await file.text();
     return sanitizeSvg(text);
-  } catch (error) {
+  } catch {
     return {
       success: false,
       error: {

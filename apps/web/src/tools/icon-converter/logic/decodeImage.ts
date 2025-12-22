@@ -22,7 +22,7 @@ export type DecodeResult =
  * Validate file type
  */
 export function validateFileType(file: File): boolean {
-  return SUPPORTED_INPUT_FORMATS.includes(file.type as any);
+  return SUPPORTED_INPUT_FORMATS.includes(file.type as typeof SUPPORTED_INPUT_FORMATS[number]);
 }
 
 /**

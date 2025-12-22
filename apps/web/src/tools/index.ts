@@ -41,10 +41,10 @@ export const tools: ToolDefinition[] = [
   apiTesterTool,
   curlParserTool,
   apiDiffTool,
-  iconConverterTool,
   imageStudioTool,
   videoStudioTool,
   apiBurstTestTool,
+  iconConverterTool,
 ];
 
 export const getToolById = (id: string) => tools.find((t) => t.id === id);

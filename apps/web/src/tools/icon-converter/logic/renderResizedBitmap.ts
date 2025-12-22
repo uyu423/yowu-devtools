@@ -99,34 +99,6 @@ function calculateFillDimensions(
 }
 
 /**
- * Parse CSS color to rgba components
- */
-function parseColor(color: string): {
-  r: number;
-  g: number;
-  b: number;
-  a: number;
-} {
-  if (color === 'transparent') {
-    return { r: 0, g: 0, b: 0, a: 0 };
-  }
-
-  // Create a temporary canvas to parse color
-  const canvas = new OffscreenCanvas(1, 1);
-  const ctx = canvas.getContext('2d');
-  if (!ctx) {
-    return { r: 255, g: 255, b: 255, a: 1 }; // fallback to white
-  }
-
-  ctx.fillStyle = color;
-  ctx.fillRect(0, 0, 1, 1);
-  const imageData = ctx.getImageData(0, 0, 1, 1);
-  const [r, g, b, a] = imageData.data;
-
-  return { r, g, b, a: a / 255 };
-}
-
-/**
  * Render resized bitmap with specified options
  */
 export async function renderResizedBitmap(
@@ -153,7 +125,6 @@ export async function renderResizedBitmap(
 
     // Fill background
     if (options.background !== 'transparent') {
-      const bgColor = parseColor(options.background);
       ctx.fillStyle = options.background;
       ctx.fillRect(0, 0, targetWidth, targetHeight);
     }

@@ -1,6 +1,6 @@
 // ZIP file export utilities
 
-import { zipSync, strToU8 } from 'fflate';
+import { zipSync } from 'fflate';
 
 interface ZipEntry {
   filename: string;
@@ -30,7 +30,8 @@ export async function createZipFile(entries: ZipEntry[]): Promise<Blob> {
     level: 6, // Compression level (0-9, 6 is default)
   });
 
-  return new Blob([zipped], { type: 'application/zip' });
+  // Convert Uint8Array to Blob
+  return new Blob([new Uint8Array(zipped)], { type: 'application/zip' });
 }
 
 /**
@@ -70,29 +71,4 @@ export async function exportIcoAsZip(icoBlob: Blob): Promise<Blob> {
   return createZipFile(entries);
 }
 
-/**
- * Add README.txt to ZIP file
- */
-export async function addReadmeToZip(
-  zipBlob: Blob,
-  readmeText: string
-): Promise<Blob> {
-  // Unzip existing content
-  const arrayBuffer = await zipBlob.arrayBuffer();
-  const bytes = new Uint8Array(arrayBuffer);
-
-  // For simplicity, create a new ZIP with README
-  // In production, you might want to use fflate's unzipSync to preserve existing files
-  const readmeBytes = strToU8(readmeText);
-
-  const filesMap: Record<string, Uint8Array> = {
-    'README.txt': readmeBytes,
-  };
-
-  // This is a simplified approach; ideally, we'd merge with existing ZIP
-  // For now, we'll just return the original ZIP
-  // TODO: Implement proper ZIP merging if needed
-
-  return zipBlob;
-}
 

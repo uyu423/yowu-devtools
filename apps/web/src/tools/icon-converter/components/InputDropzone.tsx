@@ -25,7 +25,7 @@ export const InputDropzone: React.FC<InputDropzoneProps> = ({ onFileSelect, file
 
   const validateFile = (file: File): string | null => {
     // 파일 타입 검증
-    if (!SUPPORTED_INPUT_FORMATS.includes(file.type as any)) {
+    if (!SUPPORTED_INPUT_FORMATS.includes(file.type as typeof SUPPORTED_INPUT_FORMATS[number])) {
       return `Unsupported format: ${file.type}. Please use SVG, PNG, JPG, WebP, or AVIF.`;
     }
 

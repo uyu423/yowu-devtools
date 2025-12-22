@@ -122,7 +122,7 @@ export const IconConverterToolPage: React.FC = () => {
         // message에서 current size를 추출할 수 있다면 설정
       } else if (response.type === 'success') {
         // 성공: 결과를 state에 저장
-        const blobs = response.results.map((r: any) => ({
+        const blobs = response.results.map((r: { size: number; blob: Blob; url: string }) => ({
           size: r.size,
           blob: r.blob,
           dataUrl: r.url,
