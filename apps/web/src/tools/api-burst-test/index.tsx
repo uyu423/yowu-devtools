@@ -44,7 +44,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { runBurstTest, type RequestExecutor } from './core';
 
 import { ShareModal } from '@/components/common/ShareModal';
-import { AdsenseFooter } from '@/components/common/AdsenseFooter';
+import { GoogleAdsenseBlock } from '@/components/common/GoogleAdsenseBlock';
 import type { ToolDefinition } from '@/tools/types';
 import { ToolHeader } from '@/components/common/ToolHeader';
 import { Tooltip } from '@/components/ui/Tooltip';
@@ -779,7 +779,7 @@ const ApiBurstTestTool: React.FC = () => {
 
       <ShareModal {...shareModalProps} />
 
-      <AdsenseFooter />
+      <GoogleAdsenseBlock />
     </div>
   );
 };
