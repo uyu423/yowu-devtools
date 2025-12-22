@@ -802,6 +802,7 @@ export function generateRoutes(): Plugin {
     <title>${seoTitle}</title>
     <meta name="description" content="${optimizedDescription}" />
     <meta name="keywords" content="${keywordsStr}" />
+    <meta name="naver-site-verification" content="864d7acc0fcc19f0e3da6dc2422c36f1be1f4e95" />
     <link rel="canonical" href="${toolUrl}" />
     ${hreflangLinks}
     <link rel="alternate" hreflang="x-default" href="https://tools.yowu.dev${tool.path}" />
@@ -909,6 +910,7 @@ export function generateRoutes(): Plugin {
         const metaTags = `
     <title>${homeTitle}</title>
     <meta name="description" content="${homeDescription}" />
+    <meta name="naver-site-verification" content="864d7acc0fcc19f0e3da6dc2422c36f1be1f4e95" />
     <link rel="canonical" href="${homeUrl}" />
     ${hreflangLinks}
     <link rel="alternate" hreflang="x-default" href="https://tools.yowu.dev/" />
