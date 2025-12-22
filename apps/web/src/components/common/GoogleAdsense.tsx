@@ -28,7 +28,11 @@ export const GoogleAdsense: React.FC<GoogleAdsenseProps> = ({ className }) => {
 
     try {
       // Push ad to adsbygoogle queue
-      if (typeof window !== 'undefined' && window.adsbygoogle && adRef.current) {
+      if (
+        typeof window !== 'undefined' &&
+        window.adsbygoogle &&
+        adRef.current
+      ) {
         (window.adsbygoogle = window.adsbygoogle || []).push({});
       }
     } catch (error) {
@@ -57,8 +61,34 @@ export const GoogleAdsense: React.FC<GoogleAdsenseProps> = ({ className }) => {
           data-ad-client="ca-pub-2516647367332809"
           data-ad-slot="1679105600"
           data-ad-format="fluid"
-          data-ad-layout-key="-gw-3+1f-3d+2z"
+          data-ad-layout-key="-gp-e+1c-4d+81"
         />
+        {/* AdSense 인피드 광고 텍스트 크기 스타일링 */}
+        <style>{`
+          .adsbygoogle a {
+            font-size: 16px !important; /* 광고 제목 */
+            line-height: 1.5 !important;
+          }
+          .adsbygoogle .adsbygoogle-description {
+            font-size: 14px !important; /* 광고 설명 */
+            line-height: 1.5 !important;
+          }
+          .adsbygoogle .adsbygoogle-url {
+            font-size: 12px !important; /* URL/도메인 */
+            line-height: 1.4 !important;
+          }
+          /* AdSense 광고 내부 텍스트 요소 스타일링 */
+          .adsbygoogle ins {
+            font-size: 16px !important;
+          }
+          .adsbygoogle a[href*="googleadservices.com"],
+          .adsbygoogle a[href*="doubleclick.net"] {
+            font-size: 16px !important;
+          }
+          .adsbygoogle span {
+            font-size: 14px !important;
+          }
+        `}</style>
       </div>
       <p className="mt-2 text-center text-xs text-gray-400 dark:text-gray-500">
         {t('ads.disclaimer')}
