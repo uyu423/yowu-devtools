@@ -742,63 +742,75 @@ if (shouldUseWorker(input)) {
 }
 ```
 
-## AdSense Footer 가이드 (v1.4.3)
+## AdSense 통합 가이드 (v1.5.1)
 
-모든 도구 하단에 Google AdSense 광고를 표시합니다. 광고 수익은 Yowu's DevTools의 무료 운영 및 유지보수에 사용됩니다.
+모든 도구에 Google AdSense 광고를 표시하여 무료 운영 및 유지보수 비용을 충당합니다. 광고는 사용자 경험을 해치지 않도록 자연스러운 위치에 배치됩니다.
 
 ### 공통 컴포넌트
 
 - **GoogleAdsense** (`src/components/common/GoogleAdsense.tsx`): 실제 AdSense 광고 단위 및 면책 조항
-- **AdsenseFooter** (`src/components/common/AdsenseFooter.tsx`): 도구에 쉽게 추가할 수 있는 래퍼 컴포넌트
+- **GoogleAdsenseBlock** (`src/components/common/GoogleAdsenseBlock.tsx`): 페이지 내 자유롭게 배치 가능한 광고 블록 컴포넌트
 
 ### 새 도구에 AdSense 추가하기
 
 1. **import 추가**:
 ```typescript
-import { AdsenseFooter } from '@/components/common/AdsenseFooter';
+import { GoogleAdsenseBlock } from '@/components/common/GoogleAdsenseBlock';
 ```
 
-2. **컨테이너 클래스 변경**: `h-full` → `min-h-full`
-```typescript
-// Before
-<div className="flex flex-col h-full p-4 md:p-6 max-w-5xl mx-auto">
-
-// After
-<div className="flex flex-col min-h-full p-4 md:p-6 max-w-5xl mx-auto">
-```
-
-3. **return문 마지막에 AdsenseFooter 추가**:
+2. **적절한 위치에 광고 블록 추가**:
 ```tsx
 const MyTool: React.FC = () => {
   return (
     <div className="flex flex-col min-h-full p-4 md:p-6 max-w-5xl mx-auto">
       <ToolHeader ... />
-      {/* 도구 콘텐츠 */}
+      
+      {/* 입력 섹션 */}
+      <EditorPanel ... />
+      
+      {/* 광고 - 입력과 출력 사이 자연스러운 위치 */}
+      <GoogleAdsenseBlock />
+      
+      {/* 출력 섹션 */}
+      <ResultPanel ... />
+      
       <ShareModal {...shareModalProps} />
-
-      <AdsenseFooter />
     </div>
   );
 };
 ```
 
-### 동작 방식
+### 광고 배치 원칙
 
-| 상황 | AdSense 위치 |
-|------|--------------|
-| 콘텐츠가 뷰포트보다 **작을 때** | 화면 바닥에 붙음 (`mt-auto`) |
-| 콘텐츠가 뷰포트보다 **클 때** | 스크롤 맨 끝에 표시 |
+광고는 **사용자의 자연스러운 읽기 흐름을 방해하지 않는 위치**에 배치합니다:
+
+- ✅ **입력과 출력 사이**: 사용자가 입력을 마치고 결과를 보기 전
+- ✅ **옵션과 결과 사이**: 설정을 완료하고 결과를 확인하기 전
+- ✅ **주요 기능 블록 사이**: 논리적으로 구분되는 섹션 사이
+- ❌ **입력 중간**: 사용자의 작업 흐름을 방해
+- ❌ **결과 중간**: 결과 확인을 방해
+
+### 도구별 광고 배치 예시
+
+| 도구 | 광고 위치 | 배치 이유 |
+|------|-----------|-----------|
+| JSON Viewer | 파일 업로드 박스 하단 | 입력 완료 후 자연스러운 휴지점 |
+| API Tester | Request Body 하단 | 요청 설정 완료 후 전송 전 |
+| Hash Generator | Hash Result 상단 | 입력 완료 후 결과 확인 전 |
+| Text Diff | View 선택 블록 상단 | 옵션 설정 전 자연스러운 위치 |
+| Regex Tester | Security Note 하단 | 입력 섹션과 Pattern Features 사이 |
 
 ### 핵심 CSS 설명
 
-- `min-h-full`: 컨테이너가 최소 뷰포트 높이를 차지하되 더 길어질 수 있음
-- `mt-auto`: flexbox에서 남은 공간을 위쪽으로 밀어서 AdSense를 바닥에 배치
+- `my-6`: 상하 여백으로 콘텐츠와 광고를 구분
+- `max-w-4xl mx-auto`: 광고의 최대 너비 제한 및 중앙 정렬
 
 ### 주의사항
 
 - **localhost에서는 AdSense가 표시되지 않음**: Google의 도메인 검증 및 보안 정책으로 인해 로컬 개발 환경에서는 광고가 로드되지 않습니다.
 - **i18n 지원**: 면책 조항 텍스트는 `ads.disclaimer` 키로 i18n 리소스에서 관리됩니다.
 - **다크 모드 지원**: `useResolvedTheme` 훅을 사용하여 광고 배경색이 테마에 맞게 조정됩니다.
+- **In-feed 광고**: `data-ad-format="fluid"`와 `data-ad-layout-key`를 사용하여 콘텐츠에 자연스럽게 녹아드는 인피드 광고 형태로 표시됩니다.
 
 ## 문서 구조
 
