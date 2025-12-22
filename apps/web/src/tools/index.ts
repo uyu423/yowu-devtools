@@ -7,6 +7,7 @@ import { cronTool } from './cron';
 import { curlParserTool } from './curl-parser';
 import { diffTool } from './diff';
 import { hashTool } from './hash';
+import { iconConverterTool } from './icon-converter';
 import { imageStudioTool } from './image-studio';
 import { jsonTool } from './json';
 import { jwtDecoderTool } from './jwt-decoder';
@@ -40,6 +41,7 @@ export const tools: ToolDefinition[] = [
   apiTesterTool,
   curlParserTool,
   apiDiffTool,
+  iconConverterTool,
   imageStudioTool,
   videoStudioTool,
   apiBurstTestTool,
