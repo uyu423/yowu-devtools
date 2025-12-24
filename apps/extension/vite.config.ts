@@ -3,11 +3,7 @@ import { crx } from '@crxjs/vite-plugin';
 import { resolve } from 'path';
 import manifest from './manifest.json';
 
-export default defineConfig(({ mode }) => {
-  // In production mode, exclude localhost from initiatorDomains
-  // to avoid affecting other developers' localhost environments
-  const isProduction = mode === 'production';
-
+export default defineConfig(() => {
   return {
     plugins: [
       crx({ manifest }),
@@ -17,10 +13,6 @@ export default defineConfig(({ mode }) => {
         '@': resolve(__dirname, './src'),
         '@yowu-devtools/shared': resolve(__dirname, '../../packages/shared/src'),
       },
-    },
-    define: {
-      // Inject build-time constant for initiator domains configuration
-      __INCLUDE_LOCALHOST__: JSON.stringify(!isProduction),
     },
     build: {
       outDir: 'dist',

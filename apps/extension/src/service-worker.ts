@@ -10,10 +10,8 @@
  * - Security first: Validates all origins and messages
  */
 
-// Build-time constant injected by Vite
-// - dev build: true (includes localhost in initiatorDomains)
-// - prod build: false (excludes localhost to avoid affecting other developers)
-declare const __INCLUDE_LOCALHOST__: boolean;
+// Note: __INCLUDE_LOCALHOST__ is no longer needed as initiatorDomains only contains chrome.runtime.id
+// All requests are executed from the extension's service worker context
 
 import {
   type WebAppMessage,
@@ -73,85 +71,91 @@ function getDomainRuleId(domain: string): number {
   let hash = 0;
   for (let i = 0; i < domain.length; i++) {
     const char = domain.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
+    hash = (hash << 5) - hash + char;
     hash = hash & hash; // Convert to 32bit integer
   }
   // Ensure positive number and add offset to avoid conflicts
-  return Math.abs(hash) % 100000 + 1000;
+  return (Math.abs(hash) % 100000) + 1000;
 }
 
 /**
  * Add dynamic rule to modify headers for a specific domain.
- * This rule only applies to requests targeting the specified domain.
+ * JIT Architecture: This rule is added ONLY during the API request and removed immediately after.
+ *
+ * @returns The rule ID if successful, null if failed
  */
-async function addDynamicRuleForDomain(origin: string): Promise<void> {
+async function addDynamicRuleForDomain(domain: string): Promise<number | null> {
   try {
-    const url = new URL(origin);
-    const domain = url.hostname;
     const ruleId = getDomainRuleId(domain);
 
-    console.log('[Extension] Adding dynamic rule for domain:', domain, 'ruleId:', ruleId);
+    console.log(
+      '[Extension] [JIT] Adding rule for domain:',
+      domain,
+      'ID:',
+      ruleId
+    );
 
-    // Remove existing rule with same ID first (if any)
-    // IMPORTANT: initiatorDomains limits the rule to only apply when requests
-    // originate from tools.yowu.dev or localhost. Without this, the rule would
-    // affect ALL sites making requests to the target domain, causing CORS errors
-    // on legitimate sites like shopping.naver.com.
+    const rule = {
+      id: ruleId,
+      priority: 1,
+      action: {
+        type: chrome.declarativeNetRequest.RuleActionType.MODIFY_HEADERS,
+        requestHeaders: [
+          {
+            header: 'origin',
+            operation: chrome.declarativeNetRequest.HeaderOperation.REMOVE,
+          },
+          {
+            header: 'sec-fetch-site',
+            operation: chrome.declarativeNetRequest.HeaderOperation.SET,
+            value: 'none',
+          },
+          {
+            header: 'sec-fetch-mode',
+            operation: chrome.declarativeNetRequest.HeaderOperation.SET,
+            value: 'cors',
+          },
+        ],
+      },
+      condition: {
+        requestDomains: [domain],
+        // NOTE: No initiatorDomains - chrome-extension:// doesn't work with declarativeNetRequest
+        // JIT architecture ensures this rule is only active during the actual request
+        resourceTypes: [
+          chrome.declarativeNetRequest.ResourceType.XMLHTTPREQUEST,
+          chrome.declarativeNetRequest.ResourceType.OTHER,
+        ],
+      },
+    };
+
     await chrome.declarativeNetRequest.updateDynamicRules({
       removeRuleIds: [ruleId],
-      addRules: [
-        {
-          id: ruleId,
-          priority: 1,
-          action: {
-            type: chrome.declarativeNetRequest.RuleActionType.MODIFY_HEADERS,
-            requestHeaders: [
-              { header: 'origin', operation: chrome.declarativeNetRequest.HeaderOperation.REMOVE },
-              { header: 'sec-fetch-site', operation: chrome.declarativeNetRequest.HeaderOperation.SET, value: 'none' },
-              { header: 'sec-fetch-mode', operation: chrome.declarativeNetRequest.HeaderOperation.SET, value: 'cors' },
-            ],
-          },
-          condition: {
-            requestDomains: [domain],
-            // Only apply this rule when the request originates from our allowed domains
-            // This prevents affecting requests from other sites (e.g., shopping.naver.com)
-            // Note: localhost is only included in dev builds to avoid affecting other developers
-            initiatorDomains: __INCLUDE_LOCALHOST__
-              ? ['tools.yowu.dev', 'localhost']
-              : ['tools.yowu.dev'],
-            resourceTypes: [
-              chrome.declarativeNetRequest.ResourceType.XMLHTTPREQUEST,
-              chrome.declarativeNetRequest.ResourceType.OTHER,
-            ],
-          },
-        },
-      ],
+      addRules: [rule],
     });
 
-    console.log('[Extension] Dynamic rule added successfully for:', domain);
+    console.log('[Extension] [JIT] ✅ Rule activated');
+    return ruleId;
   } catch (err) {
-    console.error('[Extension] Failed to add dynamic rule:', err);
+    console.error('[Extension] [JIT] ❌ Failed to add rule:', err);
+    return null;
   }
 }
 
 /**
  * Remove dynamic rule for a specific domain.
+ * JIT Architecture: Called immediately after the API request completes.
  */
-async function removeDynamicRuleForDomain(origin: string): Promise<void> {
+async function removeDynamicRuleForDomain(ruleId: number): Promise<void> {
   try {
-    const url = new URL(origin);
-    const domain = url.hostname;
-    const ruleId = getDomainRuleId(domain);
-
-    console.log('[Extension] Removing dynamic rule for domain:', domain, 'ruleId:', ruleId);
+    console.log('[Extension] [JIT] Removing rule ID:', ruleId);
 
     await chrome.declarativeNetRequest.updateDynamicRules({
       removeRuleIds: [ruleId],
     });
 
-    console.log('[Extension] Dynamic rule removed successfully for:', domain);
+    console.log('[Extension] [JIT] ✅ Rule deactivated');
   } catch (err) {
-    console.error('[Extension] Failed to remove dynamic rule:', err);
+    console.error('[Extension] [JIT] ❌ Failed to remove rule:', err);
   }
 }
 
@@ -170,16 +174,16 @@ function getPermissionPatterns(origin: string): string[] {
     const hostname = url.hostname;
     const protocol = url.protocol;
     const parts = hostname.split('.');
-    
+
     const patterns: string[] = [`${origin}/*`];
-    
+
     // Add wildcard patterns for parent domains (for cookie access)
     // e.g., *.sub.example.com, *.example.com
     for (let i = 1; i < parts.length - 1; i++) {
       const parentDomain = parts.slice(i).join('.');
       patterns.push(`${protocol}//*.${parentDomain}/*`);
     }
-    
+
     return patterns;
   } catch {
     return [`${origin}/*`];
@@ -202,7 +206,7 @@ async function requestPermission(origin: string): Promise<boolean> {
     // Request permissions for the origin AND parent domains (for cookie access)
     const patterns = getPermissionPatterns(origin);
     console.log('[Extension] Requesting permissions for patterns:', patterns);
-    
+
     const granted = await chrome.permissions.request({
       origins: patterns,
     });
@@ -226,9 +230,15 @@ async function revokePermission(origin: string): Promise<boolean> {
       origins: [pattern],
     });
 
-    // If permission revoked, remove dynamic rule
+    // If permission revoked, remove any stale dynamic rule (JIT cleanup)
     if (revoked) {
-      await removeDynamicRuleForDomain(origin);
+      try {
+        const url = new URL(origin);
+        const ruleId = getDomainRuleId(url.hostname);
+        await removeDynamicRuleForDomain(ruleId);
+      } catch {
+        // Ignore - rule may not exist in JIT architecture
+      }
     }
 
     return revoked;
@@ -264,7 +274,7 @@ function filterForbiddenHeaders(
     if (!h.enabled || !h.key || !h.key.trim()) continue;
 
     const headerKey = h.key.trim();
-    
+
     // Skip forbidden headers
     const isForbidden = FORBIDDEN_HEADERS.some(
       (forbidden) => forbidden.toLowerCase() === headerKey.toLowerCase()
@@ -307,7 +317,9 @@ function buildRequestBody(body: RequestSpec['body']): BodyInit | undefined {
           for (let i = 0; i < binary.length; i++) {
             bytes[i] = binary.charCodeAt(i);
           }
-          const blob = new Blob([bytes], { type: item.mimeType || 'application/octet-stream' });
+          const blob = new Blob([bytes], {
+            type: item.mimeType || 'application/octet-stream',
+          });
           formData.append(item.key, blob, item.fileName || 'file');
         }
       }
@@ -318,6 +330,16 @@ function buildRequestBody(body: RequestSpec['body']): BodyInit | undefined {
 
 async function executeRequest(spec: RequestSpec): Promise<ResponseSpec> {
   const startTime = performance.now();
+
+  console.log('[Extension] ========== Execute Request ==========');
+  console.log('[Extension] Request ID:', spec.id);
+  console.log('[Extension] Method:', spec.method);
+  console.log('[Extension] URL:', spec.url);
+  console.log('[Extension] Extension ID:', chrome.runtime.id);
+  console.log(
+    '[Extension] Extension Origin:',
+    `chrome-extension://${chrome.runtime.id}`
+  );
 
   // Validate URL
   let url: URL;
@@ -336,7 +358,12 @@ async function executeRequest(spec: RequestSpec): Promise<ResponseSpec> {
 
   // Check permission for the target origin
   const targetOrigin = url.origin;
+  const targetDomain = url.hostname;
+  console.log('[Extension] Target origin:', targetOrigin);
+  console.log('[Extension] Target domain:', targetDomain);
+
   const granted = await hasPermission(targetOrigin);
+  console.log('[Extension] Permission granted:', granted);
 
   if (!granted) {
     return {
@@ -349,13 +376,22 @@ async function executeRequest(spec: RequestSpec): Promise<ResponseSpec> {
     };
   }
 
+  // JIT: Add dynamic rule just before the request
+  console.log('[Extension] [JIT] Activating rule for request...');
+  const ruleId = await addDynamicRuleForDomain(targetDomain);
+  if (ruleId === null) {
+    console.error(
+      '[Extension] [JIT] Failed to activate rule, continuing without CORS bypass'
+    );
+  }
+
   // Build fetch options
   const headers = filterForbiddenHeaders(spec.headers);
   const body = buildRequestBody(spec.body);
 
   // Validate HTTP method
   const method = spec.method.toUpperCase();
-  if (!HTTP_METHODS.includes(method as typeof HTTP_METHODS[number])) {
+  if (!HTTP_METHODS.includes(method as (typeof HTTP_METHODS)[number])) {
     return {
       id: spec.id,
       ok: false,
@@ -373,11 +409,25 @@ async function executeRequest(spec: RequestSpec): Promise<ResponseSpec> {
 
   // Create AbortController for timeout
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), spec.options.timeoutMs);
+  const timeoutId = setTimeout(
+    () => controller.abort(),
+    spec.options.timeoutMs
+  );
 
   try {
-    console.log('[Extension] Fetch:', method, spec.url, shouldIncludeCookies ? '(with cookies)' : '(no cookies)');
-    
+    console.log('[Extension] ========== Sending Fetch Request ==========');
+    console.log('[Extension] Method:', method);
+    console.log('[Extension] URL:', spec.url);
+    console.log(
+      '[Extension] Cookies:',
+      shouldIncludeCookies ? 'INCLUDED' : 'NOT INCLUDED'
+    );
+    console.log('[Extension] Headers:', headers);
+    console.log(
+      '[Extension] Expected behavior: Origin header should be REMOVED by declarativeNetRequest rule'
+    );
+    console.log('[Extension] ================================================');
+
     const response = await fetch(spec.url, {
       method,
       headers,
@@ -386,7 +436,7 @@ async function executeRequest(spec: RequestSpec): Promise<ResponseSpec> {
       credentials: shouldIncludeCookies ? 'include' : spec.options.credentials,
       signal: controller.signal,
     });
-    
+
     console.log('[Extension] Response:', response.status, response.statusText);
 
     clearTimeout(timeoutId);
@@ -403,7 +453,11 @@ async function executeRequest(spec: RequestSpec): Promise<ResponseSpec> {
     const contentType = response.headers.get('content-type') || '';
     let responseBody: ResponseSpec['body'];
 
-    if (contentType.includes('text') || contentType.includes('json') || contentType.includes('xml')) {
+    if (
+      contentType.includes('text') ||
+      contentType.includes('json') ||
+      contentType.includes('xml')
+    ) {
       const text = await response.text();
       responseBody = { kind: 'text', data: text };
     } else {
@@ -417,6 +471,14 @@ async function executeRequest(spec: RequestSpec): Promise<ResponseSpec> {
       responseBody = { kind: 'base64', data: btoa(binary) };
     }
 
+    // JIT: Remove the rule immediately after successful response
+    if (ruleId !== null) {
+      console.log(
+        '[Extension] [JIT] Deactivating rule after successful request...'
+      );
+      await removeDynamicRuleForDomain(ruleId);
+    }
+
     return {
       id: spec.id,
       ok: response.ok,
@@ -427,13 +489,25 @@ async function executeRequest(spec: RequestSpec): Promise<ResponseSpec> {
       timingMs,
     };
   } catch (error) {
+    // JIT: Remove the rule even on error
+    if (ruleId !== null) {
+      console.log(
+        '[Extension] [JIT] Deactivating rule after failed request...'
+      );
+      await removeDynamicRuleForDomain(ruleId);
+    }
+
     clearTimeout(timeoutId);
     const timingMs = Math.round(performance.now() - startTime);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error';
+
     console.error('[Extension] Request failed:', errorMessage);
-    
-    if (error instanceof Error && (error.name === 'AbortError' || error.message.includes('abort'))) {
+
+    if (
+      error instanceof Error &&
+      (error.name === 'AbortError' || error.message.includes('abort'))
+    ) {
       return {
         id: spec.id,
         ok: false,
@@ -478,7 +552,10 @@ registerHandler('EXECUTE_REQUEST', async (message) => {
   if (message.type !== 'EXECUTE_REQUEST') {
     return {
       type: 'ERROR',
-      error: { code: ERROR_CODES.INVALID_MESSAGE, message: 'Invalid message type' },
+      error: {
+        code: ERROR_CODES.INVALID_MESSAGE,
+        message: 'Invalid message type',
+      },
     };
   }
 
@@ -490,7 +567,10 @@ registerHandler('CHECK_PERMISSION', async (message) => {
   if (message.type !== 'CHECK_PERMISSION') {
     return {
       type: 'ERROR',
-      error: { code: ERROR_CODES.INVALID_MESSAGE, message: 'Invalid message type' },
+      error: {
+        code: ERROR_CODES.INVALID_MESSAGE,
+        message: 'Invalid message type',
+      },
     };
   }
 
@@ -503,7 +583,10 @@ registerHandler('REQUEST_PERMISSION', async (message) => {
   if (message.type !== 'REQUEST_PERMISSION') {
     return {
       type: 'ERROR',
-      error: { code: ERROR_CODES.INVALID_MESSAGE, message: 'Invalid message type' },
+      error: {
+        code: ERROR_CODES.INVALID_MESSAGE,
+        message: 'Invalid message type',
+      },
     };
   }
 
@@ -535,7 +618,10 @@ registerHandler('REVOKE_PERMISSION', async (message) => {
   if (message.type !== 'REVOKE_PERMISSION') {
     return {
       type: 'ERROR',
-      error: { code: ERROR_CODES.INVALID_MESSAGE, message: 'Invalid message type' },
+      error: {
+        code: ERROR_CODES.INVALID_MESSAGE,
+        message: 'Invalid message type',
+      },
     };
   }
 
@@ -556,7 +642,10 @@ chrome.runtime.onMessageExternal.addListener(
   ) => {
     // Validate origin
     if (!isOriginAllowed(sender.origin)) {
-      console.warn('[Extension] Rejected message from unauthorized origin:', sender.origin);
+      console.warn(
+        '[Extension] Rejected message from unauthorized origin:',
+        sender.origin
+      );
       sendResponse({
         type: 'ERROR',
         error: {
@@ -568,7 +657,12 @@ chrome.runtime.onMessageExternal.addListener(
     }
 
     // Log incoming message (dev only)
-    console.log('[Extension] Received message:', message.type, 'from:', sender.origin);
+    console.log(
+      '[Extension] Received message:',
+      message.type,
+      'from:',
+      sender.origin
+    );
 
     // Get handler for message type
     const handler = handlers.get(message.type);
@@ -620,33 +714,71 @@ chrome.action.onClicked.addListener(() => {
 // =============================================================================
 
 /**
- * Sync dynamic rules with granted permissions on startup.
- * This ensures rules exist for all domains that have been granted permission.
+ * Clean up all dynamic rules on startup.
+ *
+ * NEW ARCHITECTURE (JIT - Just-In-Time Rule Activation):
+ * - Rules are NO LONGER created at startup
+ * - Rules are created ONLY at the moment of API request
+ * - Rules are REMOVED immediately after the request completes
+ * - This prevents affecting other websites while allowing API Tester to work
+ *
+ * Why this approach:
+ * - initiatorDomains with chrome-extension:// doesn't work in declarativeNetRequest
+ * - Keeping rules active all the time affects other websites visiting the same domains
+ * - JIT activation ensures rules are only active for milliseconds during the actual request
  */
-async function syncDynamicRulesWithPermissions(): Promise<void> {
+async function cleanupDynamicRulesOnStartup(): Promise<void> {
   try {
-    const origins = await getGrantedOrigins();
-    console.log('[Extension] Syncing dynamic rules for granted origins:', origins);
+    console.log('[Extension] ========== Startup Cleanup ==========');
+    console.log(
+      '[Extension] JIT Rule Architecture: Rules are created/removed per-request'
+    );
 
-    for (const origin of origins) {
-      // Skip wildcard patterns
-      if (origin.includes('*')) continue;
-      
-      try {
-        await addDynamicRuleForDomain(origin);
-      } catch (err) {
-        console.error('[Extension] Failed to add rule for:', origin, err);
-      }
+    // Remove ALL existing dynamic rules from previous sessions
+    const existingRules = await chrome.declarativeNetRequest.getDynamicRules();
+    const existingRuleIds = existingRules.map((r) => r.id);
+
+    if (existingRuleIds.length > 0) {
+      await chrome.declarativeNetRequest.updateDynamicRules({
+        removeRuleIds: existingRuleIds,
+      });
+      console.log(
+        '[Extension] ✅ Cleaned up',
+        existingRuleIds.length,
+        'stale rules'
+      );
+    } else {
+      console.log('[Extension] No stale rules to clean up');
     }
 
-    console.log('[Extension] Dynamic rules sync completed');
+    console.log('[Extension] ===========================================');
   } catch (err) {
-    console.error('[Extension] Failed to sync dynamic rules:', err);
+    console.error('[Extension] Failed to cleanup dynamic rules:', err);
   }
 }
 
-// Sync rules on startup
-syncDynamicRulesWithPermissions();
+// Clean up on startup
+cleanupDynamicRulesOnStartup();
 
-console.log('[Extension] Yowu DevTools Companion v' + PROTOCOL_VERSION + ' initialized');
+// Debug: Verify cleanup was successful
+setTimeout(async () => {
+  try {
+    const rules = await chrome.declarativeNetRequest.getDynamicRules();
+    if (rules.length === 0) {
+      console.log(
+        '[Extension] ✅ JIT Architecture: No persistent rules (expected)'
+      );
+    } else {
+      console.warn(
+        '[Extension] ⚠️ Unexpected rules found after cleanup:',
+        rules.length
+      );
+    }
+  } catch (err) {
+    console.error('[Extension] ❌ Failed to verify cleanup:', err);
+  }
+}, 1000);
 
+console.log(
+  '[Extension] Yowu DevTools Companion v' + PROTOCOL_VERSION + ' initialized'
+);

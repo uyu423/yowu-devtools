@@ -1,6 +1,6 @@
 {
   "name": "@yowu-devtools/extension",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "license": "GPL-3.0-or-later",
   "author": {
     "name": "Yongwoo Yu (Yowu)",
@@ -13,10 +13,8 @@
   },
   "type": "module",
   "scripts": {
-    "dev": "vite build --watch --mode development",
-    "build": "tsc && vite build --mode production",
-    "build:dev": "tsc && vite build --mode development",
-    "build:prod": "tsc && vite build --mode production",
+    "dev": "vite build --watch",
+    "build": "tsc && vite build",
     "lint": "eslint .",
     "clean": "rm -rf dist"
   },

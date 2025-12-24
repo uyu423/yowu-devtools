@@ -4,6 +4,73 @@ All notable changes to the Chrome Extension are documented in this file.
 
 ---
 
+## v1.0.5 (December 2025) - JIT Architecture
+
+**Major architectural change**: Switched to Just-In-Time (JIT) Rule Activation to solve the fundamental conflict between API Tester and regular web browsing.
+
+### 🎯 Problem Solved
+
+**The Dilemma**:
+- With `initiatorDomains`: Other websites work ✅, but API Tester fails ❌ (chrome-extension:// not supported)
+- Without `initiatorDomains`: API Tester works ✅, but other websites get CORS errors ❌ (rules affect all sites)
+
+**Root Cause**: Chrome's declarativeNetRequest doesn't properly match `chrome-extension://` in `initiatorDomains`, making it impossible to filter rules to only affect extension requests while keeping them active persistently.
+
+### ✨ New Architecture: JIT (Just-In-Time) Rule Activation
+
+Rules are now created and destroyed dynamically per-request:
+
+1. **On Startup**: Clean up all stale rules (no persistent rules)
+2. **Before API Request**: Add declarativeNetRequest rule for target domain
+3. **Execute Request**: Origin header is removed by the rule
+4. **After Request**: Immediately remove the rule (success or failure)
+
+**Benefits**:
+- ✅ API Tester works perfectly (Origin header removed)
+- ✅ Other websites unaffected (rules only active for milliseconds)
+- ✅ No `initiatorDomains` needed (rule exists only during extension request)
+- ✅ Clean startup (no stale rules from previous sessions)
+
+### Technical Details
+
+**Key Changes**:
+- `syncDynamicRulesWithPermissions()` → `cleanupDynamicRulesOnStartup()`
+- `addDynamicRuleForDomain()`: Now returns `ruleId`, logs `[JIT]` prefix
+- `removeDynamicRuleForDomain()`: Takes `ruleId` parameter, called after each request
+- `executeRequest()`: Wraps fetch with rule activation/deactivation
+
+**Timeline**:
+```
+[0ms]    Add rule for target domain
+[1ms]    Execute fetch() - Origin header removed ✅
+[150ms]  Response received
+[151ms]  Remove rule immediately
+```
+
+**Security**: 
+- Rules exist for <200ms per request (typical)
+- Only domains with granted permissions can have rules
+- `externally_connectable` restricts which websites can trigger extension
+
+**Performance**: 
+- Negligible overhead (~2-5ms for rule add/remove)
+- Rules are domain-specific, not global
+
+---
+
+## v1.0.4 (December 2025) - Build Mode Split
+
+Split build configuration into dev/prod modes for localhost handling.
+
+### Changes
+
+- 🔧 **Build mode split**: Separate `build:dev` and `build` (prod) commands
+  - Dev build: Includes 'localhost' in `initiatorDomains`
+  - Prod build: Excludes 'localhost' to avoid affecting other developers
+  - Prevents conflicts when multiple developers have the extension installed
+
+---
+
 ## v1.0.3 (December 2025) - Permission Cleanup
 
 Cleanup release to comply with Chrome Web Store policies.

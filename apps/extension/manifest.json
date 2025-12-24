@@ -2,9 +2,9 @@
   "manifest_version": 3,
   "name": "Yowu's DevTools Companion",
   "short_name": "DevTools Companion",
-  "version": "1.0.4",
+  "version": "1.0.5",
 
-  "description": "Companion extension for tools.yowu.dev",
+  "description": "Companion for tools.yowu.dev. Enables CORS bypass for API testing with granular domain permissions.",
 
   "homepage_url": "https://tools.yowu.dev",
 
