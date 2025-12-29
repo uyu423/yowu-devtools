@@ -235,6 +235,33 @@ const ApiTesterTool: React.FC = () => {
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Ensure all KeyValueItems have IDs (for URL share restoration)
+  // This fixes the checkbox issue when state is restored from shared URL
+  const hasEnsuredIds = useRef(false);
+  useEffect(() => {
+    if (hasEnsuredIds.current) return;
+
+    const needsIdUpdate =
+      state.queryParams.some((item) => !item.id) ||
+      state.headers.some((item) => !item.id);
+
+    if (needsIdUpdate) {
+      const updatedQueryParams = state.queryParams.map((item) =>
+        item.id ? item : { ...item, id: crypto.randomUUID() }
+      );
+      const updatedHeaders = state.headers.map((item) =>
+        item.id ? item : { ...item, id: crypto.randomUUID() }
+      );
+
+      updateState({
+        queryParams: updatedQueryParams,
+        headers: updatedHeaders,
+      });
+
+      hasEnsuredIds.current = true;
+    }
+  }, [state.queryParams, state.headers, updateState]);
+
   // Check if response has CORS error (only for direct/cors mode requests)
   const hasCorsError =
     response?.error?.code === 'CORS_ERROR' && response?.method === 'cors';
