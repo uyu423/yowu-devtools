@@ -96,18 +96,18 @@ const ApiBurstTestTool: React.FC = () => {
       };
 
       // Include params if any
-      if (params.length > 0) {
-        shareState.params = params
-          .filter((p) => p.enabled && p.key)
-          .map(({ key, value }) => ({ key, value }));
-      }
+        if (params.length > 0) {
+          shareState.params = params
+            .filter((p) => p.enabled && p.key)
+            .map(({ key, value, enabled }) => ({ key, value, enabled }));
+        }
 
-      // Include headers only if privacy allows
-      if (sharePrivacy.includeHeaders && headers.length > 0) {
-        shareState.headers = headers
-          .filter((h) => h.enabled && h.key)
-          .map(({ key, value }) => ({ key, value }));
-      }
+        // Include headers only if privacy allows
+        if (sharePrivacy.includeHeaders && headers.length > 0) {
+          shareState.headers = headers
+            .filter((h) => h.enabled && h.key)
+            .map(({ key, value, enabled }) => ({ key, value, enabled }));
+        }
 
       // Include body if not empty
       if (body.text.trim()) {
