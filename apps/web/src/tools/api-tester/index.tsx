@@ -46,8 +46,8 @@ import {
 } from './utils';
 import { useApiHistory, useCorsAllowlist, useRequestExecutor } from './hooks';
 
-import { GoogleAdsenseBlock } from '@/components/common/GoogleAdsenseBlock';
 import { ExtensionStatus } from '@/components/common/ExtensionStatus';
+import { GoogleAdsenseBlock } from '@/components/common/GoogleAdsenseBlock';
 import { ResizablePanels } from '@/components/common/ResizablePanels';
 import { ShareModal } from '@/components/common/ShareModal';
 import type { ToolDefinition } from '@/tools/types';
@@ -127,10 +127,13 @@ const ApiTesterTool: React.FC = () => {
 
       // Only include queryParams if there are enabled items
       if (enabledQueryParams.length > 0) {
-        shareState.queryParams = enabledQueryParams.map(({ key, value }) => ({
-          key,
-          value,
-        }));
+        shareState.queryParams = enabledQueryParams.map(
+          ({ key, value, enabled }) => ({
+            key,
+            value,
+            enabled,
+          })
+        );
       }
 
       // Only include headers if there are enabled items (excluding default Content-Type)
@@ -138,10 +141,13 @@ const ApiTesterTool: React.FC = () => {
         (h) => !(h.key === 'Content-Type' && h.value === 'application/json')
       );
       if (nonDefaultHeaders.length > 0) {
-        shareState.headers = nonDefaultHeaders.map(({ key, value }) => ({
-          key,
-          value,
-        }));
+        shareState.headers = nonDefaultHeaders.map(
+          ({ key, value, enabled }) => ({
+            key,
+            value,
+            enabled,
+          })
+        );
       }
 
       // Only include body if it's not 'none'
@@ -151,7 +157,11 @@ const ApiTesterTool: React.FC = () => {
           if (enabledItems.length > 0) {
             shareState.body = {
               kind: 'urlencoded',
-              items: enabledItems.map(({ key, value }) => ({ key, value })),
+              items: enabledItems.map(({ key, value, enabled }) => ({
+                key,
+                value,
+                enabled,
+              })),
             };
           }
         } else if (body.kind === 'multipart') {
