@@ -35,6 +35,8 @@ interface JsonToolState {
   search: string;
 }
 
+const JSON_WORKER_URL = new URL('../../workers/json-parser.worker.ts', import.meta.url);
+
 const DEFAULT_STATE: JsonToolState = {
   input: '',
   indent: 2,
@@ -94,20 +96,25 @@ const JsonTool: React.FC = () => {
     }
   }, [shouldUseWorker, debouncedInput]);
 
+  const workerRequest = useMemo(() => {
+    if (!shouldUseWorker || !debouncedInput.trim()) {
+      return null;
+    }
+    return {
+      input: debouncedInput,
+      indent: state.indent,
+      sortKeys: state.sortKeys,
+    };
+  }, [shouldUseWorker, debouncedInput, state.indent, state.sortKeys]);
+
   // Worker를 사용한 파싱
   const { result: workerResult, isProcessing } = useWebWorker<
     { input: string; indent: 2 | 4; sortKeys: boolean },
     { success: boolean; data?: unknown; formatted?: string; minified?: string; error?: string }
   >({
-    workerUrl: new URL('../../workers/json-parser.worker.ts', import.meta.url),
+    workerUrl: JSON_WORKER_URL,
     shouldUseWorker: shouldUseWorker && !!debouncedInput.trim(),
-    request: shouldUseWorker && debouncedInput.trim()
-      ? {
-          input: debouncedInput,
-          indent: state.indent,
-          sortKeys: state.sortKeys,
-        }
-      : null,
+    request: workerRequest,
     requestId,
     timeout: 10_000, // 10 seconds timeout
   });
