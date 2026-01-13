@@ -12,7 +12,7 @@ import { jsonTool } from './json';
 import { jwtDecoderTool } from './jwt-decoder';
 import { jwtEncoderTool } from './jwt-encoder';
 import { passwordTool } from './password';
-import { queryStringTool } from './query-string';
+import { urlParserTool } from './url-parser';
 import { regexTool } from './regex';
 import { stringLengthTool } from './string-length';
 import { timeTool } from './time';
@@ -34,7 +34,7 @@ export const tools: ToolDefinition[] = [
   hashTool,
   uuidTool,
   passwordTool,
-  queryStringTool,
+  urlParserTool,
   regexTool,
   stringLengthTool,
   apiTesterTool,

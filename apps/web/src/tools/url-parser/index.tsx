@@ -231,7 +231,7 @@ const QueryStringTool: React.FC = () => {
           resizable
           minHeight={120}
           maxHeight={500}
-          heightStorageKey="query-string:ui:input-height"
+          heightStorageKey="url-parser:ui:input-height"
         />
 
         <ActionBar className="flex-col items-start gap-4 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm sm:flex-row sm:items-center">
@@ -437,7 +437,7 @@ const QueryStringTool: React.FC = () => {
   );
 };
 
-export const queryStringTool: ToolDefinition<QueryStringToolState> = {
+export const urlParserTool: ToolDefinition<QueryStringToolState> = {
   id: 'url-parser',
   title: 'URL Parser',
   description: 'Parse and visualize URL components',

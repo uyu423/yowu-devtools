@@ -388,7 +388,7 @@ src/
   - [ ] 도구 등록 및 SEO 정보 추가
 
 - [x] **URL Parser** (이전 Query String Parser):
-  - [x] `src/tools/query-string/index.tsx` 생성
+  - [x] `src/tools/url-parser/index.tsx` 생성
   - [x] URL 또는 query string 입력 받기
   - [x] URL 컴포넌트 파싱 (protocol, host, path, fragment, query parameters)
   - [x] Query string 파싱 로직 구현 (직접 파싱으로 배열 파라미터 지원)

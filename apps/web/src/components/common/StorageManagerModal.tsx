@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { Trash2, X, RefreshCcw, Settings } from 'lucide-react';
 import { useI18n } from '@/hooks/useI18nHooks';
 import { Select } from '@/components/ui/Select';
+import { getToolById } from '@/tools';
 
 interface StorageEntry {
   key: string;
@@ -64,9 +65,17 @@ export const StorageManagerModal: React.FC<StorageManagerModalProps> = ({
       }
 
       const toolId = root || t('sidebar.storageMenuUnknown');
+      const tool = getToolById(toolId);
+      const metaKey = `meta.${toolId}.title`;
+      const translatedTitle = t(metaKey);
+      const toolTitle =
+        translatedTitle !== metaKey
+          ? translatedTitle
+          : tool?.title ?? toolId;
+
       return {
         groupId: `tool:${toolId}`,
-        groupLabel: t('sidebar.storageGroupTool').replace('{tool}', toolId),
+        groupLabel: t('sidebar.storageGroupTool').replace('{tool}', toolTitle),
       };
     },
     [t]

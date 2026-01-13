@@ -8,8 +8,8 @@ import {
   Hash,
   Laptop,
   Moon,
-  Sparkles,
   Settings,
+  Sparkles,
   Star,
   Sun,
   TrendingUp,
@@ -21,6 +21,8 @@ import { BetaBadge } from '@/components/ui/BetaBadge';
 import { LanguageSelector } from '@/components/common/LanguageSelector';
 import { NavLink } from 'react-router-dom';
 import React from 'react';
+import { STORAGE_KEYS } from '@/lib/storageKeys';
+import { StorageManagerModal } from '@/components/common/StorageManagerModal';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { buildLocalePath } from '@/lib/i18nUtils';
 import { cn } from '@/lib/utils';
@@ -29,8 +31,6 @@ import { useFavorites } from '@/hooks/useFavorites';
 import { useI18n } from '@/hooks/useI18nHooks';
 import { useRecentTools } from '@/hooks/useRecentTools';
 import { useTheme } from '@/hooks/useThemeHooks';
-import { StorageManagerModal } from '@/components/common/StorageManagerModal';
-import { STORAGE_KEYS } from '@/lib/storageKeys';
 
 // 정렬 타입 정의
 type SortType = 'alphabetical' | 'added' | 'newest';
@@ -620,11 +620,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
               )}
               title={t('sidebar.systemMode')}
             >
-                <Laptop className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={() => setTheme('dark')}
-                className={cn(
+              <Laptop className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={() => setTheme('dark')}
+              className={cn(
                 'flex-1 flex items-center justify-center py-1.5 rounded-md text-xs font-medium transition-all',
                 theme === 'dark'
                   ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-700 dark:text-white'
