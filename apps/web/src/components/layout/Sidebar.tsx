@@ -3,11 +3,13 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock,
+  Database,
   ExternalLink,
   Hash,
   Laptop,
   Moon,
   Sparkles,
+  Settings,
   Star,
   Sun,
   TrendingUp,
@@ -27,6 +29,7 @@ import { useFavorites } from '@/hooks/useFavorites';
 import { useI18n } from '@/hooks/useI18nHooks';
 import { useRecentTools } from '@/hooks/useRecentTools';
 import { useTheme } from '@/hooks/useThemeHooks';
+import { StorageManagerModal } from '@/components/common/StorageManagerModal';
 
 // 정렬 타입 정의
 type SortType = 'alphabetical' | 'added' | 'newest';
@@ -48,6 +51,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const { favorites, toggleFavorite, isFavorite } = useFavorites();
   const { recentTools } = useRecentTools();
   const { t, locale } = useI18n();
+  const [isSettingsOpen, setIsSettingsOpen] = React.useState(false);
+  const [isStorageModalOpen, setIsStorageModalOpen] = React.useState(false);
+  const settingsRef = React.useRef<HTMLDivElement>(null);
 
   // 정렬 상태 (localStorage에서 초기값 로드, 기본값: newest)
   const [sortType, setSortType] = React.useState<SortType>(() => {
@@ -83,6 +89,33 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   // Helper function to build locale-aware path
   const getLocalePath = (path: string) => buildLocalePath(locale, path);
+
+  // Settings dropdown close on outside click
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        settingsRef.current &&
+        !settingsRef.current.contains(event.target as Node)
+      ) {
+        setIsSettingsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  React.useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsSettingsOpen(false);
+      }
+    };
+    if (isSettingsOpen) {
+      document.addEventListener('keydown', handleEscape);
+      return () => document.removeEventListener('keydown', handleEscape);
+    }
+  }, [isSettingsOpen]);
 
   // 즐겨찾기 도구 목록
   const favoriteTools = favorites
@@ -251,7 +284,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     <div className="flex flex-col h-full bg-gray-50/50 dark:bg-gray-900 dark:border-gray-800 transition-colors">
       {/* Header */}
       <div className="h-14 flex items-center justify-between px-4 border-b shrink-0 bg-white dark:bg-gray-900 dark:border-gray-800 dark:text-white transition-colors">
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center gap-2">
           <a
             href="https://yowu.dev/"
             target="_blank"
@@ -272,6 +305,32 @@ export const Sidebar: React.FC<SidebarProps> = ({
           >
             {t('sidebar.appName')}
           </NavLink>
+          <div className="relative" ref={settingsRef}>
+            <Tooltip content={t('sidebar.settings')} position="bottom" nowrap>
+              <button
+                onClick={() => setIsSettingsOpen((prev) => !prev)}
+                className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                aria-haspopup="menu"
+                aria-expanded={isSettingsOpen}
+              >
+                <Settings className="w-4 h-4" />
+              </button>
+            </Tooltip>
+            {isSettingsOpen && (
+              <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg overflow-hidden z-50">
+                <button
+                  onClick={() => {
+                    setIsSettingsOpen(false);
+                    setIsStorageModalOpen(true);
+                  }}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                >
+                  <Database className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                  <span>{t('sidebar.storageManager')}</span>
+                </button>
+              </div>
+            )}
+          </div>
         </div>
         <div className="flex items-center gap-1">
           {/* Collapse button - desktop only */}
@@ -536,45 +595,54 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <LanguageSelector />
 
         {/* Theme Toggle */}
-        <div className="flex items-center justify-between bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
-          <button
-            onClick={() => setTheme('light')}
-            className={cn(
-              'flex-1 flex items-center justify-center py-1.5 rounded-md text-xs font-medium transition-all',
-              theme === 'light'
-                ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-700 dark:text-white'
-                : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
-            )}
-            title={t('sidebar.lightMode')}
-          >
-            <Sun className="w-3.5 h-3.5" />
-          </button>
-          <button
-            onClick={() => setTheme('system')}
-            className={cn(
-              'flex-1 flex items-center justify-center py-1.5 rounded-md text-xs font-medium transition-all',
-              theme === 'system'
-                ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-700 dark:text-white'
-                : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
-            )}
-            title={t('sidebar.systemMode')}
-          >
-            <Laptop className="w-3.5 h-3.5" />
-          </button>
-          <button
-            onClick={() => setTheme('dark')}
-            className={cn(
-              'flex-1 flex items-center justify-center py-1.5 rounded-md text-xs font-medium transition-all',
-              theme === 'dark'
-                ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-700 dark:text-white'
-                : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
-            )}
-            title={t('sidebar.darkMode')}
-          >
-            <Moon className="w-3.5 h-3.5" />
-          </button>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center justify-between bg-gray-100 dark:bg-gray-800 rounded-lg p-1 flex-1">
+            <button
+              onClick={() => setTheme('light')}
+              className={cn(
+                'flex-1 flex items-center justify-center py-1.5 rounded-md text-xs font-medium transition-all',
+                theme === 'light'
+                  ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-700 dark:text-white'
+                  : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
+              )}
+              title={t('sidebar.lightMode')}
+            >
+              <Sun className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={() => setTheme('system')}
+              className={cn(
+                'flex-1 flex items-center justify-center py-1.5 rounded-md text-xs font-medium transition-all',
+                theme === 'system'
+                  ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-700 dark:text-white'
+                  : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
+              )}
+              title={t('sidebar.systemMode')}
+            >
+                <Laptop className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => setTheme('dark')}
+                className={cn(
+                'flex-1 flex items-center justify-center py-1.5 rounded-md text-xs font-medium transition-all',
+                theme === 'dark'
+                  ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-700 dark:text-white'
+                  : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
+              )}
+              title={t('sidebar.darkMode')}
+            >
+              <Moon className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
       </div>
+      <StorageManagerModal
+        isOpen={isStorageModalOpen}
+        onClose={() => {
+          setIsStorageModalOpen(false);
+          setIsSettingsOpen(false);
+        }}
+      />
     </div>
   );
 };
