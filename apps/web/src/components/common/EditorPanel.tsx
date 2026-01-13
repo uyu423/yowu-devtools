@@ -323,7 +323,11 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
           key={`editor-${isDark ? 'dark' : 'light'}`}
           value={value}
           height={editorHeight}
-          className="text-sm font-mono"
+          className={cn(
+            'text-sm font-mono h-full',
+            '[&_.cm-editor]:!h-full',
+            '[&_.cm-scroller]:!h-full [&_.cm-scroller]:!overflow-auto'
+          )}
           onChange={(next) => onChange?.(next)}
           editable={!readOnly}
           placeholder={placeholder}
