@@ -99,7 +99,7 @@ const JsonTool: React.FC = () => {
     { input: string; indent: 2 | 4; sortKeys: boolean },
     { success: boolean; data?: unknown; formatted?: string; minified?: string; error?: string }
   >({
-    workerUrl: new URL('../workers/json-parser.worker.ts', import.meta.url),
+    workerUrl: new URL('../../workers/json-parser.worker.ts', import.meta.url),
     shouldUseWorker: shouldUseWorker && !!debouncedInput.trim(),
     request: shouldUseWorker && debouncedInput.trim()
       ? {

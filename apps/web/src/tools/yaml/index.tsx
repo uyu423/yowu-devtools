@@ -61,7 +61,7 @@ const YamlTool: React.FC = () => {
     { source: string; direction: 'yaml2json' | 'json2yaml'; indent: 2 | 4 },
     { success: boolean; output?: string; error?: string }
   >({
-    workerUrl: new URL('../workers/yaml-converter.worker.ts', import.meta.url),
+    workerUrl: new URL('../../workers/yaml-converter.worker.ts', import.meta.url),
     shouldUseWorker: shouldUseWorker && !!state.source.trim(),
     request: shouldUseWorker && state.source.trim()
       ? {

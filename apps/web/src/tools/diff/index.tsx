@@ -74,7 +74,7 @@ const DiffTool: React.FC = () => {
     { left: string; right: string; ignoreWhitespace: boolean; ignoreCase: boolean },
     { success: boolean; diffs?: Diff[]; error?: string }
   >({
-    workerUrl: new URL('../workers/diff-calculator.worker.ts', import.meta.url),
+    workerUrl: new URL('../../workers/diff-calculator.worker.ts', import.meta.url),
     shouldUseWorker: shouldUseWorker && (!!debouncedLeft || !!debouncedRight),
     request: shouldUseWorker && (!!debouncedLeft || !!debouncedRight)
       ? {
