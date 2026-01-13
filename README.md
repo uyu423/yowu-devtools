@@ -92,6 +92,11 @@ pnpm --filter web dev       # http://localhost:5173
 pnpm --filter web lint
 pnpm --filter web build
 pnpm --filter web preview
+
+# E2E (Playwright)
+pnpm exec playwright install --with-deps   # once, to fetch browsers
+HOST=127.0.0.1 PORT=4173 pnpm --filter web test:e2e
+# Notes: Playwright config auto-starts the Vite dev server; override host/port/baseURL with HOST/PORT/PLAYWRIGHT_BASE_URL if needed.
 ```
 
 ## Repository layout
