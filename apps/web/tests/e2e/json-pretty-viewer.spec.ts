@@ -1,13 +1,10 @@
 import { test, expect } from '@playwright/test';
-import { readFileSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, '../../../..');
-
-const largeJson = readFileSync(path.join(repoRoot, 'test-data/large-json.json'), 'utf8');
 
 test.describe('JSON Pretty Viewer', () => {
   test('parsing, view switching, error state, worker usage', async ({ page }) => {
