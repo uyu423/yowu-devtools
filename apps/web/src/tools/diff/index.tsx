@@ -21,6 +21,8 @@ import { GoogleAdsenseBlock } from '@/components/common/GoogleAdsenseBlock';
 import DiffMatchPatch from 'diff-match-patch';
 import type { Diff } from 'diff-match-patch';
 
+const DIFF_WORKER_URL = new URL('../../workers/diff-calculator.worker.ts', import.meta.url);
+
 interface DiffToolState {
   left: string;
   right: string;
@@ -69,21 +71,32 @@ const DiffTool: React.FC = () => {
     }
   }, [shouldUseWorker, debouncedLeft, debouncedRight]);
 
+  const workerRequest = useMemo(() => {
+    if (!shouldUseWorker || (!debouncedLeft && !debouncedRight)) {
+      return null;
+    }
+    return {
+      left: debouncedLeft,
+      right: debouncedRight,
+      ignoreWhitespace: state.ignoreWhitespace,
+      ignoreCase: state.ignoreCase,
+    };
+  }, [
+    shouldUseWorker,
+    debouncedLeft,
+    debouncedRight,
+    state.ignoreWhitespace,
+    state.ignoreCase,
+  ]);
+
   // Worker를 사용한 diff 계산
   const { result: workerResult, isProcessing } = useWebWorker<
     { left: string; right: string; ignoreWhitespace: boolean; ignoreCase: boolean },
     { success: boolean; diffs?: Diff[]; error?: string }
   >({
-    workerUrl: new URL('../../workers/diff-calculator.worker.ts', import.meta.url),
+    workerUrl: DIFF_WORKER_URL,
     shouldUseWorker: shouldUseWorker && (!!debouncedLeft || !!debouncedRight),
-    request: shouldUseWorker && (!!debouncedLeft || !!debouncedRight)
-      ? {
-          left: debouncedLeft,
-          right: debouncedRight,
-          ignoreWhitespace: state.ignoreWhitespace,
-          ignoreCase: state.ignoreCase,
-        }
-      : null,
+    request: workerRequest,
     requestId,
     timeout: 10_000, // 10 seconds timeout
   });

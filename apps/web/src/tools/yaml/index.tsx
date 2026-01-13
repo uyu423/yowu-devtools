@@ -18,6 +18,8 @@ import { ShareModal } from '@/components/common/ShareModal';
 import { GoogleAdsenseBlock } from '@/components/common/GoogleAdsenseBlock';
 import YAML from 'yaml';
 
+const YAML_WORKER_URL = new URL('../../workers/yaml-converter.worker.ts', import.meta.url);
+
 interface YamlToolState {
   source: string;
   direction: 'yaml2json' | 'json2yaml';
@@ -56,20 +58,25 @@ const YamlTool: React.FC = () => {
     }
   }, [shouldUseWorker, state.source]);
 
+  const workerRequest = useMemo(() => {
+    if (!shouldUseWorker || !state.source.trim()) {
+      return null;
+    }
+    return {
+      source: state.source,
+      direction: state.direction,
+      indent: state.indent,
+    };
+  }, [shouldUseWorker, state.source, state.direction, state.indent]);
+
   // Worker를 사용한 변환
   const { result: workerResult, isProcessing } = useWebWorker<
     { source: string; direction: 'yaml2json' | 'json2yaml'; indent: 2 | 4 },
     { success: boolean; output?: string; error?: string }
   >({
-    workerUrl: new URL('../../workers/yaml-converter.worker.ts', import.meta.url),
+    workerUrl: YAML_WORKER_URL,
     shouldUseWorker: shouldUseWorker && !!state.source.trim(),
-    request: shouldUseWorker && state.source.trim()
-      ? {
-          source: state.source,
-          direction: state.direction,
-          indent: state.indent,
-        }
-      : null,
+    request: workerRequest,
     requestId,
     timeout: 10_000, // 10 seconds timeout
   });
