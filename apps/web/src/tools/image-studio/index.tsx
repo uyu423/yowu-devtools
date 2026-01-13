@@ -9,7 +9,7 @@ import { useShareModal } from '@/hooks/useShareModal';
 import { useTitle } from '@/hooks/useTitle';
 import { useI18n } from '@/hooks/useI18nHooks';
 import { ShareModal } from '@/components/common/ShareModal';
-import { GoogleAdsense } from '@/components/common/GoogleAdsense';
+import { GoogleAdsenseBlock } from '@/components/common/GoogleAdsenseBlock';
 import { toast } from 'sonner';
 
 import type { ImageStudioState, ImageMetadata, CropArea, ExportFormat } from './types';
@@ -530,9 +530,7 @@ const ImageStudioTool: React.FC = () => {
           </div>
 
           {/* Adsense */}
-          <div className="mt-8">
-            <GoogleAdsense />
-          </div>
+          <GoogleAdsenseBlock />
         </div>
 
         {/* Pipeline Panel */}
@@ -658,4 +656,3 @@ export const imageStudioTool: ToolDefinition<ImageStudioState> = {
   defaultState: DEFAULT_STATE,
   Component: ImageStudioTool,
 };
-

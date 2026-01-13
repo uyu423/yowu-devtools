@@ -1,5 +1,5 @@
 import React from 'react';
-import { GoogleAdsense } from './GoogleAdsense';
+// import { GoogleAdsense } from './GoogleAdsense';
 
 /**
  * GoogleAdsenseBlock - 페이지 내 임의 위치에 표시되는 광고 블록
@@ -13,11 +13,13 @@ import { GoogleAdsense } from './GoogleAdsense';
  * - GoogleAdsenseBlock: 페이지 중간에 자유롭게 배치 가능
  */
 export const GoogleAdsenseBlock: React.FC = () => {
-  return (
-    <div className="my-6">
-      <div className="max-w-4xl mx-auto">
-        <GoogleAdsense />
-      </div>
-    </div>
-  );
+  // 광고 블록 임시 비노출 처리
+  // return (
+  //   <div className="my-6">
+  //     <div className="max-w-4xl mx-auto">
+  //       <GoogleAdsense />
+  //     </div>
+  //   </div>
+  // );
+  return <></>;
 };
