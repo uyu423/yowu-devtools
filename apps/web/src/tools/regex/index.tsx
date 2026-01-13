@@ -988,7 +988,7 @@ const RegexTool: React.FC = () => {
               resizable
               minHeight={150}
               maxHeight={600}
-              heightStorageKey="regex-test-text-height"
+              heightStorageKey="regex:ui:test-text-height"
             />
           </div>
 

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 // @ts-expect-error - virtual module provided by vite-plugin-pwa
 import { registerSW } from 'virtual:pwa-register';
 import { APP_VERSION } from '@/lib/constants';
+import { STORAGE_KEYS } from '@/lib/storageKeys';
 
 // 업데이트 체크 간격 (밀리초)
 const UPDATE_CHECK_INTERVAL = 60 * 60 * 1000; // 1시간
@@ -11,8 +12,8 @@ const VERSION_CHECK_INTERVAL = 5 * 60 * 1000; // 5분
 const DISMISS_DURATION = 24 * 60 * 60 * 1000; // 24시간
 
 // localStorage 키
-const STORAGE_KEY_UPDATE_DISMISSED = 'yowu-devtools:v1:pwa:updateDismissedUntil';
-const STORAGE_KEY_INSTALL_DISMISSED = 'yowu-devtools:v1:pwa:installDismissedUntil';
+const STORAGE_KEY_UPDATE_DISMISSED = STORAGE_KEYS.common.pwaUpdateDismissed;
+const STORAGE_KEY_INSTALL_DISMISSED = STORAGE_KEYS.common.pwaInstallDismissed;
 
 /**
  * localStorage에서 숨기기 만료 시간 확인
@@ -307,4 +308,3 @@ export function usePWA(): UsePWAResult {
     isOnline,
   };
 }
-

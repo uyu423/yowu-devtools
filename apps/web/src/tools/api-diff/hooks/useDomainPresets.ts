@@ -5,8 +5,9 @@
 import { useState, useCallback, useEffect } from 'react';
 import type { DomainPreset, DomainPresetsStore } from '../types';
 import { generateId } from '../constants';
+import { STORAGE_KEYS } from '@/lib/storageKeys';
 
-const STORAGE_KEY = 'yowu-devtools:v1:api-diff:domain-presets';
+const STORAGE_KEY = STORAGE_KEYS.apiDiff.domainPresets;
 
 const DEFAULT_STORE: DomainPresetsStore = {
   version: 1,
@@ -144,4 +145,3 @@ export function useDomainPresets() {
 }
 
 export default useDomainPresets;
-

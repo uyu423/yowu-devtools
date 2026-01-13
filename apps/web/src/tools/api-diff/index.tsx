@@ -27,9 +27,9 @@ import React, {
 import { compareResponses, sanitizePathAndParams } from './utils';
 import { useApiDiffExecutor, useDomainPresets, useHistory } from './hooks';
 
-import { GoogleAdsenseBlock } from '@/components/common/GoogleAdsenseBlock';
 import { CorsModal } from '../api-tester/components';
 import { GitCompare } from 'lucide-react';
+import { GoogleAdsenseBlock } from '@/components/common/GoogleAdsenseBlock';
 import { ShareModal } from '@/components/common/ShareModal';
 import type { ToolDefinition } from '../types';
 import { ToolHeader } from '@/components/common/ToolHeader';
@@ -390,7 +390,6 @@ const ApiDiffTool: React.FC = () => {
         description={t('tool.apiDiff.description')}
         onReset={handleReset}
         onShare={handleShare}
-        beta={true}
       />
       <ShareModal {...shareModalProps} />
 
@@ -513,7 +512,6 @@ export const apiDiffTool: ToolDefinition<ApiDiffState> = {
   category: 'api',
   defaultState: DEFAULT_STATE,
   Component: ApiDiffTool,
-  beta: true,
 };
 
 export default ApiDiffTool;

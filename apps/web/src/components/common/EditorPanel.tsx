@@ -7,6 +7,7 @@ import { HelpCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useResolvedTheme } from '@/hooks/useThemeHooks';
 import { Tooltip } from '@/components/ui/Tooltip';
+import { buildUiKey } from '@/lib/storageKeys';
 
 // We'll add more extensions later based on mode
 interface HighlightRange {
@@ -151,7 +152,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
   // Resizable state
   const [panelHeight, setPanelHeight] = React.useState<number>(() => {
     if (resizable && heightStorageKey && typeof window !== 'undefined') {
-      const stored = localStorage.getItem(`yowu-devtools:v1:ui:${heightStorageKey}`);
+      const stored = localStorage.getItem(buildUiKey(heightStorageKey));
       if (stored) {
         const parsed = parseInt(stored, 10);
         if (!isNaN(parsed) && parsed >= minHeight && parsed <= maxHeight) {
@@ -167,7 +168,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
   // Save height to localStorage
   React.useEffect(() => {
     if (resizable && heightStorageKey && typeof window !== 'undefined') {
-      localStorage.setItem(`yowu-devtools:v1:ui:${heightStorageKey}`, panelHeight.toString());
+      localStorage.setItem(buildUiKey(heightStorageKey), panelHeight.toString());
     }
   }, [resizable, heightStorageKey, panelHeight]);
 

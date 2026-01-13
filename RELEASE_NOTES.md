@@ -572,7 +572,7 @@ A major Cron Parser enhancement supporting various cron dialects with accurate s
   - Each HTML has proper `<html lang="{locale}">` attribute
 
 - 💾 **Storage**:
-  - Language preference saved to localStorage (`yowu.devtools.locale`)
+  - Language preference saved to localStorage (`yowu-devtools:common:locale`)
   - Restore language preference on app reload
   - Language selection persists across sessions
 

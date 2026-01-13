@@ -1,6 +1,7 @@
 import { useCallback, useSyncExternalStore } from 'react';
+import { STORAGE_KEYS } from '@/lib/storageKeys';
 
-const STORAGE_KEY = 'yowu-devtools:v1:app:sidebarCollapsed';
+const STORAGE_KEY = STORAGE_KEYS.common.sidebarCollapsed;
 
 // External store for sidebar collapse state
 let sidebarCollapsed = false;
@@ -50,4 +51,3 @@ export function useSidebarCollapse() {
     setCollapsed,
   };
 }
-

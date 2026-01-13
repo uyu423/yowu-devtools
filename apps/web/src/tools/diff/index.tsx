@@ -195,7 +195,7 @@ const DiffTool: React.FC = () => {
               resizable
               minHeight={150}
               maxHeight={600}
-              heightStorageKey="diff-left-height"
+              heightStorageKey="diff:ui:left-height"
             />
             <div className="mt-3">
               <FileInput
@@ -216,7 +216,7 @@ const DiffTool: React.FC = () => {
               resizable
               minHeight={150}
               maxHeight={600}
-              heightStorageKey="diff-right-height"
+              heightStorageKey="diff:ui:right-height"
             />
             <div className="mt-3">
               <FileInput

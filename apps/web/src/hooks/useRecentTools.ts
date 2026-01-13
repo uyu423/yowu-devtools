@@ -1,7 +1,8 @@
 import { useCallback } from 'react';
 import { useLocalStorage } from './useLocalStorage';
+import { STORAGE_KEYS } from '@/lib/storageKeys';
 
-const STORAGE_KEY = 'yowu-devtools:v1:app:recentTools';
+const STORAGE_KEY = STORAGE_KEYS.common.recentTools;
 const MAX_RECENT_TOOLS = 3;
 
 export interface RecentTool {

@@ -115,7 +115,7 @@ const CurlParserTool: React.FC = () => {
           resizable
           minHeight={120}
           maxHeight={500}
-          heightStorageKey="curl-parser-input-height"
+          heightStorageKey="curl-parser:ui:input-height"
         />
 
         {/* Display Options */}

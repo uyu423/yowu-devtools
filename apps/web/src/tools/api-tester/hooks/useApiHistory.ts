@@ -5,9 +5,10 @@
 import { useState, useCallback, useEffect } from 'react';
 import type { HistoryItem, ApiTesterState } from '../types';
 import { generateId } from '../utils';
+import { STORAGE_KEYS } from '@/lib/storageKeys';
 
-const HISTORY_STORAGE_KEY = 'yowu-devtools:v1:api-history';
-const FAVORITES_STORAGE_KEY = 'yowu-devtools:v1:api-favorites';
+const HISTORY_STORAGE_KEY = STORAGE_KEYS.apiTester.history;
+const FAVORITES_STORAGE_KEY = STORAGE_KEYS.apiTester.favorites;
 const MAX_HISTORY_ITEMS = 30;
 
 interface UseApiHistoryReturn {
@@ -234,4 +235,3 @@ export const useApiHistory = (): UseApiHistoryReturn => {
 };
 
 export default useApiHistory;
-

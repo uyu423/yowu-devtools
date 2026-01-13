@@ -11,6 +11,7 @@ import type {
   ResponseSpec,
 } from '@yowu-devtools/shared';
 import { EXTENSION_ID as DEFAULT_EXTENSION_ID } from '../constants';
+import { STORAGE_KEYS } from '@/lib/storageKeys';
 
 // Get extension ID from environment or use default from constants
 const EXTENSION_ID = import.meta.env.VITE_EXTENSION_ID || DEFAULT_EXTENSION_ID;
@@ -61,7 +62,7 @@ const MESSAGE_TIMEOUT = 3000;
 const REQUEST_TIMEOUT = 60000; // 60 seconds for actual API calls
 
 /** localStorage key for granted origins cache */
-const GRANTED_ORIGINS_CACHE_KEY = 'yowu-devtools:v1:api-tester:grantedOrigins';
+const GRANTED_ORIGINS_CACHE_KEY = STORAGE_KEYS.share.extensionGrantedOrigins;
 
 /**
  * Get cached granted origins from localStorage
@@ -396,4 +397,3 @@ export const useExtension = (options: UseExtensionOptions = {}): UseExtensionRet
 };
 
 export default useExtension;
-

@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { GripVertical } from 'lucide-react';
+import { buildUiKey } from '@/lib/storageKeys';
 
 interface ResizablePanelsProps {
   /** Left panel content */
@@ -39,7 +40,7 @@ export const ResizablePanels: React.FC<ResizablePanelsProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [leftWidth, setLeftWidth] = useState<number>(() => {
     if (storageKey && typeof window !== 'undefined') {
-      const stored = localStorage.getItem(`yowu-devtools:v1:ui:${storageKey}`);
+      const stored = localStorage.getItem(buildUiKey(storageKey));
       if (stored) {
         const parsed = parseFloat(stored);
         if (!isNaN(parsed) && parsed >= minLeftWidth && parsed <= maxLeftWidth) {
@@ -54,7 +55,7 @@ export const ResizablePanels: React.FC<ResizablePanelsProps> = ({
   // Save to localStorage when width changes
   useEffect(() => {
     if (storageKey && typeof window !== 'undefined') {
-      localStorage.setItem(`yowu-devtools:v1:ui:${storageKey}`, leftWidth.toString());
+      localStorage.setItem(buildUiKey(storageKey), leftWidth.toString());
     }
   }, [leftWidth, storageKey]);
 
@@ -225,4 +226,3 @@ export const ResizablePanels: React.FC<ResizablePanelsProps> = ({
     </div>
   );
 };
-

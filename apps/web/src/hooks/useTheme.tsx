@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ThemeContext } from './themeContext';
+import { STORAGE_KEYS } from '@/lib/storageKeys';
 
 export type Theme = 'light' | 'dark' | 'system';
 export type ResolvedTheme = Exclude<Theme, 'system'>;
@@ -10,7 +11,7 @@ export interface ThemeContextValue {
   setTheme: (nextTheme: Theme) => void;
 }
 
-const THEME_STORAGE_KEY = 'yowu-devtools:theme';
+const THEME_STORAGE_KEY = STORAGE_KEYS.common.theme;
 const THEME_CLASSES: ResolvedTheme[] = ['light', 'dark'];
 
 

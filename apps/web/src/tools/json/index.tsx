@@ -196,7 +196,7 @@ const JsonTool: React.FC = () => {
       <ShareModal {...shareModalProps} />
 
       <ResizablePanels
-        storageKey="json-panel-width"
+        storageKey="json:ui:panel-width"
         initialLeftWidth={50}
         minLeftWidth={25}
         maxLeftWidth={75}

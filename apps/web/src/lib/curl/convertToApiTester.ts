@@ -5,8 +5,7 @@
 import type { CurlParseResult } from './types';
 import type { ApiTesterState } from '@/tools/api-tester/types';
 import { createKeyValueItem } from '@/tools/api-tester/utils';
-
-const STORAGE_KEY = 'yowu-devtools:v1:curl-to-api-tester';
+import { SESSION_KEYS } from '../storageKeys';
 
 /**
  * Convert CurlParseResult to API Tester state
@@ -87,7 +86,7 @@ export function convertToApiTesterState(result: CurlParseResult): Partial<ApiTes
 export function storeForApiTester(result: CurlParseResult): void {
   const state = convertToApiTesterState(result);
   if (typeof window !== 'undefined') {
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    sessionStorage.setItem(SESSION_KEYS.apiTester.fromCurl, JSON.stringify(state));
   }
 }
 
@@ -96,7 +95,7 @@ export function storeForApiTester(result: CurlParseResult): void {
  */
 export function getStoredApiTesterState(): Partial<ApiTesterState> | null {
   if (typeof window === 'undefined') return null;
-  const stored = sessionStorage.getItem(STORAGE_KEY);
+  const stored = sessionStorage.getItem(SESSION_KEYS.apiTester.fromCurl);
   if (!stored) return null;
   try {
     return JSON.parse(stored);
@@ -110,7 +109,6 @@ export function getStoredApiTesterState(): Partial<ApiTesterState> | null {
  */
 export function clearStoredApiTesterState(): void {
   if (typeof window !== 'undefined') {
-    sessionStorage.removeItem(STORAGE_KEY);
+    sessionStorage.removeItem(SESSION_KEYS.apiTester.fromCurl);
   }
 }
-

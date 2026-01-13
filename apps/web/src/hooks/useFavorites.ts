@@ -1,7 +1,8 @@
 import { useCallback } from 'react';
 import { useLocalStorage } from './useLocalStorage';
+import { STORAGE_KEYS } from '@/lib/storageKeys';
 
-const STORAGE_KEY = 'yowu-devtools:v1:app:favorites';
+const STORAGE_KEY = STORAGE_KEYS.common.favorites;
 const SYNC_EVENT_NAME = 'favorites-changed';
 
 /**

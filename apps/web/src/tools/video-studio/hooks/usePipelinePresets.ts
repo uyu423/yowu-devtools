@@ -3,8 +3,9 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
+import { STORAGE_KEYS } from '@/lib/storageKeys';
 
-const STORAGE_KEY = 'yowu-devtools:v1:video-studio:pipeline-presets';
+const STORAGE_KEY = STORAGE_KEYS.videoStudio.pipelinePresets;
 
 import type { ResizeMode, ExportFormat, QualityPreset } from '../types';
 
@@ -192,4 +193,3 @@ export function usePipelinePresets() {
 }
 
 export default usePipelinePresets;
-

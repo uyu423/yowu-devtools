@@ -3,8 +3,9 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
+import { STORAGE_KEYS } from '@/lib/storageKeys';
 
-const STORAGE_KEY = 'yowu-devtools:v1:image-studio:pipeline-presets';
+const STORAGE_KEY = STORAGE_KEYS.imageStudio.pipelinePresets;
 
 import type {
   AspectRatio,
@@ -205,4 +206,3 @@ export function usePipelinePresets() {
 }
 
 export default usePipelinePresets;
-

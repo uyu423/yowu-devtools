@@ -360,11 +360,15 @@ curl -X POST 'https://api.example.com/v1/users' \
 
 #### 3.4.2 LocalStorage 저장
 
-| 키                                 | 내용                           |
-| ---------------------------------- | ------------------------------ |
-| `yowu-devtools:v1:tool:api-tester` | 마지막 요청 폼 상태            |
-| `yowu-devtools:v1:api-history`     | 최근 실행 히스토리 (최대 30개) |
-| `yowu-devtools:v1:api-favorites`   | 즐겨찾기 목록                  |
+- **네이밍 규칙**: `yowu-devtools:` 접두사 + `[common|share|<tool-id>]` + 세부 키. v1 prefix는 더 이상 사용하지 않음.
+
+| 키                                       | 내용                                        |
+| ---------------------------------------- | ------------------------------------------- |
+| `yowu-devtools:api-tester:state`         | 마지막 요청 폼 상태 (useToolState)          |
+| `yowu-devtools:api-tester:history`       | 최근 실행 히스토리 (최대 30개)              |
+| `yowu-devtools:api-tester:favorites`     | 즐겨찾기 목록                               |
+| `yowu-devtools:api-tester:cors-allowlist`| 확장 프로그램 자동 사용을 위한 Origin 허용 목록 |
+| `yowu-devtools:share:extension:granted-origins` | 다중 도구에서 공유하는 확장 권한 캐시 |
 
 **히스토리 항목 구조**:
 
@@ -510,7 +514,7 @@ interface HistoryItem {
 
 #### 3.6.3 성공 방법 캐싱
 
-**localStorage 키**: `yowu-devtools:v1:cors-strategy-cache`
+**localStorage 키**: `yowu-devtools:api-tester:cors-strategy-cache`
 
 **캐시 구조**:
 

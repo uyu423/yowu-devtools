@@ -55,8 +55,10 @@ export const DIFF_TABLE_MAX_HEIGHT = 600;
 export const DIFF_TABLE_DEFAULT_HEIGHT = 230;
 
 // LocalStorage keys
-export const STORAGE_KEY_HISTORY = 'yowu-devtools:v1:api-diff:history';
-export const STORAGE_KEY_DIFF_TABLE_HEIGHT = 'yowu-devtools:v1:api-diff:diffTableHeight';
+import { STORAGE_KEYS } from '@/lib/storageKeys';
+
+export const STORAGE_KEY_HISTORY = STORAGE_KEYS.apiDiff.history;
+export const STORAGE_KEY_DIFF_TABLE_HEIGHT = STORAGE_KEYS.apiDiff.diffTableHeight;
 
 // Common headers for autocomplete
 export const COMMON_HEADERS = [

@@ -173,7 +173,14 @@ Include:
   - the i18n rules (no hard-coded strings)
   - the verification checklist (lint/build, tests when applicable)
 
+## 10) Local Storage Key Rules
+
+- Prefix **`yowu-devtools:`**; legacy `v1` prefixes are not used.
+- Common settings live under `yowu-devtools:common:<name>` (theme, locale, favorites, recent-tools, sidebar state, tool-sort, PWA dismiss timers).
+- Tool data uses `yowu-devtools:<toolId>:state` for primary state and `yowu-devtools:<toolId>:<category>` for related values (histories, presets, `ui:<slot>`, dismiss flags, etc.).
+- Cross-tool/shared caches use `yowu-devtools:share:<name>` (e.g., extension granted-origins).
+- Apply the same prefixing for sessionStorage when used; keep naming consistent with the localStorage scheme.
+
 ---
 
 If this repository’s workflow changes (scripts, structure, i18n conventions), **update this file immediately** so it remains accurate.
-

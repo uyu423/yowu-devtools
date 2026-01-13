@@ -675,7 +675,6 @@ const ApiTesterTool: React.FC = () => {
           description={t('tool.apiTester.description')}
           onReset={resetState}
           onShare={handleShare}
-          beta={true}
         />
       </div>
 
@@ -923,7 +922,7 @@ const ApiTesterTool: React.FC = () => {
           initialLeftWidth={50}
           minLeftWidth={25}
           maxLeftWidth={75}
-          storageKey="api-tester:request-response-split"
+          storageKey="api-tester:ui:request-response-split"
         />
       </div>
 
@@ -974,7 +973,6 @@ export const apiTesterTool: ToolDefinition<ApiTesterState> = {
   category: 'tester',
   defaultState: DEFAULT_STATE,
   Component: ApiTesterTool,
-  beta: true,
 };
 
 export default apiTesterTool;

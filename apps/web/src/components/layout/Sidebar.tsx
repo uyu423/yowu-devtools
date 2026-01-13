@@ -30,10 +30,11 @@ import { useI18n } from '@/hooks/useI18nHooks';
 import { useRecentTools } from '@/hooks/useRecentTools';
 import { useTheme } from '@/hooks/useThemeHooks';
 import { StorageManagerModal } from '@/components/common/StorageManagerModal';
+import { STORAGE_KEYS } from '@/lib/storageKeys';
 
 // 정렬 타입 정의
 type SortType = 'alphabetical' | 'added' | 'newest';
-const SORT_STORAGE_KEY = 'yowu-devtools:v1:app:toolSort';
+const SORT_STORAGE_KEY = STORAGE_KEYS.common.toolSort;
 const SORT_CYCLE: SortType[] = ['alphabetical', 'added', 'newest'];
 
 interface SidebarProps {

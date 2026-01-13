@@ -7,9 +7,10 @@ import { AlertTriangle, ChevronDown, ChevronUp, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useI18n } from '@/hooks/useI18nHooks';
 import { HARD_LIMITS } from '../types';
+import { STORAGE_KEYS } from '@/lib/storageKeys';
 
-const STORAGE_KEY_RESPONSIBLE = 'yowu-devtools:v1:api-burst-test:responsibleUseDismissed';
-const STORAGE_KEY_LIMITATIONS = 'yowu-devtools:v1:api-burst-test:limitationsDismissed';
+const STORAGE_KEY_RESPONSIBLE = STORAGE_KEYS.apiBurstTest.warningResponsibleDismissed;
+const STORAGE_KEY_LIMITATIONS = STORAGE_KEYS.apiBurstTest.warningLimitationsDismissed;
 
 interface CollapsibleBannerProps {
   title: string;

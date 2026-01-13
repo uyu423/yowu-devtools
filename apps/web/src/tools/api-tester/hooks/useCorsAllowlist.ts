@@ -6,8 +6,9 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
+import { STORAGE_KEYS } from '@/lib/storageKeys';
 
-const STORAGE_KEY = 'yowu-devtools:v1:api-cors-allowlist';
+const STORAGE_KEY = STORAGE_KEYS.apiTester.corsAllowlist;
 
 interface UseCorsAllowlistReturn {
   /** Set of allowed origins */
@@ -129,4 +130,3 @@ export const useCorsAllowlist = (): UseCorsAllowlistReturn => {
 };
 
 export default useCorsAllowlist;
-

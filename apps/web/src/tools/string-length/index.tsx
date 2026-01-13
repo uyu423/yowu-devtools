@@ -390,7 +390,7 @@ const StringLengthTool: React.FC = () => {
           resizable
           minHeight={120}
           maxHeight={600}
-          heightStorageKey="string-length-input-height"
+          heightStorageKey="string-length:ui:input-height"
         />
 
         {/* AdSense - Before Statistics */}
@@ -459,4 +459,3 @@ export const stringLengthTool: ToolDefinition<StringLengthToolState> = {
   defaultState: DEFAULT_STATE,
   Component: StringLengthTool,
 };
-

@@ -207,7 +207,7 @@
 - 앱 라우트는 "(locale prefix) + (tool slug)" 구조를 지원
 - **우선순위(중요)**:
   1. URL에 locale prefix가 있으면 그 값을 최우선 사용
-  2. 없으면 localStorage의 `yowu.devtools.locale` 사용
+  2. 없으면 localStorage의 `yowu-devtools:common:locale` 사용
   3. 없으면 `navigator.language`(가능하면 best match)
   4. 최종 fallback은 `en-US`
 
@@ -255,7 +255,7 @@
   - 선택 즉시 **현재 보고 있는 tool slug 유지한 채 locale prefix만 변경**하여 이동
   - URL fragment(공유 payload)가 존재하면 **그대로 유지** (예: `#/...`가 아니라면 `location.hash` 보존)
 - 저장:
-  - localStorage key: `yowu.devtools.locale`
+- localStorage key: `yowu-devtools:common:locale`
   - 값: `en-US | ko-KR | ja-JP | zh-CN | es-ES`
 
 ### 5.0.6 빌드/프리렌더(SSG) 요구사항
@@ -319,8 +319,10 @@
 - 저장 정책: **입력 변경 시 debounce 300ms** 후 저장
 - Key 규칙:
 
-  - 전역: `yowu-devtools:v1:app`
-  - 툴별: `yowu-devtools:v1:tool:<toolId>`
+  - 공통 설정: `yowu-devtools:common:<name>` (테마, 즐겨찾기, 최근 사용, 로케일 등)
+  - 툴 상태: `yowu-devtools:<toolId>:state`
+  - 툴 부가 데이터: `yowu-devtools:<toolId>:<category>` (예: `:history`, `:ui:<slot>`)
+  - 공유 데이터: `yowu-devtools:share:<name>` (확장 권한 캐시 등)
 
 - 저장 데이터(툴별):
 
@@ -445,7 +447,7 @@ const { state, shareState } = useToolState<YamlToolState>(
 
 - 기본: `prefers-color-scheme`를 따라감 (System)
 - 사용자 설정: `System | Light | Dark` 3-state 토글 권장
-- 저장: `yowu-devtools:v1:app.theme = "system"|"light"|"dark"`
+- 저장: `yowu-devtools:common:theme = "system"|"light"|"dark"`
 
 ### 5.5 키보드 단축키 (최소 세트)
 
@@ -487,7 +489,7 @@ const { state, shareState } = useToolState<YamlToolState>(
 
 #### 즐겨찾기 기능
 
-- **저장 위치**: `yowu-devtools:v1:app:favorites` (localStorage)
+- **저장 위치**: `yowu-devtools:common:favorites` (localStorage)
 - **데이터 형식**: `string[]` (도구 ID 배열)
 - **기능**:
   - 각 도구 메뉴 항목에 별 아이콘 표시
@@ -497,7 +499,7 @@ const { state, shareState } = useToolState<YamlToolState>(
 
 #### 최근 사용한 도구 기능
 
-- **저장 위치**: `yowu-devtools:v1:app:recentTools` (localStorage)
+- **저장 위치**: `yowu-devtools:common:recent-tools` (localStorage)
 - **데이터 형식**: `Array<{ toolId: string; timestamp: number }>` (최대 3개)
 - **기능**:
   - 도구 페이지 진입 시 자동으로 기록

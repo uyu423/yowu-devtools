@@ -1,3 +1,5 @@
+import { STORAGE_KEYS } from './storageKeys';
+
 // App version - read from package.json via Vite's define
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const APP_VERSION = ((import.meta as any).env?.APP_VERSION as string | undefined) || '1.0.0';
@@ -21,7 +23,7 @@ export const SUPPORTED_LOCALES: LocaleInfo[] = [
 
 export const DEFAULT_LOCALE: LocaleCode = 'en-US';
 
-export const LOCALE_STORAGE_KEY = 'yowu.devtools.locale';
+export const LOCALE_STORAGE_KEY = STORAGE_KEYS.common.locale;
 
 // Maximum URL length for share links
 // GitHub Pages / CDN limit is typically around 8KB

@@ -8,8 +8,7 @@ import { toast } from 'sonner';
 import { getToolById } from '../tools';
 import { useI18n } from './useI18nHooks';
 import { MAX_SHARE_URL_LENGTH } from '@/lib/constants';
-
-const STORAGE_PREFIX = 'yowu-devtools:v1:tool:';
+import { buildToolStateKey } from '@/lib/storageKeys';
 
 interface StoredToolState<T> {
   state: T;
@@ -82,7 +81,7 @@ function getInitialState<T>(
   }
 
   // Priority 3: Check localStorage (saved state)
-  const raw = window.localStorage.getItem(`${STORAGE_PREFIX}${toolId}`);
+  const raw = window.localStorage.getItem(buildToolStateKey(toolId));
   if (raw) {
     try {
       const parsed = JSON.parse(raw) as StoredToolState<T>;
@@ -165,7 +164,7 @@ export function useToolState<T extends object>(
     // - there's no URL param
     // - we haven't already applied location.state (to prevent overwriting state from navigation)
     if (!payload && !appliedLocationStateRef.current) {
-      const raw = window.localStorage.getItem(`${STORAGE_PREFIX}${toolId}`);
+      const raw = window.localStorage.getItem(buildToolStateKey(toolId));
       if (raw) {
         try {
           const parsed = JSON.parse(raw) as StoredToolState<T>;
@@ -189,7 +188,7 @@ export function useToolState<T extends object>(
             : updater;
         if (typeof window !== 'undefined') {
           window.localStorage.setItem(
-            `${STORAGE_PREFIX}${toolId}`,
+            buildToolStateKey(toolId),
             JSON.stringify({
               state: next,
               updatedAt: Date.now(),

@@ -8,7 +8,8 @@ interface StorageEntry {
   key: string;
   value: string;
   size: number;
-  menu: string;
+  groupId: string;
+  groupLabel: string;
 }
 
 interface StorageManagerModalProps {
@@ -33,7 +34,51 @@ export const StorageManagerModal: React.FC<StorageManagerModalProps> = ({
   const VALUE_PREVIEW_LIMIT = 400;
   const { t } = useI18n();
   const [entries, setEntries] = React.useState<StorageEntry[]>([]);
-  const [menuFilter, setMenuFilter] = React.useState<string>('all');
+  const [groupFilter, setGroupFilter] = React.useState<string>('all');
+
+  const getGroupInfo = React.useCallback(
+    (key: string) => {
+      const PREFIX = 'yowu-devtools:';
+      if (!key.startsWith(PREFIX)) {
+        return {
+          groupId: 'legacy',
+          groupLabel: t('sidebar.storageGroupLegacy'),
+        };
+      }
+
+      const parts = key.slice(PREFIX.length).split(':');
+      const root = parts[0];
+
+      if (root === 'common') {
+        return {
+          groupId: 'common',
+          groupLabel: t('sidebar.storageGroupCommon'),
+        };
+      }
+
+      if (root === 'share') {
+        return {
+          groupId: 'share',
+          groupLabel: t('sidebar.storageGroupShared'),
+        };
+      }
+
+      const toolId = root || t('sidebar.storageMenuUnknown');
+      return {
+        groupId: `tool:${toolId}`,
+        groupLabel: t('sidebar.storageGroupTool').replace('{tool}', toolId),
+      };
+    },
+    [t]
+  );
+
+  const getGroupRank = React.useCallback((groupId: string) => {
+    if (groupId === 'common') return 1;
+    if (groupId === 'share') return 2;
+    if (groupId === 'legacy') return 3;
+    if (groupId.startsWith('tool:')) return 4;
+    return 5;
+  }, []);
 
   const parseEntries = React.useCallback(() => {
     if (typeof window === 'undefined') return;
@@ -43,23 +88,23 @@ export const StorageManagerModal: React.FC<StorageManagerModalProps> = ({
       const key = localStorage.key(i);
       if (!key) continue;
       const value = localStorage.getItem(key) ?? '';
-      const parts = key.split(':');
-      const menu = parts[2] || t('sidebar.storageMenuUnknown');
+      const { groupId, groupLabel } = getGroupInfo(key);
 
       nextEntries.push({
         key,
         value,
         size: new Blob([value]).size,
-        menu,
+        groupId,
+        groupLabel,
       });
     }
     setEntries(nextEntries.sort((a, b) => a.key.localeCompare(b.key)));
-  }, [t]);
+  }, [getGroupInfo]);
 
   React.useEffect(() => {
     if (isOpen) {
       parseEntries();
-      setMenuFilter('all');
+      setGroupFilter('all');
     }
   }, [isOpen, parseEntries]);
 
@@ -75,11 +120,19 @@ export const StorageManagerModal: React.FC<StorageManagerModalProps> = ({
     }
   }, [isOpen, onClose]);
 
-  const menus = Array.from(new Set(entries.map((entry) => entry.menu)));
+  const groups = Array.from(
+    new Map(entries.map((entry) => [entry.groupId, entry.groupLabel])).entries()
+  ).map(([groupId, groupLabel]) => ({ groupId, groupLabel }));
+  const sortedGroups = groups.sort((a, b) => {
+    const rankDiff = getGroupRank(a.groupId) - getGroupRank(b.groupId);
+    if (rankDiff !== 0) return rankDiff;
+    return a.groupLabel.localeCompare(b.groupLabel);
+  });
+
   const filteredEntries =
-    menuFilter === 'all'
+    groupFilter === 'all'
       ? entries
-      : entries.filter((entry) => entry.menu === menuFilter);
+      : entries.filter((entry) => entry.groupId === groupFilter);
 
   const handleDeleteKey = (key: string) => {
     const target = entries.find((entry) => entry.key === key);
@@ -93,12 +146,12 @@ export const StorageManagerModal: React.FC<StorageManagerModalProps> = ({
     }
   };
 
-  const handleDeleteMenu = (menu: string) => {
-    const targets = entries.filter((entry) => entry.menu === menu);
+  const handleDeleteGroup = (groupId: string, groupLabel: string) => {
+    const targets = entries.filter((entry) => entry.groupId === groupId);
     if (targets.length === 0) return;
     const confirmMessage = t('sidebar.storageDeleteMenuConfirm')
       .replace('{count}', targets.length.toString())
-      .replace('{menu}', menu);
+      .replace('{menu}', groupLabel);
     if (window.confirm(confirmMessage)) {
       targets.forEach((entry) => localStorage.removeItem(entry.key));
       parseEntries();
@@ -108,19 +161,29 @@ export const StorageManagerModal: React.FC<StorageManagerModalProps> = ({
   const totalSize = filteredEntries.reduce((sum, entry) => sum + entry.size, 0);
   const groupedEntriesMap = filteredEntries.reduce(
     (map, entry) => {
-      const next = map.get(entry.menu) ?? [];
-      next.push(entry);
-      map.set(entry.menu, next);
+      const next = map.get(entry.groupId) ?? {
+        label: entry.groupLabel,
+        items: [] as StorageEntry[],
+      };
+      next.items.push(entry);
+      map.set(entry.groupId, next);
       return map;
     },
-    new Map<string, StorageEntry[]>()
+    new Map<string, { label: string; items: StorageEntry[] }>()
   );
 
-  const grouped = Array.from(groupedEntriesMap.entries()).map(([menu, items]) => ({
-    menu,
-    items,
-    size: items.reduce((sum, item) => sum + item.size, 0),
-  }));
+  const grouped = Array.from(groupedEntriesMap.entries())
+    .map(([groupId, { label, items }]) => ({
+      groupId,
+      label,
+      items,
+      size: items.reduce((sum, item) => sum + item.size, 0),
+    }))
+    .sort((a, b) => {
+      const rankDiff = getGroupRank(a.groupId) - getGroupRank(b.groupId);
+      if (rankDiff !== 0) return rankDiff;
+      return a.label.localeCompare(b.label);
+    });
 
   if (!isOpen || typeof document === 'undefined') return null;
 
@@ -131,7 +194,7 @@ export const StorageManagerModal: React.FC<StorageManagerModalProps> = ({
     >
       <div className="fixed inset-0 bg-black/40 dark:bg-black/60" />
       <div
-        className="relative w-full max-w-4xl bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden"
+        className="relative w-full max-w-5xl bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
@@ -172,14 +235,14 @@ export const StorageManagerModal: React.FC<StorageManagerModalProps> = ({
                   {t('sidebar.storageMenuLabel')}
                 </span>
                 <Select
-                  value={menuFilter}
-                  onChange={setMenuFilter}
+                  value={groupFilter}
+                  onChange={setGroupFilter}
                   className="min-w-60"
                   options={[
                     { value: 'all', label: t('sidebar.storageMenuAll') },
-                    ...menus.map((menu) => ({
-                      value: menu,
-                      label: menu,
+                    ...sortedGroups.map((group) => ({
+                      value: group.groupId,
+                      label: group.groupLabel,
                     })),
                   ]}
                   size="md"
@@ -199,22 +262,22 @@ export const StorageManagerModal: React.FC<StorageManagerModalProps> = ({
             </div>
           ) : (
             <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
-              {grouped.map(({ menu, items, size }) => (
+              {grouped.map(({ groupId, label, items, size }) => (
                 <div
-                  key={menu}
+                  key={groupId}
                   className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-800 shadow-sm"
                 >
                   <div className="flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-900">
                     <div className="flex flex-col">
                       <span className="text-sm font-semibold text-gray-800 dark:text-gray-100">
-                        {menu}
+                        {label}
                       </span>
                       <span className="text-xs text-gray-500 dark:text-gray-400">
                         {items.length} · {formatSize(size)}
                       </span>
                     </div>
                     <button
-                      onClick={() => handleDeleteMenu(menu)}
+                      onClick={() => handleDeleteGroup(groupId, label)}
                       className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-md hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -222,7 +285,7 @@ export const StorageManagerModal: React.FC<StorageManagerModalProps> = ({
                     </button>
                   </div>
                   <div className="divide-y divide-gray-200 dark:divide-gray-700">
-                    <div className="hidden md:grid grid-cols-12 bg-gray-50/60 dark:bg-gray-900/40 text-xs font-medium text-gray-500 dark:text-gray-400 px-4 py-2">
+                    <div className="hidden md:grid grid-cols-12 gap-3 bg-gray-50/60 dark:bg-gray-900/40 text-xs font-medium text-gray-500 dark:text-gray-400 px-4 py-2">
                       <div className="col-span-6">{t('sidebar.storageKey')}</div>
                       <div className="col-span-3">{t('sidebar.storageValuePreview')}</div>
                       <div className="col-span-2">{t('sidebar.storageSize')}</div>
@@ -231,14 +294,14 @@ export const StorageManagerModal: React.FC<StorageManagerModalProps> = ({
                     {items.map((entry) => (
                       <div
                         key={entry.key}
-                        className="grid grid-cols-12 px-4 py-3 items-start text-sm hover:bg-gray-50 dark:hover:bg-gray-700/60 transition-colors"
+                        className="grid grid-cols-12 gap-3 px-4 py-3 items-start text-sm hover:bg-gray-50 dark:hover:bg-gray-700/60 transition-colors"
                       >
                         <div className="col-span-12 md:col-span-6 space-y-1">
                           <div className="font-mono text-xs text-gray-800 dark:text-gray-100 break-all">
                             {entry.key}
                           </div>
                           <div className="text-[11px] text-gray-500 dark:text-gray-400">
-                            {t('sidebar.storageMenuLabel')}: {entry.menu}
+                            {t('sidebar.storageMenuLabel')}: {entry.groupLabel}
                           </div>
                         </div>
                         <div className="col-span-12 md:col-span-3 mt-2 md:mt-0">
