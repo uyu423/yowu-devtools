@@ -1,5 +1,5 @@
 import { VitePWA } from 'vite-plugin-pwa';
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 import { generateRoutes } from './vite-plugin-generate-routes';
 import path from 'path';
 import react from '@vitejs/plugin-react';
@@ -13,6 +13,9 @@ const appVersion = packageJson.version;
 export default defineConfig({
   define: {
     'import.meta.env.APP_VERSION': JSON.stringify(appVersion),
+  },
+  test: {
+    environment: 'jsdom',
   },
   plugins: [
     react(),

@@ -58,11 +58,22 @@ export function useWebWorker<TRequest, TResponse>({
   useEffect(() => {
     // Worker를 사용하지 않는 경우 처리하지 않음 (상태는 이미 false)
     if (!shouldUseWorker || !isWorkerSupported || !request) {
+      if (timeoutRef.current !== null) {
+        window.clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+      if (workerRef.current) {
+        workerRef.current.terminate();
+        workerRef.current = null;
+      }
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setIsProcessing(false);
+      setError(null);
+      setResult(null);
       return;
     }
 
     // Worker 시작 전 상태 설정 (필수)
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsProcessing(true);
     setError(null);
 
@@ -226,4 +237,3 @@ export function shouldUseWorkerForText(
   const lines = text.split('\n').length;
   return shouldUseWorkerForData(size, lines, sizeThreshold, linesThreshold);
 }
-
