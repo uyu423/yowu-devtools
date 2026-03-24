@@ -202,8 +202,7 @@ const QueryStringTool: React.FC = () => {
 
   const handleCopyParam = (param: ParsedParam) => {
     const value = state.showDecoded ? param.decodedValue : param.rawValue;
-    const text = `${param.key}=${value}`;
-    copyToClipboard(text, t('tool.urlParser.copiedParam').replace('{key}', param.key));
+    copyToClipboard(value, t('tool.urlParser.copiedParam').replace('{key}', param.key));
   };
 
   const handleCopyAll = () => {
